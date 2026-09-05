@@ -30,14 +30,6 @@ _Avoid_: Landmark, POI, city, label
 The line a unit's position follows between one phase and the next, derived by the player from the two positions and never written in a battle file.
 _Avoid_: Path, route, trail, vector, move
 
-**Map**:
-The static geography drawn behind the units, a named file of land and places that a battle may point at and several battles may share; time-varying things never live in it.
-_Avoid_: Background, basemap, layer, terrain
-
-**Place**:
-A named point on the map the renderer labels, such as Cadiz or Cape Trafalgar.
-_Avoid_: Landmark, label, POI, marker
-
 **Furniture**:
 What the renderer draws around the picture without any battle authoring it: the compass rose, the scale bar, the wind indicator.
 _Avoid_: Chrome, overlay, HUD, widgets
