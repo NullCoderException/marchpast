@@ -1,0 +1,48 @@
+{
+  "_comment": "Distilled from docs/research/trafalgar-phases.md (research/trafalgar-phases branch, ticket #9). Times are Mahan's reconciled battle clock; positions are coarse dead reckoning from Cape Trafalgar (36.183N -6.033E): British dawn ~21 nm at ~290 deg, Combined Fleet dawn ~12 nm at ~280 deg, collision point 36.25N -6.20E. Positions are good to a few nautical miles only.",
+  "cape_trafalgar": { "lat": 36.183, "lon": -6.033 },
+  "wind_from_deg": 292,
+  "end": "17:30",
+  "phases": [
+    { "id": "dawn-sighting", "t": "05:40", "t_range": ["05:40", "06:00"],
+      "units": {
+        "weather-column": { "heading": 45, "state": "intact", "strength": 1, "approx": { "lat": 36.30, "lon": -6.44 } },
+        "lee-column":     { "heading": 45, "state": "intact", "strength": 1, "approx": { "lat": 36.28, "lon": -6.40 } },
+        "combined-fleet": { "heading": 180, "state": "intact", "strength": 1, "approx": { "lat": 36.22, "lon": -6.28 } } } },
+    { "id": "bear-up-and-wear", "t": "06:40", "t_range": ["06:00", "08:00"],
+      "units": {
+        "weather-column": { "heading": 75, "state": "intact", "strength": 1 },
+        "lee-column":     { "heading": 90, "state": "intact", "strength": 1 },
+        "combined-fleet": { "heading": 0, "state": "intact", "strength": 1, "note": "wearing S to N; heading transitional" } } },
+    { "id": "slow-approach", "t": "10:00", "t_range": ["09:30", "10:00"],
+      "units": {
+        "weather-column": { "heading": 65, "state": "intact", "strength": 1 },
+        "lee-column":     { "heading": 90, "state": "intact", "strength": 1 },
+        "combined-fleet": { "heading": 5, "state": "intact", "strength": 1, "formation": "crescent" } } },
+    { "id": "lee-column-breaks", "t": "12:00", "t_range": ["11:50", "12:10"],
+      "units": {
+        "weather-column": { "heading": 65, "state": "intact", "strength": 1, "note": "under fire, not replying" },
+        "lee-column":     { "heading": 90, "state": "engaged", "strength": 1, "approx": { "lat": 36.22, "lon": -6.20 } },
+        "combined-fleet": { "heading": 5, "state": "engaged", "strength": 1, "approx": { "lat": 36.25, "lon": -6.20 } } } },
+    { "id": "weather-column-breaks", "t": "13:00", "t_range": ["12:04", "13:00"],
+      "units": {
+        "weather-column": { "heading": 90, "state": "engaged", "strength": 1, "approx": { "lat": 36.28, "lon": -6.22 } },
+        "lee-column":     { "heading": 90, "state": "engaged", "strength": 1 },
+        "combined-fleet": { "heading": 5, "state": "engaged", "strength": 1 } } },
+    { "id": "melee", "t": "14:00", "t_range": ["13:30", "15:00"],
+      "units": {
+        "weather-column": { "heading": 90, "state": "engaged", "strength": 1 },
+        "lee-column":     { "heading": 90, "state": "engaged", "strength": 1 },
+        "combined-fleet": { "heading": 5, "state": "engaged", "strength": 0.6, "note": "Hardy: 12-14 struck of 33; van countermarching" } } },
+    { "id": "van-counterattack-and-retreat", "t": "15:00", "t_range": ["15:00", "16:45"],
+      "units": {
+        "weather-column": { "heading": 0, "state": "engaged", "strength": 1 },
+        "lee-column":     { "heading": 90, "state": "engaged", "strength": 1 },
+        "combined-fleet": { "heading": 20, "state": "broken", "strength": 0.33, "note": "Gravina + 10 haul off NNE for Cadiz; Dumanoir 4 escape SW = detachment move" } } },
+    { "id": "last-shots", "t": "16:45", "t_range": ["16:30", "17:30"],
+      "units": {
+        "weather-column": { "heading": 0, "state": "engaged", "strength": 1 },
+        "lee-column":     { "heading": 0, "state": "engaged", "strength": 1 },
+        "combined-fleet": { "heading": 20, "state": "broken", "strength": 0.33, "note": "11 to Cadiz, 4 to sea, 18 struck/burnt" } } }
+  ]
+}

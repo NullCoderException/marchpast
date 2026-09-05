@@ -1,0 +1,1403 @@
+You are drafting a battle file for a data-driven battle player. The player animates a battle as a sequence of phases; each phase is a snapshot of every unit at one battle-clock instant, and the player tweens positions and headings linearly to the next phase.
+
+# Task
+
+From the two source texts below (Nelson's memorandum of 9 October 1805, and chapter XXIII of Mahan's *Life of Nelson*, 1897), draft `trafalgar.json` for the Battle of Trafalgar, 21 October 1805, conforming to the TypeScript types given.
+
+Constraints:
+
+- **Three units only**, with exactly these ids, sides and labels:
+  - `weather-column`, side `british`, "Nelson's weather column (Victory)"
+  - `lee-column`, side `british`, "Collingwood's lee column (Royal Sovereign)"
+  - `combined-fleet`, side `combined`, "The Combined Fleet (Villeneuve)"
+- **Six to eight phases**, from the fleets sighting each other at dawn to the end of firing. Every phase must list all three units. `t` must be strictly increasing.
+- Positions are real WGS84 latitude/longitude in decimal degrees. The sources give bearings and distances from named places; you may use these known place coordinates for dead reckoning:
+  - Cape Trafalgar: 36.183 N, -6.033 E (i.e. lon -6.033)
+  - Cadiz (city): 36.533 N, -6.300 E
+  - 1 nautical mile = 1/60 degree of latitude; at this latitude 1 degree of longitude is about 48.6 nautical miles.
+- Headings are degrees true, 0 = north, clockwise.
+- Use only what the two texts support. Where the texts are silent or disagree, choose a value and say why in the phase's `notes` field. Do not invent facts from outside the two texts. If you have to estimate a position or time, say so in `notes`.
+- The `sources` table must contain exactly two entries, keyed `memorandum` and `mahan`, and every `references[].source` must be one of those keys. `locator` should be precise enough to find the passage (for Mahan, quote the first few words of the paragraph; for the memorandum, the paragraph). `quote` must be verbatim from the text below.
+- `playback_rate` is battle-clock seconds per real second; choose values so the slow approach compresses and the fighting plays slower.
+
+# Output
+
+Output **only** the JSON document, no prose before or after, no code fence.
+
+# Schema (TypeScript)
+
+```ts
+// PROTOTYPE: draft schema v1 types for the extraction test (wayfinder ticket #11).
+// Hand-derived from ADR-0001..0006 and CONTEXT.md on 2026-09-05. Not the real
+// source of truth; the real types plus runtime validator are written in the build.
+// Fields marked DRAFT are not yet decided by the map (wind #14, licensing #12).
+
+/** A point on the earth: WGS84 decimal degrees. */
+export interface Position {
+  lat: number;
+  lon: number;
+}
+
+/** Battle-clock time of day on the battle date, 24-hour "HH:MM". */
+export type BattleTime = string;
+
+/** Degrees true, 0 = north, clockwise, 0 <= heading < 360. */
+export type Heading = number;
+
+/**
+ * intact    = not in action
+ * engaged   = in action, cohesion held
+ * broken    = cohesion lost, no longer fighting as a body
+ * destroyed = ceased to exist as a fighting unit
+ */
+export type UnitState = "intact" | "engaged" | "broken" | "destroyed";
+
+/**
+ * detachment = part of the unit going where the unit's own position does not
+ * intent     = what the unit was ordered to do, whether or not it happened
+ * A unit's own motion is never a move: the player tweens it from positions.
+ */
+export type MoveKind = "detachment" | "intent";
+
+export interface Move {
+  kind: MoveKind;
+  /** Arrow head. May lie outside the extent. Tail is the unit itself. */
+  to: Position;
+}
+
+/** DRAFT (ticket #14 open): wind as a phase property. */
+export interface Wind {
+  /** Direction the wind blows FROM, degrees true. */
+  from: Heading;
+  /** Free label for now, e.g. "light", "fresh", "gale". */
+  strength?: string;
+}
+
+/** One unit's picture at the phase instant. */
+export interface UnitSnapshot {
+  /** Must match an id in Battle.units. */
+  id: string;
+  /** Centre point of the unit. */
+  position: Position;
+  heading: Heading;
+  /** Formation label styled by the renderer, e.g. "column", "line", "crescent". Not geometry. */
+  formation?: string;
+  state: UnitState;
+  /** Fraction 0..1 of opening fighting strength still fighting as part of the unit. Default 1.
+   *  Damage to ships still in the fight does NOT reduce it; only ships that have left the unit do. */
+  strength?: number;
+  moves?: Move[];
+}
+
+/** A pointer into one entry of Battle.sources. */
+export interface Reference {
+  /** Key into Battle.sources. */
+  source: string;
+  /** Precise enough for a human to find the passage in the cited edition. */
+  locator: string;
+  /** Verbatim from the cited edition. */
+  quote?: string;
+  note?: string;
+}
+
+/**
+ * The authored picture of every unit at one battle-clock instant `t`.
+ * The player tweens positions and headings linearly to the next phase's `t`.
+ * Everything else (state, strength, formation, caption, wind) steps at `t` and holds.
+ */
+export interface Phase {
+  id: string;
+  label: string;
+  t: BattleTime;
+  /** Battle-clock seconds per real second while this phase plays. */
+  playback_rate: number;
+  wind?: Wind;
+  /** Narration shown verbatim; holds until the next phase. */
+  caption: string;
+  /** Author's reasoning about disputed readings. Never animated. */
+  notes?: string;
+  /** At least one. Vouches for the whole phase. */
+  references: Reference[];
+  /** Every unit in Battle.units, every phase. */
+  units: UnitSnapshot[];
+}
+
+export interface Source {
+  /** Short display label, e.g. "Collingwood's dispatch". */
+  label: string;
+  /** Title, author, edition. */
+  work: string;
+  url?: string;
+  /** DRAFT (ticket #12 open). */
+  licence?: string;
+}
+
+/** Battle-level roster entry; identity only, no per-phase data. */
+export interface Unit {
+  id: string;
+  side: string;
+  label: string;
+}
+
+export interface Extent {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
+}
+
+export interface Battle {
+  schema_version: 1;
+  title: string;
+  /** Human-readable, e.g. "21 October 1805". */
+  date: string;
+  /** Fixed lat/lon bounding box for the whole playback. */
+  extent: Extent;
+  /** Scale-bar display unit. */
+  scale_unit: "nmi" | "km";
+  /** Optional relative path to a GeoJSON map file. */
+  map?: string;
+  /** When the last phase's picture stops holding. */
+  end: BattleTime;
+  sources: Record<string, Source>;
+  units: Unit[];
+  /** Strictly increasing `t`. */
+  phases: Phase[];
+}
+```
+
+# Source 1: Nelson, secret memorandum, Victory off Cadiz, 9 October 1805 (as reprinted in Mahan, vol. II, ch. XXII)
+
+MEMORANDUM.
+
+(Secret)
+
+Victory, off CADIZ, 9th October, 1805.
+
+Thinking it almost
+impossible to bring a Fleet of forty Sail of the Line into a
+Line of Battle in variable winds, thick weather, and other
+circumstances which must occur, without such a loss of time that
+the opportunity would probably be lost of bringing the Enemy to
+Battle in such a manner as to make the business decisive, I have
+therefore made up my mind to keep the Fleet in that position of
+sailing (with the exception of the First and Second in Command)
+that the Order of Sailing is to be the Order of Battle, placing
+the Fleet in two Lines of sixteen Ships each, with an Advanced
+Squadron of eight of the fastest sailing Two-decked Ships, which
+will always make, if wanted, a Line of twenty-four Sail, on
+whichever Line the Commander-in-Chief may direct.
+
+The Second in Command
+will, after my intentions are made known to him, have the entire
+direction of his Line to make the attack upon the Enemy, and to
+follow up the blow until they are captured or destroyed.
+
+If the Enemy's Fleet
+should be seen to windward in Line of Battle, and that the two
+Lines and the Advanced Squadron can fetch them, they will
+probably be so extended that their Van could not succour their
+Rear.
+
+I should therefore probably make the Second in Command's signal
+to lead through, about their twelfth Ship from their Rear, (or
+wherever he could fetch, if not able to get so far advanced); my
+Line would lead through about their Centre, and the Advanced
+Squadron to cut two or three or four Ships a-head of their
+Centre, so as to ensure getting at their Commander-in-Chief, on
+whom every effort must be made to capture.
+
+The whole impression of the British Fleet must be to overpower
+from two or three Ships a-head of their Commander-in-Chief
+supposed to be in the Centre, to the Rear of their Fleet. I will
+suppose twenty Sail of the Enemy's Line to be untouched, it must
+be some time before they could perform a manoeuvre to bring
+their force compact to attack any part of the British Fleet
+engaged, or to succour their own Ships, which indeed would be
+impossible without mixing with the Ships engaged.
+
+Something must be left to chance; nothing is sure in a Sea Fight
+beyond all others. Shot will carry away the masts and yards of
+friends as well as foes; but I look with confidence to a Victory
+before the Van of the Enemy could succour their Rear, and then
+that the British Fleet would most of them be ready to receive
+their twenty Sail of the Line, or to pursue them, should they
+endeavour to make off.
+
+If the Van of the Enemy tacks, the Captured Ships must run to
+leeward of the British Fleet; if the Enemy wears, the British
+must place themselves between the Enemy and the Captured, and
+disabled British Ships; and should the Enemy close, I have no
+fears as to the result.
+
+The Second in Command will in
+all possible things direct the movements of his Line, by keeping
+them as compact as the nature of the circumstances will admit.
+Captains are to look to their particular Line as their rallying
+point. But, in case Signals can neither be seen or perfectly
+understood, no Captain can do very wrong if he places his Ship
+alongside that of an Enemy.
+
+Of the intended attack from to windward, the Enemy in Line of
+Battle ready to receive an attack,
+
+The divisions of the
+British Fleet will be brought nearly within gun shot of the
+Enemy's Centre. The signal will most probably then be made for
+the Lee Line to bear up together, to set all their sails, even
+steering sails, in order to get as quickly as possible to the
+Enemy's Line, and to cut through, beginning from the 12 Ship
+from the Enemy's Rear. Some Ships may not get through their
+exact place, but they will always be at hand to assist their
+friends; and if any are thrown round the Rear of the Enemy, they
+will effectually complete the business of twelve Sail of the
+Enemy.
+
+Should the Enemy wear together, or bear up and sail large, still
+the twelve Ships composing, in the first position, the Enemy's
+Rear, are to be the object of attack of the Lee Line, unless
+otherwise directed from the Commander-in-Chief, which is
+scarcely to be expected, as the entire management of the Lee
+Line, after the intentions of the Commander-in-Chief, is
+signified, is intended to be left to the judgment of the Admiral
+commanding that Line.
+
+The
+remainder of the Enemy's Fleet, 34 Sail, are to be left to the
+management of the Commander-in-Chief, who will endeavour to take
+care that the movements of the Second in Command are as little
+interrupted as is possible.
+
+NELSON AND BRONTE.
+
+# Source 2: A. T. Mahan, The Life of Nelson (1897), vol. II, chapter XXIII, "Trafalgar. The death of Nelson", with its footnotes
+
+CHAPTER XXIII.
+
+TRAFALGAR.--THE DEATH OF NELSON.
+
+OCTOBER 19-21, 1805. AGE, 47.
+
+
+Contrary to the general policy that for many years had governed the
+naval undertakings of France and Spain, the combined fleets put to sea
+on the 19th of October, 1805, with the fixed purpose of daring the
+hazard of battle, which they could scarcely expect to avoid. They
+numbered thirty-three ships-of-the-line, eighteen French and fifteen
+Spanish, and were accompanied by five frigates and two brigs, all of
+which were French. This great force in its aggregate was one. There
+were not two separate entities, a French fleet and a Spanish fleet,
+acting in concert, as is often the case in alliances. Whatever the
+administrative arrangements, for cruising and for battle the vessels
+of the two nations were blended in a single mass, at the head of which
+was the French admiral, just as the general direction of the naval
+campaign was in the hands of the French Emperor alone. The
+commander-in-chief was Vice-Admiral Villeneuve, the same that Nelson
+recently had pursued to the West Indies and back to Europe. The
+commander of the Spanish contingent, Vice-Admiral Gravina, was less
+his colleague than his subordinate. There were also flying in the
+combined fleet the flags of four junior admirals, two French and two
+Spanish, and the broad pendants of several commodores.
+
+In the allied force there were four three-decked ships, of from one
+hundred to one hundred and thirty guns, all Spanish, of which one,
+the "Santísima Trinidad," was the largest vessel then afloat. Among
+Nelson's twenty-seven there were seven three-deckers, of ninety-eight
+to one hundred guns; but in the lower rates the British were at a
+disadvantage, having but one eighty-gun ship and three sixty-fours,
+whereas the allies had six of the former and only one of the latter.
+All the other vessels of the line-of-battle were seventy-fours, the
+normal medium type, upon which the experience of most navies of that
+day had fixed, as best fitted for the general purposes of fleet
+warfare. Where more tonnage and heavier batteries were put into single
+ships, it was simply for the purpose of reinforcing the critical
+points of an order of battle; an aim that could not be as effectively
+attained by the combination of two ships, under two captains.
+
+As Nelson said in his celebrated order, so large a body as
+thirty-three heavy vessels is not easily handled, even at sea; and
+leaving port with them is an operation yet more difficult.
+Consequently, the movement which began soon after daylight on the 19th
+was not completed that day. Owing to the falling of the wind, only
+twelve ships got fairly clear of the bay, outside of which they lay
+becalmed. The following morning the attempt was resumed, and by two or
+three o'clock in the afternoon of the 20th the whole combined fleet
+was united, and standing with a fresh southwest wind to the northward
+and westward, to gain room to windward for entering the Straits.
+
+As has been said, the movement that Blackwood recognized at 7 A.M. of
+the 19th was communicated to the admiral at half-past nine. According
+to his announced plan, to cut the enemy off from the Mediterranean, he
+at once made signal for a General Chase to the southeast,--towards
+Cape Spartel,--and the fleet moved off in that direction with a light
+southerly wind. At noon Nelson sat down in his cabin to begin his last
+letter to Lady Hamilton. The words then written he signed, as though
+conscious that no opportunity to continue might offer; nor is it
+difficult to trace that some such thought was then uppermost in his
+mind, and sought expression in the tenderness of farewell. The
+following day, however, he added a few lines, in which the dominant
+note was fear that the enemy might again elude him, by returning into
+port; an apprehension that expelled the previous haunting sense of
+finality. There he laid down the pen, never again to address her
+directly. The letter, thus abruptly closed by death, was found open
+and unsigned upon his desk after the battle.
+
+    Victory, October 19th, 1805, Noon. CADIZ, E.S.E., 16 Leagues.
+
+    MY DEAREST BELOVED EMMA, the dear friend of my bosom. The signal
+    has been made that the Enemy's Combined Fleet are coming out of
+    Port. We have very little wind, so that I have no hopes of
+    seeing them before to-morrow. May the God of Battles crown my
+    endeavours with success; at all events, I will take care that my
+    name shall ever be most dear to you and Horatia, both of whom I
+    love as much as my own life. And as my last writing before the
+    Battle will be to you, so I hope in God that I shall live to
+    finish my letter after the Battle. May Heaven bless you prays
+    your
+
+    NELSON AND BRONTE.
+
+
+    October 20th.
+
+    In the morning, we were close to the Mouth of the Straits, but
+    the wind had not come far enough to the Westward to allow the
+    Combined Fleets to weather the Shoals off Trafalgar; but they
+    were counted as far as forty Sail of Ships of War, which I
+    suppose to be thirty-four of the Line, and six Frigates. A group
+    of them was seen off the Lighthouse of Cadiz this morning, but
+    it blows so very fresh and thick weather, that I rather believe
+    they will go into the Harbour before night. May God Almighty
+    give us success over these fellows, and enable us to get a
+    Peace.
+
+He wrote the same day to his daughter, addressing the letter to Miss
+Horatia Nelson Thompson,[132] by which name she had hitherto been
+known. In the Codicil to his Will, signed on the morning of the 21st,
+a few hours before the battle, he called her his adopted daughter, and
+desired that she would in future use the name of Nelson only.
+
+    Victory, October 19th, 1805.
+
+    MY DEAREST ANGEL,--I was made happy by the pleasure of receiving
+    your letter of September 19th, and I rejoice to hear that you
+    are so very good a girl, and love my dear Lady Hamilton, who
+    most dearly loves you. Give her a kiss for me. The Combined
+    Fleets of the Enemy are now reported to be coming out of Cadiz;
+    and therefore I answer your letter, my dearest Horatia, to mark
+    to you that you are ever uppermost in my thoughts. I shall be
+    sure of your prayers for my safety, conquest, and speedy return
+    to dear Merton, and our dearest good Lady Hamilton. Be a good
+    girl, mind what Miss Connor says to you. Receive, my dearest
+    Horatia, the affectionate parental blessing of your Father,
+
+
+    NELSON AND BRONTE.
+
+The 20th of October opened with fresh breezes from south-southwest and
+heavy rains. At daybreak the British fleet was near the Straits'
+mouth, between Capes Trafalgar and Spartel, unable to see anything,
+but certain that, with the existing winds, the enemy could not have
+anticipated it there. Blackwood's frigates, out of sight to the
+northward, were dogging the path of the allies, of whose general
+position they were certain, although the thick weather hid them from
+observation. At 7 A.M. the frigate "Phoebe" signalled to Nelson that
+the enemy bore north. With the wind as it was, and considering the
+position of the land, they must be standing to the northwest, so that
+the British fleet wore and steered the same course, keeping parallel
+to the enemy and spreading lookouts in their direction. Soon after
+noon, the weather clearing, Blackwood saw the combined fleets where he
+believed them to be, under low sail, and so close that the "Euryalus"
+went about immediately. At 1 P.M. he left the squadron in temporary
+charge of a junior captain, and with his own ship kept away south to
+speak the admiral. At two he sighted the main body, and at 3.20 was
+near enough to send the telegraphic message, "The enemy appears
+determined to push to the westward." "That," wrote Nelson in his
+diary, "they shall _not_ do, if in the power of Nelson and Bronté to
+prevent them," and he telegraphed back, "I rely upon your keeping
+sight of the enemy." The frigates and lookout ships, he noted in his
+journal, had so far discharged their duties most admirably, informing
+him promptly of all the hostile movements; he was justified therefore
+in the confidence that they would do as well in the night now
+approaching.
+
+While Blackwood was communicating, Nelson himself was much of the time
+on the "Victory's" poop. Seeing there a number of midshipmen
+assembled, he observed to them, "This day or to-morrow will be a
+fortunate one for you, young gentlemen," alluding to their prospect of
+promotion after a successful battle. The same day at dinner, he said
+to some of the company, "To-morrow I will do that which will give you
+younger gentlemen something to talk and think about for the rest of
+your lives, but I shall not live to know about it myself;" and he
+added that he expected to capture twenty to twenty-two of the hostile
+fleet.[133] It may be inferred from this remark that by the dinner
+hour, between three and five, he had become satisfied that the enemy
+either would not, or could not, return into port, according to the
+fear he had expressed to Lady Hamilton, and that a battle therefore
+was certain. The letter to her, from its mention of the weather as
+thick, must have been written in the forenoon. His expectation that
+the morrow would prove the decisive day was reinforced by one of those
+prepossessions for coincidences, half jesting, half serious, which are
+natural to men, but fall too far short of conviction to be called
+superstitious. On the 21st of October, 1757, his uncle Maurice
+Suckling had commanded one of three ships-of-the-line which had beaten
+off a superior force. Nelson had several times said to Captain Hardy
+and Dr. Scott, "The 21st will be our day;" and on the morning of the
+battle, when the prediction was approaching fulfilment, he again
+remarked that the 21st of October was the happiest day in the year for
+his family; but he mentioned no reason other than that just given.
+
+The main bodies of the contending navies did not come in sight of each
+other during the 20th; the British lookout frigates, between the two,
+and three or four miles from the allied line, could see their own
+fleet only from the masthead. At about 2 P.M., soon after the weather
+cleared, the wind shifted to west-northwest, taking the ships aback.
+After filling their sails again to the new wind, as this was now fair
+for their approach to the Straits' mouth, the combined fleets wore,
+and headed to the southward. The British remaining on the same tack as
+before,--the port,--stood to the northward until 8 P.M., when they
+also wore to the southwest; but this interval of steering in nearly
+opposite directions changed the relative bearings. At midnight, by the
+log of Blackwood's frigates, the enemy stretched along the eastern
+horizon, while the British bore southwest; the space between the two
+being ten miles. The "Euryalus," three miles from the allies, saw the
+loom of the lights of her own fleet. Still fearful lest the view of
+his ships should shake the enemy's purpose, Nelson was careful not to
+lessen this distance; the more so because the British, having the
+wind, could attack when they pleased, provided the enemy by continuing
+to the southward deprived themselves of the power to regain Cadiz. Two
+British frigates were directed to keep them in sight during the night,
+reporting their movements to two others who were stationed a little
+farther from them, whence a chain of line-of-battle ships communicated
+with the "Victory." Thus, throughout the dark hours, signal lights and
+guns flashed across the waters to Nelson instantaneous information of
+every noteworthy occurrence in the hostile order.
+
+Since the morning of the 19th, the weather, fine for some days
+previous, had become unsettled, working up for the southwest gale
+which wrought so much damage among the victims of the fight. As the
+night of the 20th advanced, the wind fell, and at midnight there were
+only light westerly breezes, inclining to calm. The same conditions
+continued at dawn, and throughout the day of the 21st until after the
+battle; but there was also a great swell from the westward, the
+precursor of a storm. At 4 A.M. the British fleet again wore, and was
+standing northeast when the day broke.
+
+After leaving Cadiz, in order to avoid separations during the night,
+or in thick weather, the combined fleets had been disposed in five
+columns, a formation whose compactness, though not suited to an
+engagement, was less liable to straggling than a single long line, and
+brought all parts more directly under the control of the
+commander-in-chief at the centre. Of the five, the two to windward, of
+six ships each, constituted a reserve, similar to Nelson's proposed
+detachment of eight. It was commanded by Admiral Gravina, and was
+intended to reinforce such part of the battle as should appear to
+require it; an object for which the windward position was of the
+utmost moment, as it was for all naval initiative in that day. This
+advantage the allies did not have on the morning of Trafalgar. When
+Villeneuve, therefore, formed the line of battle, these twelve ships
+were at once incorporated with it, taking the lead of their order as
+it stood to the southward, with the wind at west-northwest,--a long
+column stretching over five miles of sea from end to end.
+
+In a general sense, then, it may be said that, when daylight showed
+the enemies to each other, the British fleet was heading to the
+northward, and that of the allies to the southward; the latter being
+ten or twelve miles east of their opponents. In the far distance, Cape
+Trafalgar, from which the battle takes its name, was just visible
+against the eastern sky. At twenty minutes before seven Nelson made in
+quick succession the signals, "To form the order of sailing,"--which
+by his previous instructions was to be the order of battle,--and "To
+prepare for battle." Ten minutes later followed the command to "Bear
+up," the "Victory" setting the example by at once altering her course
+for the enemy. Collingwood did the same, and the ships of the two
+divisions fell into the wake of their leaders as best they could, for
+the light wind afforded neither the means nor the time for refinements
+in manoeuvring. Fourteen ships followed the "Royal Sovereign," which
+bore Collingwood's flag, while the remaining twelve gathered in
+Nelson's division behind the "Victory."[134] The two columns steered
+east, about a mile apart, that of Nelson being to the northward; from
+which circumstance, the wind being west-northwest, it has been called
+commonly the weather line.
+
+Thus, as Ivanhoe, at the instant of encounter in the lists, shifted
+his lance from the shield to the casque of the Templar, Nelson, at the
+moment of engaging, changed the details of his plan, and substituted
+an attack in two columns, simultaneously made, for the charge of
+Collingwood's division, in line and in superior numbers, upon the
+enemy's flank; to be followed, more or less quickly, according to
+indications, by such movement of his own division as might seem
+advisable. It will be observed, however, that the order of sailing
+remained the order of battle,--probably, although it is not so stated,
+the fleet was already thus disposed when the signal was made, needing
+only rectification after the derangements incident to darkness,--and
+further, that the general direction of attack continued the same,
+Collingwood guiding his column upon the enemy's southern flank, while
+Nelson pointed a few ships north of their centre. In this way was
+preserved the comprehensive aim which underlay the particular
+dispositions of his famous order: "The whole impression of the British
+fleet must be to overpower from two or three ships ahead of their
+commander-in-chief, supposed to be in the Centre, to the Rear of their
+fleet." The northern flank of the allies--ten or a dozen ships--was
+consequently left unengaged, unless by their own initiative they came
+promptly into action; which, it may be added, they did not do until
+after the battle was decided.
+
+When the development of the British movement was recognized by
+Villeneuve, he saw that fighting was inevitable; and, wishing to keep
+Cadiz, then twenty miles to the northward and eastward, under his lee,
+he ordered the combined fleets to wear together.[135] The scanty wind
+which embarrassed the British impeded this manoeuvre also, so that it
+was not completed till near ten o'clock. Nelson, however, noted its
+beginning at seven, and with grave concern; for not only would it put
+the allies nearer their port, as it was intended to do, but it would
+cause vessels crippled in the action to find to leeward of them,
+during the gale which he foresaw, the dangerous shoals off Trafalgar
+instead of the open refuge of the Straits. The appreciation of the
+peril thus entailed led him to make a signal for all the ships to be
+prepared to anchor after the battle, for it was not to be hoped that
+the spars of many of them would be in a condition to bear sail. The
+result of the allied movement was to invert their order. Their ships,
+which had been steering south, now all headed north; the van became
+the rear; Gravina, who had been leading the column, was in the rear
+ship; and it was upon this rear, but still the southern flank of the
+hostile array, that the weight of Collingwood's attack was to fall.
+
+Soon after daylight Nelson, who, according to his custom, was already
+up and dressed, had gone on deck. He wore as usual his admiral's frock
+coat, on the left breast of which were stitched the stars of four
+different Orders that he always bore. It was noticed that he did not
+wear his sword at Trafalgar, although it lay ready for him on the
+cabin table; and it is supposed he forgot to call for it, as this was
+the only instance in which he was known not to carry it when engaged.
+At about six o'clock he summoned Captain Blackwood on board the
+"Victory." This officer had had a hard fag during the past forty-eight
+hours, dogging the enemy's movements through darkness and mist; but
+that task was over, and his ambition now was to get command of one of
+two seventy-fours, whose captains had gone home with Calder to give
+evidence at his trial. "My signal just made on board the Victory," he
+wrote to his wife. "I hope to order me to a vacant line-of-battle
+ship." Nelson's purpose, however, as far as stated by Blackwood, was
+simply to thank him for the successful efforts of the past two days,
+and to have him by his side till the flagship came under fire, in
+order to receive final and precise instructions, as the situation
+developed, for the conduct of the frigates during and after the
+battle. To Blackwood's congratulations upon the approach of the moment
+that he had, to use his own word, panted for, he replied: "I mean
+to-day to bleed the captains of the frigates, as I shall keep you on
+board to the very last moment."
+
+Blackwood found him in good but very calm spirits, preoccupied with
+the movements of the allies, and the probable results of his own plan
+of attack. He frequently asked, "What would you consider a victory?"
+Blackwood answered: "Considering the handsome way in which the battle
+is offered by the enemy, their apparent determination for a fair trial
+of strength, and the proximity of the land, I think if fourteen ships
+are captured, it will be a glorious result." Nelson's constant reply
+was that he would not be satisfied with anything short of twenty. He
+admitted, however, that the nearness of the land might make it
+difficult to preserve the prizes, and he was emphatic in directing
+that, if the shattered enemies had any chance of returning to Cadiz,
+the frigates were to be actively employed in destroying them, and were
+not to be diverted from that single aim in order to save either ships
+or men. Annihilation, he repeated, was his aim, and nothing short of
+it; and he must have regretted the absence of the six of the line in
+the Mediterranean, imperative as that had been. Word had been sent for
+them to Gibraltar by Blackwood the moment the enemy moved, but they
+were still away with the convoy.
+
+Blackwood, being a great personal friend of the admiral, took the
+liberty, after exchanging greetings, of submitting to him the
+expediency of shifting his flag to the "Euryalus," and conducting the
+battle from her. Nelson made no reply, but immediately ordered more
+sail to be made upon the "Victory." Finding himself foiled in this,
+Blackwood then made a direct request for the command of one of the
+two vacant seventy-fours. This would give him a chance to share in
+the fight, which in a frigate he probably would not have, but it would
+also displace the first lieutenant of the ship from the position to
+which he had succeeded temporarily. Nelson replied instantly, "No,
+Blackwood, it is those men's birthright, and they shall have it."[136]
+The incident shows vividly the lively sympathy and sense of justice
+which ever distinguished Nelson; for it must have pained him to deny a
+request so consonant to his own temper, coming from one whom he had
+long known and valued, both as a friend and as an officer, and of
+whose recent service such orders would have been a graceful and
+appropriate acknowledgment. It may be desirable to explain to
+unprofessional readers what was the claim of the lieutenants which
+Nelson refused to ignore. The efficiency of the ships for the coming
+day's work was due to them scarcely less than to the absent captains,
+and if they survived the battle, having been in command through it,
+they would reap not only the honor but also their confirmation in the
+rank of post-captain, through having exercised it in actual battle.
+This succession the admiral aptly called their birthright.
+
+Nelson availed himself of Blackwood's presence to have him, together
+with Hardy, witness his signature to a paper, in which he bequeathed
+Lady Hamilton and the child Horatia to the care of the nation, and
+which consequently has been styled a Codicil to his Will. Unless
+Blackwood's memory a few years later was at fault, in stating that his
+signal was made at six o'clock,[137] it is likely enough that this
+early summons was for the special purpose of giving formal
+completeness, by the attestation of two of his closest friends, to a
+private duty which was the last to engage Nelson's attention and
+affections; for, in addition to the date, the place and hour of his
+writing are fixed by the words, "In sight of the Combined Fleets of
+France and Spain, distant about ten miles." This was the common
+estimate of the relative positions, made by the British fleet at large
+at daybreak, and coincides fairly well with the inferences to be
+drawn, from the slow rate of speed at which the wind permitted the
+British to advance, and from the hour the conflict began. Nor was
+there time, nor convenient room, for further delay. A freshening
+breeze might readily have brought the fleet into action in a couple of
+hours, and it is the custom in preparing for battle--the signal for
+which was made at 6.40--to remove most of the conveniences, and
+arrangements for privacy, from the living spaces of the officers;
+partly to provide against their destruction, chiefly to clear away all
+impediments to fighting the guns, and to moving about the ship. In the
+case of the admiral, of course, much might be postponed to the last
+moment, but in fact his cabin was cleared of fixtures immediately
+after he went on the poop in the early morning; for it is distinctly
+mentioned that while there he gave particular directions in the
+matter, and enjoined great care in handling the portrait of Lady
+Hamilton, saying, "Take care of my guardian angel."
+
+It seems, therefore, probable that this so-called Codicil was written
+in the quiet minutes of the morning, while the fleet was forming its
+order of sailing and bearing up for the enemy, but before the
+admiral's cabin was cleared for battle. In it Nelson first recounted,
+briefly but specifically, "the eminent services of Emma Hamilton" to
+the state, on two occasions, as believed by himself to have been
+rendered. Into the actuality of these services it is not necessary
+here to inquire;[138] it is sufficient to say that Nelson's knowledge
+of them could not have been at first hand, and that the credence he
+unquestionably gave to them must have depended upon the evidence of
+others,--probably of Lady Hamilton herself, in whom he felt, and
+always expressed, the most unbounded confidence. "Could I have
+rewarded these services," the paper concludes, "I would not now call
+upon my Country; but as that has not been in my power, I leave Emma
+Lady Hamilton, therefore, a legacy to my King and Country, that they
+will give her an ample provision to maintain her rank in life. I also
+leave to the beneficence of my Country my adopted daughter, Horatia
+Nelson Thompson; and I desire she will use in future the name of
+Nelson only. These are the only favours I ask of my King and Country
+at this moment when I am going to fight their battle. May God bless my
+King and Country, and all those who I hold dear. My relations it is
+needless to mention: they will of course be amply provided for."
+
+At seven o'clock Nelson had returned from the poop to the cabin, for
+at that hour was made in his private journal the last entry of
+occurrences,--"At seven the combined fleets wearing in succession."
+Here it seems likely that he laid down the pen, for, when he was found
+writing again, some hours later, it was to complete the long record of
+experiences and of duties, with words that summed up, in fit and most
+touching expression, the self-devotion of a life already entering the
+shadow of death.
+
+Between eight and nine o'clock the other frigate commanders came on
+board the "Victory;" aides-de-camp, as it were, waiting to the last
+moment to receive such orders as might require more extensive wording,
+or precise explanation, than is supplied by the sententious phrases of
+the signal-book. Blackwood himself, a captain of long standing and of
+tried ability, was in fact intrusted contingently with no small share
+of the power and discretion of the commander-in-chief. "He not only
+gave me command of all the frigates, but he also gave me a latitude,
+seldom or ever given, that of making any use I pleased of his name, in
+ordering any of the sternmost line-of-battle ships to do what struck
+me as best." While thus waiting, the captains accompanied the admiral
+in an inspection which he made of the decks and batteries of the
+flagship. He addressed the crew at their several quarters, cautioned
+them against firing a single shot without being sure of their object,
+and to the officers he expressed himself as highly satisfied with the
+arrangements made.
+
+Meanwhile the two fleets were forming, as best they could with the
+scanty breeze, the order in which each meant to meet the shock of
+battle. The British could not range themselves in regular columns
+without loss of time that was not to be thrown away. They advanced
+rather in two elongated groups, all under full sail, even to
+studding-sails on both sides, the place of each ship being determined
+chiefly by her speed, or, perhaps, by some fortuitous advantage of
+position when the movement began. The great point was to get the heads
+of the columns into action as soon as possible, to break up the
+enemy's order. That done, those which followed could be trusted to
+complete the business on the general lines prescribed by Nelson.
+Collingwood's ship, the "Royal Sovereign," being but a few days out
+from home, and freshly coppered, easily took the lead in her own
+division. After her came the "Belleisle," also a recent arrival off
+Cadiz, but an old Mediterranean cruiser which had accompanied Nelson
+in the recent chase to the West Indies. Upon these two ships, as upon
+the heads of all columns, fell the weight of destruction from the
+enemy's resistance.
+
+The "Victory," always a fast ship, had likewise little difficulty in
+keeping her place at the front. Blackwood, having failed to get Nelson
+on board his own frigate, and realizing the exposure inseparable from
+the position of leader, ventured, at about half-past nine, when still
+six miles from the enemy, to urge that one or two ships should be
+permitted to precede the "Victory." Nelson gave a conditional
+assent--"Let them go," if they can. The "Téméraire," a three-decker,
+being close behind, was hailed to go ahead, and endeavored to do so;
+but at the same moment the admiral gave an indication of how little
+disposed he was to yield either time or position. The lee lower
+studding-sail happening to be badly set, the lieutenant of the
+forecastle had it taken in, meaning to reset it; which Nelson
+observing, ran forward and rated him severely for delaying the ship's
+progress. Anything much less useful than a lee lower studding-sail is
+hard to imagine, but by this time the admiral was getting very
+restive. "About ten o'clock," says Blackwood, "Lord Nelson's anxiety
+to close with the enemy became very apparent: he frequently remarked
+that they put a good face upon it; but always quickly added: 'I'll
+give them such a dressing as they never had before.'"
+
+Seeing that the "Téméraire" could not pass the "Victory" in time to
+lead into the hostile order, unless the flagship gave way, Blackwood,
+feeling perhaps that he might wear out his own privilege, told Hardy
+he ought to say to the admiral that, unless the "Victory" shortened
+sail, the other ships could not get into place; but Hardy naturally
+demurred. In any event, it was not just the sort of proposition that
+the captain of the ship would wish to make, and it was very doubtful
+how Nelson might take it. This the latter soon showed, however; for,
+as the "Téméraire" painfully crawled up, and her bows doubled on the
+"Victory's" quarter, he hailed her, and speaking as he always did with
+a slight nasal intonation, said: "I'll thank you, Captain Harvey, to
+keep in your proper station, which is astern of the Victory." The same
+concern for the admiral's personal safety led the assembled officers
+to comment anxiously upon the conspicuous mark offered by his blaze of
+decorations, knowing as they did that the enemy's ships swarmed with
+soldiers, that among them were many sharpshooters, and that the action
+would be close. None, however, liked to approach him with the
+suggestion that he should take any precaution. At length the surgeon,
+whose painful duty it was a few hours later to watch over the sad
+fulfilment of his apprehensions, said that he would run the risk of
+his Lordship's displeasure; but before he could find a fitting
+opportunity to speak, a shot flew over the "Victory," and the admiral
+directed all not stationed on deck to go to their quarters. No remark
+therefore was made; but it is more likely that Nelson would have
+resented the warning than that he would have heeded it.
+
+The French and Spanish fleets, being neither a homogeneous nor a
+well-exercised mass, experienced even greater difficulty than the
+British in forming their array; and the matter was to them of more
+consequence, for, as the defensive has an advantage in the careful
+preparations he may make, so, if he fail to accomplish them, he has
+little to compensate for the loss of the initiative, which he has
+yielded his opponent. The formation at which they aimed, the customary
+order of battle in that day, was a long, straight, single column,
+presenting from end to end an unbroken succession of batteries, close
+to one another and clear towards the foe, so that all the ships should
+sweep with their guns the sea over which, nearly at right angles, the
+hostile columns were advancing. Instead of this, embarrassed by both
+lack of wind and lack of skill, their manoeuvres resulted in a curved
+line, concave to the enemy's approach; the horns of the crescent thus
+formed being nearer to the latter. Collingwood noted that this
+disposition facilitated a convergent fire upon the assailants, the
+heads of whose columns were bearing down on the allied centre; it does
+not seem to have been remarked that the two horns, or wings, being to
+windward of the centre, also had it more in their power to support the
+latter--a consideration of very great importance. Neither of these
+advantages, however, was due to contrivance. The order of the combined
+fleets was the result merely of an unsuccessful effort to assume the
+usual line of battle. The ships distributed along the crescent lay
+irregularly, sometimes two and three abreast, masking each other's
+fire. On the other hand, even this irregularity had some
+compensations, for a British vessel, attempting to pass through at
+such a place, fell at once into a swarm of enemies. From horn to horn
+was about five miles. Owing to the lightness of the breeze, the allies
+carried a good deal of sail, a departure from the usual battle
+practice. This was necessary in order to enable them to keep their
+places at all, but it also had the effect of bringing them
+continually, though very gradually, nearer to Cadiz. Seeing this,
+Nelson signalled to Collingwood, "I intend to pass through the van of
+the enemy's line, to prevent him from getting into Cadiz," and the
+course of the "Victory," for this purpose, was changed a little to the
+northward.
+
+After this, towards eleven o'clock, Nelson went below to the cabin. It
+was his habit, when an engagement was expected, to have all the
+bulkheads[139] upon the fighting decks taken down, and those of his
+own apartments doubtless had been removed at least as soon as the
+enemy's sailing was signalled; but it was possible to obtain some
+degree of privacy by hanging screens, which could be hurried out of
+the way at the last moment. The "Victory" did not come under fire till
+12.30, so that at eleven she would yet be three miles or more distant
+from the enemy,[140] and screens could still remain. Shortly, after he
+entered, the signal-lieutenant, who had been by his side all the
+morning, followed him, partly to make an official report, partly to
+prefer a personal request. He was the ranking lieutenant on board, but
+had not been permitted to exercise the duties of first lieutenant,
+because Nelson some time before, to avoid constant changes in that
+important station, had ordered that the person then occupying it
+should so continue, notwithstanding the seniority of any who might
+afterwards join. Now that battle was at hand, the oldest in rank
+wished to claim the position, and to gain the reward that it insured
+after a victory,--a request natural and not improper, but more suited
+for the retirement of the cabin than for the publicity of the deck.
+
+Whatever the original injustice,--or rather hardship,--it is scarcely
+likely, remembering the refusal encountered by Blackwood, that Nelson
+would have consented now to deprive of his "birthright" the man who so
+far had been doing the work; but the petition was never preferred.
+Entering the cabin, the officer paused at the threshold, for Nelson
+was on his knees writing. The words, the last that he ever penned,
+were written in the private diary he habitually kept, in which were
+noted observations and reflections upon passing occurrences, mingled
+with occasional self-communings. They followed now, without break of
+space, or paragraph, upon the last incident recorded--"At seven the
+enemy wearing in succession"--and they ran thus:--
+
+"May the Great God, whom I worship, grant to my Country, and for the
+benefit of Europe in general, a great and glorious victory; and may no
+misconduct in any one tarnish it; and may humanity after victory be
+the predominant feature in the British fleet. For myself,
+individually, I commit my life to Him who made me, and may His
+blessing light upon my endeavours for serving my Country faithfully.
+To Him I resign myself and the just cause which is entrusted to me to
+defend. Amen. Amen. Amen."
+
+The officer, Lieutenant Pasco, waited quietly till Nelson rose from
+his knees, and then made his necessary report; but, although his
+future prospects hung upon the wish he had to express, he refrained
+with singular delicacy from intruding it upon the preoccupation of
+mind evidenced by the attitude in which he had found his commander.
+The latter soon afterwards followed him to the poop, where Blackwood
+was still awaiting his final instructions. To him Nelson said, "I will
+now amuse the fleet with a signal;" and he asked if he did not think
+there was one yet wanting. Blackwood replied that the whole fleet
+seemed very clearly to understand what they were about, and were vying
+with each other to get as near as possible to the leaders of the
+columns. Upon this succeeded the celebrated signal, the development of
+which to its final wording is a little uncertain. Comparing the
+various accounts of witnesses, it seems probably to have been as
+follows. Nelson mused for a little while, as one who phrases a thought
+in his own mind before uttering it, and then said, "Suppose we
+telegraph 'Nelson confides that every man will do his duty.'" In this
+form it was the call of the leader to the followers, the personal
+appeal of one who trusts to those in whom he trusts, a feeling
+particularly characteristic of the speaker, whose strong hold over
+others lay above all in the transparent and unswerving faith he showed
+in their loyal support; and to arouse it now in full force he used the
+watchword "duty," sure that the chord it struck in him would find its
+quick response in every man of the same blood. The officer to whom the
+remark was made, suggested "England" instead of "Nelson." To the fleet
+it could have made no difference,--to them the two names meant the
+same thing; but Nelson accepted the change with delight. "Mr. Pasco,"
+he called to the signal officer, "I wish to say to the fleet, 'England
+confides that every man will do his duty;'" and he added, "You must be
+quick, for I have one more to make, which is for close action." This
+remark shows that the columns, and particularly Collingwood's ship,
+were already nearing the enemy. Pasco answered, "If your Lordship will
+permit me to substitute 'expects' for 'confides,' it will be sooner
+completed, because 'expects' is in the vocabulary,[141] and 'confides'
+must be spelt." Nelson replied hastily, but apparently satisfied,
+"That will do, Pasco, make it directly;" but the slightly mandatory
+"expects" is less representative of the author of this renowned
+sentence than the cordial and sympathetic "confides." It is "Allez,"
+rather than "Allons;" yet even so, become now the voice of the distant
+motherland, it carries with it the shade of reverence, as well as of
+affection, which patriotism exacts.
+
+It is said that Collingwood, frequently testy, and at the moment
+preoccupied with the approaching collision with the Spanish
+three-decker he had marked for his opponent, exclaimed impatiently
+when the first number went aloft, "I wish Nelson would stop
+signalling, as we know well enough what we have to do." But the two
+life-long friends, who were not again to look each other in the face,
+soon passed to other thoughts, such as men gladly recall when death
+has parted them. When the whole signal was reported to him, and cheers
+resounded along the lines, Collingwood cordially expressed his own
+satisfaction. A few moments later, just at noon, the French ship
+"Fougueux," the second astern of the "Santa Ana," for which the "Royal
+Sovereign" was steering, fired at the latter the first gun of the
+battle. As by a common impulse the ships of all the nations engaged
+hoisted their colors, and the admirals their flags,--a courteous and
+chivalrous salute preceding the mortal encounter. For ten minutes the
+"Royal Sovereign" advanced in silence, the one centre of the hostile
+fire, upon which were fixed all eyes, as yet without danger of their
+own to distract. As she drew near the two ships between which she
+intended to pass, Nelson exclaimed admiringly, "See how that noble
+fellow Collingwood carries his ship into action." At about the same
+instant Collingwood was saying to his flag-captain, "Rotherham, what
+would Nelson give to be here!"
+
+These things being done, Nelson said to Blackwood, "Now I can do no
+more. We must trust to the great Disposer of all events, and to the
+justice of our cause. I thank God for this great opportunity of doing
+my duty." When his last signal had been acknowledged by a few ships in
+the van, the admiral directed Pasco to make that for close action, and
+to keep it up. This was accordingly hoisted on board the flagship,
+where it was flying still as she disappeared into the smoke of the
+battle, and so remained till shot away. The "Victory" was about two
+miles from the "Royal Sovereign" when the latter, at ten minutes past
+twelve, broke through the allied order, and she had still a mile and a
+half to go before she herself could reach it. At twenty minutes past
+twelve Villeneuve's flagship, the "Bucentaure," of eighty guns, fired
+a shot at her, to try the range. It fell short. A few minutes later a
+second was fired, which dropped alongside. The distance then was a
+mile and a quarter. Two or three followed in rapid succession and
+passed over the "Victory." Nelson then turned to Blackwood, and
+directed him and Captain Prowse of the "Sirius" to return to their
+ships, but in so doing to pass along the column and tell the captains
+he depended upon their exertions to get into action as quickly as
+possible. He then bade them again to go away. Blackwood, who was
+standing by him at the forward end of the poop, took his hand, and
+said, "I trust, my Lord, that on my return to the Victory, which will
+be as soon as possible, I shall find your Lordship well and in
+possession of twenty prizes." Nelson replied, "God bless you,
+Blackwood, I shall never speak to you again."
+
+The "Victory" was all the time advancing, the feeble breeze urging her
+progress, which was helped also by her lurching through the heavy
+following swell that prevailed. Before Blackwood could leave her, a
+shot passed through the main-topgallantsail, and the rent proclaimed
+to the eager eyes of the foes that the ship was fairly under their
+guns. Thereupon everything about the "Bucentaure," some seven or eight
+ships, at least, opened upon this single enemy, as the allied rear and
+centre had upon the "Royal Sovereign;" for it was imperative to stop
+her way, if possible, or at least to deaden it, and so to delay as
+long as might be the moment when she could bring her broadside to bear
+effectively. During the forty minutes that followed, the "Victory" was
+an unresisting target to her enemies, and her speed, slow enough at
+the first, decreased continually as the hail of shot riddled the
+sails, or stripped them from the yards. Every studding-sail boom was
+shot away close to the yard arms, and this light canvas, invaluable in
+so faint a wind, fell helplessly into the water. During these trying
+moments, Mr. Scott, the admiral's public secretary, was struck by a
+round shot while talking with Captain Hardy, and instantly killed.
+Those standing by sought to remove the body without drawing Nelson's
+attention to the loss of one so closely associated with him; but the
+admiral had noticed the fall. "Is that poor Scott," he said, "who is
+gone?" The clerk who took the dead man's place was killed a few
+moments later by the wind of a ball, though his person was untouched.
+
+The "Victory" continuing to forge slowly ahead, despite her injuries,
+and pointing evidently for the flagship of the hostile
+commander-in-chief, the ships round the latter, to use James's
+striking phrase, now "closed like a forest." The nearer the British
+vessel drew, the better necessarily became the enemies' aim. Just as
+she got within about five hundred yards--quarter of a mile--from the
+"Bucentaure's" beam, the mizzen topmast was shot away. At the same
+time the wheel was hit and shattered, so that the ship had to be
+steered from below, a matter that soon became of little importance. A
+couple of minutes more, eight marines were carried off by a single
+projectile, while standing drawn up on the poop, whereupon Nelson
+ordered the survivors to be dispersed about the deck. Presently a shot
+coming in through the ship's side ranged aft on the quarter-deck
+towards the admiral and Captain Hardy, between whom it passed. On its
+way it struck the fore-brace bitts--a heavy block of timber--carrying
+thence a shower of splinters, one of which bruised Hardy's foot. The
+two officers, who were walking together, stopped, and looked
+inquiringly at each other. Seeing that no harm was done, Nelson
+smiled, but said, "This is too warm work, Hardy, to last long." He
+then praised the cool resolution of the seamen around him, compelled
+to endure this murderous fire without present reply. He had never, he
+said, seen better conduct. Twenty men had so far been killed and
+thirty wounded, with not a shot fired from their own guns.
+
+Still the ship closed the "Bucentaure." It had been Nelson's purpose
+and desire to make her his special antagonist, because of Villeneuve's
+flag; but to do so required room for the "Victory" to turn under the
+French vessel's stern, and to come up alongside. As she drew near,
+Hardy, scanning the hostile array, saw three ships crowded together
+behind and beyond the "Bucentaure." He reported to Nelson that he
+could go close under her stern, but could not round-to alongside, nor
+pass through the line, without running on board one of these. The
+admiral replied, "I cannot help it, it does not signify which we run
+on board of. Go on board which you please: take your choice." At one
+o'clock the bows of the "Victory" crossed the wake of the
+"Bucentaure," by whose stern she passed within thirty feet, the
+projecting yard arms grazing the enemy's rigging. One after another,
+as they bore, the double-shotted guns tore through the woodwork of the
+French ship, the smoke, driven back, filling the lower decks of the
+"Victory," while persons on the upper deck, including Nelson himself,
+were covered with the dust which rose in clouds from the wreck. From
+the relative positions of the two vessels, the shot ranged from end to
+end of the "Bucentaure," and the injury was tremendous. Twenty guns
+were at once dismounted, and the loss by that single discharge was
+estimated, by the French, at four hundred men. Leaving the further
+care of the enemy's flagship to her followers, secure that they would
+give due heed to the admiral's order, that "every effort must be made
+to capture the hostile commander-in-chief," the "Victory" put her helm
+up, inclining to the right, and ran on board a French seventy-four,
+the "Redoutable," whose guns, as well as those of the French
+"Neptune," had been busily playing upon her hitherto. At 1.10 she lay
+along the port side of the "Redoutable," the two ships falling off
+with their heads to the eastward, and moving slowly before the wind to
+the east-southeast.
+
+In the duel which ensued between these two, in which Nelson fell, the
+disparity, so far as weight of battery was concerned, was all against
+the French ship; but the latter, while greatly overmatched at the
+guns, much the greater part of which were below deck, was markedly
+superior to her antagonist in small-arm fire on the upper deck, and
+especially aloft, where she had many musketeers stationed. Nelson
+himself was averse to the employment of men in that position, thinking
+the danger of fire greater than the gain, but the result on this day
+was fatal to very many of the "Victory's" men as well as to himself.
+As the ship's place in the battle was fixed for the moment, nothing
+now remained to be done, except for the crews to ply their weapons
+till the end was reached. The admiral and the captain, their parts of
+direction and guidance being finished, walked back and forth together
+on the quarter-deck, on the side farthest from the "Redoutable," where
+there was a clear space of a little over twenty feet in length, fore
+and aft, from the wheel to the hatch ladder leading down to the cabin.
+The mizzen-top of the "Redoutable," garnished with sharpshooters, was
+about fifty feet above them. Fifteen minutes after the vessels came
+together, as the two officers were walking forward, and had nearly
+reached the usual place of turning, Nelson, who was on Hardy's left,
+suddenly faced left about. Hardy, after taking a step farther, turned
+also, and saw the admiral in the act of falling--on his knees, with
+his left hand touching the deck; then, the arm giving way, he fell on
+his left side. It was in the exact spot where Scott, the secretary,
+had been killed an hour before. To Hardy's natural exclamation that he
+hoped he was not badly hurt, he replied, "They have done for me at
+last;" and when the expression of hope was repeated, he said again,
+"Yes, my back-bone is shot through." "I felt it break my back," he
+told the surgeon, a few minutes later. The ball had struck him on the
+left shoulder, on the forward part of the epaulette, piercing the
+lung, where it severed a large artery, and then passed through the
+spine from left to right, lodging finally in the muscles of the back.
+Although there was more than one mortal injury, the immediate and
+merciful cause of his speedy death was the internal bleeding from the
+artery. Within a few moments of his wounding some forty officers and
+men were cut down by the same murderous fire from the tops of the
+enemy. Indeed so stripped of men was the upper deck of the "Victory"
+that the French made a movement to board, which was repulsed, though
+with heavy loss.
+
+The stricken hero was at once carried below, himself covering his face
+and the decorations of his coat with his handkerchief, that the sight
+of their loss might not affect the ship's company at this critical
+instant. The cockpit was already cumbered with the wounded and dying,
+but the handkerchief falling from his face, the surgeon recognized
+him, and came at once to him. "You can do nothing for me, Beatty," he
+said; "I have but a short time to live." The surgeon also uttered the
+involuntary exclamation of encouragement, which rises inevitably to
+the lips at such a moment; but a short examination, and the sufferer's
+statement of his sensations, especially the gushing of blood within
+the breast, which was vividly felt, convinced him that there was
+indeed no hope. "Doctor, I am gone," he said to the Rev. Mr. Scott,
+the chaplain, who knelt beside him; and then added in a low voice, "I
+have to leave Lady Hamilton, and my adopted daughter Horatia, as a
+legacy to my Country."
+
+After the necessary examination had been made, nothing further could
+be done, nor was attempted, than to obtain the utmost possible relief
+from suffering. Dr. Scott and the purser of the "Victory" sustained
+the bed under his shoulders, raising him into a semi-recumbent
+posture, the only one that was supportable to him, and fanned him;
+while others gave him the cooling drink--lemonade--which he
+continually demanded. Those about did not speak to him, except when
+addressed; but the chaplain, to whom Nelson frequently said, "Pray for
+me, Doctor," ejaculated with him short prayers from time to time. The
+agony of mortal pain wrung from him repeated utterance, though no
+unmanly complaint; and his thoughts dwelt more upon home and the
+battle than upon his own suffering and approaching death. His mind
+remained clear until he became speechless, about fifteen minutes
+before he passed away, and he took frequent notice of what occurred
+near him, as well as of sounds on deck.
+
+The hour that succeeded his wounding was the decisive one of the
+fight; not that the issue admitted of much doubt, after once Nelson's
+plans had received fulfilment, and the battle joined,--unless the
+delinquent van of the allies had acted promptly,--but in those moments
+the work was done which was thenceforth, for the enemy, beyond repair.
+Overhead, therefore, the strife went on incessantly, the seamen
+toiling steadily at their guns, and cheering repeatedly. Near the
+admiral lay Lieutenant Pasco, severely but not fatally wounded. At one
+burst of hurrahs, Nelson asked eagerly what it was about; and Pasco
+replying that another ship had struck, he expressed his satisfaction.
+Soon he became very anxious for further and more exact information of
+the course of the battle, and about the safety of Captain Hardy, upon
+whom now was devolved such guidance as the fleet, until the action was
+over, must continue to receive from the flagship of the
+commander-in-chief. In accordance with his wishes many messages were
+sent to Hardy to come to him, but for some time it was not possible
+for that officer to leave the deck. During this period, up to between
+half-past two and three, the ships of the two British divisions, that
+followed the leaders, were breaking successively into the enemy's
+order, and carrying out with intelligent precision the broad outlines
+of Nelson's instructions. The heads of the columns had dashed
+themselves to pieces, like a forlorn hope, against the overpowering
+number of foes which opposed their passage--an analysis of the returns
+shows that upon the four ships which led, the "Victory" and
+"Téméraire," the "Royal Sovereign" and "Belleisle," fell one-third of
+the entire loss in a fleet of twenty-seven sail. But they had forced
+their way through, and by the sacrifice of themselves had shattered
+and pulverized the local resistance, destroyed the coherence of the
+hostile line, and opened the road for the successful action of their
+followers. With the appearance of the latter upon the scene, succeeded
+shortly by the approach of the allied van, though too late and in
+disorder, began what may be called the second and final phase of the
+battle.
+
+While such things were happening the deck could not be left by Hardy,
+who, for the time being, was commander-in-chief as well as captain.
+Shortly after Nelson fell, the "Téméraire" had run on board the
+"Redoutable" on the other side, and the French "Fougueux" upon the
+"Téméraire," so that for a few minutes the four ships were fast
+together, in the heat of the fight. About quarter past two, the
+"Victory" was shoved clear, and lay with her head to the northward,
+though scarcely with steerage way. The three others remained in
+contact with their heads to the southward. While this _mêlée_ was in
+progress, the French flagship "Bucentaure" surrendered, at five
+minutes past two; but, before hauling down the flag, Villeneuve made a
+signal to his recreant van,--"The ships that are not engaged, take
+positions which will bring them most rapidly under fire." Thus
+summoned, the ten vessels which constituted the van began to go about,
+as they should have done before; and, although retarded by the slack
+wind, they had got their heads to the southward by half-past two. Five
+stood to leeward of the line of battle, but five to windward. The
+latter would pass not far to the westward of the "Victory," and to
+meet this fresh attack demanded the captain's further care, and
+postponed his going to the death-bed of his chief. The latter had
+become very agitated at the delay, thinking that Hardy might be dead
+and the news kept from him. "Will nobody bring Hardy to me?" he
+frequently exclaimed. "He must be killed; he is surely destroyed." At
+last a midshipman came down with the message that "circumstances
+respecting the fleet required the captain's presence on deck, but that
+he would take the first favourable moment to visit his Lordship."
+Nelson, hearing the voice, asked who it was that spoke. The lad,
+Bulkeley, who later in the day was wounded also, was the son of a
+former shipmate in the far back days of the San Juan expedition, and
+the dying admiral charged the lad with a remembrance to his father.
+
+Two ships of Nelson's column, as yet not engaged,--the "Spartiate" and
+the "Minotaur,"--were then just reaching the scene. Being in the
+extreme rear, the lightness of the breeze had so far delayed them.
+Arriving thus opportunely, they hauled to the wind so as to interpose
+between the "Victory" and the approaching van of the allies. Covered
+now by two wholly fresh ships, the captain felt at liberty to quit the
+deck, in accordance with Nelson's desire. The two tried friends--Hardy
+had been everywhere with him since the day of St. Vincent, and was
+faithful enough to speak to Lady Hamilton more freely than she
+liked--shook hands affectionately. "Well, Hardy," said Nelson, "how
+goes the battle? How goes the day with us?" "Very well, my Lord,"
+replied Hardy. "We have got twelve or fourteen of the enemy's ships in
+our possession, but five of their van have tacked, and show an
+intention of bearing down upon the Victory. I have therefore called
+two or three of our fresh ships round us, and have no doubt of giving
+them a drubbing." "I hope none of _our_ ships have struck, Hardy."
+"No, my Lord," was the answer, "there is no fear of that." Nelson then
+said, "I am a dead man, Hardy. I am going fast: it will be all over
+with me soon. Come nearer to me. Pray let my dear Lady Hamilton have
+my hair, and all other things belonging to me." Hardy observed that he
+hoped Mr. Beatty could yet hold out some prospect of life. "Oh no!"
+replied Nelson; "it is impossible. My back is shot through. Beatty
+will tell you so." Hardy then returned to the deck, shaking hands
+again before parting.
+
+Nelson now desired the surgeons to leave him to the attendants, as one
+for whom nothing could be done, and to give their professional care
+where it would be of some avail. In a few moments he recalled the
+chief surgeon, and said, "I forgot to tell you that all power of
+motion and feeling below my breast are gone; and _you_ very well
+_know_ I can live but a short time." From the emphasis he placed on
+his words, the surgeon saw he was thinking of a case of spinal injury
+to a seaman some months before, which had proved mortal after many
+days' suffering; yet it would seem that, despite the conviction that
+rested on his mind, the love of life, and of all it meant to him, yet
+clung to the hope that possibly there might be a reprieve. "One would
+like to live a little longer," he murmured; and added, "What would
+become of poor Lady Hamilton if she knew my situation!" "Beatty," he
+said again, "_you know_ I am gone." "My Lord," replied the surgeon,
+with a noble and courteous simplicity, "unhappily for our country,
+nothing can be done for you;" and he turned away to conceal the
+emotion which he could not at once control. "I know it," said Nelson.
+"I feel something rising in my breast," putting his hand on his left
+side, "which tells me I am gone. God be praised, I have done my duty."
+To this latter thought he continually recurred.
+
+At about three o'clock, the five ships of the enemy's van, passing
+within gunshot to windward,[142] opened fire upon the British ships
+and their prizes. The "Victory" with her consorts replied. "Oh,
+Victory! Victory!" cried the sufferer, "how you distract my poor
+brain!" and after a pause added, "How dear life is to all men!" This
+distant exchange of shots was ineffectual, except to kill or wound a
+few more people, but while it continued Hardy had to be on deck, for
+the flag of the commander-in-chief still vested his authority in that
+ship. During this period an officer was sent to Collingwood to inform
+him of the admiral's condition, and to bear a personal message of
+farewell from the latter; but Nelson had no idea of transferring any
+portion of his duty until he parted with his life also.
+
+A short hour elapsed between Hardy's leaving the cockpit and his
+returning to it, which brings the time to four o'clock. Strength had
+ebbed fast meanwhile, and the end was now very near; but Nelson was
+still conscious. The friends again shook hands, and the captain,
+before releasing his grasp, congratulated the dying hero upon the
+brilliancy of the victory. It was complete, he said. How many were
+captured, it was impossible to see, but he was certain fourteen or
+fifteen. The exact number proved to be eighteen. "That is well," said
+Nelson, but added, faithful to his exhaustive ideas of sufficiency, "I
+bargained for twenty." Then he exclaimed, "_Anchor_, Hardy, _anchor_!"
+Hardy felt the embarrassment of issuing orders now that Collingwood
+knew that his chief was in the very arms of death; but Nelson was
+clearly within his rights. "I suppose, my Lord," said the captain,
+"Admiral Collingwood will now take upon himself the direction of
+affairs." "Not while I live, I hope, Hardy," cried Nelson, and for a
+moment endeavored, ineffectually, to raise himself from the bed. "No.
+Do _you_ anchor, Hardy." Captain Hardy then said, "Shall we make the
+signal, Sir?" "Yes," answered the admiral, "for if I live, I'll
+anchor." These words he repeated several times, even after Hardy had
+left him, and the energy of his manner showed that for the moment the
+sense of duty and of responsibility had triumphed over his increasing
+weakness.
+
+Reaction of course followed, and he told Hardy he felt that in a few
+minutes he should be no more. "Don't throw me overboard," he added;
+"you know what to do." Hardy having given assurance that these wishes
+should be attended to, Nelson then said, "Take care of my dear Lady
+Hamilton, Hardy: take care of poor Lady Hamilton. Kiss me, Hardy." The
+captain knelt down and kissed his cheek. "Now I am satisfied. Thank
+God, I have done my duty." Hardy rose and stood looking silently at
+him for an instant or two, then knelt down again and kissed his
+forehead. "Who is that?" asked Nelson. The captain answered, "It is
+Hardy;" to which his Lordship replied, "God bless you, Hardy!" The
+latter then returned to the quarter-deck, having passed about eight
+minutes in this final interview.
+
+Nelson now desired his steward, who was in attendance throughout, to
+turn him on his right side. "I wish I had not left the deck," he
+murmured; "for I shall soon be gone." Thenceforth he sank rapidly; his
+breathing became oppressed and his voice faint. To Dr. Scott he said,
+"Doctor, I have _not_ been a _great_ sinner," and after a short pause,
+"_Remember_, that I leave Lady Hamilton and my daughter Horatia as a
+legacy to my country--never forget Horatia." This injunction, with
+remembrances to Lady Hamilton and the child, he frequently repeated;
+and he charged Scott to see Mr. Rose, and tell him--but here pain
+interrupted his utterance, and after an interval he simply said, "Mr.
+Rose will remember," alluding to a letter which he had written him,
+but which as yet could not have been received. His thirst now
+increased; and he called for "drink, drink," "fan, fan," and "rub,
+rub," addressing himself in this last case to Dr. Scott, who had been
+rubbing his breast with his hand, by which some relief was given.
+These words he spoke in a very rapid manner, which rendered his
+articulation difficult; but he every now and then, with evident
+increase of pain, made a greater effort, and said distinctly, "Thank
+God, I have done my duty." This he repeated at intervals as long as
+the power of speech remained. The last words caught by Dr. Scott, who
+was bending closely over him, were, "God and my Country."
+
+Fifteen minutes after Hardy left him for the second time, the admiral
+became speechless; and when this had continued five minutes, the
+surgeon, who was busied among the other wounded, was summoned again.
+He found him upon the verge of dissolution, the hands cold and the
+pulse gone; but upon laying his hand upon his forehead, Nelson opened
+his eyes, looked up, and then closed them forever. Five minutes later
+he was dead. The passing was so quiet that Dr. Scott, still rubbing
+his breast, did not perceive it, until the surgeon announced that all
+was over. It was half-past four o'clock, just three hours after the
+fatal wound was received. Not till an hour later did the last of the
+eighteen prizes strike, and firing cease altogether; but the
+substantial results were known to Nelson before consciousness left
+him. To quote the rugged words of the "Victory's" log, "Partial firing
+continued until 4.30, when a victory having been reported to the Right
+Honourable Lord Viscount Nelson, K.B., he died of his wound."
+
+Of the five ships of the allied van which passed to windward of the
+"Victory," one was cut off and captured by the "Minotaur" and
+"Spartiate." The other four continued on the wind to the southwest,
+and escaped to sea. By the surrender of Villeneuve the chief command
+of the combined fleets remained with the Spanish admiral Gravina. The
+latter, at quarter before five, fifteen minutes after Nelson breathed
+his last, retreated upon Cadiz, making signal for the vessels which
+had not struck to rally round his flag. Ten other ships, five French
+and five Spanish,--in all eleven sail-of-the-line,--made good their
+escape into the port.
+
+"Before sunset," wrote an eye-witness on board the "Belleisle," "all
+firing had ceased. The view of the fleet at this period was highly
+interesting, and would have formed a beautiful subject for a painter.
+Just under the setting rays were five or six dismantled prizes; on one
+hand lay the Victory with part of our fleet and prizes, and on the
+left hand the Royal Sovereign and a similar cluster of ships. To the
+northward, the remnant of the combined fleets was making for Cadiz.
+The Achille, with the tricoloured ensign still displayed, had burnt to
+the water's edge about a mile from us, and our tenders and boats were
+using every effort to save the brave fellows who had so gloriously
+defended her; but only two hundred and fifty were rescued, and she
+blew up with a tremendous explosion."
+
+There, surrounded by the companions of his triumph, and by the
+trophies of his prowess, we leave our hero with his glory. Sharer of
+our mortal weakness, he has bequeathed to us a type of single-minded
+self-devotion that can never perish. As his funeral anthem proclaimed,
+while a nation mourned, "His body is buried in peace, but his Name
+liveth for evermore." Wars may cease, but the need for heroism shall
+not depart from the earth, while man remains man and evil exists to be
+redressed. Wherever danger has to be faced or duty to be done, at cost
+to self, men will draw inspiration from the name and deeds of Nelson.
+
+Happy he who lives to finish all his task. The words, "I have done my
+duty," sealed the closed book of Nelson's story with a truth broader
+and deeper than he himself could suspect. His duty was done, and its
+fruit perfected. Other men have died in the hour of victory, but for
+no other has victory so singular and so signal graced the fulfilment
+and ending of a great life's work. "Finis coronat opus" has of no man
+been more true than of Nelson. There were, indeed, consequences
+momentous and stupendous yet to flow from the decisive supremacy of
+Great Britain's sea-power, the establishment of which, beyond all
+question or competition, was Nelson's great achievement; but his part
+was done when Trafalgar was fought. The coincidence of his death with
+the moment of completed success has impressed upon that superb battle
+a stamp of finality, an immortality of fame, which even its own
+grandeur scarcely could have insured. He needed, and he left, no
+successor. To use again St. Vincent's words, "There is but one
+Nelson."
+
+FOOTNOTES:
+
+[132] The name Thompson was spelled by Nelson indifferently with or without
+the "p", which, as Nicolas observes, confirms the belief that it was
+fictitious. The fact is singular; for, from a chance remark of his, it
+appears that he meant it to be Thomson. (Morrison, Letter No. 569.)
+
+[133] The author is indebted for this anecdote to Mr. Edgar Goble, of
+Fareham, Hants, whose father, Thomas Goble, then secretary to Captain
+Hardy, was present at the table.
+
+[134] One sixty-four, the "Africa," had separated to the northward during
+the night, and joined in the battle by passing alone along the enemy's
+line, much of the time under fire. She belonged, therefore, to Nelson's
+column, and cooperated with it during the day.
+
+[135] Nelson in his journal wrote: "The enemy wearing _in succession_." As
+the allies' order was reversed, however, it is evident that he meant merely
+that the ships wore one after the other, from rear to van, but in their
+respective stations, each waiting till the one astern had, to use the old
+phrase, "marked her manoeuvre,"--a precaution intended to prevent
+collisions, though it necessarily extended the line.
+
+[136] The author is indebted for these incidents to Admiral Sir W.R. Mends,
+G.C.B., who received them from the second baronet, Sir Henry M. Blackwood,
+when serving with him as first lieutenant.
+
+[137] The "Euryalus's" log gives eight o'clock as the hour of the captain's
+going on board the "Victory;" but Blackwood not only says six, but also
+mentions that his stay on board lasted five and a half hours, which gives
+about the same time for going on board. The other frigate captains did not
+go till eight. Blackwood, as the senior, might need a fuller and longer
+continued interview, because the general direction of the frigate squadron
+would be in his hands; or Nelson might particularly desire the presence of
+a close professional friend, the captains of the ships-of-the-line having
+their hands now full of preparations.
+
+[138] The question of Lady Hamilton's services on the occasions mentioned
+by Nelson, vigorously asserted by herself, has been exhaustively discussed
+by Professor John Knox Laughton, in the "United Service Magazine" for April
+and May, 1889. His conclusions are decisively adverse to her claims.
+
+[139] See _ante_, p. 275.
+
+[140] That is, with a one and a half knot breeze.
+
+[141] The vocabulary of the telegraphic signal book provides certain words
+which can be signalled by a single number. Words not in this vocabulary
+must be spelled letter by letter,--each letter of the alphabet having its
+own number.
+
+[142] That is, to the westward.
+
+
+
+

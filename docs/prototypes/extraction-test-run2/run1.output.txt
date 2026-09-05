@@ -1,0 +1,674 @@
+{
+  "schema_version": 1,
+  "title": "The Battle of Trafalgar",
+  "date": "21 October 1805",
+  "extent": {
+    "north": 36.6,
+    "south": 36.1,
+    "east": -5.95,
+    "west": -6.8
+  },
+  "scale_unit": "nmi",
+  "end": "18:00",
+  "sources": {
+    "memorandum": {
+      "label": "Nelson's memorandum",
+      "work": "Nelson, secret memorandum, \"Victory, off CADIZ, 9th October, 1805\", as reprinted in A. T. Mahan, The Life of Nelson (1897), vol. II, ch. XXII"
+    },
+    "mahan": {
+      "label": "Mahan, Life of Nelson",
+      "work": "A. T. Mahan, The Life of Nelson (1897), vol. II, ch. XXIII, \"Trafalgar.--The death of Nelson\", with its footnotes"
+    }
+  },
+  "units": [
+    {
+      "id": "weather-column",
+      "side": "british",
+      "label": "Nelson's weather column (Victory)"
+    },
+    {
+      "id": "lee-column",
+      "side": "british",
+      "label": "Collingwood's lee column (Royal Sovereign)"
+    },
+    {
+      "id": "combined-fleet",
+      "side": "combined",
+      "label": "The Combined Fleet (Villeneuve)"
+    }
+  ],
+  "phases": [
+    {
+      "id": "daybreak",
+      "label": "Daybreak: the fleets sight each other",
+      "t": "06:00",
+      "playback_rate": 600,
+      "wind": {
+        "from": 292,
+        "strength": "light"
+      },
+      "caption": "Daybreak, 21 October. The British fleet, standing north-east since it wore at 4 A.M., sights the Combined Fleet some ten or twelve miles to the eastward, standing south, with Cape Trafalgar just visible beyond them against the eastern sky.",
+      "notes": "Mahan gives no clock time for daybreak; 06:00 is chosen because Nelson was already on deck with the enemy in sight and summoned Blackwood \"at about six o'clock\", and the first signals follow at 6.40. Positions are dead reckoning, not observation. The Combined Fleet centre is fixed from the one hard bearing available: Cadiz \"twenty miles to the northward and eastward\" of the allies at the moment Villeneuve decided to wear (about an hour later); working back from 36.533N 6.300W on a bearing of about 020 degrees puts the allied centre near 36.22N 6.43W, which also leaves Cape Trafalgar about 19 nmi to the east-south-east - consistent with the cape being visible only in the far distance. The British are placed 11 nmi west of that: Mahan says \"ten or twelve miles\" and Nelson's codicil says \"about ten miles\", so 11 splits the difference. Heading: Mahan says both that the British were \"standing northeast when the day broke\" and, generally, \"heading to the northward\"; 045 is used as the more specific of the two. Wind: Mahan reports \"light westerly breezes\" at midnight but west-northwest when the allied line formed; 292 degrees (WNW) is used throughout, since it is the direction he names for the battle itself. Strength for the weather column is 0.92 because the Africa had separated in the night and fought alone: whether the column is counted as thirteen sail including her or twelve, one of them was not with the body, and the fraction is the same either way.",
+      "references": [
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"In a general sense, then, it may be said that, when daylight showed...\"",
+          "quote": "In a general sense, then, it may be said that, when daylight showed the enemies to each other, the British fleet was heading to the northward, and that of the allies to the southward; the latter being ten or twelve miles east of their opponents. In the far distance, Cape Trafalgar, from which the battle takes its name, was just visible against the eastern sky."
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"Since the morning of the 19th, the weather, fine for some days previous...\"",
+          "quote": "At 4 A.M. the British fleet again wore, and was standing northeast when the day broke."
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"Nelson availed himself of Blackwood's presence to have him...\"",
+          "quote": "In sight of the Combined Fleets of France and Spain, distant about ten miles.",
+          "note": "Nelson's own estimate, written into the codicil that morning; used to fix the opening separation."
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, footnote 134",
+          "quote": "One sixty-four, the \"Africa,\" had separated to the northward during the night, and joined in the battle by passing alone along the enemy's line, much of the time under fire.",
+          "note": "Basis for the detachment arrow and for the weather column's strength of 0.92."
+        }
+      ],
+      "units": [
+        {
+          "id": "weather-column",
+          "position": {
+            "lat": 36.203,
+            "lon": -6.685
+          },
+          "heading": 45,
+          "formation": "column",
+          "state": "intact",
+          "strength": 0.92,
+          "moves": [
+            {
+              "kind": "detachment",
+              "to": {
+                "lat": 36.28,
+                "lon": -6.68
+              }
+            }
+          ]
+        },
+        {
+          "id": "lee-column",
+          "position": {
+            "lat": 36.186,
+            "lon": -6.685
+          },
+          "heading": 45,
+          "formation": "column",
+          "state": "intact",
+          "strength": 1
+        },
+        {
+          "id": "combined-fleet",
+          "position": {
+            "lat": 36.22,
+            "lon": -6.43
+          },
+          "heading": 180,
+          "formation": "line",
+          "state": "intact",
+          "strength": 1
+        }
+      ]
+    },
+    {
+      "id": "bear-up",
+      "label": "Bear up: the two columns steer east",
+      "t": "06:50",
+      "playback_rate": 900,
+      "wind": {
+        "from": 292,
+        "strength": "light"
+      },
+      "caption": "6.40: form the order of sailing, which by Nelson's instructions is the order of battle; and prepare for battle. Ten minutes later, bear up. The two British columns steer east, about a mile apart, Nelson's to the northward - the weather line.",
+      "notes": "Time is exact from Mahan (\"twenty minutes before seven\", \"Ten minutes later\"). The one-mile separation and the easterly course are stated; the columns are drawn a mile apart in latitude accordingly. The British have been advanced about 1.5 nmi north-east from the daybreak picture at roughly 1.8 knots, an estimate: Mahan gives no speed before the 1.5-knot figure attached to eleven o'clock, but the fleet was under all sail and the distances he does give imply something a little better than that early on. The intent arrows are the standing plan, not the ships' motion: the lee line on the enemy's rear, Nelson's line on their centre. The Combined Fleet still heads south here; Nelson noted the wear beginning at seven, ten minutes after this instant, so the arrow toward Cadiz shows Villeneuve's intention to keep the port under his lee before the manoeuvre starts.",
+      "references": [
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"In a general sense, then, it may be said that, when daylight showed...\"",
+          "quote": "Ten minutes later followed the command to \"Bear up,\" the \"Victory\" setting the example by at once altering her course for the enemy. Collingwood did the same, and the ships of the two divisions fell into the wake of their leaders as best they could, for the light wind afforded neither the means nor the time for refinements in manoeuvring."
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"In a general sense, then, it may be said that, when daylight showed...\" (closing sentences)",
+          "quote": "The two columns steered east, about a mile apart, that of Nelson being to the northward; from which circumstance, the wind being west-northwest, it has been called commonly the weather line."
+        },
+        {
+          "source": "memorandum",
+          "locator": "paragraph beginning \"The divisions of the British Fleet will be brought nearly within gun shot of the Enemy's Centre.\"",
+          "quote": "The signal will most probably then be made for the Lee Line to bear up together, to set all their sails, even steering sails, in order to get as quickly as possible to the Enemy's Line, and to cut through, beginning from the 12 Ship from the Enemy's Rear."
+        },
+        {
+          "source": "memorandum",
+          "locator": "paragraph beginning \"I should therefore probably make the Second in Command's signal to lead through...\"",
+          "quote": "my Line would lead through about their Centre, and the Advanced Squadron to cut two or three or four Ships a-head of their Centre, so as to ensure getting at their Commander-in-Chief, on whom every effort must be made to capture.",
+          "note": "Basis for the weather column's intent arrow on the allied centre."
+        }
+      ],
+      "units": [
+        {
+          "id": "weather-column",
+          "position": {
+            "lat": 36.221,
+            "lon": -6.663
+          },
+          "heading": 90,
+          "formation": "column",
+          "state": "intact",
+          "strength": 0.92,
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 36.212,
+                "lon": -6.428
+              }
+            }
+          ]
+        },
+        {
+          "id": "lee-column",
+          "position": {
+            "lat": 36.204,
+            "lon": -6.663
+          },
+          "heading": 90,
+          "formation": "column",
+          "state": "intact",
+          "strength": 1,
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 36.183,
+                "lon": -6.434
+              }
+            }
+          ]
+        },
+        {
+          "id": "combined-fleet",
+          "position": {
+            "lat": 36.201,
+            "lon": -6.428
+          },
+          "heading": 180,
+          "formation": "line",
+          "state": "intact",
+          "strength": 1,
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 36.533,
+                "lon": -6.3
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "allies-wear",
+      "label": "The allies wear together; six miles to run",
+      "t": "09:30",
+      "playback_rate": 600,
+      "wind": {
+        "from": 292,
+        "strength": "light"
+      },
+      "caption": "The allies wear together to keep Cadiz under their lee. The scanty wind drags the manoeuvre out until near ten, and it inverts their order: the van becomes the rear, and Gravina, who led, is now the rearmost ship. Blackwood, with six miles still to run, begs Nelson to let another ship lead in.",
+      "notes": "Time from Blackwood's \"about half-past nine\", and the six miles is his. That distance is measured here from the Victory at the head of the weather column - not from the column's centre point, which is drawn about 1.2 nmi astern of her - to the part of the allied line she was steering for. The Combined Fleet's heading is the awkward value in this phase: the wear began at seven and was not finished till near ten, so at 09.30 the ships are in every stage of turning. 350 is an authored average of those already round and heading north and those still coming about; no single heading is true of the body at this instant. The allied centre is carried only a little south of its 06.50 position, on the reasoning that the wear consumed the fleet's small progress. Note that Mahan's own distances - six miles at 09.30, three at eleven, a mile and a half at 12.10 - imply the British closed fastest in this stretch, about 2.6 knots, which sits oddly with his footnote of a one-and-a-half-knot breeze at eleven. The stated distances are followed rather than the footnote, because they are what he times the battle by.",
+      "references": [
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"When the development of the British movement was recognized by Villeneuve...\"",
+          "quote": "When the development of the British movement was recognized by Villeneuve, he saw that fighting was inevitable; and, wishing to keep Cadiz, then twenty miles to the northward and eastward, under his lee, he ordered the combined fleets to wear together. The scanty wind which embarrassed the British impeded this manoeuvre also, so that it was not completed till near ten o'clock."
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, same paragraph, closing sentences",
+          "quote": "The result of the allied movement was to invert their order. Their ships, which had been steering south, now all headed north; the van became the rear; Gravina, who had been leading the column, was in the rear ship; and it was upon this rear, but still the southern flank of the hostile array, that the weight of Collingwood's attack was to fall."
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"The \"Victory,\" always a fast ship, had likewise little difficulty...\"",
+          "quote": "Blackwood, having failed to get Nelson on board his own frigate, and realizing the exposure inseparable from the position of leader, ventured, at about half-past nine, when still six miles from the enemy, to urge that one or two ships should be permitted to precede the \"Victory.\""
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, footnote 135",
+          "quote": "Nelson in his journal wrote: \"The enemy wearing _in succession_.\"",
+          "note": "Mahan reads this as the ships wearing one after another in their stations, not a change of order; the unit keeps one centre through the manoeuvre."
+        }
+      ],
+      "units": [
+        {
+          "id": "weather-column",
+          "position": {
+            "lat": 36.212,
+            "lon": -6.583
+          },
+          "heading": 90,
+          "formation": "column",
+          "state": "intact",
+          "strength": 0.92
+        },
+        {
+          "id": "lee-column",
+          "position": {
+            "lat": 36.196,
+            "lon": -6.586
+          },
+          "heading": 90,
+          "formation": "column",
+          "state": "intact",
+          "strength": 1
+        },
+        {
+          "id": "combined-fleet",
+          "position": {
+            "lat": 36.19,
+            "lon": -6.424
+          },
+          "heading": 350,
+          "formation": "crescent",
+          "state": "intact",
+          "strength": 1,
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 36.533,
+                "lon": -6.3
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "through-the-van",
+      "label": "\"To prevent him from getting into Cadiz\"",
+      "t": "11:00",
+      "playback_rate": 300,
+      "wind": {
+        "from": 292,
+        "strength": "light"
+      },
+      "caption": "The allies carry sail to hold their places, and so edge continually nearer Cadiz. Nelson signals Collingwood: I intend to pass through the van of the enemy's line, to prevent him from getting into Cadiz - and the Victory's course goes a little to the northward. The allied line lies in a crescent, concave to the attack, five miles from horn to horn.",
+      "notes": "Time is Mahan's \"towards eleven o'clock\" and the three miles is his inference from the Victory not coming under fire till 12.30. Again the distance is measured from the Victory, not the column centre. The weather column's heading is turned from 090 to 085 to carry the \"a little to the northward\" - Mahan gives no number, and a small change is all his phrase supports; the intent arrow to the north end of the allied line carries the rest of the meaning. The crescent's geometry is authored from two statements only: that it was concave to the British approach with the horns nearer, and that it was five miles horn to horn. The allied centre is bowed about 0.8 nmi east of the line joining the horns.",
+      "references": [
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"The French and Spanish fleets, being neither a homogeneous nor a well-exercised mass...\"",
+          "quote": "Owing to the lightness of the breeze, the allies carried a good deal of sail, a departure from the usual battle practice. This was necessary in order to enable them to keep their places at all, but it also had the effect of bringing them continually, though very gradually, nearer to Cadiz. Seeing this, Nelson signalled to Collingwood, \"I intend to pass through the van of the enemy's line, to prevent him from getting into Cadiz,\" and the course of the \"Victory,\" for this purpose, was changed a little to the northward."
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, same paragraph, on the allied array",
+          "quote": "Instead of this, embarrassed by both lack of wind and lack of skill, their manoeuvres resulted in a curved line, concave to the enemy's approach; the horns of the crescent thus formed being nearer to the latter."
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"After this, towards eleven o'clock, Nelson went below to the cabin.\"",
+          "quote": "The \"Victory\" did not come under fire till 12.30, so that at eleven she would yet be three miles or more distant from the enemy"
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, footnote 140",
+          "quote": "That is, with a one and a half knot breeze.",
+          "note": "The speed used for the last hour of the approach; it does not reconcile with the earlier distances, as the phase note explains."
+        }
+      ],
+      "units": [
+        {
+          "id": "weather-column",
+          "position": {
+            "lat": 36.221,
+            "lon": -6.503
+          },
+          "heading": 85,
+          "formation": "column",
+          "state": "intact",
+          "strength": 0.92,
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 36.262,
+                "lon": -6.418
+              }
+            }
+          ]
+        },
+        {
+          "id": "lee-column",
+          "position": {
+            "lat": 36.193,
+            "lon": -6.502
+          },
+          "heading": 90,
+          "formation": "column",
+          "state": "intact",
+          "strength": 1,
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 36.201,
+                "lon": -6.425
+              }
+            }
+          ]
+        },
+        {
+          "id": "combined-fleet",
+          "position": {
+            "lat": 36.214,
+            "lon": -6.418
+          },
+          "heading": 0,
+          "formation": "crescent",
+          "state": "intact",
+          "strength": 1
+        }
+      ]
+    },
+    {
+      "id": "lee-line-breaks",
+      "label": "The Royal Sovereign breaks the line",
+      "t": "12:10",
+      "playback_rate": 120,
+      "wind": {
+        "from": 292,
+        "strength": "light"
+      },
+      "caption": "Just at noon the Fougueux fires the first gun of the battle at the Royal Sovereign, and for ten minutes Collingwood advances in silence, the one centre of the hostile fire. At ten minutes past twelve he breaks through astern of the Santa Ana; the Victory is two miles off, with a mile and a half still to go.",
+      "notes": "Both times are exact. The Royal Sovereign's breaking point is placed on the southern half of the allied crescent, about 1.9 nmi from the Victory and roughly two-thirds of the way from the allied centre to the southern horn - Mahan names the Santa Ana as her opponent but gives no station number, so the exact point is an estimate consistent with the two miles between the flagships and with the attack falling on the rear. The lee column's own centre is drawn about 1.6 nmi astern of the Royal Sovereign, who \"easily took the lead\" and was well ahead of her division. State for the lee column steps to engaged at this instant; the weather column is not yet under effective fire, so it holds at intact.",
+      "references": [
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"It is said that Collingwood, frequently testy...\"",
+          "quote": "A few moments later, just at noon, the French ship \"Fougueux,\" the second astern of the \"Santa Ana,\" for which the \"Royal Sovereign\" was steering, fired at the latter the first gun of the battle."
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"These things being done, Nelson said to Blackwood...\"",
+          "quote": "The \"Victory\" was about two miles from the \"Royal Sovereign\" when the latter, at ten minutes past twelve, broke through the allied order, and she had still a mile and a half to go before she herself could reach it."
+        },
+        {
+          "source": "memorandum",
+          "locator": "paragraph beginning \"The whole impression of the British Fleet must be to overpower...\"",
+          "quote": "The whole impression of the British Fleet must be to overpower from two or three Ships a-head of their Commander-in-Chief supposed to be in the Centre, to the Rear of their Fleet."
+        }
+      ],
+      "units": [
+        {
+          "id": "weather-column",
+          "position": {
+            "lat": 36.228,
+            "lon": -6.468
+          },
+          "heading": 80,
+          "formation": "column",
+          "state": "intact",
+          "strength": 0.92
+        },
+        {
+          "id": "lee-column",
+          "position": {
+            "lat": 36.198,
+            "lon": -6.458
+          },
+          "heading": 85,
+          "formation": "column",
+          "state": "engaged",
+          "strength": 1
+        },
+        {
+          "id": "combined-fleet",
+          "position": {
+            "lat": 36.233,
+            "lon": -6.412
+          },
+          "heading": 0,
+          "formation": "crescent",
+          "state": "engaged",
+          "strength": 1
+        }
+      ]
+    },
+    {
+      "id": "victory-alongside",
+      "label": "The Victory rakes the Bucentaure; Nelson falls",
+      "t": "13:10",
+      "playback_rate": 120,
+      "wind": {
+        "from": 292,
+        "strength": "light"
+      },
+      "caption": "At one o'clock the Victory crosses the Bucentaure's wake within thirty feet and rakes her from end to end. Ten minutes later she lies along the port side of the Redoutable, the two ships fallen off with their heads to the eastward. At about 1.25 Nelson is shot down from the Redoutable's mizzen-top.",
+      "notes": "Times exact. The weather column's heading is set to 110 to carry Mahan's \"heads to the eastward, and moving slowly before the wind to the east-southeast\", which describes the Victory and Redoutable locked together rather than the whole division; the column astern was still coming up on an easterly course, so this heading is the flagship's rather than a true average. The Combined Fleet's strength is still 1.0 here: ships had begun to strike (Nelson heard the cheering) but Mahan names no count before Hardy's report, and under the schema damage to ships still in the fight does not reduce strength.",
+      "references": [
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"Still the ship closed the \"Bucentaure.\"\"",
+          "quote": "At one o'clock the bows of the \"Victory\" crossed the wake of the \"Bucentaure,\" by whose stern she passed within thirty feet, the projecting yard arms grazing the enemy's rigging."
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, same paragraph, closing sentence",
+          "quote": "At 1.10 she lay along the port side of the \"Redoutable,\" the two ships falling off with their heads to the eastward, and moving slowly before the wind to the east-southeast."
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"In the duel which ensued between these two, in which Nelson fell...\"",
+          "quote": "Fifteen minutes after the vessels came together, as the two officers were walking forward, and had nearly reached the usual place of turning, Nelson, who was on Hardy's left, suddenly faced left about."
+        },
+        {
+          "source": "memorandum",
+          "locator": "paragraph beginning \"The Second in Command will in all possible things direct the movements of his Line...\"",
+          "quote": "But, in case Signals can neither be seen or perfectly understood, no Captain can do very wrong if he places his Ship alongside that of an Enemy."
+        }
+      ],
+      "units": [
+        {
+          "id": "weather-column",
+          "position": {
+            "lat": 36.234,
+            "lon": -6.429
+          },
+          "heading": 110,
+          "formation": "melee",
+          "state": "engaged",
+          "strength": 0.92
+        },
+        {
+          "id": "lee-column",
+          "position": {
+            "lat": 36.2,
+            "lon": -6.432
+          },
+          "heading": 95,
+          "formation": "melee",
+          "state": "engaged",
+          "strength": 1
+        },
+        {
+          "id": "combined-fleet",
+          "position": {
+            "lat": 36.242,
+            "lon": -6.408
+          },
+          "heading": 15,
+          "formation": "melee",
+          "state": "engaged",
+          "strength": 1
+        }
+      ]
+    },
+    {
+      "id": "line-broken",
+      "label": "The line broken; the van goes about at last",
+      "t": "14:30",
+      "playback_rate": 300,
+      "wind": {
+        "from": 292,
+        "strength": "light"
+      },
+      "caption": "The Bucentaure strikes at five minutes past two, and at quarter past the Victory is shoved clear, head to the northward with scarcely steerage way. Villeneuve's last signal calls in his unengaged van; by half-past two they have their heads to the southward, five to leeward and five to windward, and at about three the windward five open a distant and ineffectual fire.",
+      "notes": "Times exact. The Combined Fleet is set to broken here: Mahan describes the coherence of the hostile line as destroyed and the van acting on its own, too late and in disorder. Its heading of 190 is the van's, since that is the only part of the body still under way as a body - the rest are prizes and drifting wrecks, and no single heading fits them. Strength 0.61 comes from Hardy's report of \"twelve or fourteen\" in British possession; thirteen of thirty-three taken leaves twenty. The detachment arrow is the five van ships standing to windward - that is, to the westward, per Mahan's footnote - to the position from which they fired at three o'clock; the three o'clock cannonade is folded into this phase rather than given its own, since it changed nothing on the map but the position of that detachment.",
+      "references": [
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"While such things were happening the deck could not be left by Hardy...\"",
+          "quote": "About quarter past two, the \"Victory\" was shoved clear, and lay with her head to the northward, though scarcely with steerage way."
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, same paragraph",
+          "quote": "Thus summoned, the ten vessels which constituted the van began to go about, as they should have done before; and, although retarded by the slack wind, they had got their heads to the southward by half-past two. Five stood to leeward of the line of battle, but five to windward."
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"Two ships of Nelson's column, as yet not engaged...\"",
+          "quote": "We have got twelve or fourteen of the enemy's ships in our possession, but five of their van have tacked, and show an intention of bearing down upon the Victory.",
+          "note": "Hardy to Nelson, shortly after half-past two; the basis for the Combined Fleet's strength of 0.61."
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"At about three o'clock, the five ships of the enemy's van...\"",
+          "quote": "At about three o'clock, the five ships of the enemy's van, passing within gunshot to windward, opened fire upon the British ships and their prizes."
+        }
+      ],
+      "units": [
+        {
+          "id": "weather-column",
+          "position": {
+            "lat": 36.24,
+            "lon": -6.416
+          },
+          "heading": 20,
+          "formation": "melee",
+          "state": "engaged",
+          "strength": 0.92
+        },
+        {
+          "id": "lee-column",
+          "position": {
+            "lat": 36.206,
+            "lon": -6.422
+          },
+          "heading": 60,
+          "formation": "melee",
+          "state": "engaged",
+          "strength": 1
+        },
+        {
+          "id": "combined-fleet",
+          "position": {
+            "lat": 36.248,
+            "lon": -6.402
+          },
+          "heading": 190,
+          "state": "broken",
+          "strength": 0.61,
+          "moves": [
+            {
+              "kind": "detachment",
+              "to": {
+                "lat": 36.232,
+                "lon": -6.438
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "firing-ceases",
+      "label": "Firing ceases",
+      "t": "17:30",
+      "playback_rate": 300,
+      "wind": {
+        "from": 292,
+        "strength": "light"
+      },
+      "caption": "Nelson died at half-past four; an hour later the last of the eighteen prizes struck and firing ceased altogether. Gravina has drawn off for Cadiz with eleven sail of the line, four more have gone away to the south-west and escaped to sea, and the Achille burns to the water's edge before she blows up.",
+      "notes": "17:30 is Mahan's \"an hour later\" after Nelson's death at 4.30, and is the end of firing; the picture holds until 18:00, before sunset, when the Belleisle eye-witness describes the field. Both British columns are given the state intact, which under the schema's definitions means not in action - they were battered but they had stopped fighting and held the field. It is not a claim that they were undamaged: a third of the fleet's whole loss fell on the four leading ships alone. Strength 0.45 for the Combined Fleet is fifteen of thirty-three: eighteen struck, eleven got into Cadiz under Gravina and four escaped to sea, and the four that left southward are shown as a detachment rather than deducted twice. The British positions are estimates - Mahan gives no bearings after the melee, only that the Victory lay with part of the fleet and its prizes on one hand and the Royal Sovereign with a similar cluster on the other.",
+      "references": [
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"Fifteen minutes after Hardy left him for the second time...\"",
+          "quote": "It was half-past four o'clock, just three hours after the fatal wound was received. Not till an hour later did the last of the eighteen prizes strike, and firing cease altogether"
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"Of the five ships of the allied van which passed to windward...\"",
+          "quote": "The other four continued on the wind to the southwest, and escaped to sea. By the surrender of Villeneuve the chief command of the combined fleets remained with the Spanish admiral Gravina. The latter, at quarter before five, fifteen minutes after Nelson breathed his last, retreated upon Cadiz, making signal for the vessels which had not struck to rally round his flag. Ten other ships, five French and five Spanish,--in all eleven sail-of-the-line,--made good their escape into the port."
+        },
+        {
+          "source": "mahan",
+          "locator": "ch. XXIII, paragraph beginning \"\"Before sunset,\" wrote an eye-witness on board the \"Belleisle\"...\"",
+          "quote": "on one hand lay the Victory with part of our fleet and prizes, and on the left hand the Royal Sovereign and a similar cluster of ships. To the northward, the remnant of the combined fleets was making for Cadiz."
+        }
+      ],
+      "units": [
+        {
+          "id": "weather-column",
+          "position": {
+            "lat": 36.242,
+            "lon": -6.408
+          },
+          "heading": 0,
+          "state": "intact",
+          "strength": 0.92
+        },
+        {
+          "id": "lee-column",
+          "position": {
+            "lat": 36.212,
+            "lon": -6.418
+          },
+          "heading": 10,
+          "state": "intact",
+          "strength": 1
+        },
+        {
+          "id": "combined-fleet",
+          "position": {
+            "lat": 36.272,
+            "lon": -6.386
+          },
+          "heading": 20,
+          "state": "broken",
+          "strength": 0.45,
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 36.533,
+                "lon": -6.3
+              }
+            },
+            {
+              "kind": "detachment",
+              "to": {
+                "lat": 36.15,
+                "lon": -6.52
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
