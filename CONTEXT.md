@@ -53,3 +53,21 @@ _Avoid_: Health, casualties, hit points, size, losses
 **Move**:
 An authored arrow from a unit toward a position, showing something the unit's own position cannot: a detachment (part of the unit going where the unit does not) or an intent (what the unit was ordered to do, whether or not it happened).
 _Avoid_: Arrow, order, action, track
+
+### Narrative
+
+**Caption**:
+The narration text a phase shows, one plain string chosen by the author, holding until the next phase begins.
+_Avoid_: Narration, subtitle, alternate, label
+
+**Source**:
+A work the battle draws on, listed once per battle with its display label, work details, and licence, whether or not any phase references it.
+_Avoid_: Bibliography, citation, reference (for the work itself)
+
+**Reference**:
+A phase's pointer into one source: a locator precise enough to find the passage, and optionally the verbatim quote it supports.
+_Avoid_: Citation, footnote, source ref
+
+**Notes**:
+The author's per-phase reasoning about the sources, such as which reading of a disputed time was chosen and why; surfaced on demand, never animated.
+_Avoid_: Commentary, alternates, uncertainty, confidence
