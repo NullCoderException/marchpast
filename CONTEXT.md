@@ -34,6 +34,10 @@ _Avoid_: Path, route, trail, vector, move
 What the renderer draws around the picture without any battle authoring it and the viewer cannot operate: the compass rose, the scale bar, the wind indicator, the map's credit line.
 _Avoid_: Chrome, overlay, HUD, widgets, controls
 
+**Legend**:
+The furniture box that keys the picture: each side's colour and name, the four state glyphs, and the line styles for a track and the two kinds of move. Always shown.
+_Avoid_: Key, guide, symbols
+
 ### Weather
 
 **Wind**:
@@ -71,6 +75,10 @@ _Avoid_: Status, condition, morale, struck
 **Strength**:
 The fraction, 0 to 1, of a unit's opening fighting strength still fighting as part of the unit during a phase. Damage to ships or men who stay in the fight does not reduce it.
 _Avoid_: Health, casualties, hit points, size, losses
+
+**Formation**:
+The shape a unit's ships or men are arranged in, one of two words in v1: column (in line ahead along the heading) or line (abreast across the heading). A styled label the renderer draws; a battle file never carries the shape's geometry.
+_Avoid_: Shape, arrangement, order of sailing, crescent
 
 **Move**:
 An authored arrow from a unit toward a position, showing something the unit's own position cannot: a detachment (part of the unit going where the unit does not) or an intent (what the unit was ordered to do, whether or not it happened).
