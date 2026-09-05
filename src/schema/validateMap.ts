@@ -5,11 +5,21 @@
  * coordinate a `[lon, lat]` pair in range and nothing else anywhere.
  *
  * Never throws on bad data; collects every error with a JSON-pointer path.
- * Ring winding and polygon validity are not checked (ADR-0005).
+ * Ring winding and polygon validity are not checked (schema.md 3.3).
  */
 import { readAttribution, readLicense } from "./licenseFields.ts";
 import type { LandFeature, LonLat, MapFeature, MapFile, PlaceFeature } from "./types.ts";
-import { allDefined, defined, Errors, isRecord, join, ObjectReader, type ValidationError } from "./validation.ts";
+import {
+  allDefined,
+  appendPointer,
+  Errors,
+  LAT_BOUNDS,
+  LON_BOUNDS,
+  ObjectReader,
+  readNumber,
+  type ValidationError,
+  withoutUndefined,
+} from "./validation.ts";
 
 export type MapValidation = { ok: true; map: MapFile } | { ok: false; errors: ValidationError[] };
 
@@ -39,7 +49,7 @@ function readMap(json: unknown, errors: Errors): MapFile | undefined {
   if (type === undefined || features === undefined || !allDefined(features.items) || license === undefined) {
     return undefined;
   }
-  return defined({ type, features: features.items, license, attribution });
+  return withoutUndefined({ type, features: features.items, license, attribution });
 }
 
 /** Rules 3, 4 and 6: one feature. */
@@ -65,10 +75,7 @@ type Properties = { kind: "land" } | { kind: "place"; name: string };
 
 /** `properties` may carry only the keys listed for its kind: `kind` for land, `kind` and a non-empty `name` for place. */
 function readProperties(feature: ObjectReader): Properties | undefined {
-  const raw = feature.raw("properties");
-  if (raw === undefined) return undefined;
-  const isPlace = isRecord(raw) && raw["kind"] === "place";
-  const obj = ObjectReader.of(raw, feature.at("properties"), feature.errors, isPlace ? ["kind", "name"] : ["kind"]);
+  const obj = feature.object("properties", (raw) => (raw["kind"] === "place" ? ["kind", "name"] : ["kind"]));
   if (obj === undefined) return undefined;
   const kind = obj.oneOf("kind", KINDS);
   if (kind === undefined) return undefined;
@@ -110,7 +117,7 @@ function readCoordinates(value: unknown, path: string, depth: number, errors: Er
     errors.add(path, "expected an array of coordinates");
     return undefined;
   }
-  const items = value.map((item, index) => readCoordinates(item, join(path, index), depth - 1, errors));
+  const items = value.map((item, index) => readCoordinates(item, appendPointer(path, index), depth - 1, errors));
   return items.every((item) => item !== undefined) ? items : undefined;
 }
 
@@ -120,20 +127,8 @@ function readLonLat(value: unknown, path: string, errors: Errors): LonLat | unde
     errors.add(path, "expected a [lon, lat] pair with exactly two elements");
     return undefined;
   }
-  const lon = readCoordinate(value[0], join(path, 0), -180, 180, "lon", errors);
-  const lat = readCoordinate(value[1], join(path, 1), -90, 90, "lat", errors);
+  const lon = readNumber(value[0], appendPointer(path, 0), LON_BOUNDS, errors);
+  const lat = readNumber(value[1], appendPointer(path, 1), LAT_BOUNDS, errors);
   if (lon === undefined || lat === undefined) return undefined;
   return [lon, lat];
-}
-
-function readCoordinate(value: unknown, path: string, min: number, max: number, name: string, errors: Errors): number | undefined {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    errors.add(path, `expected ${name} as a finite number`);
-    return undefined;
-  }
-  if (value < min || value > max) {
-    errors.add(path, `expected ${min} <= ${name} <= ${max}, got ${value}`);
-    return undefined;
-  }
-  return value;
 }

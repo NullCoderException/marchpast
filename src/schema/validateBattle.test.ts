@@ -169,7 +169,7 @@ describe("validateBattle: shape rules", () => {
     expect(errorPaths(result)).toEqual(["/end", "/phases/0/t"]);
   });
 
-  it("checks coordinate ranges", () => {
+  it("checks position and extent ranges", () => {
     const result = validateBroken((b) => {
       b.extent.north = 91;
       b.extent.west = -181;
@@ -324,6 +324,20 @@ describe("validateBattle: cross-field rules (schema.md 2.9)", () => {
     ).toEqual(["/attribution"]);
   });
 
+  it("keeps checking references and ranks when another source is malformed", () => {
+    const result = validateBroken((b) => {
+      b.sources.mahan = { label: "Mahan" };
+      b.sources.wiki = { label: "Wikipedia", work: "Trafalgar", license: "CC-BY-SA-4.0" };
+      b.phases[0].references.push({ source: "mahan", locator: "ch. 1" }, { source: "clowes", locator: "p. 1" });
+    });
+    expect(errorPaths(result)).toEqual([
+      "/sources/mahan/work",
+      "/sources/mahan/license",
+      "/sources/wiki/license",
+      "/phases/0/references/2/source",
+    ]);
+  });
+
   it("10. every source licence is allowlisted and ranks no higher than the file's", () => {
     const src = (b: any) => b.sources["collingwood-dispatch"];
     expect(errorPaths(validateBroken((b) => (src(b).license = "GPL-3.0")))).toEqual([
@@ -358,10 +372,11 @@ describe("validateBattle: cross-field rules (schema.md 2.9)", () => {
   });
 
   it("11. map is a bare name", () => {
-    for (const notBare of ["maps/cadiz", "cadiz.geojson", "..\cadiz", "../cadiz", ""]) {
+    for (const notBare of ["maps/cadiz", "cadiz.geojson", "..\\cadiz", "../cadiz", ""]) {
       expect(errorPaths(validateBroken((b) => (b.map = notBare))), notBare).toEqual(["/map"]);
     }
     expect(validateBroken((b) => (b.map = "cadiz-bay")).ok).toBe(true);
+    expect(validateBroken((b) => (b.map = "Cádiz bay")).ok).toBe(true);
   });
 
   it("12. angles, strength and playback_rate are in range", () => {

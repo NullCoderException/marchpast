@@ -13,8 +13,11 @@ export type { LicenseId } from "./licenses.ts";
 /** A 24-hour `"HH:MM"` battle-clock time on the battle's date, `00:00` to `23:59`. Nothing finer (ADR-0002). */
 export type BattleTime = string;
 
-/** Degrees true: `0` is north, clockwise, `0 <= x < 360`. Decimals allowed so the sixteen compass points round-trip (WNW is `292.5`). */
-export type Heading = number;
+/** An angle in degrees true: `0` is north, clockwise, `0 <= x < 360`. Decimals allowed so the sixteen compass points round-trip (WNW is `292.5`). */
+export type DegreesTrue = number;
+
+/** The direction a unit's front faces, in degrees true. */
+export type Heading = DegreesTrue;
 
 /** WGS84 decimal degrees, north and east positive, `-90 <= lat <= 90`, `-180 <= lon <= 180` (battle-file convention, ADR-0001). */
 export interface Position {
@@ -112,7 +115,7 @@ export type WindForce = "calm" | "light" | "moderate" | "fresh" | "gale";
 /** The wind for a phase; steps at the phase instant, never tweened. */
 export interface Wind {
   /** Degrees true the wind blows *from*. Present if and only if `force` is not `calm`. */
-  from?: Heading;
+  from?: DegreesTrue;
   force: WindForce;
 }
 

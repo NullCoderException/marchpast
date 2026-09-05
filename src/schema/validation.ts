@@ -18,8 +18,8 @@ function escapeSegment(segment: string | number): string {
   return String(segment).replaceAll("~", "~0").replaceAll("/", "~1");
 }
 
-/** Appends segments to a JSON pointer: `join("/phases", 3, "units")` is `/phases/3/units`. */
-export function join(base: string, ...segments: (string | number)[]): string {
+/** Appends segments to a JSON pointer: `appendPointer("/phases", 3, "units")` is `/phases/3/units`. */
+export function appendPointer(base: string, ...segments: (string | number)[]): string {
   return segments.reduce<string>((path, segment) => `${path}/${escapeSegment(segment)}`, base);
 }
 
@@ -49,6 +49,29 @@ export interface NumberBounds {
   exclusiveMax?: boolean;
 }
 
+/** WGS84 latitude, decimal degrees (schema.md section 1). */
+export const LAT_BOUNDS: NumberBounds = { min: -90, max: 90 };
+/** WGS84 longitude, decimal degrees (schema.md section 1). */
+export const LON_BOUNDS: NumberBounds = { min: -180, max: 180 };
+
+/** A finite number within `bounds`, or `undefined` with the error recorded at `path`. */
+export function readNumber(value: unknown, path: string, bounds: NumberBounds, errors: Errors): number | undefined {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    errors.add(path, "expected a finite number");
+    return undefined;
+  }
+  const { min, max, exclusiveMin = false, exclusiveMax = false } = bounds;
+  const belowMin = min !== undefined && (exclusiveMin ? value <= min : value < min);
+  const aboveMax = max !== undefined && (exclusiveMax ? value >= max : value > max);
+  if (belowMin || aboveMax) {
+    const low = min === undefined ? "" : `${min} ${exclusiveMin ? "<" : "<="} `;
+    const high = max === undefined ? "" : ` ${exclusiveMax ? "<" : "<="} ${max}`;
+    errors.add(path, `expected ${low}x${high}, got ${value}`);
+    return undefined;
+  }
+  return value;
+}
+
 /** Options shared by the field readers: `optional` fields record no error when absent. */
 export interface FieldOptions {
   optional?: boolean;
@@ -59,6 +82,15 @@ export interface ArrayField<T> {
   items: (T | undefined)[];
   path: string;
 }
+
+/** A dictionary field read entry by entry: `undefined` marks the entries that failed, and `path` points at the object itself. */
+export interface RecordField<T> {
+  entries: Record<string, T | undefined>;
+  path: string;
+}
+
+/** The keys an object may carry, either fixed or chosen from the raw object (for shapes whose keys depend on a discriminator). */
+export type AllowedKeys = readonly string[] | ((raw: Record<string, unknown>) => readonly string[]);
 
 /**
  * Reads the fields of one JSON object, recording an error for each that is
@@ -81,22 +113,24 @@ export class ObjectReader {
   }
 
   /** Checks `value` is an object with no key outside `allowedKeys`; `undefined` (with an error recorded) when it is not an object. */
-  static of(value: unknown, path: string, errors: Errors, allowedKeys: readonly string[]): ObjectReader | undefined {
+  static of(value: unknown, path: string, errors: Errors, allowedKeys: AllowedKeys): ObjectReader | undefined {
     if (!isRecord(value)) {
       errors.add(path, "expected a JSON object");
       return undefined;
     }
+    const allowed = typeof allowedKeys === "function" ? allowedKeys(value) : allowedKeys;
     for (const key of Object.keys(value)) {
-      if (!allowedKeys.includes(key)) errors.add(join(path, key), "unknown key");
+      if (!allowed.includes(key)) errors.add(appendPointer(path, key), "unknown key");
     }
     return new ObjectReader(value, path, errors);
   }
 
   /** The pointer to a field of this object. */
   at(key: string): string {
-    return join(this.path, key);
+    return appendPointer(this.path, key);
   }
 
+  /** Whether the field is present (JSON has no `undefined`, so present means not `undefined`). */
   has(key: string): boolean {
     return this.value[key] !== undefined;
   }
@@ -108,6 +142,7 @@ export class ObjectReader {
     return raw;
   }
 
+  /** A string field. */
   string(key: string, options: FieldOptions = {}): string | undefined {
     const raw = this.raw(key, options);
     if (raw === undefined) return undefined;
@@ -122,20 +157,7 @@ export class ObjectReader {
   number(key: string, bounds: NumberBounds = {}, options: FieldOptions = {}): number | undefined {
     const raw = this.raw(key, options);
     if (raw === undefined) return undefined;
-    if (typeof raw !== "number" || !Number.isFinite(raw)) {
-      this.errors.add(this.at(key), "expected a finite number");
-      return undefined;
-    }
-    const { min, max, exclusiveMin = false, exclusiveMax = false } = bounds;
-    const belowMin = min !== undefined && (exclusiveMin ? raw <= min : raw < min);
-    const aboveMax = max !== undefined && (exclusiveMax ? raw >= max : raw > max);
-    if (belowMin || aboveMax) {
-      const low = min === undefined ? "" : `${min} ${exclusiveMin ? "<" : "<="} `;
-      const high = max === undefined ? "" : ` ${exclusiveMax ? "<" : "<="} ${max}`;
-      this.errors.add(this.at(key), `expected ${low}x${high}, got ${raw}`);
-      return undefined;
-    }
-    return raw;
+    return readNumber(raw, this.at(key), bounds, this.errors);
   }
 
   /** One of a fixed set of string values. */
@@ -150,7 +172,7 @@ export class ObjectReader {
   }
 
   /** A nested object, itself checked against `allowedKeys`. */
-  object(key: string, allowedKeys: readonly string[], options: FieldOptions = {}): ObjectReader | undefined {
+  object(key: string, allowedKeys: AllowedKeys, options: FieldOptions = {}): ObjectReader | undefined {
     const raw = this.raw(key, options);
     if (raw === undefined) return undefined;
     return ObjectReader.of(raw, this.at(key), this.errors, allowedKeys);
@@ -173,15 +195,15 @@ export class ObjectReader {
       this.errors.add(path, "expected at least one item");
       return undefined;
     }
-    return { items: raw.map((item, index) => readItem(item, join(path, index))), path };
+    return { items: raw.map((item, index) => readItem(item, appendPointer(path, index))), path };
   }
 
-  /** An object used as a dictionary: every value is handed to `readEntry` with its pointer. Returns `undefined` when any entry failed. */
+  /** An object used as a dictionary, each value handed to `readEntry` with its pointer. `undefined` when the field itself is missing or not an object. */
   record<T>(
     key: string,
     readEntry: (value: unknown, path: string) => T | undefined,
     options: FieldOptions = {},
-  ): Record<string, T> | undefined {
+  ): RecordField<T> | undefined {
     const raw = this.raw(key, options);
     if (raw === undefined) return undefined;
     const path = this.at(key);
@@ -189,14 +211,9 @@ export class ObjectReader {
       this.errors.add(path, "expected a JSON object");
       return undefined;
     }
-    const entries: Record<string, T> = {};
-    let complete = true;
-    for (const [id, value] of Object.entries(raw)) {
-      const entry = readEntry(value, join(path, id));
-      if (entry === undefined) complete = false;
-      else entries[id] = entry;
-    }
-    return complete ? entries : undefined;
+    const entries: Record<string, T | undefined> = {};
+    for (const [id, value] of Object.entries(raw)) entries[id] = readEntry(value, appendPointer(path, id));
+    return { entries, path };
   }
 }
 
@@ -205,7 +222,12 @@ export function allDefined<T>(items: (T | undefined)[]): items is T[] {
   return items.every((item) => item !== undefined);
 }
 
+/** Whether every entry read cleanly, narrowing the record. */
+export function allEntriesDefined<T>(entries: Record<string, T | undefined>): entries is Record<string, T> {
+  return allDefined(Object.values(entries));
+}
+
 /** Drops keys whose value is `undefined`, so optional fields that were absent stay absent in the typed value. */
-export function defined<T extends object>(value: T): T {
+export function withoutUndefined<T extends object>(value: T): T {
   return Object.fromEntries(Object.entries(value).filter(([, v]) => v !== undefined)) as T;
 }

@@ -26,7 +26,19 @@ import type {
   UnitSnapshot,
   Wind,
 } from "./types.ts";
-import { allDefined, defined, Errors, join, ObjectReader, type ValidationError } from "./validation.ts";
+import {
+  allDefined,
+  allEntriesDefined,
+  appendPointer,
+  type ArrayField,
+  Errors,
+  LAT_BOUNDS,
+  LON_BOUNDS,
+  ObjectReader,
+  type RecordField,
+  type ValidationError,
+  withoutUndefined,
+} from "./validation.ts";
 
 export type BattleValidation = { ok: true; battle: Battle } | { ok: false; errors: ValidationError[] };
 
@@ -36,12 +48,10 @@ const FORMATIONS = ["column", "line"] as const;
 const STATES = ["intact", "engaged", "broken", "destroyed"] as const;
 const MOVE_KINDS = ["detachment", "intent"] as const;
 
-const LAT = { min: -90, max: 90 };
-const LON = { min: -180, max: 180 };
 /** Degrees true: `0 <= x < 360`. */
 const ANGLE = { min: 0, max: 360, exclusiveMax: true };
-/** A bare map name (rule 11): the file's stem under `data/maps/`, never a path or a file name. */
-const BARE_MAP_NAME = /^[A-Za-z0-9_-]+$/;
+/** What disqualifies a map name (rule 11): a path separator or an extension. */
+const NOT_A_BARE_NAME = /[\/\\.]/;
 
 /** What a phase needs from the rest of the file to check its own cross-references (rules 5 and 6). */
 interface PhaseContext {
@@ -85,18 +95,19 @@ function readBattle(json: unknown, errors: Errors): Battle | undefined {
   const license = readLicense(obj);
   const attribution = readAttribution(obj, license);
   const sources = obj.record("sources", (value, path) => readSource(value, path, errors));
-  if (sources !== undefined && license !== undefined) checkSourceRanks(sources, license, obj.at("sources"), errors);
+  if (sources !== undefined && license !== undefined) checkSourceRanks(sources, license, errors);
   const units = obj.array("units", (value, path) => readUnit(value, path, errors), { nonEmpty: true });
-  if (units !== undefined) checkUniqueIds(units.items, units.path, errors);
+  if (units !== undefined) checkUniqueIds(units, errors);
   const context: PhaseContext = {
     rosterIds: units !== undefined && allDefined(units.items) ? new Set(units.items.map((unit) => unit.id)) : undefined,
-    sourceIds: sources === undefined ? undefined : new Set(Object.keys(sources)),
+    // A key whose entry failed to read is still a key, so a reference to it is not dangling.
+    sourceIds: sources === undefined ? undefined : new Set(Object.keys(sources.entries)),
   };
   const phases = obj.array("phases", (value, path) => readPhase(value, path, errors, context), { nonEmpty: true });
   if (phases !== undefined) {
-    checkUniqueIds(phases.items, phases.path, errors);
-    checkPhaseOrder(phases.items, phases.path, end, obj, errors);
-    checkWindAllOrNothing(phases.items, phases.path, errors);
+    checkUniqueIds(phases, errors);
+    checkPhaseOrder(phases, end, obj, errors);
+    checkWindAllOrNothing(phases, errors);
   }
 
   if (
@@ -108,6 +119,7 @@ function readBattle(json: unknown, errors: Errors): Battle | undefined {
     end === undefined ||
     license === undefined ||
     sources === undefined ||
+    !allEntriesDefined(sources.entries) ||
     units === undefined ||
     !allDefined(units.items) ||
     phases === undefined ||
@@ -116,7 +128,7 @@ function readBattle(json: unknown, errors: Errors): Battle | undefined {
     return undefined;
   }
 
-  return defined({
+  return withoutUndefined({
     schema_version: schemaVersion,
     title,
     date,
@@ -126,7 +138,7 @@ function readBattle(json: unknown, errors: Errors): Battle | undefined {
     end,
     license,
     attribution,
-    sources,
+    sources: sources.entries,
     units: units.items,
     phases: phases.items,
   });
@@ -143,6 +155,7 @@ function readSchemaVersion(obj: ObjectReader): 1 | undefined {
   return 1;
 }
 
+/** A battle-clock time field: `"HH:MM"`, `00:00` to `23:59`. */
 function readBattleTime(obj: ObjectReader, key: string): BattleTime | undefined {
   const raw = obj.string(key);
   if (raw === undefined) return undefined;
@@ -157,8 +170,8 @@ function readBattleTime(obj: ObjectReader, key: string): BattleTime | undefined 
 function readMapName(obj: ObjectReader): string | undefined {
   const name = obj.string("map", { optional: true });
   if (name === undefined) return undefined;
-  if (!BARE_MAP_NAME.test(name)) {
-    obj.errors.add(obj.at("map"), `expected a bare map name (letters, digits, - and _), got ${JSON.stringify(name)}`);
+  if (name === "" || NOT_A_BARE_NAME.test(name)) {
+    obj.errors.add(obj.at("map"), `expected a bare map name (no path separators, no extension), got ${JSON.stringify(name)}`);
     return undefined;
   }
   return name;
@@ -167,24 +180,26 @@ function readMapName(obj: ObjectReader): string | undefined {
 /** Rule 2 lives here beside the range checks: `south < north`, `west < east`. */
 function readExtent(obj: ObjectReader | undefined): Extent | undefined {
   if (obj === undefined) return undefined;
-  const north = obj.number("north", LAT);
-  const south = obj.number("south", LAT);
-  const east = obj.number("east", LON);
-  const west = obj.number("west", LON);
+  const north = obj.number("north", LAT_BOUNDS);
+  const south = obj.number("south", LAT_BOUNDS);
+  const east = obj.number("east", LON_BOUNDS);
+  const west = obj.number("west", LON_BOUNDS);
   if (north === undefined || south === undefined || east === undefined || west === undefined) return undefined;
   if (south >= north) obj.errors.add(obj.path, `expected south < north, got south ${south} and north ${north}`);
   if (west >= east) obj.errors.add(obj.path, `expected west < east, got west ${west} and east ${east}`);
   return { north, south, east, west };
 }
 
+/** A `{ lat, lon }` object in WGS84 range. */
 function readPosition(obj: ObjectReader | undefined): Position | undefined {
   if (obj === undefined) return undefined;
-  const lat = obj.number("lat", LAT);
-  const lon = obj.number("lon", LON);
+  const lat = obj.number("lat", LAT_BOUNDS);
+  const lon = obj.number("lon", LON_BOUNDS);
   if (lat === undefined || lon === undefined) return undefined;
   return { lat, lon };
 }
 
+/** One entry of `sources` (schema.md 2.2). */
 function readSource(value: unknown, path: string, errors: Errors): Source | undefined {
   const obj = ObjectReader.of(value, path, errors, ["label", "work", "url", "license", "license_note"]);
   if (obj === undefined) return undefined;
@@ -194,21 +209,22 @@ function readSource(value: unknown, path: string, errors: Errors): Source | unde
   const license = readLicense(obj);
   const licenseNote = obj.string("license_note", { optional: true });
   if (label === undefined || work === undefined || license === undefined) return undefined;
-  return defined({ label, work, url, license, license_note: licenseNote });
+  return withoutUndefined({ label, work, url, license, license_note: licenseNote });
 }
 
 /** Rule 10, second half: no source's licence class ranks above the file's. */
-function checkSourceRanks(sources: Record<string, Source>, fileLicense: LicenseId, path: string, errors: Errors): void {
-  for (const [id, source] of Object.entries(sources)) {
-    if (ranksAbove(source.license, fileLicense)) {
+function checkSourceRanks(sources: RecordField<Source>, fileLicense: LicenseId, errors: Errors): void {
+  for (const [id, source] of Object.entries(sources.entries)) {
+    if (source !== undefined && ranksAbove(source.license, fileLicense)) {
       errors.add(
-        join(path, id, "license"),
+        appendPointer(sources.path, id, "license"),
         `${source.license} (${classOf(source.license)}) ranks above the file's ${fileLicense} (${classOf(fileLicense)})`,
       );
     }
   }
 }
 
+/** One roster entry (schema.md 2.3). */
 function readUnit(value: unknown, path: string, errors: Errors): Unit | undefined {
   const obj = ObjectReader.of(value, path, errors, ["id", "side", "label", "commander"]);
   if (obj === undefined) return undefined;
@@ -217,19 +233,20 @@ function readUnit(value: unknown, path: string, errors: Errors): Unit | undefine
   const label = obj.string("label");
   const commander = obj.string("commander", { optional: true });
   if (id === undefined || side === undefined || label === undefined) return undefined;
-  return defined({ id, side, label, commander });
+  return withoutUndefined({ id, side, label, commander });
 }
 
 /** Rule 3: ids unique within an array; the later duplicate is the one reported. */
-function checkUniqueIds(items: ({ id: string } | undefined)[], path: string, errors: Errors): void {
+function checkUniqueIds(field: ArrayField<{ id: string }>, errors: Errors): void {
   const seen = new Set<string>();
-  items.forEach((item, index) => {
+  field.items.forEach((item, index) => {
     if (item === undefined) return;
-    if (seen.has(item.id)) errors.add(join(path, index, "id"), `duplicate id ${JSON.stringify(item.id)}`);
+    if (seen.has(item.id)) errors.add(appendPointer(field.path, index, "id"), `duplicate id ${JSON.stringify(item.id)}`);
     seen.add(item.id);
   });
 }
 
+/** One phase (schema.md 2.4), with rules 5 and 6 checked against `context`. */
 function readPhase(value: unknown, path: string, errors: Errors, context: PhaseContext): Phase | undefined {
   const obj = ObjectReader.of(value, path, errors, [
     "id",
@@ -254,9 +271,9 @@ function readPhase(value: unknown, path: string, errors: Errors, context: PhaseC
   const references = obj.array("references", (item, itemPath) => readReference(item, itemPath, errors), {
     nonEmpty: true,
   });
-  if (references !== undefined) checkReferencesResolve(references.items, references.path, context.sourceIds, errors);
+  if (references !== undefined) checkReferencesResolve(references, context.sourceIds, errors);
   const units = obj.array("units", (item, itemPath) => readSnapshot(item, itemPath, errors));
-  if (units !== undefined) checkRosterCovered(units.items, units.path, context.rosterIds, errors);
+  if (units !== undefined) checkRosterCovered(units, context.rosterIds, errors);
 
   if (
     id === undefined ||
@@ -272,7 +289,7 @@ function readPhase(value: unknown, path: string, errors: Errors, context: PhaseC
   ) {
     return undefined;
   }
-  return defined({
+  return withoutUndefined({
     id,
     label,
     t,
@@ -286,18 +303,12 @@ function readPhase(value: unknown, path: string, errors: Errors, context: PhaseC
 }
 
 /** Rule 4: `t` strictly increasing across the phases that read cleanly, and `end` later than the last `t`. */
-function checkPhaseOrder(
-  phases: (Phase | undefined)[],
-  path: string,
-  end: BattleTime | undefined,
-  root: ObjectReader,
-  errors: Errors,
-): void {
+function checkPhaseOrder(phases: ArrayField<Phase>, end: BattleTime | undefined, root: ObjectReader, errors: Errors): void {
   let previous: { t: BattleTime; index: number } | undefined;
-  phases.forEach((phase, index) => {
+  phases.items.forEach((phase, index) => {
     if (phase === undefined) return;
     if (previous !== undefined && parseBattleTime(phase.t) <= parseBattleTime(previous.t)) {
-      errors.add(join(path, index, "t"), `expected later than phase ${previous.index} at ${previous.t}, got ${phase.t}`);
+      errors.add(appendPointer(phases.path, index, "t"), `expected later than phase ${previous.index} at ${previous.t}, got ${phase.t}`);
     }
     previous = { t: phase.t, index };
   });
@@ -307,14 +318,14 @@ function checkPhaseOrder(
 }
 
 /** Rule 7: either every phase has `wind` or none does. Reported on each phase that lacks it. */
-function checkWindAllOrNothing(phases: (Phase | undefined)[], path: string, errors: Errors): void {
-  const read = phases.filter((phase) => phase !== undefined);
+function checkWindAllOrNothing(phases: ArrayField<Phase>, errors: Errors): void {
+  const read = phases.items.filter((phase) => phase !== undefined);
   const some = read.some((phase) => phase.wind !== undefined);
   const all = read.every((phase) => phase.wind !== undefined);
   if (!some || all) return;
-  phases.forEach((phase, index) => {
+  phases.items.forEach((phase, index) => {
     if (phase !== undefined && phase.wind === undefined) {
-      errors.add(join(path, index, "wind"), "required: wind is all or nothing, and other phases have it");
+      errors.add(appendPointer(phases.path, index, "wind"), "required: wind is all or nothing, and other phases have it");
     }
   });
 }
@@ -333,9 +344,10 @@ function readWind(obj: ObjectReader | undefined): Wind | undefined {
     obj.errors.add(obj.at("from"), `required when force is ${force}`);
     return undefined;
   }
-  return defined({ from, force });
+  return withoutUndefined({ from, force });
 }
 
+/** One pointer into `sources` (schema.md 2.6). */
 function readReference(value: unknown, path: string, errors: Errors): Reference | undefined {
   const obj = ObjectReader.of(value, path, errors, ["source", "locator", "quote", "note"]);
   if (obj === undefined) return undefined;
@@ -344,24 +356,20 @@ function readReference(value: unknown, path: string, errors: Errors): Reference 
   const quote = obj.string("quote", { optional: true });
   const note = obj.string("note", { optional: true });
   if (source === undefined || locator === undefined) return undefined;
-  return defined({ source, locator, quote, note });
+  return withoutUndefined({ source, locator, quote, note });
 }
 
 /** Rule 6, second half: every reference points at a key of `sources`. */
-function checkReferencesResolve(
-  references: (Reference | undefined)[],
-  path: string,
-  sourceIds: Set<string> | undefined,
-  errors: Errors,
-): void {
+function checkReferencesResolve(references: ArrayField<Reference>, sourceIds: Set<string> | undefined, errors: Errors): void {
   if (sourceIds === undefined) return;
-  references.forEach((reference, index) => {
+  references.items.forEach((reference, index) => {
     if (reference !== undefined && !sourceIds.has(reference.source)) {
-      errors.add(join(path, index, "source"), `${JSON.stringify(reference.source)} is not a key of sources`);
+      errors.add(appendPointer(references.path, index, "source"), `${JSON.stringify(reference.source)} is not a key of sources`);
     }
   });
 }
 
+/** One unit's picture at the phase instant (schema.md 2.7). */
 function readSnapshot(value: unknown, path: string, errors: Errors): UnitSnapshot | undefined {
   const obj = ObjectReader.of(value, path, errors, [
     "id",
@@ -389,32 +397,30 @@ function readSnapshot(value: unknown, path: string, errors: Errors): UnitSnapsho
     if (!allDefined(moves.items)) return undefined;
     moveList = moves.items;
   }
-  return defined({ id, position, heading, formation, state, strength, moves: moveList });
+  return withoutUndefined({ id, position, heading, formation, state, strength, moves: moveList });
 }
 
 /** Rule 5: a phase lists every roster unit exactly once and no id off the roster. */
-function checkRosterCovered(
-  snapshots: (UnitSnapshot | undefined)[],
-  path: string,
-  rosterIds: Set<string> | undefined,
-  errors: Errors,
-): void {
+function checkRosterCovered(snapshots: ArrayField<UnitSnapshot>, rosterIds: Set<string> | undefined, errors: Errors): void {
   if (rosterIds === undefined) return;
   const seen = new Set<string>();
-  snapshots.forEach((snapshot, index) => {
+  snapshots.items.forEach((snapshot, index) => {
     if (snapshot === undefined) return;
     if (!rosterIds.has(snapshot.id)) {
-      errors.add(join(path, index, "id"), `${JSON.stringify(snapshot.id)} is not on the roster`);
+      errors.add(appendPointer(snapshots.path, index, "id"), `${JSON.stringify(snapshot.id)} is not on the roster`);
     } else if (seen.has(snapshot.id)) {
-      errors.add(join(path, index, "id"), `${JSON.stringify(snapshot.id)} is listed more than once in this phase`);
+      errors.add(appendPointer(snapshots.path, index, "id"), `${JSON.stringify(snapshot.id)} is listed more than once in this phase`);
     }
     seen.add(snapshot.id);
   });
-  if (!allDefined(snapshots)) return;
+  if (!allDefined(snapshots.items)) return;
   const missing = [...rosterIds].filter((id) => !seen.has(id));
-  if (missing.length > 0) errors.add(path, `missing roster units: ${missing.map((id) => JSON.stringify(id)).join(", ")}`);
+  if (missing.length > 0) {
+    errors.add(snapshots.path, `missing roster units: ${missing.map((id) => JSON.stringify(id)).join(", ")}`);
+  }
 }
 
+/** One authored arrow (schema.md 2.8). */
 function readMove(value: unknown, path: string, errors: Errors): Move | undefined {
   const obj = ObjectReader.of(value, path, errors, ["kind", "to"]);
   if (obj === undefined) return undefined;
