@@ -69,12 +69,16 @@ A body of force the battle follows as one marker on the map, such as a fleet col
 _Avoid_: Marker, force, group, side, formation
 
 **State**:
-Which of four conditions a unit is in during a phase: intact (not in action), engaged (in action, cohesion held), broken (cohesion lost, no longer fighting as a body), or destroyed (ceased to exist as a fighting unit).
+Which of four conditions a unit is in during a phase: intact (not yet in action), engaged (in the action or its aftermath, cohesion held), broken (cohesion lost, no longer fighting as a body), or destroyed (ceased to exist as a fighting unit). A unit that has fought stays engaged when the firing stops.
 _Avoid_: Status, condition, morale, struck
 
 **Strength**:
-The fraction, 0 to 1, of a unit's opening fighting strength still fighting as part of the unit during a phase. Damage to ships or men who stay in the fight does not reduce it.
+The fraction, 0 to 1, of a unit's opening fighting strength still fighting as part of the unit during a phase. Damage to ships or men who stay in the fight does not reduce it; ships or men that have struck, or been detached from the unit, have left it and do.
 _Avoid_: Health, casualties, hit points, size, losses
+
+**Commander**:
+The named person commanding a unit, recorded once per battle as part of the unit's identity so labels and captions can name them. A change of command during the battle is caption matter.
+_Avoid_: Admiral, general, leader, flag officer, owner
 
 **Formation**:
 The shape a unit's ships or men are arranged in, one of two words in v1: column (in line ahead along the heading) or line (abreast across the heading). A styled label the renderer draws; a battle file never carries the shape's geometry.
