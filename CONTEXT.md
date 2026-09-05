@@ -31,8 +31,8 @@ The line a unit's position follows between one phase and the next, derived by th
 _Avoid_: Path, route, trail, vector, move
 
 **Furniture**:
-What the renderer draws around the picture without any battle authoring it: the compass rose, the scale bar, the wind indicator, the map's credit line.
-_Avoid_: Chrome, overlay, HUD, widgets
+What the renderer draws around the picture without any battle authoring it and the viewer cannot operate: the compass rose, the scale bar, the wind indicator, the map's credit line.
+_Avoid_: Chrome, overlay, HUD, widgets, controls
 
 ### Time
 
@@ -91,3 +91,21 @@ _Avoid_: Citation, footnote, source ref
 **Notes**:
 The author's per-phase reasoning about the sources, such as which reading of a disputed time was chosen and why; surfaced on demand, never animated.
 _Avoid_: Commentary, alternates, uncertainty, confidence
+
+### Player
+
+**Controls**:
+What the viewer operates to drive playback: play and pause, the scrubber, the phase-jump buttons, the speed multiplier, and the toggle for the details panel. Never authored in a battle file.
+_Avoid_: Furniture, UI, transport, toolbar
+
+**Scrubber**:
+The bar the viewer drags to move through the battle, one segment per phase sized by that phase's playback duration, with the battle clock shown as a readout beside it rather than as a scale on the bar.
+_Avoid_: Timeline, seek bar, slider, progress bar
+
+**Speed multiplier**:
+A viewer-chosen factor applied uniformly to every phase's playback rate, held only by the player for the current visit.
+_Avoid_: Speed, playback rate (the authored per-phase value), time scale
+
+**Details panel**:
+The on-demand view that shows the current phase's notes and references, then the battle's attribution and sources table. Hidden by default and never pauses playback.
+_Avoid_: Sidebar, drawer, info box, credits screen
