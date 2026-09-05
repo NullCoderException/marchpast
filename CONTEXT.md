@@ -18,6 +18,14 @@ _Avoid_: Course, bearing, direction, orientation
 The latitude/longitude bounding box a battle plays inside, fixed for the whole playback.
 _Avoid_: Viewport, bounds, camera, map box
 
+**Map**:
+The static geography a battle plays over, drawn behind the units: land polygons and named places, in a file the battle points at. A battle may have none.
+_Avoid_: Basemap, background, terrain, layer, chart
+
+**Place**:
+A named point on the map, such as Cadiz or Cape Trafalgar, drawn as a label so captions can refer to it.
+_Avoid_: Landmark, POI, city, label
+
 **Track**:
 The line a unit's position follows between one phase and the next, derived by the player from the two positions and never written in a battle file.
 _Avoid_: Path, route, trail, vector, move
