@@ -31,3 +31,17 @@ _Avoid_: Game time, sim time, timestamp
 **Playback rate**:
 How many battle-clock seconds elapse per real second while a phase plays.
 _Avoid_: Speed, time scale, compression, duration
+
+### Units
+
+**Unit**:
+A body of force the battle follows as one marker on the map, such as a fleet column, a squadron, or an army wing. Every phase lists every unit.
+_Avoid_: Marker, force, group, side, formation
+
+**State**:
+Which of four conditions a unit is in during a phase: intact (not in action), engaged (in action, cohesion held), broken (cohesion lost, no longer fighting as a body), or destroyed (ceased to exist as a fighting unit).
+_Avoid_: Status, condition, morale, struck
+
+**Strength**:
+The fraction, 0 to 1, of a unit's opening fighting strength still fighting as part of the unit during a phase. Damage to ships or men who stay in the fight does not reduce it.
+_Avoid_: Health, casualties, hit points, size, losses
