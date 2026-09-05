@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc -b",
-    "validate": "node -e \"console.log('validate: not yet implemented')\""
+    "validate": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/validate.ts"
   },
   "devDependencies": {
     "@types/node": "^26.4.1",
