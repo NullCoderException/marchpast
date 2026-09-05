@@ -15,7 +15,7 @@ npm run typecheck  # tsc over the app and the Vite config
 npm run validate   # check data/ against schema v1 (or: npm run validate data/battles/x.json)
 ```
 
-CI (`.github/workflows/ci.yml`) runs `npm ci`, `typecheck`, `test` and `build` on every push and pull request.
+CI (`.github/workflows/ci.yml`) runs `npm ci`, `typecheck`, `test` and `build` on every pull request and on `main`, and checks that a PR's title is a conventional commit line. Changes reach `main` only through squash-merged pull requests; see `docs/agents/git-workflow.md`.
 
 ### How data is served
 
