@@ -34,6 +34,16 @@ _Avoid_: Path, route, trail, vector, move
 What the renderer draws around the picture without any battle authoring it and the viewer cannot operate: the compass rose, the scale bar, the wind indicator, the map's credit line.
 _Avoid_: Chrome, overlay, HUD, widgets, controls
 
+### Weather
+
+**Wind**:
+The direction the wind blows from, in degrees true, and its force, authored per phase and holding until the next phase begins. A battle tracks wind in every phase or in none.
+_Avoid_: Breeze, weather, direction, wind toward
+
+**Force**:
+How hard the wind blows, one of five words: calm, light, moderate, fresh, or gale. Calm has no direction.
+_Avoid_: Beaufort, strength, speed, knots
+
 ### Time
 
 **Phase**:
