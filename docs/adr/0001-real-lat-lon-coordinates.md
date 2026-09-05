@@ -8,4 +8,4 @@ Battle files could have used per-battle abstract units (a 0..1000 box with its o
 - The projection is a renderer implementation detail, never a schema field. The renderer uses Web Mercator so that future basemap tiles line up without reprojection; at battle scale it is visually identical to equirectangular.
 - **Heading** is numeric degrees true. No compass-point strings, no radians, no dual representation.
 - Schema v1 has no length fields. The only unit-bearing field is a per-battle scale-bar display unit (nautical miles or kilometres). If a later decision needs a length, it is stored in metres and the display unit converts.
-- A unit's **position** is a single centre point plus a heading. Formation shape (column, line, crescent) is a label the renderer styles, not geometry. Positions carry no uncertainty field; source disagreements are a caption and source-refs matter.
+- A unit's **position** is a single centre point plus a heading. Formation shape is a label the renderer styles, not geometry (the v1 vocabulary, `column` and `line`, is fixed by ADR-0009). Positions carry no uncertainty field; source disagreements are a caption and references matter (ADR-0006).
