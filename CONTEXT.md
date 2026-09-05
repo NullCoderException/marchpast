@@ -31,7 +31,7 @@ The line a unit's position follows between one phase and the next, derived by th
 _Avoid_: Path, route, trail, vector, move
 
 **Furniture**:
-What the renderer draws around the picture without any battle authoring it: the compass rose, the scale bar, the wind indicator.
+What the renderer draws around the picture without any battle authoring it: the compass rose, the scale bar, the wind indicator, the map's credit line.
 _Avoid_: Chrome, overlay, HUD, widgets
 
 ### Time
@@ -75,6 +75,14 @@ _Avoid_: Narration, subtitle, alternate, label
 **Source**:
 A work the battle draws on, listed once per battle with its display label, work details, and licence, whether or not any phase references it.
 _Avoid_: Bibliography, citation, reference (for the work itself)
+
+**Licence**:
+The terms a battle file, map file, or source may be used under, recorded in data as an SPDX identifier or the word public-domain (the data field is spelled `license`). Licences rank public-domain, then attribution-only, then share-alike; a source never ranks above the file that draws on it.
+_Avoid_: License (in prose), rights, copyright, terms
+
+**Attribution**:
+The credit line a licence obliges anyone displaying or redistributing a file to show, naming the licensor; required whenever the file's licence demands one.
+_Avoid_: Credit, byline, copyright notice, acknowledgement
 
 **Reference**:
 A phase's pointer into one source: a locator precise enough to find the passage, and optionally the verbatim quote it supports.
