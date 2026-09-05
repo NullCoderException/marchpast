@@ -18,6 +18,10 @@ _Avoid_: Course, bearing, direction, orientation
 The latitude/longitude bounding box a battle plays inside, fixed for the whole playback.
 _Avoid_: Viewport, bounds, camera, map box
 
+**Track**:
+The line a unit's position follows between one phase and the next, derived by the player from the two positions and never written in a battle file.
+_Avoid_: Path, route, trail, vector, move
+
 ### Time
 
 **Phase**:
@@ -45,3 +49,7 @@ _Avoid_: Status, condition, morale, struck
 **Strength**:
 The fraction, 0 to 1, of a unit's opening fighting strength still fighting as part of the unit during a phase. Damage to ships or men who stay in the fight does not reduce it.
 _Avoid_: Health, casualties, hit points, size, losses
+
+**Move**:
+An authored arrow from a unit toward a position, showing something the unit's own position cannot: a detachment (part of the unit going where the unit does not) or an intent (what the unit was ordered to do, whether or not it happened).
+_Avoid_: Arrow, order, action, track
