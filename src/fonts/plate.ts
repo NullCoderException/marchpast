@@ -20,7 +20,7 @@ export function loadPlateFont(): Promise<void> {
   return loading;
 }
 
-/** A CSS font shorthand in the plate face, e.g. `plateFont(24)` or `plateFont(15, "italic")`. */
-export function plateFont(sizePx: number, style: "normal" | "italic" = "normal"): string {
-  return `${style} ${sizePx}px "${PLATE_FONT_FAMILY}", Georgia, serif`;
+/** A CSS font shorthand in the plate face, e.g. `plateFont(24)`. */
+export function plateFont(sizePx: number): string {
+  return `${sizePx}px "${PLATE_FONT_FAMILY}", Georgia, serif`;
 }

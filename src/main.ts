@@ -14,18 +14,18 @@ function fitToWindow(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): 
 
 /** Calls `onChange` whenever devicePixelRatio changes (zoom, or a move between monitors). */
 function watchDevicePixelRatio(onChange: () => void): void {
-  const arm = (): void => {
+  const listenForNextChange = (): void => {
     const query = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
     query.addEventListener(
       "change",
       () => {
         onChange();
-        arm();
+        listenForNextChange();
       },
       { once: true },
     );
   };
-  arm();
+  listenForNextChange();
 }
 
 function paint(ctx: CanvasRenderingContext2D): void {

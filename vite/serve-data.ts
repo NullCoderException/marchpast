@@ -18,6 +18,12 @@ const CONTENT_TYPES: Readonly<Record<string, string>> = {
   ".geojson": "application/geo+json",
 };
 
+/** Whether a request URL belongs to the data route: `/data` itself or anything beneath it. */
+export function isDataUrl(url: string): boolean {
+  const pathname = url.split("?")[0] ?? "";
+  return pathname === URL_PREFIX || pathname.startsWith(`${URL_PREFIX}/`);
+}
+
 /** Media type for a data file, by extension. */
 export function contentTypeFor(fileName: string): string {
   return CONTENT_TYPES[path.extname(fileName)] ?? "application/octet-stream";
@@ -60,7 +66,7 @@ export function serveData(): Plugin {
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         const url = req.url ?? "";
-        if (!url.startsWith(URL_PREFIX)) return next();
+        if (!isDataUrl(url)) return next();
         if (req.method !== "GET" && req.method !== "HEAD") return next();
 
         const file = resolveDataFile(url, dataDir);

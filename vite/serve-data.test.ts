@@ -1,6 +1,6 @@
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { contentTypeFor, resolveDataFile } from "./serve-data";
+import { contentTypeFor, isDataUrl, resolveDataFile } from "./serve-data";
 
 const dataDir = path.resolve("/repo/data");
 
@@ -42,5 +42,20 @@ describe("content types", () => {
 
   it("falls back to octet-stream for anything else", () => {
     expect(contentTypeFor("LICENSE")).toBe("application/octet-stream");
+  });
+});
+
+describe("route ownership", () => {
+  it("claims /data and everything beneath it", () => {
+    expect(isDataUrl("/data")).toBe(true);
+    expect(isDataUrl("/data/")).toBe(true);
+    expect(isDataUrl("/data/battles/trafalgar.json")).toBe(true);
+    expect(isDataUrl("/data?x=1")).toBe(true);
+  });
+
+  it("leaves routes that merely start with the letters alone", () => {
+    expect(isDataUrl("/database.js")).toBe(false);
+    expect(isDataUrl("/data-notes.html")).toBe(false);
+    expect(isDataUrl("/src/data/paths.ts")).toBe(false);
   });
 });

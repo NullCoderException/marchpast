@@ -7,7 +7,7 @@ Needs Node 22 or later.
 
 ```sh
 npm install        # once
-npm run dev        # dev server with hot reload, opens on http://localhost:5173
+npm run dev        # dev server with hot reload on http://localhost:5173
 npm run build      # production build into dist/
 npm run preview    # serve the production build locally
 npm test           # Vitest, once
@@ -19,9 +19,9 @@ CI (`.github/workflows/ci.yml`) runs `npm ci`, `typecheck`, `test` and `build` o
 
 ### How data is served
 
-Battle and map files stay where they are in the repo, `data/battles/<name>.json` and `data/maps/<name>.geojson`, and the app fetches them at the same paths under `/data/`. The only module that knows this is `src/data/paths.ts` (`battleUrl(name)`, `mapUrl(name)`); nothing else spells out where data lives.
+Battle and map files stay where they are in the repo, `data/battles/<name>.json` and `data/maps/<name>.geojson`, and the app fetches them at the same paths under `/data/`. The only app module that knows this is `src/data/paths.ts` (`battleUrl(name)`, `mapUrl(name)`); the Vite plugin below mounts the same `/data/` prefix, and nothing else spells out where data lives.
 
-The mapping is made real by a small Vite plugin, `vite/serve-data.ts`, rather than by `publicDir`, because `publicDir` serves a directory at the site root and cannot mount it under a `/data/` prefix. In dev the plugin answers `/data/...` requests straight from the `data/` directory and returns a plain 404 (never the HTML fallback page) for anything missing. In the build it copies `data/` into `dist/data/`, so `vite preview` and any static host serve the same URLs.
+The mapping is made real by a small Vite plugin, `vite/serve-data.ts`, rather than by `publicDir`, because `publicDir` serves a directory at the site root and cannot mount it under a `/data/` prefix. In dev the plugin answers `/data/...` requests straight from the `data/` directory and returns a plain 404 (never the HTML fallback page) for anything missing. In the build it copies `data/` into `dist/data/`, so `vite preview` and any static host serve the same URLs for the files that exist (what they return for a missing file is their own fallback behaviour; the plain-404 guarantee is the dev server's).
 
 ### The plate typeface
 

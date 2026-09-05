@@ -7,8 +7,8 @@
  * real live in `vite/serve-data.ts`.
  */
 
-/** URL prefix the data directory is served under. Mirrors the repo's `data/`. */
-export const DATA_URL_PREFIX = "/data";
+/** URL prefix the data directory is served under. Mirrors the repo's `data/`; `vite/serve-data.ts` mounts the same prefix. */
+const DATA_URL_PREFIX = "/data";
 
 /** URL of the battle file `data/battles/<name>.json`. */
 export function battleUrl(name: string): string {
