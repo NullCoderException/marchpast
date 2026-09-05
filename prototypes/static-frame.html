@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trafalgar Static Frame</title>
+<!--
+  PROTOTYPE. Throwaway. Not the renderer.
+
+  Question (wayfinder ticket #8): what visual language does the v1 renderer commit to?
+  Three radically different treatments of ONE hand-placed Trafalgar frame, switchable
+  with ?variant=A|B|C (or the arrow keys / the bar at the bottom):
+
+    A  Chart plate   engraved 1805 chart: parchment, ink, ships as ticks, cartouche caption
+    B  Broadcast     documentary map: dark sea, flat blocks, thick arrows, lower-third caption
+    C  Replay        strategy-game replay: formation bars with badges, strength bars, timeline
+
+  Two frames are hand-placed so every glyph the schema needs can be seen (?phase=break|retreat, key P):
+    break    12:15  Royal Sovereign breaks the rear   -> intact vs engaged, an intent move, tracks
+    retreat  16:00  Dumanoir's van escapes            -> broken state, strength 0.33, a detachment move
+                                                        whose head lies outside the extent and is clipped
+
+  No schema, no playback, no persistence. Positions are eyeballed from the phase research
+  (docs/research/trafalgar-phases.md on research/trafalgar-phases), not authored data.
+  Double-click the file to run it.
+-->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+  html, body { margin: 0; height: 100%; background: #14161a; overflow: hidden; }
+  canvas { display: block; width: 100vw; height: 100vh; }
+  #bar {
+    position: fixed; left: 50%; top: 14px; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 10px;
+    background: #101214; color: #f2f2f2; border: 1px solid #3a3f47;
+    border-radius: 999px; padding: 6px 10px; font: 600 13px/1 "Barlow", system-ui, sans-serif;
+    box-shadow: 0 6px 24px rgba(0,0,0,.5); z-index: 10; user-select: none;
+  }
+  #bar button {
+    background: #22262c; color: inherit; border: 0; border-radius: 999px;
+    padding: 6px 10px; font: inherit; cursor: pointer;
+  }
+  #bar button:hover { background: #333a43; }
+  #bar button:focus-visible { outline: 2px solid #ffd166; outline-offset: 1px; }
+  #bar .tag { background: #ffd166; color: #14161a; border-radius: 999px; padding: 4px 8px; letter-spacing: .04em; }
+  #bar .lbl { min-width: 150px; text-align: center; }
+  #bar .sep { width: 1px; height: 18px; background: #3a3f47; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="bar" role="toolbar" aria-label="Prototype switcher">
+  <span class="tag">PROTOTYPE</span>
+  <button id="prev" title="Previous variant (Left arrow)">&#9664;</button>
+  <span class="lbl" id="vlabel"></span>
+  <button id="next" title="Next variant (Right arrow)">&#9654;</button>
+  <span class="sep"></span>
+  <button id="phase" title="Toggle frame (P)"></button>
+</div>
+<script>
+// ------------------------------------------------------------------ data (hand placed)
+const EXTENT = { latMin: 36.08, latMax: 36.64, lonMin: -6.65, lonMax: -5.85 }; // landscape: 0.56 lat x 0.80 lon
+
+// Rough Cadiz-to-Trafalgar coast, [lon, lat], land to the east. Cadiz sits on its spit.
+const LAND = [
+  [-6.45, 36.80], [-6.44, 36.72], [-6.38, 36.64], [-6.33, 36.615], [-6.26, 36.595], [-6.22, 36.58],
+  [-6.19, 36.54], [-6.17, 36.50], [-6.18, 36.46], [-6.20, 36.43],            // inner bay shore
+  [-6.25, 36.48], [-6.29, 36.525], [-6.305, 36.535],                          // spit, bay side, to Cadiz
+  [-6.29, 36.505], [-6.26, 36.455], [-6.235, 36.415],                         // spit, sea side
+  [-6.19, 36.36], [-6.14, 36.32], [-6.09, 36.28], [-6.03, 36.18], [-5.93, 36.18],
+  [-5.85, 36.10], [-5.80, 36.03], [-5.70, 36.03], [-5.70, 36.85], [-6.45, 36.85],
+];
+const PLACES = [
+  { name: 'Cadiz', lat: 36.535, lon: -6.305, anchor: 'right' },
+  { name: 'Rota', lat: 36.62, lon: -6.37, anchor: 'right' },
+  { name: 'Sancti Petri', lat: 36.40, lon: -6.22, anchor: 'left' },
+  { name: 'Cape Trafalgar', lat: 36.18, lon: -6.03, anchor: 'right' },
+  { name: 'Barbate', lat: 36.19, lon: -5.92, anchor: 'left' },
+];
+
+const UNITS = {
+  weather:  { name: "Nelson's weather column", short: 'Weather column', initial: 'N', side: 'british',  ships: 12, formation: 'column' },
+  lee:      { name: "Collingwood's lee column", short: 'Lee column',    initial: 'C', side: 'british',  ships: 15, formation: 'column' },
+  combined: { name: 'Combined Fleet',            short: 'Combined Fleet', initial: 'V', side: 'combined', ships: 33, formation: 'crescent' },
+};
+
+const FRAMES = {
+  break: {
+    n: 4, t: '12:15', label: 'Royal Sovereign breaks the rear',
+    wind: { from: 285, text: 'W by N, light airs' },
+    caption: '"The Action began at Twelve o’Clock, by the leading Ships of the Columns breaking through the Enemy’s Line, the Commander in Chief about the Tenth Ship from the Van, the Second in Command about the Twelfth from the Rear."',
+    cite: 'Collingwood to Marsden, Euryalus, 22 October 1805',
+    units: [
+      { id: 'weather',  pos: { lat: 36.265, lon: -6.285 }, heading: 70, state: 'intact',  strength: 1,
+        next: { lat: 36.262, lon: -6.235 }, moves: [{ kind: 'intent', to: { lat: 36.258, lon: -6.198 } }] },
+      { id: 'lee',      pos: { lat: 36.200, lon: -6.275 }, heading: 85, state: 'engaged', strength: 1,
+        next: { lat: 36.200, lon: -6.240 }, moves: [] },
+      { id: 'combined', pos: { lat: 36.245, lon: -6.205 }, heading: 0,  state: 'engaged', strength: 1,
+        next: { lat: 36.258, lon: -6.198 }, moves: [] },
+    ],
+  },
+  retreat: {
+    n: 7, t: '16:00', label: "Dumanoir’s van passes to windward; Gravina retreats",
+    wind: { from: 285, text: 'W by N, light airs' },
+    caption: '"Admiral Gravina, with Ten Ships joining their Frigates to Leeward, stood towards Cadiz. The Five headmost Ships in their Van tacked, and standing to the Southward, to Windward of the British Line, were engaged."',
+    cite: 'Collingwood to Marsden, Euryalus, 22 October 1805',
+    units: [
+      { id: 'weather',  pos: { lat: 36.270, lon: -6.205 }, heading: 30, state: 'engaged', strength: 1,
+        next: { lat: 36.278, lon: -6.200 }, moves: [] },
+      { id: 'lee',      pos: { lat: 36.212, lon: -6.222 }, heading: 60, state: 'engaged', strength: 1,
+        next: { lat: 36.215, lon: -6.218 }, moves: [] },
+      { id: 'combined', pos: { lat: 36.310, lon: -6.165 }, heading: 25, state: 'broken',  strength: 0.33,
+        next: { lat: 36.380, lon: -6.200 }, moves: [{ kind: 'detachment', to: { lat: 35.98, lon: -6.52 } }] },
+    ],
+  },
+};
+
+// ------------------------------------------------------------------ projection (Web Mercator, letterboxed)
+function projector(extent, W, H, pad) {
+  const merc = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
+  const y0 = merc(extent.latMax), y1 = merc(extent.latMin);
+  const spanX = (extent.lonMax - extent.lonMin) * Math.PI / 180, spanY = y0 - y1;
+  const s = Math.min((W - 2 * pad) / spanX, (H - 2 * pad) / spanY);
+  const mw = spanX * s, mh = spanY * s, ox = (W - mw) / 2, oy = (H - mh) / 2;
+  const midLat = (extent.latMin + extent.latMax) / 2 * Math.PI / 180;
+  return {
+    xy: p => ({ x: ox + (p.lon - extent.lonMin) * Math.PI / 180 * s, y: oy + (y0 - merc(p.lat)) * s }),
+    rect: { x: ox, y: oy, w: mw, h: mh },
+    pxPerNm: s * (Math.PI / 180 / 60) / Math.cos(midLat),
+  };
+}
+
+// ------------------------------------------------------------------ shared helpers
+const rad = deg => deg * Math.PI / 180;
+function polygon(ctx, P, pts) { ctx.beginPath(); pts.forEach(([lon, lat], i) => { const q = P.xy({ lat, lon }); i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); }); ctx.closePath(); }
+function arrow(ctx, a, b, o) {
+  const ang = Math.atan2(b.y - a.y, b.x - a.x), hs = o.headSize || 10;
+  ctx.save();
+  ctx.strokeStyle = o.color; ctx.fillStyle = o.color; ctx.lineWidth = o.width || 2;
+  ctx.setLineDash(o.dash || []); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  const trim = o.head === 'filled' ? hs * 0.7 : 0;
+  ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x - Math.cos(ang) * trim, b.y - Math.sin(ang) * trim); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.translate(b.x, b.y); ctx.rotate(ang);
+  if (o.head === 'filled') { ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-hs, -hs * 0.5); ctx.lineTo(-hs * 0.7, 0); ctx.lineTo(-hs, hs * 0.5); ctx.closePath(); ctx.fill(); }
+  else if (o.head === 'ring') { ctx.beginPath(); ctx.arc(0, 0, hs * 0.5, 0, Math.PI * 2); ctx.stroke(); }
+  else { ctx.beginPath(); ctx.moveTo(-hs, -hs * 0.55); ctx.lineTo(0, 0); ctx.lineTo(-hs, hs * 0.55); ctx.stroke(); }
+  ctx.restore();
+}
+// A unit's long axis in px. Column = ships in line ahead along the heading. Crescent = 5 nm chord across the heading.
+// Styled, not geometry: never smaller than a readable glyph, whatever the extent.
+function unitLen(P, def) { return def.formation === 'crescent' ? Math.max(5 * P.pxPerNm, 150) : Math.max(def.ships * 0.2 * P.pxPerNm, 80); }
+function withUnit(ctx, P, u, fn) { const c = P.xy(u.pos); ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(rad(u.heading)); fn(c); ctx.restore(); }
+function seeded(n) { let s = n * 9301 + 49297; return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; }; }
+function wrap(ctx, text, maxW) { const words = text.split(' '), lines = []; let line = ''; for (const w of words) { const t = line ? line + ' ' + w : w; if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; } if (line) lines.push(line); return lines; }
+function scaleBar(ctx, P, x, y, color, font) {
+  const w = 5 * P.pxPerNm;
+  ctx.save(); ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.5; ctx.font = font; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w, y); ctx.moveTo(x, y - 5); ctx.lineTo(x, y + 5); ctx.moveTo(x + w, y - 5); ctx.lineTo(x + w, y + 5); ctx.stroke();
+  for (let i = 1; i < 5; i++) { ctx.beginPath(); ctx.moveTo(x + w * i / 5, y - 3); ctx.lineTo(x + w * i / 5, y + 3); ctx.stroke(); }
+  ctx.fillText('5 nautical miles', x, y - 8); ctx.restore();
+}
+
+// ================================================================== Variant A: chart plate
+const A = {
+  name: 'Chart plate',
+  ink: '#2b2418', red: '#8f2f24', blue: '#24406b', paper: '#efe3c6', paper2: '#e3d3ac', sea: '#e9dcbc',
+  draw(ctx, W, H, f) {
+    const P = projector(EXTENT, W, H, 36), R = P.rect;
+    ctx.fillStyle = '#d9c8a2'; ctx.fillRect(0, 0, W, H);
+    // paper with a faint mottle
+    ctx.fillStyle = this.paper; ctx.fillRect(R.x, R.y, R.w, R.h);
+    const rnd = seeded(7); ctx.fillStyle = 'rgba(120,90,40,.06)';
+    for (let i = 0; i < 900; i++) { const x = R.x + rnd() * R.w, y = R.y + rnd() * R.h; ctx.beginPath(); ctx.arc(x, y, rnd() * 6, 0, 7); ctx.fill(); }
+    ctx.save(); ctx.beginPath(); ctx.rect(R.x, R.y, R.w, R.h); ctx.clip();
+    // land + coastal vignette (engraved shading inside the shoreline)
+    polygon(ctx, P, LAND); ctx.fillStyle = this.paper2; ctx.fill();
+    ctx.save(); polygon(ctx, P, LAND); ctx.clip();
+    [[14, .05], [8, .08], [4, .14], [1.6, .6]].forEach(([w, a]) => { polygon(ctx, P, LAND); ctx.lineWidth = w; ctx.strokeStyle = `rgba(43,36,24,${a})`; ctx.stroke(); });
+    ctx.restore();
+    // soundings-ish dots along the coast
+    // places
+    ctx.fillStyle = this.ink; ctx.font = 'italic 15px "IM Fell English", Georgia, serif'; ctx.textBaseline = 'middle';
+    PLACES.forEach(pl => { const q = P.xy(pl); ctx.beginPath(); ctx.arc(q.x, q.y, 2.2, 0, 7); ctx.fill(); ctx.textAlign = pl.anchor === 'left' ? 'right' : 'left'; ctx.fillText(pl.name, q.x + (pl.anchor === 'left' ? -7 : 7), q.y); });
+    // units: tracks and moves first, then ships
+    f.units.forEach(u => {
+      const def = UNITS[u.id], col = def.side === 'british' ? this.red : this.blue, c = P.xy(u.pos), n = P.xy(u.next);
+      arrow(ctx, c, n, { color: col, width: 1.2, dash: [2, 4], head: 'open', headSize: 7 });
+      u.moves.forEach(m => arrow(ctx, c, P.xy(m.to), m.kind === 'intent'
+        ? { color: this.ink, width: 1.2, dash: [8, 5], head: 'open', headSize: 9 }
+        : { color: col, width: 1.8, head: 'filled', headSize: 11 }));
+    });
+    f.units.forEach(u => {
+      const def = UNITS[u.id], col = def.side === 'british' ? this.red : this.blue, L = unitLen(P, def);
+      withUnit(ctx, P, u, () => {
+        // smoke for engaged / broken
+        if (u.state !== 'intact') {
+          const r = seeded(u.id.length * 13 + u.heading); ctx.fillStyle = 'rgba(60,55,50,.13)';
+          const puffs = u.state === 'broken' ? 10 : 22;
+          for (let i = 0; i < puffs; i++) { const t = (r() - .5) * L * 1.2, s = (r() - .5) * 26 - 8; ctx.beginPath(); ctx.arc(s, -t, 5 + r() * 9, 0, 7); ctx.fill(); }
+        }
+        ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1.4; ctx.lineCap = 'round';
+        const ships = Math.min(def.ships, Math.floor(L / 4.5)), shown = Math.max(1, Math.round(ships * u.strength));
+        if (def.formation === 'column') {
+          for (let i = 0; i < ships; i++) { const y = -L / 2 + (i + .5) * (L / ships); if (i < shown) { ctx.beginPath(); ctx.moveTo(-2.6, y + 3); ctx.lineTo(0, y - 3.5); ctx.lineTo(2.6, y + 3); ctx.stroke(); } }
+        } else {
+          // crescent convex to leeward (east = +x when heading north), horns toward the British
+          for (let i = 0; i < ships; i++) { const t = i / (ships - 1) - .5, x = 18 * (1 - 4 * t * t), y = -t * L, jitter = ((i * 7) % 3 - 1) * 2.2; const brokenGap = u.state === 'broken' && i > shown; if (brokenGap) continue; ctx.beginPath(); ctx.moveTo(x + jitter - 2.6, y + 3); ctx.lineTo(x + jitter, y - 3.5); ctx.lineTo(x + jitter + 2.6, y + 3); ctx.stroke(); }
+        }
+      });
+      // label
+      const c = P.xy(u.pos); ctx.fillStyle = col; ctx.font = 'italic 14px "IM Fell English", Georgia, serif'; ctx.textAlign = def.side === 'british' ? 'right' : 'left'; ctx.textBaseline = 'middle';
+      const dx = def.side === 'british' ? -L * 0.45 - 6 : 26;
+      ctx.fillText(def.name, c.x + dx, c.y + (def.side === 'british' ? 14 : 0));
+      if (u.state === 'broken') { ctx.font = '12px "IM Fell English", Georgia, serif'; ctx.fillText('(in disorder, 11 sail)', c.x + dx, c.y + 16); }
+    });
+    ctx.restore();
+    // plate border
+    ctx.strokeStyle = this.ink; ctx.lineWidth = 1; ctx.strokeRect(R.x + .5, R.y + .5, R.w - 1, R.h - 1); ctx.strokeRect(R.x + 5.5, R.y + 5.5, R.w - 11, R.h - 11);
+    // compass rose + wind, top left
+    const cx = R.x + 74, cy = R.y + 78;
+    ctx.save(); ctx.translate(cx, cy); ctx.strokeStyle = this.ink; ctx.fillStyle = this.ink; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(0, 0, 30, 0, 7); ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 3, 0, 7); ctx.fill();
+    for (let i = 0; i < 16; i++) { ctx.beginPath(); ctx.moveTo(0, -30); ctx.lineTo(0, i % 4 ? -25 : -20); ctx.stroke(); ctx.rotate(Math.PI / 8); }
+    ctx.beginPath(); ctx.moveTo(0, -42); ctx.lineTo(4, -8); ctx.lineTo(0, 0); ctx.lineTo(-4, -8); ctx.closePath(); ctx.fill();
+    ctx.font = '13px "IM Fell English", Georgia, serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText('N', 0, -46);
+    // wind pen-arrow blowing across the rose
+    ctx.rotate(rad(f.wind.from + 180)); ctx.strokeStyle = this.blue; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(0, 58); ctx.lineTo(0, 30); ctx.stroke(); for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.moveTo(0, 56 - i * 6); ctx.lineTo(-7, 60 - i * 6); ctx.stroke(); }
+    ctx.restore();
+    ctx.fillStyle = this.ink; ctx.font = 'italic 13px "IM Fell English", Georgia, serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillText('Wind ' + f.wind.text, cx + 44, cy - 8);
+    // title block top right
+    ctx.textAlign = 'right'; ctx.font = '22px "IM Fell English", Georgia, serif'; ctx.fillText('TRAFALGAR', R.x + R.w - 22, R.y + 18);
+    ctx.font = 'italic 14px "IM Fell English", Georgia, serif'; ctx.fillText('21st October 1805 · ' + f.t + ' by the ship’s clock', R.x + R.w - 22, R.y + 46);
+    scaleBar(ctx, P, R.x + 26, R.y + R.h - 26, this.ink, 'italic 12px "IM Fell English", Georgia, serif');
+    // caption cartouche, bottom centre
+    ctx.font = '15px "IM Fell English", Georgia, serif'; const lines = wrap(ctx, f.caption, Math.min(560, R.w - 260));
+    const bw = Math.min(600, R.w - 220), bh = 22 * lines.length + 52, bx = R.x + (R.w - bw) / 2, by = R.y + R.h - bh - 46;
+    ctx.fillStyle = 'rgba(239,227,198,.92)'; ctx.fillRect(bx, by, bw, bh); ctx.strokeStyle = this.ink; ctx.lineWidth = 1; ctx.strokeRect(bx + .5, by + .5, bw - 1, bh - 1); ctx.strokeRect(bx + 4.5, by + 4.5, bw - 9, bh - 9);
+    ctx.fillStyle = this.ink; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.font = '600 12px "IM Fell English", Georgia, serif';
+    ctx.fillText(f.label.toUpperCase(), bx + bw / 2, by + 12);
+    ctx.font = '15px "IM Fell English", Georgia, serif'; lines.forEach((l, i) => ctx.fillText(l, bx + bw / 2, by + 32 + i * 22));
+    ctx.font = 'italic 12px "IM Fell English", Georgia, serif'; ctx.fillText('— ' + f.cite, bx + bw / 2, by + 32 + lines.length * 22 + 2);
+  },
+};
+
+// ================================================================== Variant B: broadcast
+const B = {
+  name: 'Broadcast',
+  red: '#e03c31', blue: '#3d7bff', land: '#5b5f4e', landEdge: '#c9c39c', text: '#f5f3ea',
+  draw(ctx, W, H, f) {
+    const P = projector(EXTENT, W, H, 0), R = P.rect;
+    const g = ctx.createRadialGradient(W * .45, H * .45, 40, W * .5, H * .5, Math.max(W, H) * .8);
+    g.addColorStop(0, '#173a52'); g.addColorStop(1, '#07141f'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.save(); ctx.beginPath(); ctx.rect(R.x, R.y, R.w, R.h); ctx.clip();
+    polygon(ctx, P, LAND); ctx.fillStyle = this.land; ctx.fill(); ctx.strokeStyle = this.landEdge; ctx.lineWidth = 2; ctx.stroke();
+    ctx.save(); polygon(ctx, P, LAND); ctx.clip(); polygon(ctx, P, LAND); ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 12; ctx.stroke(); ctx.restore();
+    ctx.font = '800 13px "Barlow Condensed", "Arial Narrow", sans-serif'; ctx.textBaseline = 'middle';
+    PLACES.forEach(pl => { const q = P.xy(pl); ctx.fillStyle = this.text; ctx.beginPath(); ctx.arc(q.x, q.y, 3, 0, 7); ctx.fill(); ctx.textAlign = pl.anchor === 'left' ? 'right' : 'left'; ctx.fillText(pl.name.toUpperCase(), q.x + (pl.anchor === 'left' ? -8 : 8), q.y); });
+    // tracks + moves
+    f.units.forEach(u => {
+      const def = UNITS[u.id], col = def.side === 'british' ? this.red : this.blue, c = P.xy(u.pos), n = P.xy(u.next);
+      const nx = n.x - c.x, ny = n.y - c.y, d = Math.hypot(nx, ny) || 1;
+      arrow(ctx, c, { x: c.x + nx * 1.6 + nx / d * 14, y: c.y + ny * 1.6 + ny / d * 14 }, { color: col + 'aa', width: 7, head: 'filled', headSize: 16 });
+      u.moves.forEach(m => { const t = P.xy(m.to); if (m.kind === 'intent') { arrow(ctx, c, t, { color: '#0b1a26', width: 7, dash: [14, 10], head: 'open', headSize: 14 }); arrow(ctx, c, t, { color: '#ffd166', width: 3.5, dash: [14, 10], head: 'open', headSize: 14 }); } else { arrow(ctx, c, t, { color: '#0b1a26', width: 8, head: 'filled', headSize: 18 }); arrow(ctx, c, t, { color: col, width: 4, head: 'filled', headSize: 16 }); } });
+    });
+    // blocks
+    f.units.forEach(u => {
+      const def = UNITS[u.id], col = def.side === 'british' ? this.red : this.blue, L = unitLen(P, def), w = def.formation === 'crescent' ? 12 : 16;
+      withUnit(ctx, P, u, () => {
+        const block = (y0, y1) => { ctx.beginPath(); ctx.moveTo(-w / 2, y1); ctx.lineTo(-w / 2, y0 + w * .6); ctx.lineTo(0, y0); ctx.lineTo(w / 2, y0 + w * .6); ctx.lineTo(w / 2, y1); ctx.closePath(); };
+        ctx.lineJoin = 'round';
+        if (u.state === 'engaged') { ctx.shadowColor = col; ctx.shadowBlur = 22; }
+        if (u.state === 'broken') {
+          ctx.shadowColor = col; ctx.shadowBlur = 8; const n = 3, seg = L / n; for (let i = 0; i < n; i++) { const off = ((i % 2) * 2 - 1) * 9; ctx.save(); ctx.translate(off, 0); block(-L / 2 + i * seg + 3, -L / 2 + (i + 1) * seg - 3); ctx.fillStyle = col + '77'; ctx.fill(); ctx.setLineDash([4, 3]); ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore(); }
+        } else if (def.formation === 'crescent') {
+          ctx.beginPath(); ctx.moveTo(-w / 2, L / 2); ctx.quadraticCurveTo(28 - w / 2, 0, -w / 2, -L / 2); ctx.lineTo(w / 2, -L / 2); ctx.quadraticCurveTo(28 + w / 2, 0, w / 2, L / 2); ctx.closePath();
+          ctx.fillStyle = col; ctx.fill(); ctx.shadowBlur = 0; ctx.strokeStyle = this.text; ctx.lineWidth = u.state === 'engaged' ? 2 : 1; ctx.stroke();
+        } else {
+          block(-L / 2, L / 2); ctx.fillStyle = u.state === 'intact' ? col + 'cc' : col; ctx.fill(); ctx.shadowBlur = 0; ctx.strokeStyle = this.text; ctx.lineWidth = u.state === 'engaged' ? 2 : 1; ctx.stroke();
+        }
+        ctx.shadowBlur = 0;
+        if (u.state === 'engaged') { // clash mark at the head
+          ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; const r = seeded(u.heading + 3); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 + r() * .4, r0 = 6 + r() * 3, r1 = 12 + r() * 8; ctx.beginPath(); ctx.moveTo(Math.cos(a) * r0, -L / 2 + Math.sin(a) * r0); ctx.lineTo(Math.cos(a) * r1, -L / 2 + Math.sin(a) * r1); ctx.stroke(); }
+        }
+      });
+      const c = P.xy(u.pos); ctx.font = '800 15px "Barlow Condensed", "Arial Narrow", sans-serif'; ctx.textBaseline = 'middle'; ctx.textAlign = def.side === 'british' ? 'right' : 'left';
+      const dx = def.side === 'british' ? -L * .45 - 12 : 34, dy = def.side === 'british' ? 16 : -4;
+      ctx.lineWidth = 4; ctx.strokeStyle = '#07141f'; ctx.strokeText(def.short.toUpperCase(), c.x + dx, c.y + dy); ctx.fillStyle = this.text; ctx.fillText(def.short.toUpperCase(), c.x + dx, c.y + dy);
+      ctx.font = '600 12px "Barlow", sans-serif'; const sub = u.state === 'broken' ? 'BROKEN · ' + Math.round(u.strength * 100) + '%' : u.state.toUpperCase() + ' · ' + def.ships + ' SAIL';
+      ctx.strokeText(sub, c.x + dx, c.y + dy + 16); ctx.fillStyle = u.state === 'broken' ? '#ffd166' : '#c8d3dc'; ctx.fillText(sub, c.x + dx, c.y + dy + 16);
+    });
+    ctx.restore();
+    // wind, top right
+    const wx = W - 70, wy = 70;
+    ctx.save(); ctx.translate(wx, wy); ctx.strokeStyle = this.text; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 34, 0, 7); ctx.stroke();
+    ctx.rotate(rad(f.wind.from + 180)); ctx.fillStyle = this.text; ctx.beginPath(); ctx.moveTo(0, 26); ctx.lineTo(10, -8); ctx.lineTo(0, -2); ctx.lineTo(-10, -8); ctx.closePath(); ctx.fill(); ctx.restore();
+    ctx.fillStyle = this.text; ctx.font = '800 13px "Barlow Condensed", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillText('WIND ' + f.wind.text.split(',')[0].toUpperCase(), wx, wy + 42);
+    ctx.font = '600 11px "Barlow", sans-serif'; ctx.fillStyle = '#c8d3dc'; ctx.fillText(f.wind.text.split(', ')[1].toUpperCase(), wx, wy + 58);
+    // north + scale, top left
+    ctx.fillStyle = this.text; ctx.font = '800 14px "Barlow Condensed", sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillText('▲ N', 24, 22); scaleBar(ctx, P, 24, 62, this.text, '600 11px "Barlow", sans-serif');
+    // lower third
+    const lh = 92, ly = H - lh - 52;
+    ctx.fillStyle = 'rgba(5,12,20,.86)'; ctx.fillRect(0, ly, W, lh); ctx.fillStyle = this.red; ctx.fillRect(0, ly, 6, lh);
+    ctx.fillStyle = this.text; ctx.font = '800 40px "Barlow Condensed", sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(f.t, 28, ly + lh / 2);
+    ctx.fillStyle = '#c8d3dc'; ctx.font = '600 12px "Barlow", sans-serif'; ctx.textBaseline = 'top'; ctx.fillText('21 OCT 1805', 28, ly + lh / 2 + 24);
+    ctx.fillStyle = '#ffd166'; ctx.font = '800 16px "Barlow Condensed", sans-serif'; ctx.fillText(f.label.toUpperCase(), 140, ly + 14);
+    ctx.fillStyle = this.text; ctx.font = '400 15px "Barlow", sans-serif'; wrap(ctx, f.caption, W - 190).slice(0, 2).forEach((l, i) => ctx.fillText(l, 140, ly + 38 + i * 20));
+    ctx.fillStyle = '#8fa2b1'; ctx.font = '600 11px "Barlow", sans-serif'; ctx.fillText(f.cite.toUpperCase(), 140, ly + lh - 16);
+  },
+};
+
+// ================================================================== Variant C: replay
+const C = {
+  name: 'Replay',
+  red: '#b7362b', blue: '#2f5fa8', sea: '#cfd9dc', land: '#e6dcc3', ink: '#2c3238', grid: 'rgba(44,50,56,.12)',
+  stateColor: { intact: '#8a949c', engaged: '#e29b1a', broken: '#c62828', destroyed: '#2c3238' },
+  draw(ctx, W, H, f) {
+    const P = projector(EXTENT, W, H, 0), R = P.rect;
+    ctx.fillStyle = '#b9c5c9'; ctx.fillRect(0, 0, W, H); ctx.fillStyle = this.sea; ctx.fillRect(R.x, R.y, R.w, R.h);
+    ctx.save(); ctx.beginPath(); ctx.rect(R.x, R.y, R.w, R.h); ctx.clip();
+    // graticule every 0.1 degree
+    ctx.strokeStyle = this.grid; ctx.lineWidth = 1;
+    for (let lat = 36.1; lat < EXTENT.latMax; lat += .1) { const q = P.xy({ lat, lon: EXTENT.lonMin }); ctx.beginPath(); ctx.moveTo(R.x, q.y); ctx.lineTo(R.x + R.w, q.y); ctx.stroke(); }
+    for (let lon = -6.5; lon < EXTENT.lonMax; lon += .1) { const q = P.xy({ lat: EXTENT.latMin, lon }); ctx.beginPath(); ctx.moveTo(q.x, R.y); ctx.lineTo(q.x, R.y + R.h); ctx.stroke(); }
+    polygon(ctx, P, LAND); ctx.fillStyle = this.land; ctx.fill(); ctx.strokeStyle = '#8f8467'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.font = '600 12px "Barlow", system-ui, sans-serif'; ctx.textBaseline = 'middle';
+    PLACES.forEach(pl => { const q = P.xy(pl); ctx.fillStyle = this.ink; ctx.beginPath(); ctx.arc(q.x, q.y, 2.5, 0, 7); ctx.fill(); ctx.textAlign = pl.anchor === 'left' ? 'right' : 'left'; ctx.fillText(pl.name, q.x + (pl.anchor === 'left' ? -7 : 7), q.y); });
+    // tracks: fading dots; moves
+    f.units.forEach(u => {
+      const def = UNITS[u.id], col = def.side === 'british' ? this.red : this.blue, c = P.xy(u.pos), n = P.xy(u.next);
+      const dx = n.x - c.x, dy = n.y - c.y, d = Math.hypot(dx, dy) || 1, steps = Math.max(3, Math.round(d / 7));
+      for (let i = 1; i <= steps; i++) { const t = i / steps; ctx.fillStyle = col; ctx.globalAlpha = .85 - t * .6; ctx.beginPath(); ctx.arc(c.x + dx * t, c.y + dy * t, 2.4, 0, 7); ctx.fill(); }
+      ctx.globalAlpha = 1;
+      ctx.save(); ctx.translate(n.x + dx / d * 8, n.y + dy / d * 8); ctx.rotate(Math.atan2(dy, dx)); ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-6, -5); ctx.lineTo(0, 0); ctx.lineTo(-6, 5); ctx.stroke(); ctx.restore();
+      u.moves.forEach(m => { const t = P.xy(m.to); if (m.kind === 'intent') arrow(ctx, c, t, { color: this.ink, width: 1.6, dash: [6, 5], head: 'ring', headSize: 14 }); else { arrow(ctx, c, t, { color: col, width: 2.2, head: 'filled', headSize: 12 }); /* branch glyph at the tail */ ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(Math.atan2(t.y - c.y, t.x - c.x)); ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(18, 0); ctx.lineTo(10, -7); ctx.moveTo(18, 0); ctx.lineTo(10, 7); ctx.stroke(); ctx.restore(); } });
+    });
+    // formation bars + badges
+    f.units.forEach(u => {
+      const def = UNITS[u.id], col = def.side === 'british' ? this.red : this.blue, L = unitLen(P, def), sc = this.stateColor[u.state];
+      withUnit(ctx, P, u, () => {
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        if (def.formation === 'crescent') {
+          ctx.strokeStyle = col; ctx.lineWidth = 6; if (u.state === 'broken') ctx.setLineDash([9, 7]);
+          ctx.beginPath(); ctx.moveTo(0, L / 2); ctx.quadraticCurveTo(30, 0, 0, -L / 2); ctx.stroke(); ctx.setLineDash([]);
+          ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(-6, -L / 2 + 8); ctx.lineTo(0, -L / 2 - 2); ctx.lineTo(6, -L / 2 + 8); ctx.stroke();
+        } else {
+          ctx.strokeStyle = col; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(0, L / 2); ctx.lineTo(0, -L / 2); ctx.stroke();
+          ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(-7, -L / 2 + 8); ctx.lineTo(0, -L / 2 - 3); ctx.lineTo(7, -L / 2 + 8); ctx.stroke();
+        }
+      });
+      const c = P.xy(u.pos), bx = c.x + (def.formation === 'crescent' ? 16 : 0), by = c.y;
+      // badge
+      ctx.beginPath(); ctx.arc(bx, by, 14, 0, 7); ctx.fillStyle = '#fbfaf6'; ctx.fill(); ctx.lineWidth = 3.5; ctx.strokeStyle = sc; if (u.state === 'broken') ctx.setLineDash([4, 3]); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = col; ctx.font = '800 15px "Barlow Condensed", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(def.initial, bx, by + 1);
+      // strength bar
+      ctx.fillStyle = 'rgba(44,50,56,.25)'; ctx.fillRect(bx - 14, by + 18, 28, 4); ctx.fillStyle = u.strength < .5 ? this.stateColor.broken : col; ctx.fillRect(bx - 14, by + 18, 28 * u.strength, 4);
+      // label chip
+      const txt = def.short + ' · ' + def.ships; ctx.font = '600 12px "Barlow", sans-serif'; const tw = ctx.measureText(txt).width + 14;
+      const lx = def.side === 'british' ? bx - 22 - tw : bx + 22, ly = by - 10;
+      ctx.fillStyle = 'rgba(251,250,246,.9)'; ctx.fillRect(lx, ly, tw, 20); ctx.fillStyle = sc; ctx.fillRect(lx, ly, 3, 20);
+      ctx.fillStyle = this.ink; ctx.textAlign = 'left'; ctx.fillText(txt, lx + 8, ly + 10);
+    });
+    ctx.restore();
+    // compass with wind, top right
+    const cx = W - 66, cy = 66;
+    ctx.save(); ctx.translate(cx, cy); ctx.strokeStyle = this.ink; ctx.fillStyle = this.ink; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(0, 0, 30, 0, 7); ctx.stroke(); for (let i = 0; i < 8; i++) { ctx.beginPath(); ctx.moveTo(0, -30); ctx.lineTo(0, i % 2 ? -26 : -22); ctx.stroke(); ctx.rotate(Math.PI / 4); }
+    ctx.beginPath(); ctx.moveTo(0, -38); ctx.lineTo(4, -4); ctx.lineTo(-4, -4); ctx.closePath(); ctx.fill();
+    ctx.font = '800 12px "Barlow Condensed", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText('N', 0, -41);
+    ctx.rotate(rad(f.wind.from + 180)); ctx.strokeStyle = '#1c7c9c'; ctx.fillStyle = '#1c7c9c'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, 46); ctx.lineTo(0, 10); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(7, 14); ctx.lineTo(-7, 14); ctx.closePath(); ctx.fill();
+    ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, 42); ctx.lineTo(8, 38); ctx.stroke(); // one feather = light
+    ctx.restore();
+    ctx.fillStyle = this.ink; ctx.font = '600 11px "Barlow", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillText('Wind ' + f.wind.text, cx, cy + 50);
+    scaleBar(ctx, P, W - 24 - 5 * P.pxPerNm, H - 78, this.ink, '600 11px "Barlow", sans-serif');
+    // phase card, top left
+    ctx.font = '400 14px "Barlow", sans-serif'; const lines = wrap(ctx, f.caption, 380);
+    const cw = 420, ch = 92 + lines.length * 19, px = 20, py = 20;
+    ctx.fillStyle = 'rgba(251,250,246,.94)'; ctx.fillRect(px, py, cw, ch); ctx.strokeStyle = '#8f8467'; ctx.lineWidth = 1; ctx.strokeRect(px + .5, py + .5, cw - 1, ch - 1);
+    ctx.fillStyle = this.ink; ctx.font = '500 26px "IBM Plex Mono", monospace'; ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText(f.t, px + 16, py + 14);
+    ctx.font = '800 16px "Barlow Condensed", sans-serif'; ctx.fillText(f.label.toUpperCase(), px + 96, py + 14);
+    ctx.font = '600 11px "Barlow", sans-serif'; ctx.fillStyle = '#6b737a'; ctx.fillText('TRAFALGAR · 21 OCTOBER 1805 · PHASE ' + f.n + ' OF 8', px + 96, py + 36);
+    ctx.fillStyle = this.ink; ctx.font = '400 14px "Barlow", sans-serif'; lines.forEach((l, i) => ctx.fillText(l, px + 16, py + 58 + i * 19));
+    ctx.fillStyle = '#6b737a'; ctx.font = '600 11px "Barlow", sans-serif'; ctx.fillText(f.cite, px + 16, py + ch - 20);
+    // timeline strip, bottom
+    const ty = H - 46, tx0 = 24, tx1 = W - 24; ctx.fillStyle = 'rgba(251,250,246,.9)'; ctx.fillRect(0, H - 64, W, 64);
+    ctx.strokeStyle = '#8f8467'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(tx0, ty); ctx.lineTo(tx1, ty); ctx.stroke();
+    const phases = [['05:40', 'Dawn'], ['06:40', 'Bear up'], ['10:00', 'Approach'], ['12:00', 'Rear broken'], ['12:30', 'Centre broken'], ['13:30', 'Melee'], ['15:00', 'Van and retreat'], ['16:45', 'Last shots'], ['17:30', '']];
+    const mins = t => +t.slice(0, 2) * 60 + +t.slice(3), t0 = mins('05:40'), t1 = mins('17:30'), X = t => tx0 + (mins(t) - t0) / (t1 - t0) * (tx1 - tx0);
+    phases.forEach(([t, l]) => { ctx.fillStyle = this.ink; ctx.beginPath(); ctx.arc(X(t), ty, 4, 0, 7); ctx.fill(); ctx.font = '600 11px "Barlow", sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top'; if (l) ctx.fillText(l, X(t) + 6, ty + 6); });
+    ctx.fillStyle = '#e29b1a'; ctx.beginPath(); ctx.moveTo(X(f.t), ty - 12); ctx.lineTo(X(f.t) + 6, ty - 2); ctx.lineTo(X(f.t) - 6, ty - 2); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = this.ink; ctx.font = '500 11px "IBM Plex Mono", monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(f.t, X(f.t), ty - 14);
+  },
+};
+
+// ================================================================== switcher
+const VARIANTS = { A, B, C }, KEYS = ['A', 'B', 'C'];
+const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
+function params() { const p = new URLSearchParams(location.search); return { v: KEYS.includes(p.get('variant')) ? p.get('variant') : 'A', ph: FRAMES[p.get('phase')] ? p.get('phase') : 'break' }; }
+function setParams(v, ph) { const p = new URLSearchParams(location.search); p.set('variant', v); p.set('phase', ph); history.replaceState(null, '', '?' + p); render(); }
+function render() {
+  const { v, ph } = params(), dpr = devicePixelRatio || 1, W = innerWidth, H = innerHeight;
+  canvas.width = W * dpr; canvas.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  VARIANTS[v].draw(ctx, W, H, FRAMES[ph]);
+  document.getElementById('vlabel').textContent = v + ' · ' + VARIANTS[v].name;
+  document.getElementById('phase').textContent = 'Frame: ' + FRAMES[ph].t + ' · ' + ph;
+}
+function cycle(d) { const { v, ph } = params(); setParams(KEYS[(KEYS.indexOf(v) + d + 3) % 3], ph); }
+function togglePhase() { const { v, ph } = params(); setParams(v, ph === 'break' ? 'retreat' : 'break'); }
+document.getElementById('prev').onclick = () => cycle(-1);
+document.getElementById('next').onclick = () => cycle(1);
+document.getElementById('phase').onclick = togglePhase;
+addEventListener('keydown', e => { if (/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return; if (e.key === 'ArrowLeft') cycle(-1); if (e.key === 'ArrowRight') cycle(1); if (e.key === 'p' || e.key === 'P') togglePhase(); });
+addEventListener('resize', render);
+document.fonts && document.fonts.ready.then(render);
+render();
+</script>
+</body>
+</html>
