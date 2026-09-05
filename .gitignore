@@ -1,0 +1,14 @@
+# dependencies and build output
+node_modules/
+dist/
+
+# editor and OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# agent worktrees
+.claude/worktrees/
