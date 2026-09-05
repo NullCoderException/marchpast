@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatBattleTime, isBattleTime, parseBattleTime } from "./time";
+import { formatBattleTime, isBattleTime, parseBattleTime } from "./time.ts";
 
 describe("battle-clock time", () => {
   it("parses HH:MM to minutes since midnight", () => {

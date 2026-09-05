@@ -1,61 +1,12 @@
 import { describe, expect, it } from "vitest";
-import type { Battle } from "./types";
-import { validateBattle } from "./validateBattle";
+import { MINIMAL_BATTLE } from "./examples.ts";
+import type { Battle } from "./types.ts";
+import { validateBattle } from "./validateBattle.ts";
 
 /** The minimal example from `docs/schema.md` 2.11, as a fresh deep copy each time so tests can break it freely. */
 function minimalBattle(): Battle {
-  return structuredClone(MINIMAL);
+  return structuredClone(MINIMAL_BATTLE);
 }
-
-const MINIMAL: Battle = {
-  schema_version: 1,
-  title: "The Battle of Trafalgar",
-  date: "21 October 1805",
-  extent: { north: 36.61, south: 36.05, east: -6.0, west: -6.8 },
-  scale_unit: "nmi",
-  map: "cadiz",
-  end: "17:30",
-  license: "CC-BY-4.0",
-  attribution: "Sandtable contributors, CC BY 4.0",
-  sources: {
-    "collingwood-dispatch": {
-      label: "Collingwood's dispatch",
-      work: "Collingwood to Marsden, 22 October 1805, London Gazette Extraordinary no. 15858",
-      url: "https://en.wikisource.org/wiki/The_London_Gazette/Number_15858",
-      license: "public-domain",
-      license_note: "Crown copyright in an 1805 publication long expired",
-    },
-  },
-  units: [
-    { id: "weather-column", side: "British", label: "Weather column", commander: "Nelson" },
-    { id: "lee-column", side: "British", label: "Lee column", commander: "Collingwood" },
-    { id: "combined-fleet", side: "Combined Fleet", label: "Combined Fleet", commander: "Villeneuve" },
-  ],
-  phases: [
-    {
-      id: "dawn-sighting",
-      label: "Dawn: the fleets sight each other",
-      t: "05:40",
-      playback_rate: 600,
-      wind: { from: 292.5, force: "light" },
-      caption: "At daylight the enemy is discovered six or seven miles to the eastward.",
-      notes: "Collingwood's dawn fix anchors the British position.",
-      references: [{ source: "collingwood-dispatch", locator: "p. 1365", quote: "at Daylight" }],
-      units: [
-        { id: "weather-column", position: { lat: 36.26, lon: -6.47 }, heading: 45, formation: "column", state: "intact" },
-        { id: "lee-column", position: { lat: 36.24, lon: -6.44 }, heading: 45, formation: "column", state: "intact" },
-        {
-          id: "combined-fleet",
-          position: { lat: 36.22, lon: -6.3 },
-          heading: 180,
-          formation: "column",
-          state: "intact",
-          moves: [{ kind: "intent", to: { lat: 36.0, lon: -6.2 } }],
-        },
-      ],
-    },
-  ],
-};
 
 /** Applies `mutate` to a fresh minimal battle (typed loosely so tests can write invalid shapes) and validates it. */
 function validateBroken(mutate: (battle: any) => void) {
@@ -73,7 +24,7 @@ function errorPaths(result: ReturnType<typeof validateBattle>): string[] {
 describe("validateBattle: a well-formed file", () => {
   it("accepts the minimal example and hands back the typed battle", () => {
     const result = validateBattle(minimalBattle());
-    expect(result).toEqual({ ok: true, battle: MINIMAL });
+    expect(result).toEqual({ ok: true, battle: MINIMAL_BATTLE });
   });
 
   it("accepts a file without the optional fields", () => {

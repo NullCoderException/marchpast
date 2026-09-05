@@ -3,7 +3,7 @@
  * date, `00:00` to `23:59`, nothing finer. This module converts between that
  * string and minutes since midnight; it knows nothing about phases or tweening.
  */
-import type { BattleTime } from "./types";
+import type { BattleTime } from "./types.ts";
 
 const BATTLE_TIME = /^([01]\d|2[0-3]):([0-5]\d)$/;
 

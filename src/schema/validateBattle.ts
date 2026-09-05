@@ -10,8 +10,9 @@
  * cross-field checks run over whatever did read cleanly, so one malformed
  * unit never hides an unrelated ordering error.
  */
-import { attributionRequired, classOf, isLicenseId, ranksAbove, type LicenseId } from "./licenses";
-import { isBattleTime, parseBattleTime } from "./time";
+import { readAttribution, readLicense } from "./licenseFields.ts";
+import { classOf, ranksAbove, type LicenseId } from "./licenses.ts";
+import { isBattleTime, parseBattleTime } from "./time.ts";
 import type {
   Battle,
   BattleTime,
@@ -24,8 +25,8 @@ import type {
   Unit,
   UnitSnapshot,
   Wind,
-} from "./types";
-import { allDefined, defined, Errors, join, ObjectReader, type ValidationError } from "./validation";
+} from "./types.ts";
+import { allDefined, defined, Errors, join, ObjectReader, type ValidationError } from "./validation.ts";
 
 export type BattleValidation = { ok: true; battle: Battle } | { ok: false; errors: ValidationError[] };
 
@@ -82,10 +83,7 @@ function readBattle(json: unknown, errors: Errors): Battle | undefined {
   const map = readMapName(obj);
   const end = readBattleTime(obj, "end");
   const license = readLicense(obj);
-  const attribution = obj.string("attribution", { optional: true });
-  if (license !== undefined && !obj.has("attribution") && attributionRequired(license)) {
-    errors.add(obj.at("attribution"), `required: ${license} is in the ${classOf(license)} class`);
-  }
+  const attribution = readAttribution(obj, license);
   const sources = obj.record("sources", (value, path) => readSource(value, path, errors));
   if (sources !== undefined && license !== undefined) checkSourceRanks(sources, license, obj.at("sources"), errors);
   const units = obj.array("units", (value, path) => readUnit(value, path, errors), { nonEmpty: true });
@@ -150,17 +148,6 @@ function readBattleTime(obj: ObjectReader, key: string): BattleTime | undefined 
   if (raw === undefined) return undefined;
   if (!isBattleTime(raw)) {
     obj.errors.add(obj.at(key), 'expected a battle-clock time "HH:MM", 00:00 to 23:59');
-    return undefined;
-  }
-  return raw;
-}
-
-/** Rules 9 and 10, first half: a `license` field is an allowlisted identifier. */
-function readLicense(obj: ObjectReader): LicenseId | undefined {
-  const raw = obj.string("license");
-  if (raw === undefined) return undefined;
-  if (!isLicenseId(raw)) {
-    obj.errors.add(obj.at("license"), `licence ${JSON.stringify(raw)} is not in the allowlist (src/schema/licenses.ts)`);
     return undefined;
   }
   return raw;

@@ -69,11 +69,16 @@ export interface ArrayField<T> {
  * caller can assemble the typed value only when every part read cleanly.
  */
 export class ObjectReader {
-  private constructor(
-    private readonly value: Record<string, unknown>,
-    readonly path: string,
-    readonly errors: Errors,
-  ) {}
+  private readonly value: Record<string, unknown>;
+  readonly path: string;
+  readonly errors: Errors;
+
+  // Explicit fields rather than parameter properties: Node's strip-only TypeScript mode, which runs `scripts/validate.ts`, has no support for the latter.
+  private constructor(value: Record<string, unknown>, path: string, errors: Errors) {
+    this.value = value;
+    this.path = path;
+    this.errors = errors;
+  }
 
   /** Checks `value` is an object with no key outside `allowedKeys`; `undefined` (with an error recorded) when it is not an object. */
   static of(value: unknown, path: string, errors: Errors, allowedKeys: readonly string[]): ObjectReader | undefined {

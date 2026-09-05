@@ -6,9 +6,9 @@
  * one-line meaning from the spec so the types read alone. Runtime checking
  * lives in `validateBattle.ts` and `validateMap.ts`.
  */
-import type { LicenseId } from "./licenses";
+import type { LicenseId } from "./licenses.ts";
 
-export type { LicenseId } from "./licenses";
+export type { LicenseId } from "./licenses.ts";
 
 /** A 24-hour `"HH:MM"` battle-clock time on the battle's date, `00:00` to `23:59`. Nothing finer (ADR-0002). */
 export type BattleTime = string;

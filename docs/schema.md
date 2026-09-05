@@ -1,6 +1,6 @@
 # Schema v1: the battle file and the map file
 
-*Derived from ADR-0001 to ADR-0010 and `CONTEXT.md` on 2026-09-05 for the v0.1 build. Until the TypeScript types and runtime validator exist this document is what they are built from; once they exist they are the source of truth and this file is regenerated from them, never edited against them.*
+*Derived from ADR-0001 to ADR-0010 and `CONTEXT.md` on 2026-09-05 for the v0.1 build. The source of truth is now the code: the types in `src/schema/types.ts`, the licence table in `src/schema/licenses.ts`, and the validators `src/schema/validateBattle.ts` and `src/schema/validateMap.ts`. This document is kept in step with them, never edited against them; a test validates the two JSON examples below against the validators so they cannot drift.*
 
 Two data files describe a battle. The **battle file** at `data/battles/<name>.json` is the timeline: a roster of units and a list of phases, each phase the picture of every unit at one battle-clock instant. The optional **map file** at `data/maps/<name>.geojson` is the static geography the battle plays over. The renderer knows nothing about any specific battle; everything battle-specific is in these two files.
 

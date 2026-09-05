@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { attributionRequired, classOf, LICENSE_CLASSES, rankOf, ranksAbove } from "./licenses";
+import { attributionRequired, classOf, LICENSE_CLASSES, rankOf, ranksAbove } from "./licenses.ts";
 
 describe("licence allowlist", () => {
   it("assigns each v1 identifier its class", () => {
