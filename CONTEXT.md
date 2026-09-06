@@ -144,6 +144,14 @@ _Avoid_: Commentary, alternates, uncertainty, confidence
 
 ### Player
 
+**View**:
+A named whole visual treatment of the picture that the viewer picks: the chart plate (the default), the night plate, or atlas. Every view is built from the one engraved system and owns only its paper and inks, its line weights, whether the sea is stippled, and how a unit and its engaged mark are drawn; the projection, the furniture and the caption band are the same in all of them. Held by the player for the current visit, never authored in a battle file.
+_Avoid_: Theme, skin, style, mode, layer, variant
+
+**Glyph**:
+How a view draws one unit: the chart plate's ship-ticks, atlas's block. Drawn in two parts, the mark its state puts on the plate around it and the unit itself, so that every unit's mark is laid down before any unit's body and a melee does not erase itself.
+_Avoid_: Icon, symbol, marker, sprite, token
+
 **Controls**:
 What the viewer operates to drive playback: play and pause, the scrubber, the phase-jump buttons, the speed multiplier, the picker, and the toggle for the details panel. Never authored in a battle file.
 _Avoid_: Furniture, UI, transport, toolbar
