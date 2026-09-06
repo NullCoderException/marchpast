@@ -7,8 +7,8 @@
  * Pure, and reading nothing but the roster's `arm` fields, so the row count is
  * a decision the furniture pass looks up rather than one it makes in ink.
  */
-import { ARMS, type Arm } from "../../schema/arms.ts";
-import type { Unit } from "../../schema/types.ts";
+import { ARMS } from "../../schema/arms.ts";
+import type { Arm, Unit } from "../../schema/types.ts";
 
 /**
  * The arms the legend keys, in the order the spec lists them: every arm the

@@ -1,7 +1,7 @@
 /**
  * Where a glyph's signs go: the arithmetic every view's body pass shares
- * (ADR-0016). Eight signs arranged by the formation word, thinned by strength,
- * knocked out of rank when the unit is broken.
+ * (ADR-0016). Eight sign slots laid out by the formation word, thinned by
+ * strength, knocked out of rank when the unit is broken.
  *
  * A **sign** is the repeated shape a view draws one arm in; how many there are
  * and where they sit is the same for every arm and every view, so it lives
@@ -21,6 +21,15 @@ export interface Slot {
 /** A mass is four across and two deep (ADR-0016): half a line's frontage, twice its depth. */
 export const MASS_FRONTAGE = 4;
 export const MASS_RANKS = 2;
+
+/**
+ * How wide a glyph stands across its own front: the whole length for a column
+ * or a line, half of it for a mass, which spends the other half on its second
+ * rank. Both views measure a mass by this, so both agree on what one is.
+ */
+export function frontage(formation: Formation, length: number): number {
+  return formation === "mass" ? (length * MASS_FRONTAGE) / SIGNS_PER_GLYPH : length;
+}
 
 /**
  * Every slot a formation offers, in the order strength fills them: for a mass,

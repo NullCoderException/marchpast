@@ -14,12 +14,11 @@
  * is drawn at the origin heading up the negative y axis; the caller has
  * rotated, so a bearing never reaches this file.
  */
-import type { Arm } from "../../schema/arms.ts";
-import type { Formation } from "../../schema/types.ts";
+import type { Arm, Formation } from "../../schema/types.ts";
 import { seeded } from "../primitives.ts";
 import { GLYPH_PX, SIGN_HALF_HEIGHT, SIGN_HALF_WIDTH, SIGNS_PER_GLYPH } from "../style.ts";
 import type { Glyph, GlyphRequest, Sign } from "../view.ts";
-import { signPositions, signSlots } from "./arrangement.ts";
+import { frontage, signPositions, signSlots } from "./slots.ts";
 
 /**
  * Billow's two weights: a full cloud when a unit is engaged, the same cloud
@@ -47,7 +46,13 @@ const CHORD_MIN_SCALE = 0.9;
 const RANK_BAR_THICKNESS = 2.6;
 /** How far the outline of a destroyed unit stands off the footprint its signs would have filled. */
 const OUTLINE_PAD = 2;
-/** The pitch the signs sit on, from the glyph's fixed length: what the label pass measures a mass's depth in. */
+/**
+ * The pitch the signs sit on at the glyph's fixed length. `signSlots` takes its
+ * pitch from the length it is handed, which is the same number on the plate and
+ * a smaller one in the legend's sample; `halfWidth` is asked only by the label
+ * pass, which is always on the plate, so the plate's pitch is the honest one
+ * here and the legend never asks.
+ */
 const SIGN_PITCH = GLYPH_PX / SIGNS_PER_GLYPH;
 
 /**
@@ -136,9 +141,18 @@ function body(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
  */
 function drawHollowOutline(ctx: CanvasRenderingContext2D, length: number, formation: Formation, scale: number): void {
   const slots = signSlots(formation, length);
+  const pitch = length / SIGNS_PER_GLYPH;
   const pad = (SIGN_HALF_WIDTH + OUTLINE_PAD) * scale;
-  const w = Math.max(...slots.map((slot) => slot.x)) + pad;
-  const h = Math.max(...slots.map((slot) => slot.y)) + pad;
+  // Along an axis the signs are ranked on, the outline takes each end sign's
+  // own half-pitch, so a line is exactly the glyph's length and a mass exactly
+  // half of it by two ranks. Across an axis they are not, it is the sign's
+  // footprint and a little air.
+  const half = (values: number[]): number => {
+    const span = Math.max(...values);
+    return span === 0 ? pad : span + pitch / 2;
+  };
+  const w = half(slots.map((slot) => slot.x));
+  const h = half(slots.map((slot) => slot.y));
   ctx.save();
   ctx.lineWidth = 1 * scale;
   ctx.setLineDash([]);
@@ -179,14 +193,14 @@ function drawBillow(ctx: CanvasRenderingContext2D, request: GlyphRequest, random
   const { along } = axes(formation);
   const count = Math.max(MIN_PUFFS, Math.round(cloud.puffs * scale));
   const clearance = ticks.halfWidth(scale, formation) + HULL_CLEARANCE * scale;
-  // A mass's frontage is half a line's, so its dust hangs over half the ground.
-  const frontage = formation === "mass" ? length / 2 : length;
+  // The dust hangs over the unit's own front, which for a mass is half a line's.
+  const front = frontage(formation, length);
 
   const puffs: Puff[] = [];
   for (let i = 0; i < count; i++) {
     const out = i / Math.max(1, count - 1);
     // Narrow at the hull, broad downwind: the cloud fans out as it drifts.
-    const spread = (random() - 0.5) * frontage * (0.5 + out * 0.5);
+    const spread = (random() - 0.5) * front * (0.5 + out * 0.5);
     const distance = clearance + out * cloud.reach * scale;
     puffs.push({
       x: along.x * spread + drift.x * distance,

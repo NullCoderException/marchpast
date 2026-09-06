@@ -5,7 +5,8 @@
  * that a mass asks the label for room, is checked here.
  */
 import { describe, expect, it } from "vitest";
-import { ARMS, type Arm } from "../../schema/arms.ts";
+import { ARMS } from "../../schema/arms.ts";
+import type { Arm } from "../../schema/types.ts";
 import type { Glyph, Sign } from "../view.ts";
 import { block } from "./block.ts";
 import { ticks } from "./ticks.ts";

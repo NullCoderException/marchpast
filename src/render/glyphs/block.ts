@@ -13,10 +13,9 @@
  * wholly different way replaces this one pass and nothing else. Drawn at the
  * origin heading up the negative y axis; the caller has rotated.
  */
-import type { Arm } from "../../schema/arms.ts";
-import type { Formation } from "../../schema/types.ts";
-import type { Glyph, GlyphRequest, Sign } from "../view.ts";
-import { MASS_RANKS } from "./arrangement.ts";
+import type { Arm, Formation } from "../../schema/types.ts";
+import type { Glyph, GlyphRequest, Sign, SignBox } from "../view.ts";
+import { frontage, MASS_RANKS } from "./slots.ts";
 
 /** The block's thickness across its long axis. */
 const THICKNESS = 10;
@@ -65,7 +64,7 @@ const signs: Record<Arm, Sign> = {
 };
 
 /** One diagonal across the sign's field at the block's centre. `rise` picks which way it leans. */
-function diagonal(ctx: CanvasRenderingContext2D, half: { x: number; y: number }, rise: number): void {
+function diagonal(ctx: CanvasRenderingContext2D, half: SignBox, rise: number): void {
   const { x, y } = signField(half);
   ctx.beginPath();
   ctx.moveTo(-x, rise * y);
@@ -74,7 +73,7 @@ function diagonal(ctx: CanvasRenderingContext2D, half: { x: number; y: number },
 }
 
 /** The field the sign is drawn in: the block's full thickness, and no more than `SIGN_ASPECT` of that along it. */
-function signField(half: { x: number; y: number }): { x: number; y: number } {
+function signField(half: SignBox): SignBox {
   const across = Math.min(half.x, half.y);
   const along = Math.min(Math.max(half.x, half.y), across * SIGN_ASPECT);
   return half.x >= half.y ? { x: along, y: across } : { x: across, y: along };
@@ -95,7 +94,7 @@ export const block: Glyph = {
  */
 function blockSize(formation: Formation, length: number, scale: number): { w: number; h: number } {
   const thickness = THICKNESS * scale;
-  if (formation === "mass") return { w: length / 2, h: thickness * MASS_RANKS };
+  if (formation === "mass") return { w: frontage(formation, length), h: thickness * MASS_RANKS };
   return formation === "column" ? { w: thickness, h: length } : { w: length, h: thickness };
 }
 
@@ -103,12 +102,13 @@ function blockSize(formation: Formation, length: number, scale: number): { w: nu
  * The part of the block strength fills, growing from the rear: astern for a
  * column and for a mass, from the left flank for a line.
  */
-function filledRect(formation: Formation, w: number, h: number, filled: number): Rect {
+function filledRect(formation: Formation, w: number, h: number, filled: number): Box {
   if (formation === "line") return { x: -w / 2, y: -h / 2, w: w * filled, h };
   return { x: -w / 2, y: h / 2 - h * filled, w, h: h * filled };
 }
 
-interface Rect {
+/** A part of the block, from its top-left corner. Not `projection.ts`'s `Rect`: that one is on the plate, this one at the origin. */
+interface Box {
   x: number;
   y: number;
   w: number;
@@ -166,7 +166,7 @@ function body(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
 }
 
 /** One pass of the arm's sign, clipped to a part of the block and stroked in one ink. */
-function paintSign(ctx: CanvasRenderingContext2D, clip: Rect, ink: string, draw: () => void): void {
+function paintSign(ctx: CanvasRenderingContext2D, clip: Box, ink: string, draw: () => void): void {
   ctx.save();
   ctx.beginPath();
   ctx.rect(clip.x, clip.y, clip.w, clip.h);

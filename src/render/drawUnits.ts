@@ -12,7 +12,7 @@
  * It draws `plate.unitsDrawn`, not the whole picture: which units a level puts
  * on the plate is settled once, in `level.ts`, before any pass runs (ADR-0017).
  */
-import type { Arm } from "../schema/arms.ts";
+import type { Arm } from "../schema/types.ts";
 import type { Picture, UnitPicture } from "../timeline/picture.ts";
 import type { Plate } from "./plate.ts";
 import { drawArrow, hashString, type Point } from "./primitives.ts";
@@ -39,10 +39,15 @@ export function drawUnits(plate: Plate): void {
   };
 
   // The arm is roster identity, never per-phase state (ADR-0015), so it is
-  // looked up here rather than carried on the picture. Every unit drawn is a
-  // roster unit, so the fallback is unreachable; the map's type is what asks
-  // for it.
-  const armOf = (unit: UnitPicture): Arm => roster.get(unit.id)?.arm ?? "ship";
+  // looked up here rather than carried on the picture. There is no fallback
+  // sign and so no fallback arm: a unit the roster does not hold is a picture
+  // that was never built from this battle, and it fails the way a missing
+  // snapshot does in `pictureAt` rather than drawing foot as ships.
+  const armOf = (unit: UnitPicture): Arm => {
+    const arm = roster.get(unit.id)?.arm;
+    if (arm === undefined) throw new RangeError(`The roster has no unit ${JSON.stringify(unit.id)}`);
+    return arm;
+  };
 
   // Tracks and moves. A track runs wherever the tween takes it: heading is the
   // front, so a unit retiring in good order draws its track back through its

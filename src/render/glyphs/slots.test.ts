@@ -1,12 +1,12 @@
 /**
- * How a glyph's eight signs are laid out and which of them survive: the
+ * How a glyph's eight sign slots are laid out and which of them survive: the
  * arithmetic under every view's body pass (ADR-0016). What the signs *look*
  * like is checked by eye against the design canvas; where they sit is checked
  * here.
  */
 import { describe, expect, it } from "vitest";
 import { SIGNS_PER_GLYPH } from "../style.ts";
-import { occupiedSlots, shownSigns, signPositions, signSlots } from "./arrangement.ts";
+import { frontage, occupiedSlots, shownSigns, signPositions, signSlots } from "./slots.ts";
 
 /** A glyph is 72px long, so its signs sit on a 9px pitch. */
 const LENGTH = 72;
@@ -54,6 +54,23 @@ describe("signSlots", () => {
     expect(footprint(mass.map((slot) => slot.x))).toBeCloseTo(footprint(line.map((slot) => slot.x)) / 2, 10);
     expect(footprint(mass.map((slot) => slot.y))).toBeCloseTo(2 * PITCH, 10);
     expect(footprint(line.map((slot) => slot.y))).toBeCloseTo(PITCH, 10);
+  });
+});
+
+describe("frontage", () => {
+  it("is the whole length for a column or a line and half of it for a mass", () => {
+    expect(frontage("column", LENGTH)).toBe(LENGTH);
+    expect(frontage("line", LENGTH)).toBe(LENGTH);
+    expect(frontage("mass", LENGTH)).toBe(LENGTH / 2);
+  });
+
+  it("agrees with the slots it describes, so the two never drift", () => {
+    const across = (formation: "line" | "mass"): number => {
+      const xs = signSlots(formation, LENGTH).map((slot) => slot.x);
+      return Math.max(...xs) - Math.min(...xs) + PITCH;
+    };
+    expect(across("line")).toBeCloseTo(frontage("line", LENGTH), 10);
+    expect(across("mass")).toBeCloseTo(frontage("mass", LENGTH), 10);
   });
 });
 

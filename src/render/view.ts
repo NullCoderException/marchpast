@@ -103,12 +103,18 @@ export interface GlyphRequest {
   palette: Palette;
 }
 
+/** Half the box a sign is drawn inside, from its centre outward. */
+export interface SignBox {
+  x: number;
+  y: number;
+}
+
 /**
  * The repeated shape one view draws one arm in, at the origin heading up, in
  * the ink and weight the caller has already set on the context. `half` is the
  * box it fills: one sign's footprint on the plate, the whole block in Atlas.
  */
-export type Sign = (ctx: CanvasRenderingContext2D, half: { x: number; y: number }, scale: number) => void;
+export type Sign = (ctx: CanvasRenderingContext2D, half: SignBox, scale: number) => void;
 
 /**
  * How a view draws a unit: the one pass a view replaces wholesale, in two

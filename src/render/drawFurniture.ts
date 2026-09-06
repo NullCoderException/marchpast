@@ -181,6 +181,18 @@ const LEGEND_WIDTH = 168;
 const LEGEND_SAMPLE = 40;
 /** The legend's samples are drawn small, so a glyph knows to leave off its finest detail. */
 const LEGEND_SCALE = 0.75;
+/** The three motion styles, which the legend always keys: track, intent, detachment. */
+const LEGEND_LINE_ROWS = 3;
+
+/**
+ * How tall the legend stands, in rows: one per side, one per state, one per arm
+ * the roster keys, and one per line style. Exported because the arm rows are
+ * the only ones whose count is a decision (ADR-0015), and a decision is worth a
+ * test.
+ */
+export function legendRowCount(sides: number, arms: readonly Arm[]): number {
+  return sides + STATES.length + arms.length + LEGEND_LINE_ROWS;
+}
 
 /**
  * The always-on legend: each side's colour and name, the four state glyphs, one
@@ -196,7 +208,7 @@ function drawLegend(plate: Plate, bottom: number): void {
   // The rows that are not about an arm still have to be drawn in one: the arm
   // most of the battle is made of, so Cannae's states are not ship-ticks.
   const ordinary = legendArm(plate.battle.units);
-  const rows = colours.size + STATES.length + arms.length + 3;
+  const rows = legendRowCount(colours.size, arms);
   const height = rows * LEGEND_ROW + 16;
   const x = frame.x + MARGIN;
   const y = bottom - height;
