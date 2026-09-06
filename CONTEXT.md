@@ -51,7 +51,7 @@ What the renderer draws around the picture without any battle authoring it and t
 _Avoid_: Chrome, overlay, HUD, widgets, controls
 
 **Legend**:
-The furniture box that keys the picture: each side's colour and name, the four state glyphs, and the line styles for a track and the two kinds of move. Always shown.
+The furniture box that keys the picture: each side's colour and name, the four state glyphs, the line styles for a track and the two kinds of move, and, when the battle has more than one arm, the sign for each. Always shown.
 _Avoid_: Key, guide, symbols
 
 ### Weather
@@ -104,6 +104,22 @@ _Avoid_: Health, casualties, hit points, size, losses
 The named person commanding a unit, recorded once per battle as part of the unit's identity so labels and captions can name them. A change of command during the battle is caption matter.
 _Avoid_: Admiral, general, leader, flag officer, owner
 
+**Arm**:
+What a unit is made of, one word from a fixed list, recorded once per battle as part of the unit's identity: infantry, cavalry, or ship in v2. Never changes during a battle; heavy or light, a ship of the line or a frigate, is label and caption matter.
+_Avoid_: Type, kind, class, branch, troop type, category
+
+**Infantry**:
+The arm of a unit of men who fight on foot: the Roman legions, the Libyan foot.
+_Avoid_: Foot (in data), legion, phalanx, troops
+
+**Cavalry**:
+The arm of a unit of men who fight mounted: Hasdrubal's Spanish and Gallic horse, the Numidians.
+_Avoid_: Horse (in data), mounted, dragoons
+
+**Ship**:
+The arm of a unit made of vessels, whatever their rate or whether they are under way or at anchor: a fleet column, a squadron, the Danish line of blockships.
+_Avoid_: Naval, fleet, vessel, sail
+
 **Formation**:
 The shape a unit's ships or men are arranged in, one of two words in v1: column (in line ahead along the heading) or line (abreast across the heading). A styled label the renderer draws; a battle file never carries the shape's geometry.
 _Avoid_: Shape, arrangement, order of sailing, crescent
@@ -155,6 +171,10 @@ _Avoid_: Theme switcher, view toggle, style menu, mode
 **Glyph**:
 How a view draws one unit: the chart plate's ship-ticks, atlas's block. Drawn in two parts, the mark its state puts on the plate around it and the unit itself, so that every unit's mark is laid down before any unit's body and a melee does not erase itself.
 _Avoid_: Icon, symbol, marker, sprite, token
+
+**Sign**:
+The shape by which a view tells one arm from another inside a glyph: the chart plate's chevron tick for a ship, atlas's diagonal across a cavalry block. Every view has a sign for every arm.
+_Avoid_: Mark (the state's), icon, symbol, tick (except for the ship sign), badge
 
 **Controls**:
 What the viewer operates to drive playback: play and pause, the scrubber, the phase-jump buttons, the speed multiplier, the view chooser, the picker, and the toggle for the details panel. Never authored in a battle file.
