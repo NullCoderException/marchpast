@@ -4,11 +4,22 @@
  * origin so the units pass and the legend draw the same thing at different sizes.
  */
 import type { Formation, UnitState } from "../schema/types.ts";
-import { SMOKE, TICK_HALF_HEIGHT, TICK_HALF_WIDTH, TICKS_PER_GLYPH, type LineStyle } from "./style.ts";
+import type { Rect } from "./projection.ts";
+import { INK, SMOKE, TICK_HALF_HEIGHT, TICK_HALF_WIDTH, TICKS_PER_GLYPH, type LineStyle } from "./style.ts";
 
 export interface Point {
   x: number;
   y: number;
+}
+
+/** The plate's edge: a double ink rule just inside `frame`, where the letterbox begins (ADR-0009). */
+export function drawPlateRule(ctx: CanvasRenderingContext2D, frame: Rect): void {
+  ctx.save();
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(frame.x + 0.5, frame.y + 0.5, frame.width - 1, frame.height - 1);
+  ctx.strokeRect(frame.x + 5.5, frame.y + 5.5, frame.width - 11, frame.height - 11);
+  ctx.restore();
 }
 
 /** A small deterministic generator so smoke and disorder do not flicker between frames. */

@@ -17,6 +17,8 @@ export const PARCHMENT_PANEL = "rgba(239,227,198,0.92)";
 export const LAND = "#e3d3ac";
 /** The letterbox outside the extent: a darker tone so the plate's edge reads. */
 export const LETTERBOX = "#d9c8a2";
+/** Margin between the canvas edge and the plate. */
+export const PLATE_MARGIN = 20;
 /** Engaged smoke. */
 export const SMOKE = "rgba(60,55,50,0.13)";
 

@@ -6,7 +6,7 @@
  */
 import type { Wind, WindForce } from "../schema/types.ts";
 import type { Plate } from "./plate.ts";
-import { drawArrow, drawGlyph, type Point } from "./primitives.ts";
+import { drawArrow, drawGlyph, drawPlateRule, type Point } from "./primitives.ts";
 import { toRadians } from "./projection.ts";
 import { METRES_PER_UNIT, scaleBarLength, UNIT_LABEL } from "./scaleBar.ts";
 import { detachmentStyle, font, INK, INTENT_STYLE, PARCHMENT_PANEL, STATES, TRACK_STYLE } from "./style.ts";
@@ -33,13 +33,8 @@ export function drawFurniture(plate: Plate): void {
 }
 
 /** A double ink rule at the extent's edge, where the letterbox begins. */
-function drawPlateBorder({ ctx, projection: { extentRect: frame } }: Plate): void {
-  ctx.save();
-  ctx.strokeStyle = INK;
-  ctx.lineWidth = 1;
-  ctx.strokeRect(frame.x + 0.5, frame.y + 0.5, frame.width - 1, frame.height - 1);
-  ctx.strokeRect(frame.x + 5.5, frame.y + 5.5, frame.width - 11, frame.height - 11);
-  ctx.restore();
+function drawPlateBorder({ ctx, projection: { extentRect } }: Plate): void {
+  drawPlateRule(ctx, extentRect);
 }
 
 function drawCompassRose(plate: Plate, wind: Wind | undefined): void {

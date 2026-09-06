@@ -18,15 +18,12 @@ import { seeded } from "./primitives.ts";
 import { fitProjection, type Rect } from "./projection.ts";
 import type { Plate } from "./plate.ts";
 import { METRES_PER_UNIT } from "./scaleBar.ts";
-import { LETTERBOX, MIN_GLYPH_PX, NOMINAL_GLYPH_NMI, PARCHMENT, sideColours } from "./style.ts";
+import { LETTERBOX, MIN_GLYPH_PX, NOMINAL_GLYPH_NMI, PARCHMENT, PLATE_MARGIN, sideColours } from "./style.ts";
 
 export interface Renderer {
   /** Draws the picture. Synchronous; returns when the canvas holds it. */
   render(battle: Battle, map: MapFile | undefined, picture: Picture): void;
 }
-
-/** Margin between the canvas edge and the plate. */
-const PLATE_MARGIN = 20;
 
 export function createRenderer(canvas: HTMLCanvasElement): Renderer {
   const ctx = canvas.getContext("2d");

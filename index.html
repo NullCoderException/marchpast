@@ -12,14 +12,22 @@
         overflow: hidden;
         background: #efe3c6;
       }
+      /* The plate above, the controls beneath: the canvas takes whatever height the controls leave. */
+      body {
+        display: flex;
+        flex-direction: column;
+      }
       canvas {
         display: block;
-        width: 100vw;
-        height: 100vh;
+        flex: 1;
+        min-height: 0;
+        width: 100%;
       }
     </style>
   </head>
   <body>
+    <canvas></canvas>
+    <div id="controls"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
