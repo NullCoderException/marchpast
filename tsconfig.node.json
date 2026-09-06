@@ -17,5 +17,6 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["vite.config.ts", "vite"]
+  "include": ["vite.config.ts", "vite", "src/schema", "src/data/battleIndex.ts"],
+  "exclude": ["src/schema/*.test.ts"]
 }

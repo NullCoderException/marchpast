@@ -12,7 +12,7 @@
 import type { Battle, MapFile } from "../schema/types.ts";
 import { createRenderer } from "../render/index.ts";
 import { pictureAt } from "../timeline/pictureAt.ts";
-import { createControls } from "./controls.ts";
+import { createControls, type PickerOptions } from "./controls.ts";
 import { createDetailsPanel } from "./details.ts";
 import { Listeners } from "./dom.ts";
 import "./player.css";
@@ -39,6 +39,8 @@ export interface PlayerOptions {
   battle: Battle;
   /** The battle's map, when it names one. */
   map?: MapFile;
+  /** What the Picker offers. Absent when the Library's index could not be loaded: the battle still plays, without a Picker. */
+  picker?: PickerOptions;
 }
 
 /** A running player. */
@@ -51,7 +53,7 @@ export interface Player {
 const MAX_FRAME_SECONDS = 0.25;
 
 /** Builds the player and starts its loop, paused on the first phase with its caption shown. */
-export function createPlayer({ canvas, controlsRoot, battle, map }: PlayerOptions): Player {
+export function createPlayer({ canvas, controlsRoot, battle, map, picker }: PlayerOptions): Player {
   const renderer = createRenderer(canvas);
   const listeners = new Listeners();
   const details = createDetailsPanel(battle);
@@ -77,7 +79,7 @@ export function createPlayer({ canvas, controlsRoot, battle, map }: PlayerOption
       details.setOpen(!details.isOpen());
       dirty = true;
     },
-  });
+  }, picker);
   controlsRoot.append(details.root, controls.root);
 
   // Space plays and pauses, the arrows jump phases. A focused control that

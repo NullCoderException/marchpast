@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { battleUrl, mapUrl } from "./paths";
+import { battleUrl, indexUrl, mapUrl } from "./paths";
 
 describe("data served by name", () => {
   it("resolves a battle name to data/battles/<name>.json", () => {
@@ -8,6 +8,10 @@ describe("data served by name", () => {
 
   it("resolves a map name to data/maps/<name>.geojson", () => {
     expect(mapUrl("cadiz")).toBe("/data/maps/cadiz.geojson");
+  });
+
+  it("puts the library index at data/index.json", () => {
+    expect(indexUrl()).toBe("/data/index.json");
   });
 });
 
@@ -26,5 +30,9 @@ describe("data under a base path", () => {
 
   it("puts a map beneath the app's base URL", () => {
     expect(mapUrl("cadiz")).toBe("/sandtable/data/maps/cadiz.geojson");
+  });
+
+  it("puts the index beneath the app's base URL", () => {
+    expect(indexUrl()).toBe("/sandtable/data/index.json");
   });
 });

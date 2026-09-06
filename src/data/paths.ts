@@ -22,6 +22,11 @@ export function battleUrl(name: string): string {
   return `${dataPrefix()}/battles/${name}.json`;
 }
 
+/** URL of the Library's index, `data/index.json`: the one file on the data route the build generates rather than stores (ADR-0011). */
+export function indexUrl(): string {
+  return `${dataPrefix()}/index.json`;
+}
+
 /** URL of the map file `data/maps/<name>.geojson`. */
 export function mapUrl(name: string): string {
   return `${dataPrefix()}/maps/${name}.geojson`;

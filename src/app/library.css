@@ -1,0 +1,146 @@
+/*
+ * The Library in the plate's spirit: parchment, ink, the bundled face and the
+ * plate's type ramp, set as a page rather than drawn on a canvas.
+ *
+ * As in player.css, the values are the Chart plate's (CHART_PLATE in
+ * src/render/views.ts), copied rather than published: the view stops at the
+ * canvas edge (ADR-0014, #47), and the Library has no view at all.
+ */
+
+/*
+ * index.html sizes the player's page to the viewport and clips it, which is
+ * right for a plate and wrong for a list. The class goes on <html> when the
+ * Library is what the URL asked for.
+ */
+.st-library-page,
+.st-library-page body {
+  height: auto;
+  overflow: auto;
+}
+
+.st-library,
+.st-library-back {
+  --st-ink: #2b2418;
+  --st-parchment: #efe3c6;
+  --st-rule: rgba(43, 36, 24, 0.55);
+  --st-sunk: #e3d3ac;
+  font-family: "IM Fell English", Georgia, serif;
+  color: var(--st-ink);
+  background: var(--st-parchment);
+}
+
+.st-library {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 56px 24px 40px;
+}
+
+/* The plate's rule, in the one place the page needs a horizon. */
+.st-library-head {
+  padding-bottom: 16px;
+  border-bottom: 3px double var(--st-rule);
+}
+
+.st-library-name {
+  margin: 0;
+  font-size: 30px;
+  font-weight: normal;
+  letter-spacing: 0.02em;
+}
+
+.st-library-idea {
+  margin: 8px 0 0;
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.st-library-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.st-library-entry + .st-library-entry {
+  border-top: 1px solid rgba(43, 36, 24, 0.2);
+}
+
+/* The whole entry is the target: the summary is part of what is being chosen. */
+.st-library-link {
+  display: block;
+  padding: 20px 12px;
+  margin: 0 -12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.st-library-link:hover {
+  background: var(--st-sunk);
+}
+
+.st-library-link:focus-visible {
+  outline: 2px solid var(--st-ink);
+  outline-offset: 2px;
+}
+
+.st-library-title {
+  display: block;
+  font-size: 22px;
+}
+
+/* A date is an aside, as it is on the plate. */
+.st-library-date {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.st-library-summary {
+  display: block;
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.st-library-empty {
+  padding: 24px 0;
+  font-size: 15px;
+  font-style: italic;
+}
+
+.st-library-credit {
+  padding-top: 20px;
+  border-top: 1px solid var(--st-rule);
+  font-size: 11px;
+  font-style: italic;
+}
+
+.st-library a {
+  color: inherit;
+}
+
+/* The way back from a battle that would not load: the only thing in the
+   controls strip when there is no player to control. */
+.st-library-back {
+  display: inline-block;
+  padding: 10px 24px;
+  border-top: 1px solid var(--st-rule);
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 15px;
+  color: inherit;
+}
+
+@media (max-width: 520px) {
+  .st-library {
+    padding: 32px 16px 28px;
+  }
+
+  .st-library-link {
+    padding: 16px 8px;
+    margin: 0 -8px;
+  }
+}
