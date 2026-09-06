@@ -1,5 +1,5 @@
 /**
- * The data files this repository ships are valid against schema v1.
+ * The data files this repository ships are valid against schema v2.
  *
  * `npm run validate` is the command a person runs against `data/`; CI runs
  * `npm test`, so this is what keeps an invalid battle or map file off `main`.

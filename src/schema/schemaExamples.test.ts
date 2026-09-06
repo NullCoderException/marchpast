@@ -9,12 +9,14 @@ function jsonBlocks(markdown: string): unknown[] {
 }
 
 /**
- * `docs/schema.md` became the v2 spec at the v0.2 handoff (2026-09-06) while the
- * validators still read v1. Until the schema v2 build issue lands, the two
- * validate checks are skipped rather than deleted: that issue un-skips them,
- * and from then on the spec and the validator are held together again.
+ * `docs/schema.md` became the v2 spec at the v0.2 handoff (2026-09-06) while
+ * the validators still read v1, and one flag per file kind is what lets each
+ * validate check come back as its own slice lands. The battle file's is done;
+ * the map file's four new kinds (schema.md 3.2) are the next slice, so its
+ * check stays skipped rather than deleted.
  */
-const VALIDATORS_READ_V2 = false;
+const BATTLE_VALIDATOR_READS_V2 = true;
+const MAP_VALIDATOR_READS_V2 = false;
 
 describe("the examples in docs/schema.md", () => {
   const blocks = jsonBlocks(schemaMd);
@@ -27,11 +29,11 @@ describe("the examples in docs/schema.md", () => {
     expect(blocks[0]).toMatchObject({ schema_version: 2 });
   });
 
-  it.skipIf(!VALIDATORS_READ_V2)("battle example validates, so the spec cannot drift from the validator", () => {
+  it.skipIf(!BATTLE_VALIDATOR_READS_V2)("battle example validates, so the spec cannot drift from the validator", () => {
     expect(validateBattle(blocks[0])).toMatchObject({ ok: true });
   });
 
-  it.skipIf(!VALIDATORS_READ_V2)("map example validates, so the spec cannot drift from the validator", () => {
+  it.skipIf(!MAP_VALIDATOR_READS_V2)("map example validates, so the spec cannot drift from the validator", () => {
     expect(validateMap(blocks[1])).toMatchObject({ ok: true });
   });
 });

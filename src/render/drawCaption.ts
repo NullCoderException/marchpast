@@ -1,7 +1,7 @@
 /**
  * The caption band (ADR-0009): full width along the bottom, ink-ruled, in the
- * plate face. Left, the battle clock and date; right, the phase label, the
- * caption word-wrapped, and beneath it the phase's reference source labels.
+ * plate face. Left, the battle clock and the current phase's date; right, the
+ * phase label, the caption word-wrapped, and beneath it the reference labels.
  * Part of the picture, so a screenshot stands alone.
  */
 import type { Battle } from "../schema/types.ts";
@@ -80,11 +80,12 @@ export function drawCaption(
   ctx.textBaseline = "top";
   ctx.textAlign = "left";
 
-  // Left: the clock, large, and the date beneath it.
+  // Left: the clock, large, and the date beneath it. The date is the current
+  // phase's day, so it advances with a battle that crosses midnight (ADR-0013).
   ctx.font = font(26);
   ctx.fillText(formatClock(picture.clock), PAD_X, top + PAD_Y + 2);
   ctx.font = font(13, true);
-  ctx.fillText(battle.date, PAD_X, top + PAD_Y + 36);
+  ctx.fillText(battle.dates[picture.phase.day ?? 0] ?? "", PAD_X, top + PAD_Y + 36);
 
   // Right: the phase label, the caption, the sources.
   const x = PAD_X + CLOCK_COLUMN;

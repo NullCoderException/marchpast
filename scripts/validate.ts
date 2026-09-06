@@ -1,5 +1,5 @@
 /**
- * `npm run validate [paths...]`: checks the data files against schema v1.
+ * `npm run validate [paths...]`: checks the data files against schema v2.
  *
  * With no arguments it validates every `data/battles/*.json` and
  * `data/maps/*.geojson` under the current directory; with arguments, only

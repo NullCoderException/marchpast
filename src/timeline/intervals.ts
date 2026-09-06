@@ -10,6 +10,11 @@
  * `clockIntervals` is the same stretch in the seconds the playing clock
  * counts, a wall frame being worth a fraction of a minute. Everything a
  * player holds is seconds.
+ *
+ * This module still reads `t` alone and ignores a phase's `day`, so it is
+ * right for a battle inside one day and wrong across midnight. The clock that
+ * counts from the first day's midnight (`instantMinutes` in
+ * `src/schema/time.ts`) is the battle-clock slice's work, not this one's.
  */
 import type { Battle } from "../schema/types.ts";
 import { parseBattleTime } from "../schema/time.ts";

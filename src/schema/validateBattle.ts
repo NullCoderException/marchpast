@@ -2,25 +2,29 @@
  * Runtime validator for the battle file (schema.md section 2).
  *
  * Checks every shape rule (types, required fields, enums, ranges, unknown keys
- * rejected at every level) and the twelve cross-field rules of schema.md 2.9.
- * Never throws on bad data; collects every error with a JSON-pointer path.
+ * rejected at every level) and the seventeen cross-field rules of schema.md
+ * 2.10. Never throws on bad data; collects every error with a JSON-pointer path.
  *
  * Each `read*` function checks one table of the spec and returns the typed
  * value only when every field read cleanly, recording errors otherwise. The
  * cross-field checks run over whatever did read cleanly, so one malformed
  * unit never hides an unrelated ordering error.
  */
+import { ARMS } from "./arms.ts";
+import { treeDepth, unitsAtLevel } from "./hierarchy.ts";
 import { readAttribution, readLicense } from "./licenseFields.ts";
 import { classOf, ranksAbove, type LicenseId } from "./licenses.ts";
-import { isBattleTime, parseBattleTime } from "./time.ts";
+import { instantMinutes, isBattleTime } from "./time.ts";
 import type {
   Battle,
   BattleTime,
+  Day,
   Extent,
   Move,
   Phase,
   Position,
   Reference,
+  SortDate,
   Source,
   Unit,
   UnitSnapshot,
@@ -31,6 +35,7 @@ import {
   allEntriesDefined,
   appendPointer,
   type ArrayField,
+  DAY_BOUNDS,
   Errors,
   LAT_BOUNDS,
   LON_BOUNDS,
@@ -44,18 +49,20 @@ export type BattleValidation = { ok: true; battle: Battle } | { ok: false; error
 
 const SCALE_UNITS = ["nmi", "km"] as const;
 const WIND_FORCES = ["calm", "light", "moderate", "fresh", "gale"] as const;
-const FORMATIONS = ["column", "line"] as const;
+const FORMATIONS = ["column", "line", "mass"] as const;
 const STATES = ["intact", "engaged", "broken", "destroyed"] as const;
 const MOVE_KINDS = ["detachment", "intent"] as const;
 
 /** Degrees true: `0 <= x < 360`. */
 const ANGLE = { min: 0, max: 360, exclusiveMax: true };
-/** What disqualifies a map name (rule 11): a path separator or an extension. */
+/** What disqualifies a map name (rule 13): a path separator or an extension. */
 const NOT_A_BARE_NAME = /[\/\\.]/;
+/** Rule 17: the label placement proof's break point, made a rule (ADR-0017). */
+const MAX_UNITS_PER_LEVEL = 16;
 
-/** What a phase needs from the rest of the file to check its own cross-references (rules 5 and 6). */
+/** What a phase needs from the rest of the file to check its own cross-references (rules 7 and 8). */
 interface PhaseContext {
-  /** Every roster id, or `undefined` when the roster did not read cleanly and rule 5 cannot be judged. */
+  /** Every roster id, or `undefined` when the roster did not read cleanly and rule 7 cannot be judged. */
   rosterIds: Set<string> | undefined;
   /** Every key of `sources`, or `undefined` when they did not read cleanly. */
   sourceIds: Set<string> | undefined;
@@ -72,14 +79,18 @@ function readBattle(json: unknown, errors: Errors): Battle | undefined {
   const obj = ObjectReader.of(json, "", errors, [
     "schema_version",
     "title",
-    "date",
+    "summary",
+    "dates",
+    "sort_date",
     "extent",
     "scale_unit",
     "map",
     "end",
+    "end_day",
     "license",
     "attribution",
     "sources",
+    "levels",
     "units",
     "phases",
   ]);
@@ -87,17 +98,27 @@ function readBattle(json: unknown, errors: Errors): Battle | undefined {
 
   const schemaVersion = readSchemaVersion(obj);
   const title = obj.string("title");
-  const date = obj.string("date");
+  const summary = obj.string("summary");
+  const dates = obj.array("dates", (value, path) => readStringItem(value, path, errors), { nonEmpty: true });
+  const sortDate = readSortDate(obj.object("sort_date", ["year", "month", "day"]));
   const extent = readExtent(obj.object("extent", ["north", "south", "east", "west"]));
   const scaleUnit = obj.oneOf("scale_unit", SCALE_UNITS);
   const map = readMapName(obj);
   const end = readBattleTime(obj, "end");
+  const endDay = obj.number("end_day", DAY_BOUNDS, { optional: true });
   const license = readLicense(obj);
   const attribution = readAttribution(obj, license);
   const sources = obj.record("sources", (value, path) => readSource(value, path, errors));
   if (sources !== undefined && license !== undefined) checkSourceRanks(sources, license, errors);
+  const levels = obj.array("levels", (value, path) => readStringItem(value, path, errors), { optional: true });
   const units = obj.array("units", (value, path) => readUnit(value, path, errors), { nonEmpty: true });
-  if (units !== undefined) checkUniqueIds(units, errors);
+  if (units !== undefined) {
+    checkUniqueIds(units, errors);
+    checkParents(units, errors);
+    if (allDefined(units.items)) {
+      checkLevels(units.items, levels === undefined ? undefined : levels.items, obj, errors);
+    }
+  }
   const context: PhaseContext = {
     rosterIds: units !== undefined && allDefined(units.items) ? new Set(units.items.map((unit) => unit.id)) : undefined,
     // A key whose entry failed to read is still a key, so a reference to it is not dangling.
@@ -106,20 +127,25 @@ function readBattle(json: unknown, errors: Errors): Battle | undefined {
   const phases = obj.array("phases", (value, path) => readPhase(value, path, errors, context), { nonEmpty: true });
   if (phases !== undefined) {
     checkUniqueIds(phases, errors);
-    checkPhaseOrder(phases, end, obj, errors);
+    const lastDay = checkPhaseOrder(phases, end, endDay, obj.has("end_day"), obj, errors);
     checkWindAllOrNothing(phases, errors);
+    if (dates !== undefined) checkDates(dates, lastDay, endDay, obj, errors);
   }
 
   if (
     schemaVersion === undefined ||
     title === undefined ||
-    date === undefined ||
+    summary === undefined ||
+    dates === undefined ||
+    !allDefined(dates.items) ||
+    sortDate === undefined ||
     extent === undefined ||
     scaleUnit === undefined ||
     end === undefined ||
     license === undefined ||
     sources === undefined ||
     !allEntriesDefined(sources.entries) ||
+    (levels !== undefined && !allDefined(levels.items)) ||
     units === undefined ||
     !allDefined(units.items) ||
     phases === undefined ||
@@ -131,28 +157,48 @@ function readBattle(json: unknown, errors: Errors): Battle | undefined {
   return withoutUndefined({
     schema_version: schemaVersion,
     title,
-    date,
+    summary,
+    dates: dates.items,
+    sort_date: sortDate,
     extent,
     scale_unit: scaleUnit,
     map,
     end,
+    end_day: endDay,
     license,
     attribution,
     sources: sources.entries,
+    levels: levels === undefined ? undefined : (levels.items as string[]),
     units: units.items,
     phases: phases.items,
   });
 }
 
-/** Rule 1: `schema_version` is exactly `1`. */
-function readSchemaVersion(obj: ObjectReader): 1 | undefined {
+/** Rule 1: `schema_version` is exactly `2`, and a v1 file is told what v2 needs (schema.md section 0). */
+function readSchemaVersion(obj: ObjectReader): 2 | undefined {
   const version = obj.number("schema_version");
   if (version === undefined) return undefined;
-  if (version !== 1) {
-    obj.errors.add(obj.at("schema_version"), `unsupported schema version ${version}; this validator reads version 1`);
+  if (version === 1) {
+    obj.errors.add(
+      obj.at("schema_version"),
+      "schema version 1 is not read by this validator; version 2 needs summary, dates in place of date, sort_date, and arm on every unit",
+    );
     return undefined;
   }
-  return 1;
+  if (version !== 2) {
+    obj.errors.add(obj.at("schema_version"), `unsupported schema version ${version}; this validator reads version 2`);
+    return undefined;
+  }
+  return 2;
+}
+
+/** One entry of a string array (`dates`, `levels`). */
+function readStringItem(value: unknown, path: string, errors: Errors): string | undefined {
+  if (typeof value !== "string") {
+    errors.add(path, "expected a string");
+    return undefined;
+  }
+  return value;
 }
 
 /** A battle-clock time field: `"HH:MM"`, `00:00` to `23:59`. */
@@ -166,7 +212,21 @@ function readBattleTime(obj: ObjectReader, key: string): BattleTime | undefined 
   return raw;
 }
 
-/** Rule 11: `map` is a bare name, never a path or a file name. */
+/** Rule 6: three integers, a real month and day, and no year zero (schema.md 2.1). */
+function readSortDate(obj: ObjectReader | undefined): SortDate | undefined {
+  if (obj === undefined) return undefined;
+  const year = obj.number("year", { integer: true });
+  const month = obj.number("month", { min: 1, max: 12, integer: true });
+  const day = obj.number("day", { min: 1, max: 31, integer: true });
+  if (year === 0) {
+    obj.errors.add(obj.at("year"), "expected a year in ordinary historical numbering, which has no year zero");
+    return undefined;
+  }
+  if (year === undefined || month === undefined || day === undefined) return undefined;
+  return { year, month, day };
+}
+
+/** Rule 13: `map` is a bare name, never a path or a file name. */
 function readMapName(obj: ObjectReader): string | undefined {
   const name = obj.string("map", { optional: true });
   if (name === undefined) return undefined;
@@ -212,7 +272,7 @@ function readSource(value: unknown, path: string, errors: Errors): Source | unde
   return withoutUndefined({ label, work, url, license, license_note: licenseNote });
 }
 
-/** Rule 10, second half: no source's licence class ranks above the file's. */
+/** Rule 12, second half: no source's licence class ranks above the file's. */
 function checkSourceRanks(sources: RecordField<Source>, fileLicense: LicenseId, errors: Errors): void {
   for (const [id, source] of Object.entries(sources.entries)) {
     if (source !== undefined && ranksAbove(source.license, fileLicense)) {
@@ -224,16 +284,70 @@ function checkSourceRanks(sources: RecordField<Source>, fileLicense: LicenseId, 
   }
 }
 
-/** One roster entry (schema.md 2.3). */
+/** One roster entry (schema.md 2.3). Rule 15 is the `arm` enum. */
 function readUnit(value: unknown, path: string, errors: Errors): Unit | undefined {
-  const obj = ObjectReader.of(value, path, errors, ["id", "side", "label", "commander"]);
+  const obj = ObjectReader.of(value, path, errors, ["id", "side", "label", "short_label", "commander", "arm", "parent"]);
   if (obj === undefined) return undefined;
   const id = obj.string("id");
   const side = obj.string("side");
   const label = obj.string("label");
+  const shortLabel = obj.string("short_label", { optional: true });
   const commander = obj.string("commander", { optional: true });
-  if (id === undefined || side === undefined || label === undefined) return undefined;
-  return withoutUndefined({ id, side, label, commander });
+  const arm = obj.oneOf("arm", ARMS);
+  const parent = obj.string("parent", { optional: true });
+  if (id === undefined || side === undefined || label === undefined || arm === undefined) return undefined;
+  return withoutUndefined({ id, side, label, short_label: shortLabel, commander, arm, parent });
+}
+
+/** Rule 16: `parent` names an earlier roster entry on the same side, which is what makes a cycle impossible. */
+function checkParents(units: ArrayField<Unit>, errors: Errors): void {
+  const earlier = new Map<string, Unit>();
+  // A unit that failed to read has an id nobody can see, so from there on an
+  // unresolved parent may name it; only the side check stays reportable.
+  let anyEarlierFailed = false;
+  units.items.forEach((unit, index) => {
+    if (unit === undefined) {
+      anyEarlierFailed = true;
+      return;
+    }
+    if (unit.parent !== undefined) {
+      const path = appendPointer(units.path, index, "parent");
+      const parent = earlier.get(unit.parent);
+      if (parent === undefined) {
+        if (!anyEarlierFailed) errors.add(path, `${JSON.stringify(unit.parent)} is not a roster unit listed before this one`);
+      } else if (parent.side !== unit.side) {
+        errors.add(
+          path,
+          `parent ${JSON.stringify(unit.parent)} is on side ${JSON.stringify(parent.side)}, not ${JSON.stringify(unit.side)}`,
+        );
+      }
+    }
+    earlier.set(unit.id, unit);
+  });
+}
+
+/** Rule 17: `levels` present exactly when the roster is a tree, one name per level, and no level over sixteen units. */
+function checkLevels(units: Unit[], levels: (string | undefined)[] | undefined, root: ObjectReader, errors: Errors): void {
+  const isTree = units.some((unit) => unit.parent !== undefined);
+  if (isTree && levels === undefined) {
+    errors.add(root.at("levels"), "required: a unit has a parent, so every level of the tree needs a name");
+  } else if (!isTree && levels !== undefined) {
+    errors.add(root.at("levels"), "forbidden: no unit has a parent, so the battle has one level and no Level chooser");
+  }
+
+  const depth = treeDepth(units);
+  if (isTree && levels !== undefined && levels.length !== depth) {
+    errors.add(root.at("levels"), `expected ${depth} names, one per level of the unit tree, got ${levels.length}`);
+  }
+
+  for (let level = 0; level < depth; level += 1) {
+    const drawn = unitsAtLevel(units, level).length;
+    if (drawn > MAX_UNITS_PER_LEVEL) {
+      const name = levels?.[level];
+      const which = name === undefined ? `level ${level}` : `level ${level} (${JSON.stringify(name)})`;
+      errors.add(root.at("units"), `${which} draws ${drawn} units; no level draws more than ${MAX_UNITS_PER_LEVEL}`);
+    }
+  }
 }
 
 /** Rule 3: ids unique within an array; the later duplicate is the one reported. */
@@ -246,11 +360,12 @@ function checkUniqueIds(field: ArrayField<{ id: string }>, errors: Errors): void
   });
 }
 
-/** One phase (schema.md 2.4), with rules 5 and 6 checked against `context`. */
+/** One phase (schema.md 2.4), with rules 7 and 8 checked against `context`. */
 function readPhase(value: unknown, path: string, errors: Errors, context: PhaseContext): Phase | undefined {
   const obj = ObjectReader.of(value, path, errors, [
     "id",
     "label",
+    "day",
     "t",
     "playback_rate",
     "wind",
@@ -262,6 +377,8 @@ function readPhase(value: unknown, path: string, errors: Errors, context: PhaseC
   if (obj === undefined) return undefined;
   const id = obj.string("id");
   const label = obj.string("label");
+  const dayPresent = obj.has("day");
+  const day = obj.number("day", DAY_BOUNDS, { optional: true });
   const t = readBattleTime(obj, "t");
   const playbackRate = obj.number("playback_rate", { min: 0, exclusiveMin: true });
   const windPresent = obj.has("wind");
@@ -278,6 +395,7 @@ function readPhase(value: unknown, path: string, errors: Errors, context: PhaseC
   if (
     id === undefined ||
     label === undefined ||
+    (dayPresent && day === undefined) ||
     t === undefined ||
     playbackRate === undefined ||
     (windPresent && wind === undefined) ||
@@ -292,6 +410,7 @@ function readPhase(value: unknown, path: string, errors: Errors, context: PhaseC
   return withoutUndefined({
     id,
     label,
+    day,
     t,
     playback_rate: playbackRate,
     wind,
@@ -302,22 +421,75 @@ function readPhase(value: unknown, path: string, errors: Errors, context: PhaseC
   });
 }
 
-/** Rule 4: `t` strictly increasing across the phases that read cleanly, and `end` later than the last `t`. */
-function checkPhaseOrder(phases: ArrayField<Phase>, end: BattleTime | undefined, root: ObjectReader, errors: Errors): void {
-  let previous: { t: BattleTime; index: number } | undefined;
+/** An instant as the error messages name it: the time of day, and the day when it is not the first. */
+function describeInstant(day: Day, t: BattleTime): string {
+  return day === 0 ? t : `${t} on day ${day}`;
+}
+
+/**
+ * Rule 4: phases strictly increase on (`day`, `t`), the first is on day `0`,
+ * `end_day` is not before the last phase's day, and (`end_day`, `end`) is later
+ * than the last phase. Returns the last cleanly-read phase's day, which rule 5
+ * counts `dates` against.
+ */
+function checkPhaseOrder(
+  phases: ArrayField<Phase>,
+  end: BattleTime | undefined,
+  endDay: Day | undefined,
+  endDayPresent: boolean,
+  root: ObjectReader,
+  errors: Errors,
+): Day | undefined {
+  let previous: { day: Day; t: BattleTime; minutes: number; index: number } | undefined;
   phases.items.forEach((phase, index) => {
     if (phase === undefined) return;
-    if (previous !== undefined && parseBattleTime(phase.t) <= parseBattleTime(previous.t)) {
-      errors.add(appendPointer(phases.path, index, "t"), `expected later than phase ${previous.index} at ${previous.t}, got ${phase.t}`);
+    const day = phase.day ?? 0;
+    const minutes = instantMinutes(day, phase.t);
+    if (index === 0 && day !== 0) {
+      errors.add(appendPointer(phases.path, 0, "day"), `expected the first phase on day 0, got day ${day}`);
     }
-    previous = { t: phase.t, index };
+    if (previous !== undefined && minutes <= previous.minutes) {
+      errors.add(
+        appendPointer(phases.path, index, "t"),
+        `expected later than phase ${previous.index} at ${describeInstant(previous.day, previous.t)}, got ${describeInstant(day, phase.t)}`,
+      );
+    }
+    previous = { day, t: phase.t, minutes, index };
   });
-  if (end !== undefined && previous !== undefined && parseBattleTime(end) <= parseBattleTime(previous.t)) {
-    errors.add(root.at("end"), `expected later than the last phase at ${previous.t}, got ${end}`);
+  if (previous === undefined) return undefined;
+
+  const lastDay = previous.day;
+  if (endDayPresent && endDay !== undefined && endDay < lastDay) {
+    // `end` is unjudgeable until `end_day` is right, so this is the only error.
+    errors.add(root.at("end_day"), `expected not less than the last phase's day ${lastDay}, got ${endDay}`);
+    return lastDay;
+  }
+  const resolvedEndDay = endDay ?? lastDay;
+  if (end !== undefined && instantMinutes(resolvedEndDay, end) <= previous.minutes) {
+    errors.add(
+      root.at("end"),
+      `expected later than the last phase at ${describeInstant(previous.day, previous.t)}, got ${describeInstant(resolvedEndDay, end)}`,
+    );
+  }
+  return lastDay;
+}
+
+/** Rule 5: one `dates` entry per day the battle spans, so no `day` points past it and no entry goes unused. */
+function checkDates(
+  dates: ArrayField<string>,
+  lastPhaseDay: Day | undefined,
+  endDay: Day | undefined,
+  root: ObjectReader,
+  errors: Errors,
+): void {
+  if (lastPhaseDay === undefined) return;
+  const days = Math.max(lastPhaseDay, endDay ?? lastPhaseDay) + 1;
+  if (dates.items.length !== days) {
+    errors.add(root.at("dates"), `expected ${days} ${days === 1 ? "entry" : "entries"}, one per day of the battle, got ${dates.items.length}`);
   }
 }
 
-/** Rule 7: either every phase has `wind` or none does. Reported on each phase that lacks it. */
+/** Rule 9: either every phase has `wind` or none does. Reported on each phase that lacks it. */
 function checkWindAllOrNothing(phases: ArrayField<Phase>, errors: Errors): void {
   const read = phases.items.filter((phase) => phase !== undefined);
   const some = read.some((phase) => phase.wind !== undefined);
@@ -330,7 +502,7 @@ function checkWindAllOrNothing(phases: ArrayField<Phase>, errors: Errors): void 
   });
 }
 
-/** Rule 8: `from` is present if and only if `force` is not `calm`. */
+/** Rule 10: `from` is present if and only if `force` is not `calm`. */
 function readWind(obj: ObjectReader | undefined): Wind | undefined {
   if (obj === undefined) return undefined;
   const from = obj.number("from", ANGLE, { optional: true });
@@ -359,7 +531,7 @@ function readReference(value: unknown, path: string, errors: Errors): Reference 
   return withoutUndefined({ source, locator, quote, note });
 }
 
-/** Rule 6, second half: every reference points at a key of `sources`. */
+/** Rule 8, second half: every reference points at a key of `sources`. */
 function checkReferencesResolve(references: ArrayField<Reference>, sourceIds: Set<string> | undefined, errors: Errors): void {
   if (sourceIds === undefined) return;
   references.items.forEach((reference, index) => {
@@ -400,7 +572,7 @@ function readSnapshot(value: unknown, path: string, errors: Errors): UnitSnapsho
   return withoutUndefined({ id, position, heading, formation, state, strength, moves: moveList });
 }
 
-/** Rule 5: a phase lists every roster unit exactly once and no id off the roster. */
+/** Rule 7: a phase lists every roster unit exactly once and no id off the roster. */
 function checkRosterCovered(snapshots: ArrayField<UnitSnapshot>, rosterIds: Set<string> | undefined, errors: Errors): void {
   if (rosterIds === undefined) return;
   const seen = new Set<string>();

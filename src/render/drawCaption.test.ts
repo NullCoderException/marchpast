@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { layoutCaption } from "./drawCaption.ts";
+import { drawCaption, layoutCaption } from "./drawCaption.ts";
 import type { Battle } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
 
@@ -18,7 +18,7 @@ function fakeContext(): CanvasRenderingContext2D {
 
 const battle = {
   title: "The Battle of Trafalgar",
-  date: "21 October 1805",
+  dates: ["21 October 1805"],
   sources: {
     collingwood: { label: "Collingwood's dispatch" },
     southey: { label: "Southey" },
@@ -27,7 +27,26 @@ const battle = {
   },
 } as unknown as Battle;
 
+/** A drawing context that measures like `fakeContext` and records every string drawn. */
+function recordingContext(): { ctx: CanvasRenderingContext2D; texts: string[] } {
+  const texts: string[] = [];
+  const ctx = {
+    ...(fakeContext() as unknown as Record<string, unknown>),
+    save() {},
+    restore() {},
+    fillRect() {},
+    beginPath() {},
+    moveTo() {},
+    lineTo() {},
+    stroke() {},
+    measureText: (text: string) => ({ width: text.length * 6 }) as TextMetrics,
+    fillText: (text: string) => texts.push(text),
+  } as unknown as CanvasRenderingContext2D;
+  return { ctx, texts };
+}
+
 const picture = {
+  phase: { day: 0 },
   caption: "At daylight, Cape Trafalgar bearing east by south about seven leagues.",
   label: "Dawn: the fleets sight each other",
   references: [{ source: "collingwood" }, { source: "southey" }, { source: "mahan" }, { source: "britannica" }],
@@ -73,5 +92,27 @@ describe("the caption band's phase label", () => {
     const layout = layoutCaption(fakeContext(), battle, picture, 1280);
 
     expect(layout.labelLines).toEqual(["DAWN: THE FLEETS SIGHT EACH OTHER"]);
+  });
+});
+
+describe("the caption band's date", () => {
+  it("draws the date of the day the phase falls on, so a battle across midnight advances it", () => {
+    const twoDays = { ...battle, dates: ["1 August 1798", "2 August 1798"] } as unknown as Battle;
+    const daybreak = { ...picture, phase: { day: 1 }, clock: 0 } as unknown as Picture;
+
+    const first = recordingContext();
+    drawCaption(first.ctx, twoDays, { ...picture, clock: 0 } as unknown as Picture, layoutCaption(fakeContext(), twoDays, picture, 1280), 0, 1280);
+    expect(first.texts).toContain("1 August 1798");
+
+    const second = recordingContext();
+    drawCaption(second.ctx, twoDays, daybreak, layoutCaption(fakeContext(), twoDays, daybreak, 1280), 0, 1280);
+    expect(second.texts).toContain("2 August 1798");
+  });
+
+  it("draws the first day's date for a phase with no day, the single-day case", () => {
+    const noDay = { ...picture, phase: {}, clock: 0 } as unknown as Picture;
+    const { ctx, texts } = recordingContext();
+    drawCaption(ctx, battle, noDay, layoutCaption(fakeContext(), battle, noDay, 1280), 0, 1280);
+    expect(texts).toContain("21 October 1805");
   });
 });
