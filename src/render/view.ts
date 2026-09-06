@@ -18,7 +18,7 @@
  * Everything else is a shared pass parameterised by the palette. Nothing here
  * comes from data: a view is never authored in a battle file.
  */
-import type { Formation, UnitState } from "../schema/types.ts";
+import type { Arm, Formation, UnitState } from "../schema/types.ts";
 
 /** The view's key: what player state holds and the View chooser sets. */
 export type ViewId = "plate" | "night" | "atlas";
@@ -77,9 +77,11 @@ export interface Pens {
 
 /** What a glyph pass is handed for one unit, at the origin and heading up. */
 export interface GlyphRequest {
-  /** The long axis in pixels. */
+  /** The long axis in pixels: the plate constant, the same for every arm on every screen (ADR-0016). */
   length: number;
   formation: Formation;
+  /** What the unit is made of, so the glyph picks the sign it draws it in (ADR-0015). */
+  arm: Arm;
   state: UnitState;
   /** `0` to `1`: the fraction of the unit still fighting. */
   strength: number;
@@ -101,6 +103,19 @@ export interface GlyphRequest {
   palette: Palette;
 }
 
+/** Half the box a sign is drawn inside, from its centre outward. */
+export interface SignBox {
+  x: number;
+  y: number;
+}
+
+/**
+ * The repeated shape one view draws one arm in, at the origin heading up, in
+ * the ink and weight the caller has already set on the context. `half` is the
+ * box it fills: one sign's footprint on the plate, the whole block in Atlas.
+ */
+export type Sign = (ctx: CanvasRenderingContext2D, half: SignBox, scale: number) => void;
+
 /**
  * How a view draws a unit: the one pass a view replaces wholesale, in two
  * halves.
@@ -113,6 +128,13 @@ export interface GlyphRequest {
  */
 export interface Glyph {
   /**
+   * The view's sign for every arm there is. Keyed by `Arm`, so a new arm does
+   * not compile until each view has drawn it: a view that cannot tell foot
+   * from horse is a broken view, not a degraded one, and there is no fallback
+   * sign (ADR-0015).
+   */
+  signs: Record<Arm, Sign>;
+  /**
    * What the unit's state puts on the plate around it: the plate's smoke, the
    * Atlas hatching. Drawn under every unit's body, not just its own. Omitted
    * by a view whose glyph has nothing to lay down first.
@@ -122,9 +144,10 @@ export interface Glyph {
   body(ctx: CanvasRenderingContext2D, request: GlyphRequest): void;
   /**
    * Half the glyph's extent across its long axis, in pixels: the one number
-   * the shared label pass needs from a glyph in order to clear it.
+   * the shared label pass needs from a glyph in order to clear it. A `mass`
+   * answers for two ranks, so the label clears the rear one (ADR-0016).
    */
-  halfWidth(scale: number): number;
+  halfWidth(scale: number, formation: Formation): number;
 }
 
 /** A named whole visual treatment of the picture. */

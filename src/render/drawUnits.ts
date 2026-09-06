@@ -12,11 +12,12 @@
  * It draws `plate.unitsDrawn`, not the whole picture: which units a level puts
  * on the plate is settled once, in `level.ts`, before any pass runs (ADR-0017).
  */
+import type { Arm } from "../schema/types.ts";
 import type { Picture, UnitPicture } from "../timeline/picture.ts";
 import type { Plate } from "./plate.ts";
 import { drawArrow, hashString, type Point } from "./primitives.ts";
 import { toRadians } from "./projection.ts";
-import { font } from "./style.ts";
+import { font, GLYPH_PX } from "./style.ts";
 import type { GlyphRequest } from "./view.ts";
 
 /** Below this many pixels a track is a dot under the glyph, not an arrow. */
@@ -37,7 +38,20 @@ export function drawUnits(plate: Plate): void {
     return (side === undefined ? undefined : plate.colours.get(side)) ?? palette.ink;
   };
 
-  // Tracks and moves.
+  // The arm is roster identity, never per-phase state (ADR-0015), so it is
+  // looked up here rather than carried on the picture. There is no fallback
+  // sign and so no fallback arm: a unit the roster does not hold is a picture
+  // that was never built from this battle, and it fails the way a missing
+  // snapshot does in `pictureAt` rather than drawing foot as ships.
+  const armOf = (unit: UnitPicture): Arm => {
+    const arm = roster.get(unit.id)?.arm;
+    if (arm === undefined) throw new RangeError(`The roster has no unit ${JSON.stringify(unit.id)}`);
+    return arm;
+  };
+
+  // Tracks and moves. A track runs wherever the tween takes it: heading is the
+  // front, so a unit retiring in good order draws its track back through its
+  // own rear (ADR-0016). Nothing here assumes it runs ahead.
   for (const unit of unitsDrawn) {
     const here = projection.project(unit.position.lat, unit.position.lon);
     if (unit.track !== undefined) {
@@ -59,8 +73,9 @@ export function drawUnits(plate: Plate): void {
     at: projection.project(unit.position.lat, unit.position.lon),
     heading: toRadians(unit.heading),
     request: {
-      length: plate.glyphLength,
+      length: GLYPH_PX,
       formation: unit.formation,
+      arm: armOf(unit),
       state: unit.state,
       strength: unit.strength,
       colour: colourOf(unit),
@@ -110,12 +125,15 @@ function drawLabel(plate: Plate, unit: UnitPicture, at: Point, label: string, co
   const { extentRect } = plate.projection;
   const detail = unit.strength < 1 ? `${unit.state} · ${Math.round(unit.strength * 100)}%` : unit.state;
 
-  // The label sits on the glyph's flank, across its long axis, where the track and moves (which run
-  // ahead of the unit) never go. A column's flank is beside the heading; a line's is behind it.
+  // The label sits on the glyph's flank, across its long axis. A column's flank
+  // is beside the heading; a line's and a mass's is behind it. The track is an
+  // obstacle wherever it lies, ahead of the unit or behind it, and clearing it
+  // is the label slice's (#39), not this pass's.
   const heading = toRadians(unit.heading);
   const flank = unit.formation === "column" ? heading + Math.PI / 2 : heading + Math.PI;
-  // The one thing the label needs from the view: how far the glyph reaches across its axis.
-  const reach = view.glyph.halfWidth(1) + LABEL_GAP;
+  // The one thing the label needs from the view: how far the glyph reaches
+  // across its axis, which for a mass is two ranks.
+  const reach = view.glyph.halfWidth(1, unit.formation) + LABEL_GAP;
 
   ctx.save();
   ctx.font = font(12);

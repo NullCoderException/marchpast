@@ -1,17 +1,24 @@
 /**
- * The plate glyph: a unit as ink ship-ticks (ADR-0009), with **Billow** as the
- * engaged mark (#58) — outlined puffs merging into one scalloped cloud that
- * drifts to the lee flank under the phase's wind.
+ * The plate glyph: a unit as eight ink signs arranged by its formation
+ * (ADR-0009, ADR-0016), with **Billow** as the engaged mark (#58) — outlined
+ * puffs merging into one scalloped cloud that drifts to the lee flank under
+ * the phase's wind.
+ *
+ * The sign is the arm's: a ship's chevron tick unchanged from v1, a solid rank
+ * bar for foot, the same bar barred for horse (ADR-0015, ADR-0016). Where the
+ * signs sit is `slots.ts`, which every view shares; this file is only
+ * what they look like on paper.
  *
  * Used by both plate views: the Chart plate and the Night plate differ only in
  * their palettes, which is the seam's first claim (ADR-0014). Everything here
  * is drawn at the origin heading up the negative y axis; the caller has
  * rotated, so a bearing never reaches this file.
  */
-import type { Formation, UnitState } from "../../schema/types.ts";
+import type { Arm, Formation } from "../../schema/types.ts";
 import { seeded } from "../primitives.ts";
-import { TICK_HALF_HEIGHT, TICK_HALF_WIDTH, TICKS_PER_GLYPH } from "../style.ts";
-import type { Glyph, GlyphRequest } from "../view.ts";
+import { GLYPH_PX, SIGN_HALF_HEIGHT, SIGN_HALF_WIDTH, SIGNS_PER_GLYPH } from "../style.ts";
+import type { Glyph, GlyphRequest, Sign } from "../view.ts";
+import { frontage, signPositions, signSlots } from "./slots.ts";
 
 /**
  * Billow's two weights: a full cloud when a unit is engaged, the same cloud
@@ -35,7 +42,60 @@ const CHORD_LENGTH = 0.82;
 /** Below this scale the chords are too fine to read, so the legend's sample leaves them off. */
 const CHORD_MIN_SCALE = 0.9;
 
-export const ticks: Glyph = { mark, body, halfWidth: (scale) => TICK_HALF_WIDTH * scale };
+/** The rank bar's weight: solid, because hollow already means destroyed (ADR-0016). */
+const RANK_BAR_THICKNESS = 2.6;
+/** How far the outline of a destroyed unit stands off the footprint its signs would have filled. */
+const OUTLINE_PAD = 2;
+/**
+ * The pitch the signs sit on at the glyph's fixed length. `signSlots` takes its
+ * pitch from the length it is handed, which is the same number on the plate and
+ * a smaller one in the legend's sample; `halfWidth` is asked only by the label
+ * pass, which is always on the plate, so the plate's pitch is the honest one
+ * here and the legend never asks.
+ */
+const SIGN_PITCH = GLYPH_PX / SIGNS_PER_GLYPH;
+
+/**
+ * The plate's sign for every arm (ADR-0016). Each is drawn at the origin
+ * heading up, inside `half` — the footprint one sign fills — in the ink and
+ * weight the body pass has already set.
+ *
+ * Foot and horse follow the same convention Atlas uses inside its block, so a
+ * viewer who switches views carries the same reading across: the bar is the
+ * rank, the diagonal is the horse.
+ */
+const signs: Record<Arm, Sign> = {
+  /** One ship as a chevron pointing ahead: v1's tick, unchanged. */
+  ship: (ctx, half) => {
+    ctx.beginPath();
+    ctx.moveTo(-half.x, half.y);
+    ctx.lineTo(0, -half.y);
+    ctx.lineTo(half.x, half.y);
+    ctx.stroke();
+  },
+  /** Foot as a short solid rank bar across the heading. */
+  infantry: (ctx, half, scale) => {
+    const thickness = RANK_BAR_THICKNESS * scale;
+    ctx.fillRect(-half.x, -thickness / 2, half.x * 2, thickness);
+  },
+  /** Horse as the same bar with one diagonal through it. */
+  cavalry: (ctx, half, scale) => {
+    const thickness = RANK_BAR_THICKNESS * scale;
+    ctx.fillRect(-half.x, -thickness / 2, half.x * 2, thickness);
+    ctx.beginPath();
+    ctx.moveTo(-half.x, half.y);
+    ctx.lineTo(half.x, -half.y);
+    ctx.stroke();
+  },
+};
+
+export const ticks: Glyph = {
+  signs,
+  mark,
+  body,
+  // A mass is two ranks deep, so the label clears the rear one (ADR-0016).
+  halfWidth: (scale, formation) => (formation === "mass" ? SIGN_PITCH / 2 + SIGN_HALF_HEIGHT : SIGN_HALF_WIDTH) * scale,
+};
 
 /** The smoke, laid down before any unit's ships so a melee does not erase itself. */
 function mark(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
@@ -44,14 +104,15 @@ function mark(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
 }
 
 function body(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
-  const { length, formation, state, strength, colour, seed, scale } = request;
-  // Its own generator from the same seed: the body draws the same ticks whether
+  const { length, formation, arm, state, strength, colour, seed, scale } = request;
+  // Its own generator from the same seed: the body draws the same signs whether
   // or not the mark ran before it, which is what lets the two halves be
   // separate passes over separate loops.
   const random = seeded(seed);
 
   ctx.save();
   ctx.strokeStyle = colour;
+  ctx.fillStyle = colour;
   ctx.lineWidth = 1.4 * scale;
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
@@ -59,61 +120,39 @@ function body(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
   if (state === "destroyed") {
     drawHollowOutline(ctx, length, formation, scale);
   } else {
-    for (const index of occupiedSlots(state, shownTicks(state, strength), random)) {
-      const along = -length / 2 + ((index + 0.5) * length) / TICKS_PER_GLYPH;
-      const slot = formation === "column" ? { x: 0, y: along } : { x: along, y: 0 };
-      // A broken unit's ticks are knocked out of line as well as thinned out.
-      drawTick(ctx, slot, state === "broken" ? (random() - 0.5) * 0.9 : 0, scale);
+    const sign = signs[arm];
+    const half = { x: SIGN_HALF_WIDTH * scale, y: SIGN_HALF_HEIGHT * scale };
+    for (const slot of signPositions(formation, state, strength, length, random)) {
+      ctx.save();
+      ctx.translate(slot.x, slot.y);
+      // A broken unit's signs are knocked out of rank as well as thinned out.
+      if (state === "broken") ctx.rotate((random() - 0.5) * 0.9);
+      sign(ctx, half, scale);
+      ctx.restore();
     }
   }
   ctx.restore();
 }
 
-/** Ticks a glyph shows: `round(ticks * strength)`, at least one unless destroyed. */
-function shownTicks(state: UnitState, strength: number): number {
-  if (state === "destroyed") return 0;
-  return Math.max(1, Math.round(TICKS_PER_GLYPH * strength));
-}
-
-/** Which slots carry a tick: a centred contiguous run when the unit holds together, scattered with gaps when broken. */
-function occupiedSlots(state: UnitState, shown: number, random: () => number): number[] {
-  if (state !== "broken") {
-    const start = Math.floor((TICKS_PER_GLYPH - shown) / 2);
-    return Array.from({ length: shown }, (_, i) => start + i);
-  }
-  // Spread the survivors over the whole length, each nudged into a neighbouring slot, so the gaps read as gaps.
-  const indices = new Set<number>();
-  for (let i = 0; i < shown; i++) {
-    const ideal = ((i + 0.5) * TICKS_PER_GLYPH) / shown;
-    const nudge = Math.floor(random() * 2) - 1;
-    let index = Math.min(TICKS_PER_GLYPH - 1, Math.max(0, Math.floor(ideal) + nudge));
-    while (indices.has(index) && index < TICKS_PER_GLYPH - 1) index++;
-    indices.add(index);
-  }
-  return [...indices];
-}
-
-/** One ship as a chevron pointing ahead. */
-function drawTick(ctx: CanvasRenderingContext2D, at: Point, rotation: number, scale: number): void {
-  const w = TICK_HALF_WIDTH * scale;
-  const h = TICK_HALF_HEIGHT * scale;
-  ctx.save();
-  ctx.translate(at.x, at.y);
-  ctx.rotate(rotation);
-  ctx.beginPath();
-  ctx.moveTo(-w, h);
-  ctx.lineTo(0, -h);
-  ctx.lineTo(w, h);
-  ctx.stroke();
-  ctx.restore();
-}
-
-/** The destroyed glyph: the outline the ticks would have filled, and nothing inside it. */
+/**
+ * The destroyed glyph: the outline the signs would have filled, and nothing
+ * inside it. A `mass` therefore leaves the two-rank footprint behind it, which
+ * is how a body that died where it stood is told from a line that did.
+ */
 function drawHollowOutline(ctx: CanvasRenderingContext2D, length: number, formation: Formation, scale: number): void {
-  const across = (TICK_HALF_WIDTH + 2) * scale;
-  const along = length / 2;
-  const w = formation === "column" ? across : along;
-  const h = formation === "column" ? along : across;
+  const slots = signSlots(formation, length);
+  const pitch = length / SIGNS_PER_GLYPH;
+  const pad = (SIGN_HALF_WIDTH + OUTLINE_PAD) * scale;
+  // Along an axis the signs are ranked on, the outline takes each end sign's
+  // own half-pitch, so a line is exactly the glyph's length and a mass exactly
+  // half of it by two ranks. Across an axis they are not, it is the sign's
+  // footprint and a little air.
+  const half = (values: number[]): number => {
+    const span = Math.max(...values);
+    return span === 0 ? pad : span + pitch / 2;
+  };
+  const w = half(slots.map((slot) => slot.x));
+  const h = half(slots.map((slot) => slot.y));
   ctx.save();
   ctx.lineWidth = 1 * scale;
   ctx.setLineDash([]);
@@ -153,13 +192,15 @@ function drawBillow(ctx: CanvasRenderingContext2D, request: GlyphRequest, random
   // one flank rather than a halo the unit sits inside.
   const { along } = axes(formation);
   const count = Math.max(MIN_PUFFS, Math.round(cloud.puffs * scale));
-  const clearance = (TICK_HALF_WIDTH + HULL_CLEARANCE) * scale;
+  const clearance = ticks.halfWidth(scale, formation) + HULL_CLEARANCE * scale;
+  // The dust hangs over the unit's own front, which for a mass is half a line's.
+  const front = frontage(formation, length);
 
   const puffs: Puff[] = [];
   for (let i = 0; i < count; i++) {
     const out = i / Math.max(1, count - 1);
     // Narrow at the hull, broad downwind: the cloud fans out as it drifts.
-    const spread = (random() - 0.5) * length * (0.5 + out * 0.5);
+    const spread = (random() - 0.5) * front * (0.5 + out * 0.5);
     const distance = clearance + out * cloud.reach * scale;
     puffs.push({
       x: along.x * spread + drift.x * distance,
@@ -290,7 +331,8 @@ const ALONG_DAMPING = 0.35;
 /**
  * A unit's own axes at the origin heading up: `along` its long axis, `across`
  * its flanks. A column runs in line ahead, so its length is the heading; a
- * line runs abreast, so its length is across it.
+ * line runs abreast, so its length is across it, and a mass — wider than it is
+ * deep — lies the same way a line does.
  */
 function axes(formation: Formation): { along: Point; across: Point } {
   if (formation === "column") return { along: { x: 0, y: 1 }, across: { x: 1, y: 0 } };
