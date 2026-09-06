@@ -1,5 +1,7 @@
 # State, strength and moves carry Cannae unchanged, with `broken` widened and a returning detachment costing nothing
 
+*Amended 2026-09-06: `docs/schema.md` is now the v2 spec, written at the handoff (#53).*
+
 ADR-0003 fixed a four-value **state** enum and an optional **strength** fraction; ADR-0004 fixed two **move** kinds and made a unit's own motion the renderer's **track**, with no schema field; ADR-0016 gave land units their signs and let a track run behind a unit that keeps its heading. Cannae is the first land battle authored against all three ([#41](https://github.com/NullCoderException/sandtable/issues/41)), and it is the hardest case v0.2 has: legions that fight on in fragments until they are killed where they stand, a cavalry wing that rides off the field in pursuit and comes back, a wing that flees with almost all its men alive, an army whose losses no source counts as they mount, and a ride round the enemy's rear that ends facing the way it came.
 
 We decided that **v1's vocabulary holds**: four states, one fraction, two move kinds, no waypoints and no turn hint. Two things sharpen. **`broken` means no longer acting as one body**, whether the unit flees, as Gravina's remnant did, or fights on in fragments, as the legions did; and **a detachment reduces strength only when the detached part does not return to the unit**, so a pursuit that comes back is an arrow and costs nothing.

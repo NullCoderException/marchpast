@@ -1,5 +1,7 @@
 # Phases are snapshots linearly tweened by the player
 
+*Amended 2026-09-06: multi-day battles arrived in v2 as the per-phase `day` offset this ADR anticipated (ADR-0013); the ordering key is (`day`, `t`) and the engine's clock runs from midnight of the first day. The snapshot-tween model and the step rules stand.*
+
 A battle file had three ways to describe motion between phases: a linear tween between one snapshot per phase, timed keyframes inside a phase, or static held pictures with only the move arrows animating. We chose the snapshot tween: a phase carries one position and heading per unit at one battle-clock instant, and the player interpolates linearly to the next phase. Keyframes would have split "phase" into a narration concept and a motion concept and doubled what an extraction pipeline must produce; static pictures were the slideshow the concept doc set as the floor. Curved or multi-leg movement, such as the Combined Fleet wearing from south to north at Trafalgar, is expressed by adding a phase, never by adding a schema concept.
 
 ## Considered options
