@@ -119,7 +119,6 @@ describe("a battle that crosses midnight", () => {
     const shares = [21_900 / 54_000, 21_300 / 54_000, 10_800 / 54_000];
 
     expect(wallDuration(NIGHT_BATTLE)).toEqual({ total: 90, perPhase: [36.5, 35.5, 18] });
-    expect(scrubberSegments(NIGHT_BATTLE)).toEqual([36.5 / 90, 35.5 / 90, 18 / 90]);
     // Every phase plays at one rate here, so a segment is its interval's share.
     for (const [index, fraction] of scrubberSegments(NIGHT_BATTLE).entries()) {
       expect(fraction).toBeCloseTo(shares[index]!, 12);

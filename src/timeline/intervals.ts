@@ -59,7 +59,7 @@ export function checkMultiplier(multiplier: number): void {
 }
 
 /** A phase's instant in minutes from midnight of the first day; an absent `day` is day 0 (schema.md 2.4). */
-function phaseInstant(phase: Phase): number {
+function phaseInstantMinutes(phase: Phase): number {
   return instantMinutes(phase.day ?? 0, phase.t);
 }
 
@@ -68,18 +68,18 @@ function phaseInstant(phase: Phase): number {
  * phase's `day` rather than to 0, because "later than the last phase" is only
  * meaningful on the same day (ADR-0013).
  */
-function endInstant(battle: Battle): number {
+function endInstantMinutes(battle: Battle): number {
   return instantMinutes(battle.end_day ?? battle.phases.at(-1)?.day ?? 0, battle.end);
 }
 
 /** Each phase's interval, in phase order. */
 export function intervals(battle: Battle): Interval[] {
-  const end = endInstant(battle);
+  const end = endInstantMinutes(battle);
   return battle.phases.map((phase, index) => {
     const next = battle.phases[index + 1];
     return {
-      startMinutes: phaseInstant(phase),
-      endMinutes: next === undefined ? end : phaseInstant(next),
+      startMinutes: phaseInstantMinutes(phase),
+      endMinutes: next === undefined ? end : phaseInstantMinutes(next),
       playbackRate: phase.playback_rate,
     };
   });
@@ -99,12 +99,12 @@ export function clockIntervals(battle: Battle): ClockInterval[] {
 export function startClock(battle: Battle): ClockSeconds {
   const first = battle.phases[0];
   if (first === undefined) throw new RangeError("A battle has at least one phase");
-  return phaseInstant(first) * 60;
+  return phaseInstantMinutes(first) * 60;
 }
 
 /** The instant playback finishes at: the battle's `end` on `end_day`, in battle-clock seconds. */
 export function endClock(battle: Battle): ClockSeconds {
-  return endInstant(battle) * 60;
+  return endInstantMinutes(battle) * 60;
 }
 
 /** `clock` held inside the battle: never before the first phase's instant, never past `end`. */
@@ -145,7 +145,7 @@ export function scrubberSegments(battle: Battle, multiplier = 1): number[] {
 export function phaseIndexAt(battle: Battle, clockMinutes: number): number {
   const phases = battle.phases;
   for (let index = phases.length - 1; index > 0; index -= 1) {
-    if (clockMinutes >= phaseInstant(phases[index]!)) return index;
+    if (clockMinutes >= phaseInstantMinutes(phases[index]!)) return index;
   }
   return 0;
 }

@@ -94,7 +94,6 @@ export const TEST_BATTLE: Battle = {
   ],
 };
 
-
 /**
  * The synthetic battle that crosses midnight (ADR-0013): an evening action
  * that runs through the night into the next afternoon.
