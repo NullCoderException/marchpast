@@ -25,8 +25,6 @@ export interface Plate {
   projection: Projection;
   /** Side name to ink colour, by roster order, in the view's palette. */
   colours: Map<string, string>;
-  /** Long axis of a full-strength unit glyph in pixels, never below the readable minimum. */
-  glyphLength: number;
-  /** Pixels per metre of ground at the extent's centre latitude, for the scale bar and glyph length. */
+  /** Pixels per metre of ground at the extent's centre latitude, for the scale bar. */
   pixelsPerMetre: number;
 }

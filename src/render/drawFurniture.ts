@@ -10,13 +10,14 @@
  * and pens — which is the whole reason Atlas's legend shows blocks without
  * this file knowing Atlas exists (ADR-0014).
  */
-import type { Wind, WindForce } from "../schema/types.ts";
+import type { Arm, Wind, WindForce } from "../schema/types.ts";
 import type { Plate } from "./plate.ts";
 import { drawArrow, drawPlateRule, type Point } from "./primitives.ts";
 import { toRadians } from "./projection.ts";
 import { METRES_PER_UNIT, scaleBarLength, UNIT_LABEL } from "./scaleBar.ts";
 import { font, STATES } from "./style.ts";
 import type { GlyphRequest } from "./view.ts";
+import { legendArm, legendArms } from "./glyphs/arms.ts";
 import { compassPoint } from "./text.ts";
 
 /** Feathers on the wind arrow's tail: none at calm, one for light through four for gale (ADR-0008). */
@@ -181,12 +182,21 @@ const LEGEND_SAMPLE = 40;
 /** The legend's samples are drawn small, so a glyph knows to leave off its finest detail. */
 const LEGEND_SCALE = 0.75;
 
-/** The always-on legend: each side's colour and name, the four state glyphs, the three line styles. Its bottom sits at `bottom`. */
+/**
+ * The always-on legend: each side's colour and name, the four state glyphs, one
+ * row per arm when the roster has two or more (ADR-0015), and the three line
+ * styles. Its bottom sits at `bottom`.
+ */
 function drawLegend(plate: Plate, bottom: number): void {
   const { ctx, colours, view } = plate;
   const { palette, pens, glyph } = view;
   const frame = plate.projection.extentRect;
-  const rows = colours.size + STATES.length + 3;
+  // Trafalgar is all ships, so it keys no arm and its legend is unchanged.
+  const arms = legendArms(plate.battle.units);
+  // The rows that are not about an arm still have to be drawn in one: the arm
+  // most of the battle is made of, so Cannae's states are not ship-ticks.
+  const ordinary = legendArm(plate.battle.units);
+  const rows = colours.size + STATES.length + arms.length + 3;
   const height = rows * LEGEND_ROW + 16;
   const x = frame.x + MARGIN;
   const y = bottom - height;
@@ -205,11 +215,12 @@ function drawLegend(plate: Plate, bottom: number): void {
   const sampleCentre = (): Point => ({ x: x + 12 + LEGEND_SAMPLE / 2, y: rowY });
 
   /** A sample of the view's own glyph, laid across the row. No wind reaches the legend. */
-  const sample = (state: (typeof STATES)[number], strength: number, colour: string, seed: number): void => {
+  const sample = (state: (typeof STATES)[number], strength: number, colour: string, seed: number, arm: Arm): void => {
     const centre = sampleCentre();
     const request: GlyphRequest = {
       length: LEGEND_SAMPLE - 6,
       formation: "column",
+      arm,
       state,
       strength,
       colour,
@@ -228,16 +239,25 @@ function drawLegend(plate: Plate, bottom: number): void {
 
   ctx.font = font(12, true);
   for (const [side, colour] of colours) {
-    sample("intact", 1, colour, 1);
+    sample("intact", 1, colour, 1, ordinary);
     ctx.fillStyle = colour;
     ctx.fillText(side, textX, rowY);
     rowY += LEGEND_ROW;
   }
 
   for (const state of STATES) {
-    sample(state, state === "broken" ? 0.4 : 1, palette.ink, 3);
+    sample(state, state === "broken" ? 0.4 : 1, palette.ink, 3, ordinary);
     ctx.fillStyle = palette.ink;
     ctx.fillText(state, textX, rowY);
+    rowY += LEGEND_ROW;
+  }
+
+  // Sampled from the view's own glyph, like the state rows: the whole point is
+  // that a reader learns this view's foot from this view's horse.
+  for (const arm of arms) {
+    sample("intact", 1, palette.ink, 5, arm);
+    ctx.fillStyle = palette.ink;
+    ctx.fillText(arm, textX, rowY);
     rowY += LEGEND_ROW;
   }
 

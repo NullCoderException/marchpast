@@ -28,8 +28,7 @@ import { unitsDrawn } from "./level.ts";
 import { seeded } from "./primitives.ts";
 import { fitProjection, type Rect } from "./projection.ts";
 import type { Plate } from "./plate.ts";
-import { METRES_PER_UNIT } from "./scaleBar.ts";
-import { MIN_GLYPH_PX, NOMINAL_GLYPH_NMI, PLATE_MARGIN, sideColours } from "./style.ts";
+import { PLATE_MARGIN, sideColours } from "./style.ts";
 import type { Viewer } from "./view.ts";
 import { viewById } from "./views.ts";
 
@@ -71,6 +70,8 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
       ctx.fillRect(extentRect.x, extentRect.y, extentRect.width, extentRect.height);
       if (palette.stipple !== undefined) mottle(ctx, extentRect, palette.stipple);
 
+      // For the scale bar alone: a glyph's length is a plate constant and owes
+      // nothing to the ground it stands on (ADR-0016).
       const centreLat = (battle.extent.north + battle.extent.south) / 2;
       const pixelsPerMetre = 1 / projection.metresPerPixel(centreLat);
       const plate: Plate = {
@@ -82,7 +83,6 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
         unitsDrawn: unitsDrawn(battle.units, picture.units, viewer.level),
         projection,
         colours: sideColours(battle, palette),
-        glyphLength: Math.max(MIN_GLYPH_PX, NOMINAL_GLYPH_NMI * METRES_PER_UNIT.nmi * pixelsPerMetre),
         pixelsPerMetre,
       };
 

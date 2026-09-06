@@ -7,11 +7,16 @@
  * door; there is no default battle (ADR-0011). Either way the page shows every
  * error on the plate, and in the console.
  *
+ * `?fixture=<name>` plays a renderer fixture from `app/fixtures.ts` instead:
+ * no fetch, no map, no library and no Picker. It is a way to look at a slice
+ * before its battle file exists, and nothing else uses it.
+ *
  * The layout is the plate above and the controls beneath, set in `index.html`;
  * this file only fills the two slots, and takes them both down again when the
  * page is the library, which has no plate to draw and nothing to control.
  */
 import { battleNameFrom, battleQuery } from "./app/battleName.ts";
+import { fixtureNameFrom, FIXTURES } from "./app/fixtures.ts";
 import { createLibraryLink, createLibraryPage } from "./app/libraryPage.ts";
 import { formatLoadErrors, type LoadError } from "./app/load.ts";
 import { loadBattle, type LoadResult } from "./app/loadBattle.ts";
@@ -31,6 +36,14 @@ async function start(): Promise<void> {
   const controlsRoot = document.getElementById("controls");
   if (canvas === null || controlsRoot === null) throw new Error("index.html must hold a <canvas> and a #controls element");
   const page: Page = { canvas, controlsRoot };
+
+  // A fixture is not a battle: nothing is fetched, so the library is never asked for either.
+  const fixture = fixtureNameFrom(window.location.search);
+  if (fixture !== undefined) {
+    await loadFace();
+    playFixture(page, fixture);
+    return;
+  }
 
   const name = battleNameFrom(window.location.search);
   // Both pages want the library: it is the front door's list, and it fills the
@@ -92,6 +105,22 @@ async function playBattle(page: Page, name: string, loading: Promise<LoadResult>
       ? { battles: library.library, current: name, choose: (chosen) => window.location.assign(battleQuery(chosen)) }
       : undefined,
   });
+}
+
+/**
+ * A renderer fixture straight from code. It carries no Picker: a fixture is not
+ * in the library, so there is nothing for the chooser to put it among.
+ */
+function playFixture(page: Page, name: string): void {
+  const battle = FIXTURES[name];
+  if (battle === undefined) {
+    console.error(`Sandtable has no fixture "${name}"`);
+    showNotice(page.canvas, { heading: `No fixture “${name}”`, lines: [`The fixtures there are: ${Object.keys(FIXTURES).join(", ")}.`] });
+    page.controlsRoot.append(createLibraryLink());
+    return;
+  }
+  document.title = `${battle.title} — Sandtable`;
+  createPlayer({ canvas: page.canvas, controlsRoot: page.controlsRoot, battle, map: undefined });
 }
 
 /** The plate face. It is bundled, so this is quick; if it fails all the same, the fallback serif in every font string is better than a blank page. */

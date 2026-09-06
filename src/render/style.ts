@@ -1,8 +1,8 @@
 /**
  * The engraved system: what every view is built from and no view may change
  * (#58). The typeface and its ramp, the rule that sides take their ink by
- * roster order, the glyph's footprint and how long a unit reads on the ground,
- * and the plate's margin.
+ * roster order, the footprint of one sign and the glyph's fixed length, and
+ * the plate's margin.
  *
  * The values a view *does* own — paper, ink, land, letterbox, panel, coast,
  * stipple, the side inks and the pens — live in `view.ts` and `views.ts`, so
@@ -15,15 +15,18 @@ import type { Palette } from "./view.ts";
 /** Margin between the canvas edge and the plate. */
 export const PLATE_MARGIN = 20;
 
-/** Ticks a unit glyph shows at full strength. A renderer constant: no data field carries a ship count. */
-export const TICKS_PER_GLYPH = 8;
-/** A glyph is never shorter than this on screen, whatever the extent (ADR-0009). */
-export const MIN_GLYPH_PX = 72;
-/** Nominal true length of a full-strength glyph: eight ships at two cables each. */
-export const NOMINAL_GLYPH_NMI = 1.6;
-/** Half the footprint of one ship tick, across and along the heading. */
-export const TICK_HALF_WIDTH = 2.6;
-export const TICK_HALF_HEIGHT = 3.25;
+/** Signs a unit glyph shows at full strength, whatever its arm. A renderer constant: no data field carries a ship count (ADR-0016). */
+export const SIGNS_PER_GLYPH = 8;
+/**
+ * A glyph's long axis, in pixels. A plate constant: the same on every screen,
+ * for every arm, on Trafalgar's extent and on Cannae's, because a glyph is a
+ * styled label and never geometry (ADR-0016, superseding ADR-0009's nominal
+ * true length with a readable floor). The scale bar says how big the field is.
+ */
+export const GLYPH_PX = 72;
+/** Half the footprint one sign fills, across and along the heading. Every arm's sign is drawn inside it. */
+export const SIGN_HALF_WIDTH = 2.6;
+export const SIGN_HALF_HEIGHT = 3.25;
 
 export const STATES: readonly UnitState[] = ["intact", "engaged", "broken", "destroyed"];
 
