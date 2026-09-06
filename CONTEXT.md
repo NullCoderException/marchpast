@@ -204,6 +204,10 @@ _Avoid_: Speed, playback rate (the authored per-phase value), time scale
 The on-demand view that shows the current phase's notes and references, then the battle's attribution and sources table. Hidden by default and never pauses playback.
 _Avoid_: Sidebar, drawer, info box, credits screen
 
+**Unit card**:
+The unit's label unfolded: a panel the renderer draws beside a unit's glyph, in the label's own place, giving its full name and commander, its arm, formation, state and strength, and its parent or children. Shown while the pointer rests on the unit and held open by a click or tap, one at a time, and never pauses playback. Viewer-opened, never authored in a battle file.
+_Avoid_: Tooltip, popup, popover, info box, unit panel
+
 ### Site
 
 **Library**:
