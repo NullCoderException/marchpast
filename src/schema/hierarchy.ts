@@ -37,7 +37,7 @@ export function treeDepth(units: readonly Unit[]): number {
   return deepest + 1;
 }
 
-/** Whether any unit names `id` as its parent. */
+/** The ids that are somebody's parent, so a unit outside the set has no children. */
 function parentIds(units: readonly Unit[]): Set<string> {
   return new Set(units.map((unit) => unit.parent).filter((id) => id !== undefined));
 }

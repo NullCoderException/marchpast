@@ -23,10 +23,16 @@ describe("unitDepths", () => {
   });
 
   it("puts every unit of a flat roster at depth 0", () => {
+    expect(unitDepths(roster(["a"], ["b"], ["c"]))).toEqual(new Map([["a", 0], ["b", 0], ["c", 0]]));
+  });
+});
+
+describe("treeDepth", () => {
+  it("counts a flat roster as one level", () => {
     expect(treeDepth(roster(["a"], ["b"], ["c"]))).toBe(1);
   });
 
-  it("counts the tree's depth as the deepest unit's depth plus one", () => {
+  it("counts the deepest unit's depth plus one", () => {
     expect(treeDepth(roster(["a"], ["a1", "a"]))).toBe(2);
     expect(treeDepth(roster(["a"], ["a1", "a"], ["a1x", "a1"]))).toBe(3);
   });

@@ -111,10 +111,15 @@ function readBattle(json: unknown, errors: Errors): Battle | undefined {
   const sources = obj.record("sources", (value, path) => readSource(value, path, errors));
   if (sources !== undefined && license !== undefined) checkSourceRanks(sources, license, errors);
   const levels = obj.array("levels", (value, path) => readStringItem(value, path, errors), { optional: true });
+  const levelNames = levels !== undefined && allDefined(levels.items) ? levels.items : undefined;
   const units = obj.array("units", (value, path) => readUnit(value, path, errors), { nonEmpty: true });
   if (units !== undefined) {
     checkUniqueIds(units, errors);
     checkParents(units, errors);
+    // Rule 17 counts units, so a roster with a unit missing would be counted
+    // short and could pass a level that really is over sixteen. It waits for a
+    // clean roster rather than reporting a number it cannot trust; the file is
+    // already failing on that unit, and the next run reaches this.
     if (allDefined(units.items)) {
       checkLevels(units.items, levels === undefined ? undefined : levels.items, obj, errors);
     }
@@ -127,7 +132,7 @@ function readBattle(json: unknown, errors: Errors): Battle | undefined {
   const phases = obj.array("phases", (value, path) => readPhase(value, path, errors, context), { nonEmpty: true });
   if (phases !== undefined) {
     checkUniqueIds(phases, errors);
-    const lastDay = checkPhaseOrder(phases, end, endDay, obj.has("end_day"), obj, errors);
+    const lastDay = checkPhaseOrder(phases, end, endDay, obj, errors);
     checkWindAllOrNothing(phases, errors);
     if (dates !== undefined) checkDates(dates, lastDay, endDay, obj, errors);
   }
@@ -168,7 +173,7 @@ function readBattle(json: unknown, errors: Errors): Battle | undefined {
     license,
     attribution,
     sources: sources.entries,
-    levels: levels === undefined ? undefined : (levels.items as string[]),
+    levels: levelNames,
     units: units.items,
     phases: phases.items,
   });
@@ -436,7 +441,6 @@ function checkPhaseOrder(
   phases: ArrayField<Phase>,
   end: BattleTime | undefined,
   endDay: Day | undefined,
-  endDayPresent: boolean,
   root: ObjectReader,
   errors: Errors,
 ): Day | undefined {
@@ -445,6 +449,8 @@ function checkPhaseOrder(
     if (phase === undefined) return;
     const day = phase.day ?? 0;
     const minutes = instantMinutes(day, phase.t);
+    // Keyed on index 0, not on the first phase that read: if phases[0] is
+    // malformed its day is unknown, and phases[1] is not the first phase.
     if (index === 0 && day !== 0) {
       errors.add(appendPointer(phases.path, 0, "day"), `expected the first phase on day 0, got day ${day}`);
     }
@@ -459,7 +465,7 @@ function checkPhaseOrder(
   if (previous === undefined) return undefined;
 
   const lastDay = previous.day;
-  if (endDayPresent && endDay !== undefined && endDay < lastDay) {
+  if (endDay !== undefined && endDay < lastDay) {
     // `end` is unjudgeable until `end_day` is right, so this is the only error.
     errors.add(root.at("end_day"), `expected not less than the last phase's day ${lastDay}, got ${endDay}`);
     return lastDay;

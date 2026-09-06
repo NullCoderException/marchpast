@@ -16,8 +16,3 @@ export const ARMS = ["infantry", "cavalry", "ship"] as const;
 
 /** What a unit is made of. Identity, never per-phase state. */
 export type Arm = (typeof ARMS)[number];
-
-/** Whether `value` is on the arm allowlist. */
-export function isArm(value: string): value is Arm {
-  return (ARMS as readonly string[]).includes(value);
-}

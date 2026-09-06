@@ -313,6 +313,13 @@ function snapshotEveryUnit(b: any): void {
   }
 }
 
+/** Drops every unit with a parent, and their snapshots, leaving a one-level roster. */
+function flatten(b: any): void {
+  b.units = b.units.filter((unit: any) => unit.parent === undefined);
+  const ids = new Set(b.units.map((unit: any) => unit.id));
+  for (const phase of b.phases) phase.units = phase.units.filter((unit: any) => ids.has(unit.id));
+}
+
 /** Replaces the roster with `count` parentless units and drops `levels`, so the battle has one level. */
 function flatRoster(b: any, count: number): void {
   b.units = Array.from({ length: count }, (_, index) => ({
@@ -633,21 +640,11 @@ describe("validateBattle: cross-field rules (schema.md 2.10)", () => {
       ),
     ).toEqual(["/levels"]);
     const flat = validateBroken((b) => {
-      b.units = b.units.filter((unit: any) => unit.parent === undefined);
-      const ids = new Set(b.units.map((unit: any) => unit.id));
-      for (const phase of b.phases) phase.units = phase.units.filter((unit: any) => ids.has(unit.id));
+      flatten(b);
       delete b.levels;
     });
     expect(flat.ok).toBe(true);
-    expect(
-      errorPaths(
-        validateBroken((b) => {
-          b.units = b.units.filter((unit: any) => unit.parent === undefined);
-          const ids = new Set(b.units.map((unit: any) => unit.id));
-          for (const phase of b.phases) phase.units = phase.units.filter((unit: any) => ids.has(unit.id));
-        }),
-      ),
-    ).toEqual(["/levels"]);
+    expect(errorPaths(validateBroken((b) => flatten(b)))).toEqual(["/levels"]);
   });
 
   it("17. levels has one name per level of the tree", () => {

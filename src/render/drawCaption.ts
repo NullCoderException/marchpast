@@ -85,6 +85,8 @@ export function drawCaption(
   ctx.font = font(26);
   ctx.fillText(formatClock(picture.clock), PAD_X, top + PAD_Y + 2);
   ctx.font = font(13, true);
+  // Rule 5 gives a validated battle one `dates` entry per day, so the empty
+  // fallback is unreachable; it is here because the index type allows a miss.
   ctx.fillText(battle.dates[picture.phase.day ?? 0] ?? "", PAD_X, top + PAD_Y + 36);
 
   // Right: the phase label, the caption, the sources.
