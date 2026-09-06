@@ -15,7 +15,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateBattle } from "../src/schema/validateBattle.ts";
 import { validateMap } from "../src/schema/validateMap.ts";
-import type { ValidationError } from "../src/schema/validation.ts";
+import { errorLine, type ValidationError } from "../src/schema/validation.ts";
 
 /** The outcome for one file: no errors means it is valid. */
 export interface FileReport {
@@ -101,7 +101,7 @@ export function formatReports(reports: FileReport[]): string {
     if (report.errors.length === 0) continue;
     errorCount += report.errors.length;
     lines.push(report.file);
-    for (const error of report.errors) lines.push(`  ${error.path || "(root)"}: ${error.message}`);
+    for (const error of report.errors) lines.push(errorLine(error));
   }
   const failing = reports.filter((report) => report.errors.length > 0).length;
   if (reports.length === 0) lines.push("no data files found");

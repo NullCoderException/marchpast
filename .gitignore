@@ -12,3 +12,6 @@ Thumbs.db
 
 # agent worktrees
 .claude/worktrees/
+
+# generated: the library index is built from the battle files (ADR-0011)
+data/index.json

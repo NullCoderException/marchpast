@@ -4,14 +4,26 @@
  * the same way in both. Anything under `/data/` that is not a file is a plain
  * 404, never the SPA's index.html fallback.
  *
+ * One file on that route is on no one's disk: `/data/index.json` is the
+ * library, built from the battle files themselves by `library.ts` (ADR-0011).
+ * The build writes it into `dist/data/`; dev generates it per request, so a
+ * battle file added or edited while the server runs shows up on the front door
+ * without a restart. A battle file that fails the validator fails the build,
+ * and reads as a 500 in dev, rather than dropping quietly out of the list.
+ *
  * Vite's `publicDir` cannot mount a directory under a prefix, which is why this
  * is a small plugin rather than a config line.
  */
 import fs from "node:fs";
+import type { ServerResponse } from "node:http";
 import path from "node:path";
 import type { Plugin } from "vite";
+import { libraryJson } from "./library.ts";
 
 const URL_PREFIX = "/data";
+
+/** The generated file: `data/index.json` is a build output and is never committed. */
+const INDEX_FILE = "index.json";
 
 const CONTENT_TYPES: Readonly<Record<string, string>> = {
   ".json": "application/json",
@@ -51,6 +63,31 @@ export function resolveDataFile(url: string, dataDir: string): string | null {
   return resolved;
 }
 
+/** Whether a request URL names the generated library rather than a file on disk. */
+export function isIndexUrl(url: string): boolean {
+  return (url.split("?")[0] ?? "") === `${URL_PREFIX}/${INDEX_FILE}`;
+}
+
+/** Answers a request for the library with the generated JSON, or with the validator's complaint. */
+function sendIndex(res: ServerResponse, dataDir: string, headOnly: boolean): void {
+  let json: string;
+  try {
+    json = libraryJson(dataDir);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(message);
+    res.statusCode = 500;
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.end(headOnly ? undefined : message);
+    return;
+  }
+
+  res.statusCode = 200;
+  res.setHeader("Content-Type", CONTENT_TYPES[".json"] ?? "application/json");
+  res.setHeader("Cache-Control", "no-cache");
+  res.end(headOnly ? undefined : json);
+}
+
 export function serveData(): Plugin {
   let dataDir = "";
   let outDir = "";
@@ -68,6 +105,8 @@ export function serveData(): Plugin {
         const url = req.url ?? "";
         if (!isDataUrl(url)) return next();
         if (req.method !== "GET" && req.method !== "HEAD") return next();
+
+        if (isIndexUrl(url)) return sendIndex(res, dataDir, req.method === "HEAD");
 
         const file = resolveDataFile(url, dataDir);
         if (file === null || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
@@ -90,7 +129,10 @@ export function serveData(): Plugin {
 
     writeBundle() {
       if (!fs.existsSync(dataDir)) return;
-      fs.cpSync(dataDir, path.join(outDir, "data"), { recursive: true });
+      const outData = path.join(outDir, "data");
+      fs.cpSync(dataDir, outData, { recursive: true });
+      // Last, so it wins over a stale index.json left in `data/` by an earlier build.
+      fs.writeFileSync(path.join(outData, INDEX_FILE), libraryJson(dataDir));
     },
   };
 }

@@ -8,7 +8,8 @@ import { describe, expect, it } from "vitest";
 import { battleUrl, mapUrl } from "../data/paths.ts";
 import { MINIMAL_BATTLE, MINIMAL_MAP } from "../schema/examples.ts";
 import type { Battle } from "../schema/types.ts";
-import { formatLoadErrors, loadBattle, type FetchLike } from "./loadBattle.ts";
+import type { FetchLike } from "./load.ts";
+import { loadBattle } from "./loadBattle.ts";
 
 /** The minimal battle without its `map`, for the case that needs no map file. */
 const MAPLESS: Battle = (() => {
@@ -115,22 +116,5 @@ describe("loadBattle", () => {
       ok: false,
       errors: [{ file: mapUrl("missing"), path: "", message: "HTTP 404 Not Found" }],
     });
-  });
-});
-
-describe("formatLoadErrors", () => {
-  it("groups errors under their file, one line each, the root path written as (root)", () => {
-    const lines = formatLoadErrors([
-      { file: battleUrl("x"), path: "/phases/3/units/1/heading", message: "must be a number" },
-      { file: battleUrl("x"), path: "", message: "unknown key: extra" },
-      { file: mapUrl("y"), path: "/features", message: "must be an array" },
-    ]);
-    expect(lines).toEqual([
-      battleUrl("x"),
-      "  /phases/3/units/1/heading: must be a number",
-      "  (root): unknown key: extra",
-      mapUrl("y"),
-      "  /features: must be an array",
-    ]);
   });
 });

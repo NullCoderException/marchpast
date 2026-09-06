@@ -1,14 +1,15 @@
 /**
  * The controls beneath the plate: play/pause, the phase-segmented scrubber and
  * its battle-clock readout, the phase-jump buttons, the speed multiplier, the
- * View chooser, the Level chooser when the battle has more than one level, and
- * the details-panel toggle. Plain DOM, no framework.
+ * View chooser, the Level chooser when the battle has more than one level, the
+ * details-panel toggle and the Picker. Plain DOM, no framework.
  *
  * Nothing here decides anything: every gesture calls one of the transitions in
  * `state.ts` through the handlers it was given, and `update` is the only way
  * state reaches the DOM. That is the seam that keeps the rules testable
  * without a browser.
  */
+import type { LibraryEntry } from "../data/library.ts";
 import { formatClock, VIEWS, viewById, type ViewId } from "../render/index.ts";
 import type { Battle } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
@@ -33,6 +34,20 @@ export interface ControlHandlers {
   toggleDetails(): void;
 }
 
+/**
+ * What the Picker is built from: the library, which battle is playing, and
+ * what choosing another one does. Absent when the library could not be loaded,
+ * in which case the strip simply has no Picker.
+ */
+export interface PickerOptions {
+  /** Every battle in the library, in its order. */
+  battles: readonly LibraryEntry[];
+  /** The name of the battle playing now: the one the Picker shows. */
+  current: string;
+  /** What choosing another battle does. Navigation, not a transition, which is why it is not one of the handlers. */
+  choose(name: string): void;
+}
+
 /** The controls as the player holds them: one element to place, one call to keep in step. */
 export interface Controls {
   /** The element holding every control, appended to the root the player was given. */
@@ -44,7 +59,7 @@ export interface Controls {
 }
 
 /** Builds the controls for a battle, wiring every gesture to one of `handlers`. */
-export function createControls(battle: Battle, handlers: ControlHandlers): Controls {
+export function createControls(battle: Battle, handlers: ControlHandlers, picker?: PickerOptions): Controls {
   const listeners = new Listeners();
   const root = element("div", "st-controls");
 
@@ -61,8 +76,11 @@ export function createControls(battle: Battle, handlers: ControlHandlers): Contr
   details.setAttribute("aria-expanded", "false");
 
   // The tail of the strip is the controls that change how the battle is
-  // presented rather than where in it we are (#47, ADR-0017).
+  // presented rather than where in it we are (#47, ADR-0017). The Picker comes
+  // after even those: it leaves the battle altogether, so it sits apart from
+  // the transport (ADR-0011).
   root.append(previous, play, next, bar, readout, multiplier, view, ...(level === undefined ? [] : [level]), details);
+  if (picker !== undefined) root.append(battlePicker(listeners, picker));
 
   return {
     root,
@@ -176,6 +194,25 @@ function multiplierChooser(listeners: Listeners, handlers: ControlHandlers): HTM
     select.append(option);
   }
   listeners.on<Event>(select, "change", () => handlers.setMultiplier(Number(select.value)));
+  return select;
+}
+
+/**
+ * The Picker (ADR-0011): every battle in the library by title, the one playing
+ * selected. Choosing another navigates to it as a fresh visit, so no player
+ * state survives the change — which is what makes the view, the level and the
+ * speed multiplier properties of a visit rather than of the site.
+ */
+function battlePicker(listeners: Listeners, picker: PickerOptions): HTMLSelectElement {
+  const select = element("select", "st-picker");
+  select.setAttribute("aria-label", "Battle");
+  for (const battle of picker.battles) {
+    const option = element("option", undefined, battle.title);
+    option.value = battle.name;
+    option.selected = battle.name === picker.current;
+    select.append(option);
+  }
+  listeners.on<Event>(select, "change", () => picker.choose(select.value));
   return select;
 }
 
