@@ -11,7 +11,7 @@ A point on the earth, latitude and longitude, where a unit's centre is at a mome
 _Avoid_: Location, coordinates, point
 
 **Heading**:
-The direction a unit's front faces, in degrees true (0 is north, clockwise, 0 to 360). The front is not the direction of travel: a unit that retires in good order keeps its heading toward the enemy and its track runs behind it.
+The direction a unit's front faces, in degrees true (0 is north, clockwise, 0 to 360). The front is where the unit's force is directed: its course while it is moving, the way its guns or its line face while it is fighting. So it is not the direction of travel — a unit that retires in good order keeps its heading toward the enemy and its track runs behind it — and a moored fleet's heading is its broadside, not its bows, which are notes matter. A unit fought from both sides still has one front: the side the attack came from.
 _Avoid_: Course, bearing, direction, orientation
 
 **Extent**:
@@ -105,7 +105,7 @@ Which of four conditions a unit is in during a phase: intact (not yet in action)
 _Avoid_: Status, condition, morale, struck, routed, annihilated
 
 **Strength**:
-The fraction, 0 to 1, of a unit's opening fighting strength still fighting as part of the unit during a phase. Damage to ships or men who stay in the fight does not reduce it; ships or men that have struck, fled, or been detached from the unit for the rest of the battle have left it and do. A detachment that returns to the unit never left it and costs nothing. Never a casualty count: a unit that has run is near zero before any of its men are dead.
+The fraction, 0 to 1, of a unit's opening fighting strength still fighting as part of the unit during a phase. Damage to ships or men who stay in the fight does not reduce it; ships or men that have struck, fled, or been detached from the unit for the rest of the battle have left it and do. A detachment that returns to the unit never left it and costs nothing; whether it returns is judged inside the battle the file holds, so a ship still aground at the last phase has left the unit whatever became of her afterwards. Never a casualty count: a unit that has run is near zero before any of its men are dead.
 _Avoid_: Health, casualties, hit points, size, losses
 
 **Commander**:
@@ -129,7 +129,7 @@ The arm of a unit made of vessels, whatever their rate or whether they are under
 _Avoid_: Naval, fleet, vessel, sail
 
 **Formation**:
-The shape a unit's signs are arranged in, one of three words: column (in file along the heading), line (abreast across the heading) or mass (in ranks, four across and two deep). A styled label the renderer draws at a fixed size; a battle file never carries the shape's geometry, so a crescent, a wedge or a hollow is caption matter.
+The shape a unit's signs are arranged in, one of three words: column (in file along the heading), line (abreast across the heading) or mass (in ranks, four across and two deep). A shape and never a condition, so a fleet at anchor is drawn in the shape it lies in and its anchoring is caption matter; a fleet in line of battle is a line, abreast of its own front, as a line of foot is. A styled label the renderer draws at a fixed size; a battle file never carries the shape's geometry, so a crescent, a wedge or a hollow is caption matter.
 _Avoid_: Shape, arrangement, order of sailing, crescent, phalanx, block, depth
 
 **Move**:
