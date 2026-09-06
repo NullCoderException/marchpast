@@ -55,7 +55,7 @@ async function fetchJson(url: string, fetchLike: FetchLike): Promise<{ ok: true;
   try {
     response = await fetchLike(url);
   } catch (error) {
-    return { ok: false, message: `cannot fetch: ${describe(error)}` };
+    return { ok: false, message: `cannot fetch: ${errorMessage(error)}` };
   }
   if (!response.ok) {
     return { ok: false, message: `HTTP ${response.status}${response.statusText === "" ? "" : ` ${response.statusText}`}` };
@@ -63,11 +63,12 @@ async function fetchJson(url: string, fetchLike: FetchLike): Promise<{ ok: true;
   try {
     return { ok: true, value: await response.json() };
   } catch (error) {
-    return { ok: false, message: `not valid JSON: ${describe(error)}` };
+    return { ok: false, message: `not valid JSON: ${errorMessage(error)}` };
   }
 }
 
-function describe(error: unknown): string {
+/** What a thrown value says, whether or not it is an `Error`. */
+function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 

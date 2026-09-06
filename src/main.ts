@@ -9,36 +9,9 @@
  */
 import { battleNameFrom } from "./app/battleName.ts";
 import { formatLoadErrors, loadBattle } from "./app/loadBattle.ts";
-import { paintNotice, type Notice } from "./app/notice.ts";
+import { showNotice } from "./app/notice.ts";
 import { loadPlateFont } from "./fonts/plate.ts";
 import { createPlayer } from "./player/index.ts";
-
-/** Calls `onChange` whenever devicePixelRatio changes (zoom, or a move between monitors). */
-function watchDevicePixelRatio(onChange: () => void): () => void {
-  let query: MediaQueryList | undefined;
-  const listenForNextChange = (): void => {
-    query = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
-    query.addEventListener("change", handleChange, { once: true });
-  };
-  const handleChange = (): void => {
-    onChange();
-    listenForNextChange();
-  };
-  listenForNextChange();
-  return () => query?.removeEventListener("change", handleChange);
-}
-
-/** Keeps `notice` painted on the canvas through resizes and zooms until the returned function is called. */
-function showNotice(canvas: HTMLCanvasElement, notice: Notice): () => void {
-  const paint = (): void => paintNotice(canvas, notice);
-  window.addEventListener("resize", paint);
-  const stopWatching = watchDevicePixelRatio(paint);
-  paint();
-  return () => {
-    window.removeEventListener("resize", paint);
-    stopWatching();
-  };
-}
 
 async function start(): Promise<void> {
   const canvas = document.querySelector("canvas");
@@ -48,7 +21,10 @@ async function start(): Promise<void> {
   const name = battleNameFrom(window.location.search);
   const loading = loadBattle(name);
 
-  await loadPlateFont();
+  // The plate face is bundled, so this is quick; if it fails all the same, the
+  // fallback serif in every font string is better than a blank page.
+  await loadPlateFont().catch((error: unknown) => console.warn("Sandtable: the plate typeface did not load", error));
+
   const hideNotice = showNotice(canvas, { heading: document.title, lines: [`Loading ${name}…`] });
   const result = await loading;
   hideNotice();
