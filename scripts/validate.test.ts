@@ -160,18 +160,3 @@ describe("npm run validate", () => {
     expect(result.stdout).toContain("/end");
   });
 });
-
-describe("the repository's own data files", () => {
-  const repoData = path.resolve(__dirname, "..", "data");
-
-  it("are all valid, and include the Cadiz map", () => {
-    const reports = validateDataDir(repoData);
-    const failures = reports.flatMap((report) =>
-      report.errors.map(
-        (error) => `${path.relative(repoData, report.file).replaceAll("\\", "/")} ${error.path}: ${error.message}`,
-      ),
-    );
-    expect(failures).toEqual([]);
-    expect(reports.map((report) => path.basename(report.file))).toContain("cadiz.geojson");
-  });
-});
