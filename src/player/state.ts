@@ -1,8 +1,9 @@
 /**
  * What the player holds between frames, and every way a control moves it.
  *
- * The state is three numbers, a flag and a view: nothing here is authored,
- * nothing survives a reload (issue #13's resolution, and #47 for the view). Every transition is a pure
+ * The state is a clock, a flag and the viewer's three choices — speed, view
+ * and level: nothing here is authored,
+ * nothing survives a reload (issue #13's resolution, #47 for the view and ADR-0017 for the level). Every transition is a pure
  * function of the battle and the state before it, so the controls can be read
  * as "which transition does this button call" and the rules are tested without
  * a DOM.
@@ -31,12 +32,19 @@ export interface PlayerState {
    * the same battle in whichever treatment each has picked (ADR-0014).
    */
   view: ViewId;
+  /**
+   * The depth of the unit tree the plate draws: `0` is the coarsest, and every
+   * visit opens on it. Player state like the view — never authored, never on
+   * the URL, never remembered — and a battle with one level never moves it off
+   * `0` (ADR-0017).
+   */
+  level: number;
 }
 
-/** Paused on the first phase in the default view, which is what loading lands on (schema.md 2.10, #47). */
+/** Paused on the first phase in the default view at the coarsest level, which is what loading lands on (schema.md 2.11, #47). */
 export function initialState(battle: Battle, multiplier = 1): PlayerState {
   checkMultiplier(multiplier);
-  return { clock: startClock(battle), playing: false, multiplier, view: DEFAULT_VIEW.id };
+  return { clock: startClock(battle), playing: false, multiplier, view: DEFAULT_VIEW.id, level: 0 };
 }
 
 /** Whether the clock has reached `end`, where the last picture holds. */
@@ -100,6 +108,14 @@ export function setMultiplier(state: PlayerState, multiplier: number): PlayerSta
 /** Switch the view, leaving the clock and the play state where they are: a switch never interrupts (#47). */
 export function setView(state: PlayerState, view: ViewId): PlayerState {
   return { ...state, view };
+}
+
+/**
+ * Switch the level drawn, leaving the clock and the play state where they are:
+ * only the renderer's choice of units changes, mid-playback included (ADR-0017).
+ */
+export function setLevel(state: PlayerState, level: number): PlayerState {
+  return { ...state, level };
 }
 
 /** Jump to a phase's own `t` — what a scrubber tick clicks to — keeping the play state. */
