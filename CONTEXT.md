@@ -11,7 +11,7 @@ A point on the earth, latitude and longitude, where a unit's centre is at a mome
 _Avoid_: Location, coordinates, point
 
 **Heading**:
-The direction a unit's front faces, in degrees true (0 is north, clockwise, 0 to 360).
+The direction a unit's front faces, in degrees true (0 is north, clockwise, 0 to 360). The front is not the direction of travel: a unit that retires in good order keeps its heading toward the enemy and its track runs behind it.
 _Avoid_: Course, bearing, direction, orientation
 
 **Extent**:
@@ -121,8 +121,8 @@ The arm of a unit made of vessels, whatever their rate or whether they are under
 _Avoid_: Naval, fleet, vessel, sail
 
 **Formation**:
-The shape a unit's ships or men are arranged in, one of two words in v1: column (in line ahead along the heading) or line (abreast across the heading). A styled label the renderer draws; a battle file never carries the shape's geometry.
-_Avoid_: Shape, arrangement, order of sailing, crescent
+The shape a unit's signs are arranged in, one of three words: column (in file along the heading), line (abreast across the heading) or mass (in ranks, four across and two deep). A styled label the renderer draws at a fixed size; a battle file never carries the shape's geometry, so a crescent, a wedge or a hollow is caption matter.
+_Avoid_: Shape, arrangement, order of sailing, crescent, phalanx, block, depth
 
 **Move**:
 An authored arrow from a unit toward a position, showing something the unit's own position cannot: a detachment (part of the unit going where the unit does not) or an intent (what the unit was ordered to do, whether or not it happened).
@@ -173,7 +173,7 @@ How a view draws one unit: the chart plate's ship-ticks, atlas's block. Drawn in
 _Avoid_: Icon, symbol, marker, sprite, token
 
 **Sign**:
-The shape by which a view tells one arm from another inside a glyph: the chart plate's chevron tick for a ship, atlas's diagonal across a cavalry block. Every view has a sign for every arm.
+The shape by which a view tells one arm from another inside a glyph: the chart plate's chevron tick for a ship, its rank bar for foot and barred rank bar for horse, atlas's diagonal across a cavalry block. Every view has a sign for every arm.
 _Avoid_: Mark (the state's), icon, symbol, tick (except for the ship sign), badge
 
 **Controls**:
