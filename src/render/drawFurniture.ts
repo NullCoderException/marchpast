@@ -3,13 +3,20 @@
  * wind blowing across it, the battle title, the scale bar, the always-on
  * legend, and the map's credit line. North is always up. Drawn after the
  * picture, inside the frame, with nothing clipped.
+ *
+ * A **shared pass**: the furniture set and which corner each piece sits in are
+ * fixed across views (#58), so no view replaces this. It draws in the view's
+ * ink and, for the legend's samples and line rows, with the view's own glyph
+ * and pens — which is the whole reason Atlas's legend shows blocks without
+ * this file knowing Atlas exists (ADR-0014).
  */
 import type { Wind, WindForce } from "../schema/types.ts";
 import type { Plate } from "./plate.ts";
-import { drawArrow, drawGlyph, drawPlateRule, type Point } from "./primitives.ts";
+import { drawArrow, drawPlateRule, type Point } from "./primitives.ts";
 import { toRadians } from "./projection.ts";
 import { METRES_PER_UNIT, scaleBarLength, UNIT_LABEL } from "./scaleBar.ts";
-import { detachmentStyle, font, INK, INTENT_STYLE, PARCHMENT_PANEL, STATES, TRACK_STYLE } from "./style.ts";
+import { font, STATES } from "./style.ts";
+import type { GlyphRequest } from "./view.ts";
 import { compassPoint } from "./text.ts";
 
 /** Feathers on the wind arrow's tail: none at calm, one for light through four for gale (ADR-0008). */
@@ -32,21 +39,22 @@ export function drawFurniture(plate: Plate): void {
   drawCredit(plate);
 }
 
-/** A double ink rule at the extent's edge, where the letterbox begins. */
-function drawPlateBorder({ ctx, projection: { extentRect } }: Plate): void {
-  drawPlateRule(ctx, extentRect);
+/** A double rule at the extent's edge, where the letterbox begins. */
+function drawPlateBorder({ ctx, view, projection: { extentRect } }: Plate): void {
+  drawPlateRule(ctx, extentRect, view.palette.ink);
 }
 
 function drawCompassRose(plate: Plate, wind: Wind | undefined): void {
   const { ctx } = plate;
+  const ink = plate.view.palette.ink;
   const frame = plate.projection.extentRect;
   const cx = frame.x + 74;
   const cy = frame.y + 78;
 
   ctx.save();
   ctx.translate(cx, cy);
-  ctx.strokeStyle = INK;
-  ctx.fillStyle = INK;
+  ctx.strokeStyle = ink;
+  ctx.fillStyle = ink;
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.arc(0, 0, ROSE_RADIUS, 0, Math.PI * 2);
@@ -79,7 +87,7 @@ function drawCompassRose(plate: Plate, wind: Wind | undefined): void {
   // The wind as a pen arrow blowing across the rose: it points where the wind goes, so flip `from`.
   if (wind !== undefined && wind.force !== "calm" && wind.from !== undefined) {
     ctx.rotate(toRadians(wind.from + 180));
-    ctx.strokeStyle = INK;
+    ctx.strokeStyle = ink;
     ctx.lineWidth = 1.4;
     ctx.lineCap = "round";
     const tail = ROSE_RADIUS + 26;
@@ -104,7 +112,7 @@ function drawCompassRose(plate: Plate, wind: Wind | undefined): void {
 
   if (wind !== undefined) {
     ctx.save();
-    ctx.fillStyle = INK;
+    ctx.fillStyle = ink;
     ctx.font = font(13, true);
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
@@ -115,9 +123,9 @@ function drawCompassRose(plate: Plate, wind: Wind | undefined): void {
 }
 
 /** The battle's title, top right, as the plate's cartouche. */
-function drawTitle({ ctx, battle, projection: { extentRect: frame } }: Plate): void {
+function drawTitle({ ctx, battle, view, projection: { extentRect: frame } }: Plate): void {
   ctx.save();
-  ctx.fillStyle = INK;
+  ctx.fillStyle = view.palette.ink;
   ctx.textAlign = "right";
   ctx.textBaseline = "top";
   ctx.font = font(22);
@@ -128,6 +136,7 @@ function drawTitle({ ctx, battle, projection: { extentRect: frame } }: Plate): v
 /** The scale bar, bottom left, in the battle's unit. Returns the y of its label's top so the legend can sit above it. */
 function drawScaleBar(plate: Plate): number {
   const { ctx, battle } = plate;
+  const ink = plate.view.palette.ink;
   const frame = plate.projection.extentRect;
   const unit = battle.scale_unit;
   const pixelsPerUnit = METRES_PER_UNIT[unit] * plate.pixelsPerMetre;
@@ -138,8 +147,8 @@ function drawScaleBar(plate: Plate): number {
   const label = `${bar.units} ${bar.units === 1 ? UNIT_LABEL[unit].one : UNIT_LABEL[unit].many}`;
 
   ctx.save();
-  ctx.strokeStyle = INK;
-  ctx.fillStyle = INK;
+  ctx.strokeStyle = ink;
+  ctx.fillStyle = ink;
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.moveTo(x, y);
@@ -169,10 +178,13 @@ function drawScaleBar(plate: Plate): number {
 const LEGEND_ROW = 18;
 const LEGEND_WIDTH = 168;
 const LEGEND_SAMPLE = 40;
+/** The legend's samples are drawn small, so a glyph knows to leave off its finest detail. */
+const LEGEND_SCALE = 0.75;
 
 /** The always-on legend: each side's colour and name, the four state glyphs, the three line styles. Its bottom sits at `bottom`. */
 function drawLegend(plate: Plate, bottom: number): void {
-  const { ctx, colours } = plate;
+  const { ctx, colours, view } = plate;
+  const { palette, pens, glyph } = view;
   const frame = plate.projection.extentRect;
   const rows = colours.size + STATES.length + 3;
   const height = rows * LEGEND_ROW + 16;
@@ -180,9 +192,9 @@ function drawLegend(plate: Plate, bottom: number): void {
   const y = bottom - height;
 
   ctx.save();
-  ctx.fillStyle = PARCHMENT_PANEL;
+  ctx.fillStyle = palette.panel;
   ctx.fillRect(x, y, LEGEND_WIDTH, height);
-  ctx.strokeStyle = INK;
+  ctx.strokeStyle = palette.ink;
   ctx.lineWidth = 1;
   ctx.strokeRect(x + 0.5, y + 0.5, LEGEND_WIDTH - 1, height - 1);
 
@@ -192,48 +204,52 @@ function drawLegend(plate: Plate, bottom: number): void {
   let rowY = y + 8 + LEGEND_ROW / 2;
   const sampleCentre = (): Point => ({ x: x + 12 + LEGEND_SAMPLE / 2, y: rowY });
 
+  /** A sample of the view's own glyph, laid across the row. No wind reaches the legend. */
+  const sample = (state: (typeof STATES)[number], strength: number, colour: string, seed: number): void => {
+    const centre = sampleCentre();
+    const request: GlyphRequest = {
+      length: LEGEND_SAMPLE - 6,
+      formation: "column",
+      state,
+      strength,
+      colour,
+      seed,
+      scale: LEGEND_SCALE,
+      windTo: undefined,
+      palette,
+    };
+    ctx.save();
+    ctx.translate(centre.x, centre.y);
+    ctx.rotate(Math.PI / 2);
+    glyph.mark?.(ctx, request);
+    glyph.body(ctx, request);
+    ctx.restore();
+  };
+
   ctx.font = font(12, true);
   for (const [side, colour] of colours) {
-    const c = sampleCentre();
-    ctx.save();
-    ctx.translate(c.x, c.y);
-    ctx.rotate(Math.PI / 2);
-    drawGlyph(ctx, { length: LEGEND_SAMPLE - 6, formation: "column", state: "intact", strength: 1, colour, seed: 1, scale: 0.75 });
-    ctx.restore();
+    sample("intact", 1, colour, 1);
     ctx.fillStyle = colour;
     ctx.fillText(side, textX, rowY);
     rowY += LEGEND_ROW;
   }
 
-  ctx.fillStyle = INK;
   for (const state of STATES) {
-    const c = sampleCentre();
-    ctx.save();
-    ctx.translate(c.x, c.y);
-    ctx.rotate(Math.PI / 2);
-    drawGlyph(ctx, {
-      length: LEGEND_SAMPLE - 6,
-      formation: "column",
-      state,
-      strength: state === "broken" ? 0.4 : 1,
-      colour: INK,
-      seed: 3,
-      scale: 0.75,
-    });
-    ctx.restore();
+    sample(state, state === "broken" ? 0.4 : 1, palette.ink, 3);
+    ctx.fillStyle = palette.ink;
     ctx.fillText(state, textX, rowY);
     rowY += LEGEND_ROW;
   }
 
-  const firstSide = colours.values().next().value ?? INK;
-  const lines: ReadonlyArray<readonly [label: string, style: typeof TRACK_STYLE]> = [
-    ["track", TRACK_STYLE],
-    ["intent", INTENT_STYLE],
-    ["detachment", detachmentStyle(firstSide)],
-  ];
-  for (const [label, style] of lines) {
-    drawArrow(ctx, { x: x + 12, y: rowY }, { x: x + 12 + LEGEND_SAMPLE, y: rowY }, style);
-    ctx.fillStyle = INK;
+  const firstSide = colours.values().next().value ?? palette.ink;
+  const lines = [
+    ["track", pens.track, palette.ink],
+    ["intent", pens.intent, palette.ink],
+    ["detachment", pens.detachment, firstSide],
+  ] as const;
+  for (const [label, pen, colour] of lines) {
+    drawArrow(ctx, { x: x + 12, y: rowY }, { x: x + 12 + LEGEND_SAMPLE, y: rowY }, pen, colour);
+    ctx.fillStyle = palette.ink;
     ctx.fillText(label, textX, rowY);
     rowY += LEGEND_ROW;
   }
@@ -241,11 +257,11 @@ function drawLegend(plate: Plate, bottom: number): void {
 }
 
 /** The map file's attribution, bottom right, whenever a map is loaded and has one (ADR-0007). */
-function drawCredit({ ctx, map, projection: { extentRect: frame } }: Plate): void {
+function drawCredit({ ctx, map, view, projection: { extentRect: frame } }: Plate): void {
   const credit = map?.attribution;
   if (credit === undefined || credit === "") return;
   ctx.save();
-  ctx.fillStyle = INK;
+  ctx.fillStyle = view.palette.ink;
   ctx.font = font(11, true);
   ctx.textAlign = "right";
   ctx.textBaseline = "bottom";

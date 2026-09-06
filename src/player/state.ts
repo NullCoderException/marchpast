@@ -1,12 +1,13 @@
 /**
  * What the player holds between frames, and every way a control moves it.
  *
- * The state is three numbers and a flag: nothing here is authored, nothing
- * survives a reload (issue #13's resolution). Every transition is a pure
+ * The state is three numbers, a flag and a view: nothing here is authored,
+ * nothing survives a reload (issue #13's resolution, and #47 for the view). Every transition is a pure
  * function of the battle and the state before it, so the controls can be read
  * as "which transition does this button call" and the rules are tested without
  * a DOM.
  */
+import { DEFAULT_VIEW, type ViewId } from "../render/index.ts";
 import type { Battle } from "../schema/types.ts";
 import { checkMultiplier, clockIntervals, endClock, intervalAt, startClock } from "../timeline/intervals.ts";
 import type { ClockSeconds } from "../timeline/picture.ts";
@@ -24,12 +25,18 @@ export interface PlayerState {
   playing: boolean;
   /** The viewer's speed multiplier on every phase's authored rate. */
   multiplier: number;
+  /**
+   * The view the picture is drawn in: player state like the multiplier, never
+   * authored and never in the picture, so two viewers of the same instant see
+   * the same battle in whichever treatment each has picked (ADR-0014).
+   */
+  view: ViewId;
 }
 
-/** Paused on the first phase, which is what loading lands on (schema.md 2.10). */
-export function initialState(battle: Battle, multiplier = 1): PlayerState {
+/** Paused on the first phase in the default view, which is what loading lands on (schema.md 2.10, #47). */
+export function initialState(battle: Battle, multiplier = 1, view: ViewId = DEFAULT_VIEW.id): PlayerState {
   checkMultiplier(multiplier);
-  return { clock: startClock(battle), playing: false, multiplier };
+  return { clock: startClock(battle), playing: false, multiplier, view };
 }
 
 /** Whether the clock has reached `end`, where the last picture holds. */
@@ -88,6 +95,11 @@ export function scrubTo(battle: Battle, state: PlayerState, fraction: BarFractio
 export function setMultiplier(state: PlayerState, multiplier: number): PlayerState {
   checkMultiplier(multiplier);
   return { ...state, multiplier };
+}
+
+/** Switch the view, leaving the clock and the play state where they are: a switch never interrupts (#47). */
+export function setView(state: PlayerState, view: ViewId): PlayerState {
+  return { ...state, view };
 }
 
 /** Jump to a phase's own `t` — what a scrubber tick clicks to — keeping the play state. */
