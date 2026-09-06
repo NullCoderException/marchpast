@@ -21,25 +21,38 @@ const MIN_HEIGHT = 74;
 export interface CaptionLayout {
   height: number;
   lines: string[];
-  sources: string;
+  /** The phase label, upper case and wrapped to the text column. */
+  labelLines: string[];
+  /** The sources credit, already wrapped to the text column; empty when the phase cites none. */
+  sourceLines: string[];
 }
 
 /** Measures the band for a canvas `width`: wraps the caption so the height is known before the projection is fitted. */
 export function layoutCaption(ctx: CanvasRenderingContext2D, battle: Battle, picture: Picture, width: number): CaptionLayout {
   ctx.save();
-  ctx.font = font(CAPTION_SIZE);
   const textWidth = Math.max(80, width - PAD_X * 2 - CLOCK_COLUMN);
+  ctx.font = font(12);
+  const labelLines = wrapText(picture.label.toUpperCase(), textWidth, (text) => ctx.measureText(text).width);
+
+  ctx.font = font(CAPTION_SIZE);
   const lines = wrapText(picture.caption, textWidth, (text) => ctx.measureText(text).width);
-  ctx.restore();
 
   const labels = new Set<string>();
   for (const reference of picture.references) {
     labels.add(battle.sources[reference.source]?.label ?? reference.source);
   }
   const sources = [...labels].join(", ");
+  // The credit wraps like the caption: on a narrow plate it is longer than the
+  // column, and an unwrapped line runs off the edge of the picture.
+  ctx.font = font(12, true);
+  const sourceLines = sources === "" ? [] : wrapText(`— ${sources}`, textWidth, (text) => ctx.measureText(text).width);
+  ctx.restore();
 
-  const height = Math.max(MIN_HEIGHT, PAD_Y * 2 + LABEL_LINE + lines.length * CAPTION_LINE + (sources === "" ? 0 : SOURCES_LINE));
-  return { height, lines, sources };
+  const height = Math.max(
+    MIN_HEIGHT,
+    PAD_Y * 2 + labelLines.length * LABEL_LINE + lines.length * CAPTION_LINE + sourceLines.length * SOURCES_LINE,
+  );
+  return { height, lines, labelLines, sourceLines };
 }
 
 /** Draws the band across `[0, width]` with its top at `top`. */
@@ -77,16 +90,20 @@ export function drawCaption(
   const x = PAD_X + CLOCK_COLUMN;
   let y = top + PAD_Y;
   ctx.font = font(12);
-  ctx.fillText(picture.label.toUpperCase(), x, y);
-  y += LABEL_LINE;
+  for (const line of layout.labelLines) {
+    ctx.fillText(line, x, y);
+    y += LABEL_LINE;
+  }
   ctx.font = font(CAPTION_SIZE);
   for (const line of layout.lines) {
     ctx.fillText(line, x, y);
     y += CAPTION_LINE;
   }
-  if (layout.sources !== "") {
-    ctx.font = font(12, true);
-    ctx.fillText(`— ${layout.sources}`, x, y + 2);
+  ctx.font = font(12, true);
+  y += 2;
+  for (const line of layout.sourceLines) {
+    ctx.fillText(line, x, y);
+    y += SOURCES_LINE;
   }
   ctx.restore();
 }
