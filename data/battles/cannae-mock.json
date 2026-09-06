@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "title": "Cannae (mocked frame for the label prototype)",
+  "date": "2 August 216 BC",
+  "extent": { "north": 41.324, "south": 41.288, "east": 16.178, "west": 16.098 },
+  "scale_unit": "km",
+  "end": "14:00",
+  "license": "CC-BY-4.0",
+  "attribution": "Sandtable prototype #39. PROTOTYPE ONLY: the eight units and their sequence follow the Cannae research note, but every position is sketched by hand to make a crowded frame, not extracted from a source. Never merge to main.",
+  "sources": {
+    "polybius": {
+      "label": "Polybius",
+      "work": "Polybius, Histories III.107-117, trans. Evelyn S. Shuckburgh (Macmillan, 1889)",
+      "url": "https://www.gutenberg.org/ebooks/44125",
+      "license": "public-domain",
+      "license_note": "Shuckburgh died 1906; Gutenberg text."
+    },
+    "livy": {
+      "label": "Livy",
+      "work": "Livy, History of Rome XXII.43-50, trans. D. Spillan and Cyrus Edmonds (Bohn, 1849-50)",
+      "url": "https://www.gutenberg.org/ebooks/10907",
+      "license": "public-domain",
+      "license_note": "Translation published 1849-50; Gutenberg text."
+    }
+  },
+  "units": [
+    { "id": "roman-cavalry", "side": "Roman", "label": "Roman cavalry", "commander": "Paullus" },
+    { "id": "roman-infantry", "side": "Roman", "label": "Roman and allied infantry", "commander": "Servilius" },
+    { "id": "allied-cavalry", "side": "Roman", "label": "Allied cavalry", "commander": "Varro" },
+    { "id": "hasdrubal-cavalry", "side": "Carthaginian", "label": "Spanish and Gallic cavalry", "commander": "Hasdrubal" },
+    { "id": "libyans-left", "side": "Carthaginian", "label": "Libyan foot (river flank)", "commander": "Hannibal" },
+    { "id": "spanish-gallic-centre", "side": "Carthaginian", "label": "Spanish and Gallic foot", "commander": "Mago" },
+    { "id": "libyans-right", "side": "Carthaginian", "label": "Libyan foot (open flank)", "commander": "Hannibal" },
+    { "id": "numidians", "side": "Carthaginian", "label": "Numidian horse", "commander": "Hanno" }
+  ],
+  "phases": [
+    {
+      "id": "both-armies-formed",
+      "label": "Both armies formed, the Romans facing south",
+      "t": "07:30",
+      "playback_rate": 240,
+      "wind": { "from": 135, "force": "fresh" },
+      "caption": "The Roman line faces south with the citizen horse on the right along the river, the allied horse on the left, and the foot between them in maniples several times deeper than their front. Hannibal answers with the Spanish and Gallic horse on his left by the river, the Numidians on his right, and a crescent of Spanish and Gallic foot bowed forward with the Libyans held back on either flank.",
+      "references": [{ "source": "polybius", "locator": "III.113" }],
+      "units": [
+        { "id": "roman-cavalry", "position": { "lat": 41.316, "lon": 16.112 }, "heading": 195, "formation": "line", "state": "intact" },
+        { "id": "roman-infantry", "position": { "lat": 41.314, "lon": 16.1345 }, "heading": 190, "formation": "line", "state": "intact" },
+        { "id": "allied-cavalry", "position": { "lat": 41.3155, "lon": 16.157 }, "heading": 185, "formation": "line", "state": "intact" },
+        { "id": "hasdrubal-cavalry", "position": { "lat": 41.306, "lon": 16.112 }, "heading": 15, "formation": "line", "state": "intact" },
+        { "id": "libyans-left", "position": { "lat": 41.3035, "lon": 16.1235 }, "heading": 10, "formation": "line", "state": "intact" },
+        { "id": "spanish-gallic-centre", "position": { "lat": 41.309, "lon": 16.1345 }, "heading": 10, "formation": "line", "state": "intact" },
+        { "id": "libyans-right", "position": { "lat": 41.3035, "lon": 16.1455 }, "heading": 10, "formation": "line", "state": "intact" },
+        { "id": "numidians", "position": { "lat": 41.306, "lon": 16.157 }, "heading": 5, "formation": "line", "state": "intact" }
+      ]
+    },
+    {
+      "id": "light-troops-and-cavalry-clash",
+      "label": "Skirmishers open; the cavalry close on the river",
+      "t": "08:30",
+      "playback_rate": 240,
+      "wind": { "from": 135, "force": "fresh" },
+      "caption": "The light troops open the action and the Spanish and Gallic horse close head on with the Roman horse by the river, where neither can manoeuvre. On the far wing the Numidians ride at the allied horse from one side and then the other without coming to a decision.",
+      "references": [{ "source": "polybius", "locator": "III.115-116" }, { "source": "livy", "locator": "XXII.47" }],
+      "units": [
+        { "id": "roman-cavalry", "position": { "lat": 41.313, "lon": 16.1125 }, "heading": 195, "formation": "line", "state": "engaged" },
+        { "id": "roman-infantry", "position": { "lat": 41.3125, "lon": 16.1345 }, "heading": 190, "formation": "line", "state": "intact" },
+        { "id": "allied-cavalry", "position": { "lat": 41.313, "lon": 16.1565 }, "heading": 185, "formation": "line", "state": "engaged" },
+        { "id": "hasdrubal-cavalry", "position": { "lat": 41.3095, "lon": 16.112 }, "heading": 15, "formation": "line", "state": "engaged" },
+        { "id": "libyans-left", "position": { "lat": 41.3035, "lon": 16.1235 }, "heading": 10, "formation": "line", "state": "intact" },
+        { "id": "spanish-gallic-centre", "position": { "lat": 41.3095, "lon": 16.1345 }, "heading": 10, "formation": "line", "state": "intact" },
+        { "id": "libyans-right", "position": { "lat": 41.3035, "lon": 16.1455 }, "heading": 10, "formation": "line", "state": "intact" },
+        { "id": "numidians", "position": { "lat": 41.3095, "lon": 16.156 }, "heading": 5, "formation": "line", "state": "engaged" }
+      ]
+    },
+    {
+      "id": "roman-cavalry-destroyed",
+      "label": "Hasdrubal breaks the Roman horse; the lines of foot meet",
+      "t": "09:00",
+      "playback_rate": 240,
+      "wind": { "from": 135, "force": "fresh" },
+      "caption": "The cavalry fight by the river is violent rather than long: the Roman horse is broken and chased along the bank. Behind it the legionaries take the place of the light troops and close with the crescent, which holds for a time.",
+      "references": [{ "source": "polybius", "locator": "III.115" }],
+      "units": [
+        { "id": "roman-cavalry", "position": { "lat": 41.3185, "lon": 16.1055 }, "heading": 300, "formation": "line", "state": "broken", "strength": 0.2 },
+        { "id": "roman-infantry", "position": { "lat": 41.311, "lon": 16.1345 }, "heading": 190, "formation": "line", "state": "engaged" },
+        { "id": "allied-cavalry", "position": { "lat": 41.312, "lon": 16.156 }, "heading": 185, "formation": "line", "state": "engaged", "strength": 0.9 },
+        {
+          "id": "hasdrubal-cavalry",
+          "position": { "lat": 41.315, "lon": 16.1085 },
+          "heading": 320,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "intent", "to": { "lat": 41.3175, "lon": 16.12 } }]
+        },
+        { "id": "libyans-left", "position": { "lat": 41.304, "lon": 16.124 }, "heading": 10, "formation": "line", "state": "intact" },
+        { "id": "spanish-gallic-centre", "position": { "lat": 41.308, "lon": 16.1345 }, "heading": 10, "formation": "line", "state": "engaged" },
+        { "id": "libyans-right", "position": { "lat": 41.304, "lon": 16.145 }, "heading": 10, "formation": "line", "state": "intact" },
+        { "id": "numidians", "position": { "lat": 41.3105, "lon": 16.155 }, "heading": 5, "formation": "line", "state": "engaged" }
+      ]
+    },
+    {
+      "id": "centre-gives-ground",
+      "label": "The centre gives ground; the crescent turns concave",
+      "t": "09:45",
+      "playback_rate": 300,
+      "wind": { "from": 135, "force": "fresh" },
+      "caption": "The Spanish and Gallic foot gives way and retires, and the Romans close from their wings toward the point of danger until the bow has become a hollow. The Libyans on either flank wheel inward on to the Roman flanks, while Hasdrubal, done with the Roman horse, rides east behind the Roman rear.",
+      "references": [{ "source": "polybius", "locator": "III.115" }, { "source": "livy", "locator": "XXII.47" }],
+      "units": [
+        { "id": "roman-cavalry", "position": { "lat": 41.3195, "lon": 16.104 }, "heading": 300, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "roman-infantry", "position": { "lat": 41.3065, "lon": 16.1345 }, "heading": 190, "formation": "line", "state": "engaged", "strength": 0.95 },
+        {
+          "id": "allied-cavalry",
+          "position": { "lat": 41.3115, "lon": 16.156 },
+          "heading": 120,
+          "formation": "line",
+          "state": "engaged",
+          "strength": 0.7,
+          "moves": [{ "kind": "detachment", "to": { "lat": 41.314, "lon": 16.17 } }]
+        },
+        {
+          "id": "hasdrubal-cavalry",
+          "position": { "lat": 41.316, "lon": 16.129 },
+          "heading": 90,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "intent", "to": { "lat": 41.3105, "lon": 16.1345 } }]
+        },
+        { "id": "libyans-left", "position": { "lat": 41.3055, "lon": 16.1265 }, "heading": 80, "formation": "line", "state": "engaged" },
+        { "id": "spanish-gallic-centre", "position": { "lat": 41.302, "lon": 16.1345 }, "heading": 5, "formation": "line", "state": "engaged", "strength": 0.8 },
+        { "id": "libyans-right", "position": { "lat": 41.3055, "lon": 16.1425 }, "heading": 280, "formation": "line", "state": "engaged" },
+        { "id": "numidians", "position": { "lat": 41.311, "lon": 16.16 }, "heading": 30, "formation": "line", "state": "engaged" }
+      ]
+    },
+    {
+      "id": "encirclement",
+      "label": "The circle closes; Paullus falls",
+      "t": "11:00",
+      "playback_rate": 300,
+      "wind": { "from": 135, "force": "fresh" },
+      "caption": "The Libyans have both Roman flanks, the rallied centre the front and Hasdrubal's horse the rear: the Roman foot is surrounded where it stands and cut down in a ring. The allied horse is already away to the east with the Numidians behind it.",
+      "references": [{ "source": "polybius", "locator": "III.116" }],
+      "units": [
+        { "id": "roman-cavalry", "position": { "lat": 41.321, "lon": 16.102 }, "heading": 300, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "roman-infantry", "position": { "lat": 41.305, "lon": 16.1345 }, "heading": 190, "formation": "line", "state": "broken", "strength": 0.3 },
+        {
+          "id": "allied-cavalry",
+          "position": { "lat": 41.314, "lon": 16.169 },
+          "heading": 60,
+          "formation": "line",
+          "state": "broken",
+          "strength": 0.1,
+          "moves": [{ "kind": "detachment", "to": { "lat": 41.32, "lon": 16.178 } }]
+        },
+        { "id": "hasdrubal-cavalry", "position": { "lat": 41.3105, "lon": 16.1345 }, "heading": 180, "formation": "line", "state": "engaged" },
+        { "id": "libyans-left", "position": { "lat": 41.305, "lon": 16.1275 }, "heading": 90, "formation": "line", "state": "engaged" },
+        { "id": "spanish-gallic-centre", "position": { "lat": 41.2995, "lon": 16.1345 }, "heading": 5, "formation": "line", "state": "engaged", "strength": 0.8 },
+        { "id": "libyans-right", "position": { "lat": 41.305, "lon": 16.1415 }, "heading": 270, "formation": "line", "state": "engaged" },
+        { "id": "numidians", "position": { "lat": 41.313, "lon": 16.162 }, "heading": 60, "formation": "line", "state": "engaged" }
+      ]
+    }
+  ]
+}

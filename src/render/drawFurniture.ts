@@ -11,6 +11,8 @@ import { toRadians } from "./projection.ts";
 import { METRES_PER_UNIT, scaleBarLength, UNIT_LABEL } from "./scaleBar.ts";
 import { detachmentStyle, font, INK, INTENT_STYLE, PARCHMENT_PANEL, STATES, TRACK_STYLE } from "./style.ts";
 import { compassPoint } from "./text.ts";
+import { lastFrame, recordFurniture } from "../prototype/state.ts";
+import type { Rect } from "./projection.ts";
 
 /** Feathers on the wind arrow's tail: none at calm, one for light through four for gale (ADR-0008). */
 const FEATHERS: Readonly<Record<WindForce, number>> = { calm: 0, light: 1, moderate: 2, fresh: 3, gale: 4 };
@@ -30,6 +32,66 @@ export function drawFurniture(plate: Plate): void {
   const scaleTop = drawScaleBar(plate);
   drawLegend(plate, scaleTop - LEGEND_GAP);
   drawCredit(plate);
+  // PROTOTYPE (#39): the furniture is what the labels have to share the plate with,
+  // so its boxes are published for the placer. One frame behind, which nothing can see.
+  recordFurniture(furnitureBoxes(plate, scaleTop));
+}
+
+/**
+ * PROTOTYPE (#39): where the furniture sits, in the same arithmetic the draw
+ * passes above use. Throwaway: if the placer keeps furniture in its collision
+ * model, the real renderer should return these rather than recompute them.
+ */
+function furnitureBoxes(plate: Plate, scaleTop: number): Rect[] {
+  const { ctx, battle, map } = plate;
+  const frame = plate.projection.extentRect;
+  const boxes: Rect[] = [];
+
+  ctx.save();
+
+  // The compass rose, its needle, the wind arrow across it and the wind sentence beside it.
+  const cx = frame.x + 74;
+  const cy = frame.y + 78;
+  ctx.font = font(13, true);
+  const wind = plate.picture.wind;
+  const windText =
+    wind === undefined ? 0 : ctx.measureText(wind.force === "calm" || wind.from === undefined ? "Wind calm" : "Wind WNW, moderate").width;
+  const roseRight = windText === 0 ? cx + ROSE_RADIUS + 6 : cx + ROSE_RADIUS + 34 + windText + 6;
+  boxes.push({ x: cx - ROSE_RADIUS - 28, y: cy - ROSE_RADIUS - 28, width: roseRight - (cx - ROSE_RADIUS - 28), height: (ROSE_RADIUS + 28) * 2 });
+
+  // The title, top right.
+  ctx.font = font(22);
+  const titleWidth = ctx.measureText(battle.title).width;
+  boxes.push({ x: frame.x + frame.width - 22 - titleWidth, y: frame.y + 14, width: titleWidth + 8, height: 32 });
+
+  // The scale bar and its label, bottom left.
+  const pixelsPerUnit = METRES_PER_UNIT[battle.scale_unit] * plate.pixelsPerMetre;
+  const bar = scaleBarLength({ pixelsPerUnit, maxPixels: Math.max(40, Math.min(180, frame.width / 4)) });
+  const barY = frame.y + frame.height - MARGIN;
+  boxes.push({ x: frame.x + MARGIN, y: scaleTop, width: Math.max(bar.pixels, 90), height: barY + 8 - scaleTop });
+
+  // The legend panel, sitting above the scale bar.
+  const numerals = lastFrame.placed.filter((label) => label.numeral !== undefined).length;
+  const rows = plate.colours.size + STATES.length + 3 + numerals;
+  const height = rows * LEGEND_ROW + 16;
+  const bottom = scaleTop - LEGEND_GAP;
+  ctx.font = font(12, true);
+  const keyWidth = lastFrame.placed
+    .filter((label) => label.numeral !== undefined)
+    .reduce((widest, label) => Math.max(widest, ctx.measureText(label.unit.name).width), 0);
+  const panelWidth = Math.max(LEGEND_WIDTH, keyWidth + 12 + LEGEND_SAMPLE + 22);
+  boxes.push({ x: frame.x + MARGIN, y: bottom - height, width: panelWidth, height });
+
+  // The map credit, bottom right, when there is one.
+  const credit = map?.attribution;
+  if (credit !== undefined && credit !== "") {
+    ctx.font = font(11, true);
+    const creditWidth = ctx.measureText(credit).width;
+    boxes.push({ x: frame.x + frame.width - 14 - creditWidth, y: frame.y + frame.height - 26, width: creditWidth + 6, height: 20 });
+  }
+
+  ctx.restore();
+  return boxes;
 }
 
 /** A double ink rule at the extent's edge, where the letterbox begins. */
@@ -174,17 +236,27 @@ const LEGEND_SAMPLE = 40;
 function drawLegend(plate: Plate, bottom: number): void {
   const { ctx, colours } = plate;
   const frame = plate.projection.extentRect;
-  const rows = colours.size + STATES.length + 3;
+  // PROTOTYPE (#39): collapse step 5 puts a numeral beside the glyph, which only
+  // means anything if the legend keys it — per frame, for the units collapsed that far.
+  const numerals = lastFrame.placed
+    .filter((label) => label.numeral !== undefined)
+    .sort((a, b) => (a.numeral ?? 0) - (b.numeral ?? 0));
+  const rows = colours.size + STATES.length + 3 + numerals.length;
   const height = rows * LEGEND_ROW + 16;
   const x = frame.x + MARGIN;
   const y = bottom - height;
+  ctx.save();
+  ctx.font = font(12, true);
+  const keyWidth = numerals.reduce((widest, label) => Math.max(widest, ctx.measureText(label.unit.name).width), 0);
+  ctx.restore();
+  const panelWidth = Math.max(LEGEND_WIDTH, keyWidth + 12 + LEGEND_SAMPLE + 22);
 
   ctx.save();
   ctx.fillStyle = PARCHMENT_PANEL;
-  ctx.fillRect(x, y, LEGEND_WIDTH, height);
+  ctx.fillRect(x, y, panelWidth, height);
   ctx.strokeStyle = INK;
   ctx.lineWidth = 1;
-  ctx.strokeRect(x + 0.5, y + 0.5, LEGEND_WIDTH - 1, height - 1);
+  ctx.strokeRect(x + 0.5, y + 0.5, panelWidth - 1, height - 1);
 
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
@@ -235,6 +307,18 @@ function drawLegend(plate: Plate, bottom: number): void {
     drawArrow(ctx, { x: x + 12, y: rowY }, { x: x + 12 + LEGEND_SAMPLE, y: rowY }, style);
     ctx.fillStyle = INK;
     ctx.fillText(label, textX, rowY);
+    rowY += LEGEND_ROW;
+  }
+
+  // The numeral key, when any label collapsed that far.
+  for (const label of numerals) {
+    ctx.font = font(13, true);
+    ctx.fillStyle = label.unit.colour;
+    ctx.textAlign = "center";
+    ctx.fillText(String(label.numeral), x + 12 + LEGEND_SAMPLE / 2, rowY);
+    ctx.textAlign = "left";
+    ctx.font = font(12, true);
+    ctx.fillText(label.unit.name, textX, rowY);
     rowY += LEGEND_ROW;
   }
   ctx.restore();

@@ -12,6 +12,11 @@ import { formatLoadErrors, loadBattle } from "./app/loadBattle.ts";
 import { showNotice } from "./app/notice.ts";
 import { loadPlateFont } from "./fonts/plate.ts";
 import { createPlayer } from "./player/index.ts";
+// PROTOTYPE (#39) — throwaway scaffolding; none of this belongs on main.
+import { installHarness } from "./prototype/harness.ts";
+import { settings } from "./prototype/state.ts";
+import { stressBattle } from "./prototype/stress.ts";
+import { mountSwitcher } from "./prototype/switcher.ts";
 
 async function start(): Promise<void> {
   const canvas = document.querySelector("canvas");
@@ -37,7 +42,10 @@ async function start(): Promise<void> {
   }
 
   document.title = `${result.battle.title} — Sandtable`;
-  createPlayer({ canvas, controlsRoot, battle: result.battle, map: result.map });
+  const battle = settings.stress > 0 ? stressBattle(result.battle, settings.stress) : result.battle;
+  createPlayer({ canvas, controlsRoot, battle, map: result.map });
+  mountSwitcher();
+  installHarness(battle, result.map);
 }
 
 void start();

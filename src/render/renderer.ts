@@ -14,6 +14,7 @@ import { drawCaption, layoutCaption } from "./drawCaption.ts";
 import { drawFurniture } from "./drawFurniture.ts";
 import { drawMap } from "./drawMap.ts";
 import { drawUnits } from "./drawUnits.ts";
+import { recordPlate } from "../prototype/plateRecord.ts";
 import { seeded } from "./primitives.ts";
 import { fitProjection, type Rect } from "./projection.ts";
 import type { Plate } from "./plate.ts";
@@ -65,9 +66,17 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
         picture,
         projection,
         colours: sideColours(battle),
-        glyphLength: Math.max(MIN_GLYPH_PX, NOMINAL_GLYPH_NMI * METRES_PER_UNIT.nmi * pixelsPerMetre),
+        // PROTOTYPE (#39): the nominal glyph is a fleet's 1.6 nmi, which on Cannae's 6 km
+        // extent draws a 560px unit. Until land units are decided (#49) a glyph is capped at
+        // a twelfth of the plate, so the mocked land frame can be read at all.
+        glyphLength: Math.max(
+          MIN_GLYPH_PX,
+          Math.min(NOMINAL_GLYPH_NMI * METRES_PER_UNIT.nmi * pixelsPerMetre, extentRect.width / 12),
+        ),
         pixelsPerMetre,
       };
+
+      recordPlate(plate);
 
       // The picture is clipped to the extent; furniture is not.
       ctx.save();
