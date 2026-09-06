@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { drawCaption, layoutCaption } from "./drawCaption.ts";
 import type { Battle } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
+import { DEFAULT_VIEW } from "./views.ts";
 
 /** A measuring context: every glyph six pixels wide, which is all the layout needs. */
 function fakeContext(): CanvasRenderingContext2D {
@@ -101,18 +102,18 @@ describe("the caption band's date", () => {
     const daybreak = { ...picture, phase: { day: 1 }, clock: 0 } as unknown as Picture;
 
     const first = recordingContext();
-    drawCaption(first.ctx, twoDays, { ...picture, clock: 0 } as unknown as Picture, layoutCaption(fakeContext(), twoDays, picture, 1280), 0, 1280);
+    drawCaption(first.ctx, twoDays, { ...picture, clock: 0 } as unknown as Picture, layoutCaption(fakeContext(), twoDays, picture, 1280), 0, 1280, DEFAULT_VIEW.palette);
     expect(first.texts).toContain("1 August 1798");
 
     const second = recordingContext();
-    drawCaption(second.ctx, twoDays, daybreak, layoutCaption(fakeContext(), twoDays, daybreak, 1280), 0, 1280);
+    drawCaption(second.ctx, twoDays, daybreak, layoutCaption(fakeContext(), twoDays, daybreak, 1280), 0, 1280, DEFAULT_VIEW.palette);
     expect(second.texts).toContain("2 August 1798");
   });
 
   it("draws the first day's date for a phase with no day, the single-day case", () => {
     const noDay = { ...picture, phase: {}, clock: 0 } as unknown as Picture;
     const { ctx, texts } = recordingContext();
-    drawCaption(ctx, battle, noDay, layoutCaption(fakeContext(), battle, noDay, 1280), 0, 1280);
+    drawCaption(ctx, battle, noDay, layoutCaption(fakeContext(), battle, noDay, 1280), 0, 1280, DEFAULT_VIEW.palette);
     expect(texts).toContain("21 October 1805");
   });
 });
