@@ -1,0 +1,60 @@
+import { describe, expect, it } from "vitest";
+import { compassPoint, formatClock, wrapText } from "./text.ts";
+
+/** A fake measurer: every character is 10 px wide. */
+const tenPerChar = (text: string): number => text.length * 10;
+
+describe("wrapText", () => {
+  it("keeps a short text on one line", () => {
+    expect(wrapText("the fleet", 200, tenPerChar)).toEqual(["the fleet"]);
+  });
+
+  it("breaks between words when the next word would overflow", () => {
+    expect(wrapText("the enemy is discovered to the eastward", 120, tenPerChar)).toEqual([
+      "the enemy is",
+      "discovered",
+      "to the",
+      "eastward",
+    ]);
+  });
+
+  it("puts a word longer than the width on its own line rather than dropping it", () => {
+    expect(wrapText("a extraordinarily b", 50, tenPerChar)).toEqual(["a", "extraordinarily", "b"]);
+  });
+
+  it("collapses runs of whitespace and returns no lines for an empty text", () => {
+    expect(wrapText("  spaced   out  ", 200, tenPerChar)).toEqual(["spaced out"]);
+    expect(wrapText("", 200, tenPerChar)).toEqual([]);
+    expect(wrapText("   ", 200, tenPerChar)).toEqual([]);
+  });
+});
+
+describe("compassPoint", () => {
+  it("names the sixteen points from degrees true", () => {
+    expect(compassPoint(0)).toBe("N");
+    expect(compassPoint(22.5)).toBe("NNE");
+    expect(compassPoint(45)).toBe("NE");
+    expect(compassPoint(90)).toBe("E");
+    expect(compassPoint(180)).toBe("S");
+    expect(compassPoint(270)).toBe("W");
+    expect(compassPoint(292.5)).toBe("WNW");
+    expect(compassPoint(337.5)).toBe("NNW");
+  });
+
+  it("rounds to the nearest point and wraps at north", () => {
+    expect(compassPoint(285)).toBe("WNW");
+    expect(compassPoint(10)).toBe("N");
+    expect(compassPoint(12)).toBe("NNE");
+    expect(compassPoint(350)).toBe("N");
+    expect(compassPoint(359.9)).toBe("N");
+  });
+});
+
+describe("formatClock", () => {
+  it("writes battle-clock seconds since midnight as HH:MM, dropping seconds", () => {
+    expect(formatClock(0)).toBe("00:00");
+    expect(formatClock(12 * 3600 + 15 * 60)).toBe("12:15");
+    expect(formatClock(16 * 3600 + 59)).toBe("16:00");
+    expect(formatClock(23 * 3600 + 59 * 60 + 59)).toBe("23:59");
+  });
+});
