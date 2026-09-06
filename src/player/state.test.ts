@@ -182,12 +182,11 @@ describe("setLevel", () => {
 describe("levelOptions", () => {
   it("offers the battle's levels, coarsest first, when there is a choice", () => {
     expect(levelOptions(MINIMAL_BATTLE)).toEqual(["Columns", "Squadrons"]);
+    // The shipped Trafalgar carries the same two levels now that its squadrons are authored.
+    expect(levelOptions(trafalgar)).toEqual(["Columns", "Squadrons"]);
   });
 
   it("offers nothing for a battle with no levels, so no chooser is built", () => {
-    // Trafalgar as it stands is one flat roster (the squadrons are their own data issue).
-    expect(trafalgar.levels).toBeUndefined();
-    expect(levelOptions(trafalgar)).toEqual([]);
     expect(levelOptions(withLevels(undefined))).toEqual([]);
   });
 
