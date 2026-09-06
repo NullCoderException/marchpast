@@ -1,4 +1,14 @@
 {
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "Design language"
+    },
+    {
+      "id": "page-2",
+      "name": "v2 map features"
+    }
+  ],
   "artboards": [
     {
       "file": "Main.dc.html",
@@ -6,7 +16,8 @@
       "y": 0,
       "w": 760,
       "h": 1180,
-      "title": "The system"
+      "title": "The system",
+      "page": "page-1"
     },
     {
       "file": "ChartPlate.dc.html",
@@ -14,7 +25,8 @@
       "y": 0,
       "w": 1120,
       "h": 650,
-      "title": "Chart plate · default view (reference)"
+      "title": "Chart plate · default view (reference)",
+      "page": "page-1"
     },
     {
       "file": "Treatments.dc.html",
@@ -22,7 +34,8 @@
       "y": 790,
       "w": 1120,
       "h": 760,
-      "title": "Treatments · engaged, labels, collapse order"
+      "title": "Treatments · engaged, labels, collapse order",
+      "page": "page-1"
     },
     {
       "file": "NightPlate.dc.html",
@@ -30,7 +43,8 @@
       "y": 0,
       "w": 1120,
       "h": 650,
-      "title": "Candidate second view · Night plate"
+      "title": "Candidate second view · Night plate",
+      "page": "page-1"
     },
     {
       "file": "Atlas.dc.html",
@@ -38,7 +52,8 @@
       "y": 790,
       "w": 1120,
       "h": 650,
-      "title": "Candidate second view · Atlas"
+      "title": "Candidate second view · Atlas",
+      "page": "page-1"
     },
     {
       "file": "Phone.dc.html",
@@ -46,7 +61,53 @@
       "y": 0,
       "w": 390,
       "h": 844,
-      "title": "Phone · 390 wide"
+      "title": "Phone · 390 wide",
+      "page": "page-1"
+    },
+    {
+      "file": "Features.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1120,
+      "h": 1920,
+      "title": "Map features · relief, shoal, river, work",
+      "page": "page-2"
+    },
+    {
+      "file": "CannaePlate.dc.html",
+      "x": 1220,
+      "y": 0,
+      "w": 1120,
+      "h": 650,
+      "title": "Cannae · Chart plate (relief chip)",
+      "page": "page-2"
+    },
+    {
+      "file": "CannaeNight.dc.html",
+      "x": 1220,
+      "y": 790,
+      "w": 1120,
+      "h": 650,
+      "title": "Cannae · Night plate (relief chip)",
+      "page": "page-2"
+    },
+    {
+      "file": "CannaeAtlas.dc.html",
+      "x": 1220,
+      "y": 1580,
+      "w": 1120,
+      "h": 650,
+      "title": "Cannae · Atlas (relief chip)",
+      "page": "page-2"
+    },
+    {
+      "file": "Copenhagen.dc.html",
+      "x": 2440,
+      "y": 0,
+      "w": 1120,
+      "h": 650,
+      "title": "Copenhagen · Chart plate (shoal chip)",
+      "page": "page-2"
     }
   ],
   "annotations": [
@@ -55,31 +116,68 @@
       "x": 2080,
       "y": -150,
       "w": 520,
-      "text": "NIGHT PLATE: the broadcast variant rebuilt in the system. Same plate, inverted: parchment ink on an indigo ground, side inks lifted to read on it, smoke as a pale wash.\nFor: the Nile is fought after dark, and this reads across a room. Against: loses the document feel; prints badly."
+      "text": "NIGHT PLATE: the broadcast variant rebuilt in the system. Same plate, inverted: parchment ink on an indigo ground, side inks lifted to read on it, smoke as a pale wash.\nFor: the Nile is fought after dark, and this reads across a room. Against: loses the document feel; prints badly.",
+      "page": "page-1"
     },
     {
       "id": "atlas-note",
       "x": 2080,
       "y": 640,
       "w": 520,
-      "text": "ATLAS: the replay variant rebuilt in ink. Units as solid blocks with a heading nose, strength as the filled fraction, engaged as a hatched zone, thicker arrows.\nFor: mass and motion at a glance; Cannae’s envelopment is blocks and arrows. Against: closest to the game the concept rules out; no per-ship ticks."
+      "text": "ATLAS: the replay variant rebuilt in ink. Units as solid blocks with a heading nose, strength as the filled fraction, engaged as a hatched zone, thicker arrows.\nFor: mass and motion at a glance; Cannae’s envelopment is blocks and arrows. Against: closest to the game the concept rules out; no per-ship ticks.",
+      "page": "page-1"
     },
     {
       "id": "pick-note",
       "x": 3300,
       "y": 900,
       "w": 390,
-      "text": "TO DECIDE: (1) which engaged treatment, D Billow, E Flow or F Fire lines (switch the chip on the Chart plate); (2) which second view, Night plate or Atlas, or both; (3) whether collapse step 5 (numerals) is allowed; (4) the phone furniture collapse as drawn."
+      "text": "TO DECIDE: (1) which engaged treatment, D Billow, E Flow or F Fire lines (switch the chip on the Chart plate); (2) which second view, Night plate or Atlas, or both; (3) whether collapse step 5 (numerals) is allowed; (4) the phone furniture collapse as drawn.",
+      "page": "page-1"
     },
     {
       "id": "smoke-note",
       "x": 860,
       "y": -150,
       "w": 520,
-      "text": "ENGAGED, REDRAWN: the v0.1 wash puffs read as airbrush. The three treatments here are all cut with the pen and blown by the plate’s wind. The chip above this artboard switches between them; the Treatments sheet below sets them side by side."
+      "text": "ENGAGED, REDRAWN: the v0.1 wash puffs read as airbrush. The three treatments here are all cut with the pen and blown by the plate’s wind. The chip above this artboard switches between them; the Treatments sheet below sets them side by side.",
+      "page": "page-1"
+    },
+    {
+      "id": "v2-intro",
+      "x": 0,
+      "y": -170,
+      "w": 1120,
+      "page": "page-2",
+      "text": "V2 MAP FEATURES: how ADR-0012’s four kinds (contour, river, shoal, work) are inked in the system decided by #58. The sheet sets the candidates side by side; the Cannae boards put relief under seven units in all three views, the Copenhagen board puts a shoal and a work under three. Land units are drawn with the v0.1 tick glyph for now: what a legion or a cavalry wing looks like is the unit-types ticket (#48), not this one."
+    },
+    {
+      "id": "v2-decide",
+      "x": 2440,
+      "y": 790,
+      "w": 560,
+      "page": "page-2",
+      "text": "TO DECIDE: (1) relief on the chart plate: A contours weighted by level (data-native, nothing to amend), B hachures (reopens the map format for a raster: amends ADR-0007 and ADR-0012) or C tint; switch the relief chip on the three Cannae boards. (2) What Night and Atlas may re-tune, as drawn: alphas only, tint proposed for Atlas. (3) The shoal fill: dots, ripples or hatch (chip on Copenhagen). (4) The river: single line, two banks or water strip (sheet). (5) The work glyph: bastioned square with small capitals, flag, or filled square (sheet). (6) Paper panels under the furniture on a plate with relief."
+    },
+    {
+      "id": "v2-cannae",
+      "x": 1220,
+      "y": -170,
+      "w": 560,
+      "page": "page-2",
+      "text": "CANNAE, PHASE 6 (~10:15): the allied cavalry flees. Seven units and eight labels on a field the size of Trafalgar’s centre, over 64 contour lines at 10 m. The crowding is the point: judge whether the relief drowns the units, and whether the label rules from #58 (displacement, leaders) hold on land. The wind is Livy’s Volturnus from the south-east, so the billow reads as dust blown into the Roman faces."
+    },
+    {
+      "id": "v2-cph",
+      "x": 2440,
+      "y": -170,
+      "w": 560,
+      "page": "page-2",
+      "text": "COPENHAGEN, PHASE 3 (10:05): Bellona and Russell ground. The Middle Ground is a shoal polygon named by a place point; Trekroner is a work; the King’s Deep is a place. The detachment head on the shoal edge is the two grounded ships. Whether Trekroner is also a unit that fires belongs to unit types (#48)."
     }
   ],
   "launch": {
-    "view": "canvas"
+    "view": "canvas",
+    "page": "page-2"
   }
 }
