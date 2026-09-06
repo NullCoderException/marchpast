@@ -2,11 +2,12 @@
  * What the player holds between frames, and every way a control moves it.
  *
  * The state is a clock, a flag and the viewer's three choices — speed, view
- * and level: nothing here is authored,
- * nothing survives a reload (issue #13's resolution, #47 for the view and ADR-0017 for the level). Every transition is a pure
- * function of the battle and the state before it, so the controls can be read
- * as "which transition does this button call" and the rules are tested without
- * a DOM.
+ * and level: nothing here is authored, and nothing survives a reload (issue
+ * #13's resolution, #47 for the view, ADR-0017 for the level). Every
+ * transition is a pure function of the battle and the state before it, so the
+ * controls can be read as "which transition does this button call" and the
+ * rules are tested without a DOM. The fixed lists a chooser offers live here
+ * for the same reason.
  */
 import { DEFAULT_VIEW, type ViewId } from "../render/index.ts";
 import type { Battle } from "../schema/types.ts";
@@ -17,6 +18,18 @@ import { fractionToClock, type BarFraction } from "./scrub.ts";
 
 /** The speed multipliers the viewer may choose, applied uniformly to every phase's authored rate. */
 export const MULTIPLIERS = [0.5, 1, 2, 4] as const;
+
+/**
+ * The levels the viewer may choose, coarsest first: the battle's own `levels`
+ * names, and none at all when there is nothing to choose. A battle with no
+ * `levels` has one level and gets no Level chooser; so would a `levels` of one
+ * name, which the validator does not allow but which is one level all the same
+ * (ADR-0017).
+ */
+export function levelOptions(battle: Battle): readonly string[] {
+  const levels = battle.levels ?? [];
+  return levels.length < 2 ? [] : levels;
+}
 
 /** Everything the player knows between frames. */
 export interface PlayerState {

@@ -9,7 +9,7 @@
  * between the plate's ticks and Atlas's blocks. The label is drawn here, by
  * the same code, for every view: none of the three replaces it (ADR-0014).
  *
- * It draws `plate.drawnUnits`, not the whole picture: which units a level puts
+ * It draws `plate.unitsDrawn`, not the whole picture: which units a level puts
  * on the plate is settled once, in `level.ts`, before any pass runs (ADR-0017).
  */
 import type { Picture, UnitPicture } from "../timeline/picture.ts";
@@ -25,7 +25,7 @@ const MIN_ARROW_PX = 6;
 const LABEL_GAP = 30;
 
 export function drawUnits(plate: Plate): void {
-  const { ctx, battle, picture, drawnUnits, projection, view } = plate;
+  const { ctx, battle, picture, unitsDrawn, projection, view } = plate;
   const { palette, pens } = view;
   // The whole roster, never the level's slice of it: a unit's label — and the
   // numeral that will key it in the legend (#39) — is its whole-roster entry
@@ -38,7 +38,7 @@ export function drawUnits(plate: Plate): void {
   };
 
   // Tracks and moves.
-  for (const unit of drawnUnits) {
+  for (const unit of unitsDrawn) {
     const here = projection.project(unit.position.lat, unit.position.lon);
     if (unit.track !== undefined) {
       const ahead = projection.project(unit.track.to.lat, unit.track.to.lon);
@@ -55,7 +55,7 @@ export function drawUnits(plate: Plate): void {
   // unit's smoke must never cover the next unit's ships, and at 13:30 off
   // Trafalgar three units overlap (ADR-0014).
   const windFrom = blowingWind(picture);
-  const glyphs = drawnUnits.map((unit) => ({
+  const glyphs = unitsDrawn.map((unit) => ({
     at: projection.project(unit.position.lat, unit.position.lon),
     heading: toRadians(unit.heading),
     request: {
@@ -83,7 +83,7 @@ export function drawUnits(plate: Plate): void {
   }
 
   // Labels: the unit's name and beneath it the state word and, below full strength, the percentage.
-  for (const unit of drawnUnits) {
+  for (const unit of unitsDrawn) {
     const here = projection.project(unit.position.lat, unit.position.lon);
     drawLabel(plate, unit, here, roster.get(unit.id)?.label ?? unit.id, colourOf(unit));
   }

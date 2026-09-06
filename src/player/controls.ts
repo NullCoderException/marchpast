@@ -14,7 +14,7 @@ import type { Battle } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
 import { Listeners, element } from "./dom.ts";
 import { barSegments, clockToFraction, type BarFraction } from "./scrub.ts";
-import { MULTIPLIERS, type PlayerState } from "./state.ts";
+import { levelOptions, MULTIPLIERS, type PlayerState } from "./state.ts";
 
 /** What the viewer's gestures ask the player to do. */
 export interface ControlHandlers {
@@ -31,17 +31,6 @@ export interface ControlHandlers {
   /** Picking a level by its depth, which changes only which units are drawn (ADR-0017). */
   setLevel(level: number): void;
   toggleDetails(): void;
-}
-
-/**
- * The Level chooser's options: the battle's level names, coarsest first, and
- * none at all when there is nothing to choose. A battle with no `levels` has
- * one level and gets no chooser; so would a `levels` of one name, which the
- * validator does not allow but which is one level all the same (ADR-0017).
- */
-export function levelOptions(battle: Battle): readonly string[] {
-  const levels = battle.levels ?? [];
-  return levels.length < 2 ? [] : levels;
 }
 
 /** The controls as the player holds them: one element to place, one call to keep in step. */

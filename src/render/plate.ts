@@ -21,7 +21,7 @@ export interface Plate {
    * what is there. `picture.units` stays the whole roster, which is what the
    * labels' numerals are indexed by (schema.md 2.9, 2.11).
    */
-  drawnUnits: readonly UnitPicture[];
+  unitsDrawn: readonly UnitPicture[];
   projection: Projection;
   /** Side name to ink colour, by roster order, in the view's palette. */
   colours: Map<string, string>;

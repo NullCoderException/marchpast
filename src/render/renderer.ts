@@ -79,7 +79,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
         battle,
         map,
         picture,
-        drawnUnits: unitsDrawn(battle.units, picture.units, viewer.level),
+        unitsDrawn: unitsDrawn(battle.units, picture.units, viewer.level),
         projection,
         colours: sideColours(battle, palette),
         glyphLength: Math.max(MIN_GLYPH_PX, NOMINAL_GLYPH_NMI * METRES_PER_UNIT.nmi * pixelsPerMetre),
