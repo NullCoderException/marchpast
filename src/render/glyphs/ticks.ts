@@ -116,9 +116,11 @@ interface Puff {
  * side of each puff, drifting off the unit's flank under the wind.
  *
  * The union outline is drawn as a band rather than as strokes, so no puff's
- * outline shows inside another: the union of the puffs is filled in ink, then
- * the union of the same puffs eroded by the line width is filled back in
- * paper. The cloud is therefore opaque, as the design canvas drew it.
+ * outline shows inside another: the union of the puffs is filled in ink and the
+ * same union eroded by the line width is punched back out. That has to happen
+ * on a scratch canvas — punching straight onto the plate would erase the sea
+ * under it — and the reward is a cloud whose inside is genuinely empty, so at
+ * Cannae a fighting wing does not sit in a paper hole in the ground.
  */
 function drawBillow(ctx: CanvasRenderingContext2D, request: GlyphRequest, random: () => number): void {
   const { length, formation, state, scale, palette } = request;
@@ -146,33 +148,82 @@ function drawBillow(ctx: CanvasRenderingContext2D, request: GlyphRequest, random
     });
   }
 
-  const width = Math.max(0.4, 0.7 * scale);
-  ctx.save();
-  tracePuffs(ctx, puffs, 0);
-  ctx.fillStyle = palette.ink;
-  ctx.fill();
-  tracePuffs(ctx, puffs, -width);
-  ctx.fillStyle = palette.paper;
-  ctx.fill();
+  paintCloud(ctx, puffs, drift, Math.max(0.4, 0.7 * scale), scale, palette.ink);
+}
+
+/**
+ * Paints the cloud through a scratch canvas: the union in ink, the eroded union
+ * punched out of it, then the hatching, and the result stamped onto the plate.
+ * `destination-out` on the plate itself would take the sea with it.
+ */
+function paintCloud(
+  ctx: CanvasRenderingContext2D,
+  puffs: readonly Puff[],
+  drift: { x: number; y: number },
+  width: number,
+  scale: number,
+  ink: string,
+): void {
+  const margin = 2;
+  const left = Math.min(...puffs.map((p) => p.x - p.r)) - margin;
+  const top = Math.min(...puffs.map((p) => p.y - p.r)) - margin;
+  const right = Math.max(...puffs.map((p) => p.x + p.r)) + margin;
+  const bottom = Math.max(...puffs.map((p) => p.y + p.r)) + margin;
+  const cloudWidth = right - left;
+  const cloudHeight = bottom - top;
+  if (cloudWidth <= 0 || cloudHeight <= 0) return;
+
+  // The plate's transform carries the device pixel ratio and the unit's
+  // rotation; the scratch is rendered at the same density so the outline stays
+  // a hairline rather than a smear.
+  const transform = ctx.getTransform();
+  const density = Math.max(1, Math.hypot(transform.a, transform.b));
+  const deviceWidth = Math.ceil(cloudWidth * density);
+  const deviceHeight = Math.ceil(cloudHeight * density);
+  const scratch = scratchCanvas(deviceWidth, deviceHeight);
+  const paint = scratch.getContext("2d");
+  if (paint === null) return;
+
+  paint.setTransform(density, 0, 0, density, -left * density, -top * density);
+  paint.clearRect(left, top, cloudWidth, cloudHeight);
+
+  tracePuffs(paint, puffs, 0);
+  paint.fillStyle = ink;
+  paint.fill();
+  paint.globalCompositeOperation = "destination-out";
+  tracePuffs(paint, puffs, -width);
+  paint.fill();
+  paint.globalCompositeOperation = "source-over";
 
   // Three chords on each puff's lee side. Too fine to read in the legend's sample, so skipped there.
   if (scale >= 0.9) {
-    ctx.strokeStyle = palette.ink;
-    ctx.lineWidth = 0.55 * scale;
+    paint.strokeStyle = ink;
+    paint.lineWidth = 0.55 * scale;
     for (const puff of puffs) {
       for (const fraction of [0.3, 0.52, 0.74]) {
         const offset = puff.r * fraction;
         const half = Math.sqrt(Math.max(0, puff.r * puff.r - offset * offset)) * 0.82;
         const cx = puff.x + drift.x * offset;
         const cy = puff.y + drift.y * offset;
-        ctx.beginPath();
-        ctx.moveTo(cx - drift.y * half, cy + drift.x * half);
-        ctx.lineTo(cx + drift.y * half, cy - drift.x * half);
-        ctx.stroke();
+        paint.beginPath();
+        paint.moveTo(cx - drift.y * half, cy + drift.x * half);
+        paint.lineTo(cx + drift.y * half, cy - drift.x * half);
+        paint.stroke();
       }
     }
   }
-  ctx.restore();
+
+  // Only the corner just painted: the scratch is shared and only ever grows.
+  ctx.drawImage(scratch, 0, 0, deviceWidth, deviceHeight, left, top, cloudWidth, cloudHeight);
+}
+
+/** One scratch canvas for every cloud on every frame, grown to the largest asked for. */
+let sharedScratch: HTMLCanvasElement | undefined;
+function scratchCanvas(width: number, height: number): HTMLCanvasElement {
+  const canvas = (sharedScratch ??= document.createElement("canvas"));
+  if (canvas.width < width) canvas.width = width;
+  if (canvas.height < height) canvas.height = height;
+  return canvas;
 }
 
 /** Every puff in one path, so a non-zero fill paints their union. `grow` erodes or dilates each radius. */

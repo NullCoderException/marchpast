@@ -13,8 +13,11 @@ import type { Glyph, GlyphRequest } from "../view.ts";
 const THICKNESS = 10;
 /** How far the engaged hatching stands off the block. */
 const HATCH_PAD = 7;
-/** The heading nose's height beyond the block's leading edge. */
-const NOSE = 8;
+/** The heading nose: a small barb on the leading edge, not a taper of the whole
+ * block. A full-width nose turns the block into an arrow, and Atlas already has
+ * three arrows of its own. */
+const NOSE = 4;
+const NOSE_HALF_WIDTH = 2.5;
 
 export const block: Glyph = { mark, body, halfWidth: (scale) => (THICKNESS / 2 + HATCH_PAD) * scale };
 
@@ -53,9 +56,9 @@ function body(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
   ctx.strokeRect(-w / 2, -h / 2, w, h);
   ctx.setLineDash([]);
 
-  // The heading nose: the block's whole leading edge for a column, a small barb for a line.
+  // The heading nose, the same barb whichever way the block runs.
   const nose = NOSE * scale;
-  const base = column ? w / 2 : 4 * scale;
+  const base = Math.min(w / 2, NOSE_HALF_WIDTH * scale);
   ctx.fillStyle = colour;
   ctx.beginPath();
   ctx.moveTo(-base, -h / 2);
