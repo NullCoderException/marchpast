@@ -120,6 +120,14 @@ describe("validateMap: rules (schema.md 3.3)", () => {
     ).toBe(true);
     expect(
       validateBroken((m) => {
+        m.features[CONTOUR].geometry = {
+          type: "MultiLineString",
+          coordinates: [[[16.14, 41.29], [16.16, 41.3]], [[16.2, 41.27], [16.22, 41.28]]],
+        };
+      }).ok,
+    ).toBe(true);
+    expect(
+      validateBroken((m) => {
         m.features[CONTOUR].geometry = { type: "LineString", coordinates: [[16.14, 41.29], [16.16, 41.3]] };
       }).ok,
     ).toBe(true);

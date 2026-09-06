@@ -5,7 +5,10 @@
  * each with a geometry its kind allows and only the properties its kind lists,
  * every coordinate a `[lon, lat]` pair in range and nothing else anywhere.
  *
- * The two tables below are what a kind is: one row in each adds a seventh.
+ * Three tables are what a kind is: the geometries it allows, the properties it
+ * carries beyond `kind`, and how each of those properties is read. A seventh
+ * kind is one row in the first two; a property no kind carries yet is one
+ * more reader.
  *
  * Never throws on bad data; collects every error with a JSON-pointer path.
  * Ring winding and polygon validity are not checked (schema.md 3.3).
@@ -45,8 +48,24 @@ const KIND_GEOMETRIES: Record<MapKind, readonly GeometryType[]> = {
   work: POINT_GEOMETRIES,
 };
 
+/** Rule 5: how each property beyond `kind` is read, one entry per property name any kind carries. */
+const PROPERTY_READERS = {
+  /** Metres above sea level, bounded either side (schema.md 3.2). */
+  elevation: (obj: ObjectReader) => obj.number("elevation", ELEVATION_BOUNDS),
+  /** The label a caption refers to: present, a string, and not empty. */
+  name: (obj: ObjectReader, kind: MapKind) => {
+    const name = obj.string("name");
+    if (name === undefined) return undefined;
+    if (name !== "") return name;
+    obj.errors.add(obj.at("name"), `expected a non-empty ${kind} name`);
+    return undefined;
+  },
+} as const;
+
+type PropertyName = keyof typeof PROPERTY_READERS;
+
 /** Rules 5 and 7: what each kind carries beyond `kind`. Natural features carry nothing; a contour its level; named things a name. */
-const KIND_PROPERTIES: Record<MapKind, readonly string[]> = {
+const KIND_PROPERTIES: Record<MapKind, readonly PropertyName[]> = {
   land: [],
   river: [],
   shoal: [],
@@ -109,22 +128,12 @@ function readProperties(feature: ObjectReader): MapFeature["properties"] | undef
   if (obj === undefined) return undefined;
   const kind = obj.oneOf("kind", KINDS);
   if (kind === undefined) return undefined;
-
-  if (kind === "contour") {
-    const elevation = obj.number("elevation", ELEVATION_BOUNDS);
-    if (elevation === undefined) return undefined;
-    return { kind, elevation };
-  }
-  if (kind === "place" || kind === "work") {
-    const name = obj.string("name");
-    if (name === undefined) return undefined;
-    if (name === "") {
-      obj.errors.add(obj.at("name"), `expected a non-empty ${kind} name`);
-      return undefined;
-    }
-    return { kind, name };
-  }
-  return { kind };
+  const properties: Record<string, unknown> = { kind };
+  for (const property of KIND_PROPERTIES[kind]) properties[property] = PROPERTY_READERS[property](obj, kind);
+  if (Object.values(properties).some((value) => value === undefined)) return undefined;
+  // Every property the kind lists read cleanly and nothing else got through the
+  // allowed keys, so this is that kind's `properties`.
+  return properties as MapFeature["properties"];
 }
 
 /** The keys a `properties` object may carry, read off its own `kind` so anything else is reported as an unknown key. */
