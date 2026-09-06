@@ -20,6 +20,10 @@
 
 .st-controls {
   display: flex;
+  /* The strip takes as many lines as it needs: on a phone the controls are
+     wider than the screen, and an unwrapped row puts "Details" out of reach
+     because the page cannot scroll sideways. */
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   padding: 10px 24px;
@@ -63,7 +67,10 @@
 .st-bar {
   position: relative;
   display: flex;
-  flex: 1;
+  /* Grows to fill the line it is on, and takes a line of its own once the
+     strip wraps: a scrubber squeezed into the tail of a row cannot be aimed. */
+  flex: 1 1 220px;
+  min-width: 0;
   height: 18px;
   border: 1px solid var(--st-rule);
   background: var(--st-sunk);
@@ -210,4 +217,38 @@
 
 .st-details a {
   color: inherit;
+}
+
+/* A phone: the same controls, in the room a phone has. The strip wraps by
+   itself; this only stops the padding and gaps from spending width the
+   buttons need, and keeps the wrapped strip shallow enough that the plate
+   above it still has a picture's worth of height. */
+@media (max-width: 520px) {
+  .st-controls {
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  /* The scrubber takes a line of its own rather than a squeezed tail of one;
+     what follows it wraps beneath. Reordering to save a line is not worth it:
+     it would put the visual order out of step with the tab order. */
+  .st-bar {
+    flex-basis: 100%;
+  }
+
+  /* Every button keeps its full hit area; only the room they reserve beyond
+     their text goes, which is what fits the strip into two lines instead of
+     three. A third line comes off the picture above. */
+  .st-play {
+    min-width: 4em;
+  }
+
+  .st-readout {
+    min-width: 0;
+    font-size: 17px;
+  }
+
+  .st-details {
+    padding: 12px;
+  }
 }
