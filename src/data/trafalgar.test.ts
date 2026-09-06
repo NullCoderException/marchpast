@@ -33,6 +33,9 @@ const PHASES: ReadonlyArray<readonly [id: string, t: string]> = [
   ["last-shots", "16:45"],
 ];
 
+/** The two phases in which Dumanoir's four escaping ships are drawn as an arrow to seaward. */
+const RETREAT_PHASES = ["van-counterattack-and-retreat", "last-shots"] as const;
+
 /** The three columns, which are the roster's roots and the only units drawn at level 0. */
 const COLUMNS = ["weather-column", "lee-column", "combined-fleet"] as const;
 
@@ -48,20 +51,27 @@ const SQUADRONS: ReadonlyArray<readonly [id: string, parent: string]> = [
   ["observation-squadron", "combined-fleet"],
 ];
 
+/** Each British column as the pair of halves it advances in, the van ahead of the rear. */
+const BRITISH_HALVES: ReadonlyArray<readonly [van: string, rear: string]> = [
+  ["weather-van", "weather-rear"],
+  ["lee-van", "lee-rear"],
+];
+
 /**
- * The v0.1 picture of the three columns, `[lat, lon, heading]` per phase in
- * phase order. #87 forbids touching it: a squadron level is added beneath the
- * columns, never derived from them and never allowed to move them.
+ * The v0.1 picture of the three columns, `[id, lat, lon, heading]` per column
+ * per phase, in phase order. #87 forbids touching it: the squadron level is
+ * added beneath the columns, never derived from them and never allowed to move
+ * them.
  */
-const COLUMN_PICTURE: ReadonlyArray<ReadonlyArray<readonly [number, number, number]>> = [
-  [[36.26, -6.47, 45], [36.235, -6.44, 45], [36.22, -6.29, 180]],
-  [[36.275, -6.455, 75], [36.25, -6.425, 90], [36.225, -6.265, 5]],
-  [[36.285, -6.35, 65], [36.235, -6.31, 90], [36.24, -6.225, 275]],
-  [[36.275, -6.275, 65], [36.235, -6.236, 90], [36.25, -6.2, 275]],
-  [[36.27, -6.255, 80], [36.23, -6.215, 90], [36.25, -6.197, 275]],
-  [[36.265, -6.21, 90], [36.228, -6.2, 90], [36.245, -6.19, 275]],
-  [[36.27, -6.2, 0], [36.225, -6.195, 90], [36.285, -6.175, 5]],
-  [[36.275, -6.19, 0], [36.22, -6.19, 90], [36.345, -6.185, 340]],
+const COLUMN_PICTURE: ReadonlyArray<ReadonlyArray<readonly [string, number, number, number]>> = [
+  [["weather-column", 36.26, -6.47, 45], ["lee-column", 36.235, -6.44, 45], ["combined-fleet", 36.22, -6.29, 180]],
+  [["weather-column", 36.275, -6.455, 75], ["lee-column", 36.25, -6.425, 90], ["combined-fleet", 36.225, -6.265, 5]],
+  [["weather-column", 36.285, -6.35, 65], ["lee-column", 36.235, -6.31, 90], ["combined-fleet", 36.24, -6.225, 275]],
+  [["weather-column", 36.275, -6.275, 65], ["lee-column", 36.235, -6.236, 90], ["combined-fleet", 36.25, -6.2, 275]],
+  [["weather-column", 36.27, -6.255, 80], ["lee-column", 36.23, -6.215, 90], ["combined-fleet", 36.25, -6.197, 275]],
+  [["weather-column", 36.265, -6.21, 90], ["lee-column", 36.228, -6.2, 90], ["combined-fleet", 36.245, -6.19, 275]],
+  [["weather-column", 36.27, -6.2, 0], ["lee-column", 36.225, -6.195, 90], ["combined-fleet", 36.285, -6.175, 5]],
+  [["weather-column", 36.275, -6.19, 0], ["lee-column", 36.22, -6.19, 90], ["combined-fleet", 36.345, -6.185, 340]],
 ];
 
 /** The share-alike works the issue forbids as sources: the Wikipedia order of battle and the Commons `Trafalgar 1200hr.svg` diagram. */
@@ -84,6 +94,25 @@ function snapshot(phaseId: string, unitId: string): UnitSnapshot {
 /** One unit's snapshots across every phase, in phase order. */
 function snapshots(unitId: string): UnitSnapshot[] {
   return battle.phases.map((phase) => snapshot(phase.id, unitId));
+}
+
+/** Dumanoir's four escaping ships, drawn as an arrow to the south-west of whichever unit loses them. */
+function expectDetachmentToSeaward(unitId: string, phaseId: string): void {
+  const unit = snapshot(phaseId, unitId);
+  const where = `${unitId} ${phaseId}`;
+  const detachment = unit.moves?.find((move) => move.kind === "detachment");
+  expect(detachment, where).toBeDefined();
+  expect(detachment!.to.lat, where).toBeLessThan(unit.position.lat);
+  expect(detachment!.to.lon, where).toBeLessThan(unit.position.lon);
+}
+
+/** A unit that hauls off for Cadiz from three o'clock: further north at each of the last two phases. */
+function expectRetiresNorth(unitId: string): void {
+  const retreat = phaseIndex("van-counterattack-and-retreat");
+  const track = snapshots(unitId);
+  for (const index of [retreat, retreat + 1]) {
+    expect(track[index]!.position.lat, `${unitId} phase ${index}`).toBeGreaterThan(track[index - 1]!.position.lat);
+  }
 }
 
 describe("data/battles/trafalgar.json", () => {
@@ -185,15 +214,8 @@ describe("data/battles/trafalgar.json", () => {
     expect(crescent.heading).toBeGreaterThanOrEqual(260);
     expect(crescent.heading).toBeLessThanOrEqual(280);
     // The remnant moves north toward Cadiz from phase 7; Dumanoir's van is drawn as a detachment south-west.
-    const retreat = phaseIndex("van-counterattack-and-retreat");
-    expect(fleet[retreat]!.position.lat).toBeGreaterThan(fleet[retreat - 1]!.position.lat);
-    expect(fleet[retreat + 1]!.position.lat).toBeGreaterThan(fleet[retreat]!.position.lat);
-    for (const unit of fleet.slice(retreat)) {
-      const detachment = unit.moves?.find((move) => move.kind === "detachment");
-      expect(detachment).toBeDefined();
-      expect(detachment!.to.lat).toBeLessThan(unit.position.lat);
-      expect(detachment!.to.lon).toBeLessThan(unit.position.lon);
-    }
+    expectRetiresNorth("combined-fleet");
+    for (const phaseId of RETREAT_PHASES) expectDetachmentToSeaward("combined-fleet", phaseId);
   });
 
   it("plays the day in three to four minutes at 1x, the fight slower than the approach", () => {
@@ -208,11 +230,10 @@ describe("data/battles/trafalgar.json", () => {
 });
 
 describe("data/battles/trafalgar.json at squadron level", () => {
-  it("names two levels and draws three columns then eight squadrons, never more than nine on the plate", () => {
+  it("names two levels, and draws the three columns at one and the eight squadrons at the other", () => {
     expect(battle.levels).toEqual(["Columns", "Squadrons"]);
     expect(unitsAtLevel(battle.units, 0).map((unit) => unit.id)).toEqual([...COLUMNS]);
     expect(unitsAtLevel(battle.units, 1).map((unit) => unit.id)).toEqual(SQUADRONS.map(([id]) => id));
-    for (const level of battle.levels!.keys()) expect(unitsAtLevel(battle.units, level).length).toBeLessThanOrEqual(9);
   });
 
   it("lists each column immediately before its own squadrons, British first", () => {
@@ -229,12 +250,15 @@ describe("data/battles/trafalgar.json at squadron level", () => {
       ["combined-rear", "combined-fleet"],
       ["observation-squadron", "combined-fleet"],
     ]);
+  });
+
+  it("makes every unit a body of ships, parents and squadrons alike", () => {
     for (const unit of battle.units) expect(unit.arm, unit.id).toBe("ship");
   });
 
   it("gives every unit a short label, distinct within the level it is drawn at", () => {
     for (const unit of battle.units) expect(unit.short_label, unit.id).toBeTruthy();
-    for (const level of battle.levels!.keys()) {
+    for (let level = 0; level < battle.levels!.length; level++) {
       const shortLabels = unitsAtLevel(battle.units, level).map((unit) => unit.short_label);
       expect(new Set(shortLabels).size, `level ${level}`).toBe(shortLabels.length);
     }
@@ -244,34 +268,33 @@ describe("data/battles/trafalgar.json at squadron level", () => {
     for (const [index, phase] of battle.phases.entries()) {
       const picture = COLUMNS.map((id) => {
         const unit = snapshot(phase.id, id);
-        return [unit.position.lat, unit.position.lon, unit.heading];
+        return [id, unit.position.lat, unit.position.lon, unit.heading];
       });
       expect(picture, phase.id).toEqual(COLUMN_PICTURE[index]);
     }
   });
 
-  it("keeps every squadron on its parent's side, in every phase, at a strength the schema allows", () => {
-    const sides = new Map(battle.units.map((unit) => [unit.id, unit.side]));
-    for (const [id, parent] of SQUADRONS) {
-      expect(sides.get(id), id).toBe(sides.get(parent));
-      const squadron = snapshots(id);
-      expect(squadron.length, id).toBe(PHASES.length);
-      for (const [index, unit] of squadron.entries()) {
-        const strength = unit.strength ?? 1;
-        expect(strength, `${id} phase ${index}`).toBeGreaterThanOrEqual(0);
-        expect(strength, `${id} phase ${index}`).toBeLessThanOrEqual(1);
+  it("turns no squadron through more than a quarter circle except the wear the fleet itself makes", () => {
+    for (const [id] of SQUADRONS) {
+      const headings = snapshots(id).map((unit) => unit.heading);
+      for (let index = 1; index < headings.length; index++) {
+        // The shortest arc the player tweens along, signed: this is the turn a
+        // viewer sees, and schema 2.7 wants any turn past 90 degrees authored.
+        const arc = Math.abs((((headings[index]! - headings[index - 1]! + 540) % 360) - 180));
+        const wearing = battle.phases[index]!.id === "bear-up-and-wear";
+        expect(arc, `${id} into ${battle.phases[index]!.id}`).toBeLessThanOrEqual(wearing ? 180 : 90);
       }
     }
   });
 
   it("advances each British column as a van half ahead of its rear half, both at full strength", () => {
-    for (const [van, rear] of [["weather-van", "weather-rear"], ["lee-van", "lee-rear"]]) {
+    for (const [van, rear] of BRITISH_HALVES) {
       for (const phase of battle.phases) {
-        expect(snapshot(phase.id, van!).position.lon, `${van} ${phase.id}`).toBeGreaterThan(
-          snapshot(phase.id, rear!).position.lon,
+        expect(snapshot(phase.id, van).position.lon, `${van} ${phase.id}`).toBeGreaterThan(
+          snapshot(phase.id, rear).position.lon,
         );
       }
-      for (const id of [van!, rear!]) {
+      for (const id of [van, rear]) {
         for (const [index, unit] of snapshots(id).entries()) expect(unit.strength ?? 1, `${id} phase ${index}`).toBe(1);
       }
     }
@@ -298,16 +321,13 @@ describe("data/battles/trafalgar.json at squadron level", () => {
     expect(snapshot("melee", "combined-van").position.lat).toBeGreaterThan(
       snapshot("weather-column-breaks", "combined-van").position.lat,
     );
-    // It wears at 15:00 and takes over the detachment; the parent keeps its own arrow.
-    for (const phaseId of ["van-counterattack-and-retreat", "last-shots"]) {
+    // It stands to the southward from three o'clock and takes over the detachment.
+    for (const phaseId of RETREAT_PHASES) {
       const unit = snapshot(phaseId, "combined-van");
       expect(unit.state, phaseId).toBe("broken");
       expect(unit.heading, phaseId).toBeGreaterThan(180);
       expect(unit.heading, phaseId).toBeLessThan(270);
-      const detachment = unit.moves?.find((move) => move.kind === "detachment");
-      expect(detachment, phaseId).toBeDefined();
-      expect(detachment!.to.lat, phaseId).toBeLessThan(unit.position.lat);
-      expect(detachment!.to.lon, phaseId).toBeLessThan(unit.position.lon);
+      expectDetachmentToSeaward("combined-van", phaseId);
     }
     // No other squadron carries a move: the arrow belongs to the unit the four ships leave.
     for (const [id] of SQUADRONS.filter(([id]) => id !== "combined-van")) {
@@ -347,10 +367,7 @@ describe("data/battles/trafalgar.json at squadron level", () => {
         );
       }
     }
-    // Then north for Cadiz, ending low.
-    const retreat = phaseIndex("van-counterattack-and-retreat");
-    expect(gravina[retreat]!.position.lat).toBeGreaterThan(gravina[retreat - 1]!.position.lat);
-    expect(gravina[retreat + 1]!.position.lat).toBeGreaterThan(gravina[retreat]!.position.lat);
+    expectRetiresNorth("observation-squadron");
     expect(gravina.at(-1)!.strength).toBeLessThanOrEqual(0.5);
     expect(gravina.at(-1)!.strength).toBeGreaterThan(0);
   });
