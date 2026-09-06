@@ -17,6 +17,8 @@
  * schema default.
  */
 import type { Battle } from "../schema/types.ts";
+import { parseBattleTime } from "../schema/time.ts";
+import type { ClockSeconds } from "./picture.ts";
 
 /** A valid three-phase battle with clean interval arithmetic. Treat as frozen: tests that need a variant clone it. */
 export const TEST_BATTLE: Battle = {
@@ -87,10 +89,11 @@ export const TEST_BATTLE: Battle = {
   ],
 };
 
-/** Battle-clock seconds since midnight for an `"HH:MM:SS"` string, so the tests can say what they mean. */
-export function at(time: string): number {
-  const [hh = "0", mm = "0", ss = "0"] = time.split(":");
-  return Number(hh) * 3600 + Number(mm) * 60 + Number(ss);
+/** Battle-clock seconds since midnight for an `"HH:MM"` or `"HH:MM:SS"` instant, so a test can say the moment it means. */
+export function clock(time: string): ClockSeconds {
+  const match = /^(\d{2}:\d{2})(?::([0-5]\d))?$/.exec(time);
+  if (match === null) throw new RangeError(`Not an "HH:MM" or "HH:MM:SS" instant: ${JSON.stringify(time)}`);
+  return parseBattleTime(match[1]!) * 60 + Number(match[2] ?? 0);
 }
 
 /** A deep copy of the fixture, for a test that needs one thing changed. */

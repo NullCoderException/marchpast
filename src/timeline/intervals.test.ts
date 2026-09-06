@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { endClock, intervals, phaseIndexAt, scrubberSegments, startClock, wallDuration } from "./intervals.ts";
-import { TEST_BATTLE, at, cloneTestBattle } from "./testBattle.ts";
+import { TEST_BATTLE, clock, cloneTestBattle } from "./testBattle.ts";
 
 describe("intervals", () => {
   it("runs each phase from its own t to the next phase's, and the last to the battle's end", () => {
@@ -20,8 +20,8 @@ describe("intervals", () => {
 
 describe("startClock and endClock", () => {
   it("are the first phase's t and the battle's end, in battle-clock seconds", () => {
-    expect(startClock(TEST_BATTLE)).toBe(at("10:00"));
-    expect(endClock(TEST_BATTLE)).toBe(at("10:30"));
+    expect(startClock(TEST_BATTLE)).toBe(clock("10:00"));
+    expect(endClock(TEST_BATTLE)).toBe(clock("10:30"));
   });
 });
 

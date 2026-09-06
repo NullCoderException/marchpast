@@ -9,8 +9,7 @@
  * rather than multiplying once.
  */
 import type { Battle } from "../schema/types.ts";
-import { parseBattleTime } from "../schema/time.ts";
-import { endClock, phaseIndexAt, startClock } from "./intervals.ts";
+import { checkMultiplier, clampClock, clockIntervals, endClock, intervalAt } from "./intervals.ts";
 import type { ClockSeconds } from "./picture.ts";
 
 /** Where the clock has reached, and whether the battle is over there. */
@@ -21,42 +20,41 @@ export interface Advance {
   finished: boolean;
 }
 
-/** The battle-clock second the phase at `index` starts on. */
-function phaseStart(battle: Battle, index: number): ClockSeconds {
-  return parseBattleTime(battle.phases[index]!.t) * 60;
-}
-
 /**
  * The clock after `wallDeltaSeconds` of real time at `multiplier` times the
  * authored rates, crossing as many phase boundaries as the delta pays for and
  * changing rate at each. Stops at `end` and reports finished; an instant
  * before the first phase's `t` is clamped up to it first.
+ *
+ * Advancing never restarts, because it cannot tell a resumed play from a
+ * still-running tick: playing on from a finished battle is the player setting
+ * the clock back to `startClock(battle)` and advancing from there.
  */
 export function advance(battle: Battle, clockSeconds: ClockSeconds, wallDeltaSeconds: number, multiplier: number): Advance {
   if (!(wallDeltaSeconds >= 0) || !Number.isFinite(wallDeltaSeconds)) {
     throw new RangeError(`A wall delta runs forward: ${wallDeltaSeconds}`);
   }
-  if (!(multiplier > 0) || !Number.isFinite(multiplier)) {
-    throw new RangeError(`Speed multiplier must be a positive finite number: ${multiplier}`);
-  }
+  checkMultiplier(multiplier);
 
   const end = endClock(battle);
-  let clock = Math.min(Math.max(clockSeconds, startClock(battle)), end);
+  const phases = clockIntervals(battle);
+  let clock = clampClock(battle, clockSeconds);
+  let index = intervalAt(battle, clock).index;
   let remaining = wallDeltaSeconds;
 
   while (remaining > 0 && clock < end) {
-    const index = phaseIndexAt(battle, clock / 60);
-    const next = battle.phases[index + 1];
-    const intervalEnd = next === undefined ? end : parseBattleTime(next.t) * 60;
-    const rate = battle.phases[index]!.playback_rate * multiplier;
-    const wallLeftInPhase = (intervalEnd - clock) / rate;
+    const interval = phases[index];
+    if (interval === undefined) break;
+    const rate = interval.playbackRate * multiplier;
+    const wallLeftInPhase = (interval.endSeconds - clock) / rate;
     if (remaining < wallLeftInPhase) {
       clock += remaining * rate;
       remaining = 0;
     } else {
       // Land exactly on the boundary rather than accumulating float drift.
-      clock = intervalEnd;
+      clock = interval.endSeconds;
       remaining -= wallLeftInPhase;
+      index += 1;
     }
   }
 
@@ -65,8 +63,9 @@ export function advance(battle: Battle, clockSeconds: ClockSeconds, wallDeltaSec
 
 /** The next phase jump's target: the following phase's `t`, or `end` when the last phase is playing. */
 export function nextPhaseStart(battle: Battle, clockSeconds: ClockSeconds): ClockSeconds {
-  const index = phaseIndexAt(battle, Math.min(Math.max(clockSeconds, startClock(battle)), endClock(battle)) / 60);
-  return index + 1 < battle.phases.length ? phaseStart(battle, index + 1) : endClock(battle);
+  const phases = clockIntervals(battle);
+  const interval = phases[intervalAt(battle, clockSeconds).index + 1];
+  return interval === undefined ? endClock(battle) : interval.startSeconds;
 }
 
 /**
@@ -77,7 +76,8 @@ export function nextPhaseStart(battle: Battle, clockSeconds: ClockSeconds): Cloc
  * far back as it goes.
  */
 export function previousPhaseStart(battle: Battle, clockSeconds: ClockSeconds, wallSecondsIntoPhase: number): ClockSeconds {
-  const index = phaseIndexAt(battle, Math.min(Math.max(clockSeconds, startClock(battle)), endClock(battle)) / 60);
-  if (wallSecondsIntoPhase > 1) return phaseStart(battle, index);
-  return phaseStart(battle, Math.max(index - 1, 0));
+  const phases = clockIntervals(battle);
+  const index = intervalAt(battle, clockSeconds).index;
+  const target = wallSecondsIntoPhase > 1 ? index : Math.max(index - 1, 0);
+  return phases[target]!.startSeconds;
 }

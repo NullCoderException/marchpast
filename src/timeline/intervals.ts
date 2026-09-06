@@ -5,10 +5,11 @@
  *
  * A phase carries one instant, `t`, not a start and an end (ADR-0002): its
  * interval runs to the next phase's `t`, and the last phase's runs to the
- * battle's `end`. Intervals are in battle-clock minutes because `"HH:MM"` is
- * all the schema stores; the playing clock is in seconds, because a wall
- * frame is worth a fraction of a minute. `startClock` and `endClock` are the
- * bridge, and everything a player holds is seconds.
+ * battle's `end`. Intervals come in two units because the battle has two:
+ * `intervals` is minutes, since `"HH:MM"` is all the schema stores, and
+ * `clockIntervals` is the same stretch in the seconds the playing clock
+ * counts, a wall frame being worth a fraction of a minute. Everything a
+ * player holds is seconds.
  */
 import type { Battle } from "../schema/types.ts";
 import { parseBattleTime } from "../schema/time.ts";
@@ -24,6 +25,18 @@ export interface Interval {
   playbackRate: number;
 }
 
+/** The same stretch in battle-clock seconds, the unit the playing clock counts, and the phase it belongs to. */
+export interface ClockInterval {
+  /** Index into `battle.phases`. */
+  index: number;
+  /** The phase's own `t`, in battle-clock seconds. */
+  startSeconds: ClockSeconds;
+  /** The next phase's `t`, or the battle's `end` for the last phase, in battle-clock seconds. */
+  endSeconds: ClockSeconds;
+  /** Battle-clock seconds per real second, before any viewer multiplier. */
+  playbackRate: number;
+}
+
 /** How long the whole battle and each of its phases take to play, in wall seconds. */
 export interface WallDuration {
   /** Wall seconds from the first phase's `t` to `end`. */
@@ -33,7 +46,7 @@ export interface WallDuration {
 }
 
 /** Throws unless `multiplier` is a viewer speed a duration can be divided by. */
-function checkMultiplier(multiplier: number): void {
+export function checkMultiplier(multiplier: number): void {
   if (!(multiplier > 0) || !Number.isFinite(multiplier)) {
     throw new RangeError(`Speed multiplier must be a positive finite number: ${multiplier}`);
   }
@@ -52,6 +65,16 @@ export function intervals(battle: Battle): Interval[] {
   });
 }
 
+/** Each phase's interval in battle-clock seconds: the one derivation everything on the playing clock works from. */
+export function clockIntervals(battle: Battle): ClockInterval[] {
+  return intervals(battle).map((interval, index) => ({
+    index,
+    startSeconds: interval.startMinutes * 60,
+    endSeconds: interval.endMinutes * 60,
+    playbackRate: interval.playbackRate,
+  }));
+}
+
 /** The instant playback starts from: the first phase's `t`, in battle-clock seconds. */
 export function startClock(battle: Battle): ClockSeconds {
   const first = battle.phases[0];
@@ -64,14 +87,19 @@ export function endClock(battle: Battle): ClockSeconds {
   return parseBattleTime(battle.end) * 60;
 }
 
+/** `clock` held inside the battle: never before the first phase's `t`, never past `end`. */
+export function clampClock(battle: Battle, clock: ClockSeconds): ClockSeconds {
+  return Math.min(Math.max(clock, startClock(battle)), endClock(battle));
+}
+
 /**
  * Wall seconds the battle takes to play at `multiplier` times its authored
  * rates: each phase's interval divided by its rate, and the sum.
  */
 export function wallDuration(battle: Battle, multiplier = 1): WallDuration {
   checkMultiplier(multiplier);
-  const perPhase = intervals(battle).map(
-    (interval) => ((interval.endMinutes - interval.startMinutes) * 60) / (interval.playbackRate * multiplier),
+  const perPhase = clockIntervals(battle).map(
+    (interval) => (interval.endSeconds - interval.startSeconds) / (interval.playbackRate * multiplier),
   );
   return { total: perPhase.reduce((a, b) => a + b, 0), perPhase };
 }
@@ -99,4 +127,10 @@ export function phaseIndexAt(battle: Battle, clockMinutes: number): number {
     if (clockMinutes >= parseBattleTime(phases[index]!.t)) return index;
   }
   return 0;
+}
+
+/** The interval holding `clock`, which is clamped into the battle first, so the caller never has to. */
+export function intervalAt(battle: Battle, clock: ClockSeconds): ClockInterval {
+  const index = phaseIndexAt(battle, clampClock(battle, clock) / 60);
+  return clockIntervals(battle)[index]!;
 }

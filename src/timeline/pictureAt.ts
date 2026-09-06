@@ -9,24 +9,27 @@
  * carry no track.
  */
 import type { Battle, Phase, UnitSnapshot } from "../schema/types.ts";
-import { parseBattleTime } from "../schema/time.ts";
-import { endClock, phaseIndexAt, startClock } from "./intervals.ts";
+import { clampClock, intervalAt } from "./intervals.ts";
 import type { ClockSeconds, Picture, UnitPicture } from "./picture.ts";
 import { lerpHeading, lerpPosition } from "./tween.ts";
 
-/** The phase's snapshots by unit id. The validator guarantees exactly one per roster unit. */
-function snapshotsById(phase: Phase): Map<string, UnitSnapshot> {
-  return new Map(phase.units.map((snapshot) => [snapshot.id, snapshot]));
+/**
+ * A lookup of the phase's snapshot for a roster unit id. The validator
+ * guarantees exactly one per unit, so a miss is a battle that never passed it
+ * and fails loudly rather than drawing half a picture.
+ */
+function snapshotLookup(phase: Phase): (id: string) => UnitSnapshot {
+  const byId = new Map(phase.units.map((snapshot) => [snapshot.id, snapshot]));
+  return (id) => {
+    const snapshot = byId.get(id);
+    if (snapshot === undefined) {
+      throw new RangeError(`Phase ${JSON.stringify(phase.id)} has no snapshot for unit ${JSON.stringify(id)}`);
+    }
+    return snapshot;
+  };
 }
 
-/** The snapshot for `id`, or a loud failure: a battle that reaches here has passed the validator. */
-function snapshotFor(snapshots: Map<string, UnitSnapshot>, phase: Phase, id: string): UnitSnapshot {
-  const snapshot = snapshots.get(id);
-  if (snapshot === undefined) throw new RangeError(`Phase ${JSON.stringify(phase.id)} has no snapshot for unit ${JSON.stringify(id)}`);
-  return snapshot;
-}
-
-/** One unit's picture: geometry tweened toward `to` if there is one, everything else read off `from`. */
+/** One unit's picture: geometry tweened toward `to` when there is one, everything else read off `from`. */
 function unitPicture(id: string, from: UnitSnapshot, to: UnitSnapshot | undefined, f: number): UnitPicture {
   const picture: UnitPicture = {
     id,
@@ -46,31 +49,23 @@ function unitPicture(id: string, from: UnitSnapshot, to: UnitSnapshot | undefine
  * after `end` is clamped into the battle, so the caller never has to.
  */
 export function pictureAt(battle: Battle, clockSeconds: ClockSeconds): Picture {
-  const clock = Math.min(Math.max(clockSeconds, startClock(battle)), endClock(battle));
-  const phaseIndex = phaseIndexAt(battle, clock / 60);
-  const phase = battle.phases[phaseIndex]!;
-  const next = battle.phases[phaseIndex + 1];
+  const clock = clampClock(battle, clockSeconds);
+  const interval = intervalAt(battle, clock);
+  const phase = battle.phases[interval.index]!;
+  const next = battle.phases[interval.index + 1];
 
-  const startSeconds = parseBattleTime(phase.t) * 60;
-  const endSeconds = next === undefined ? endClock(battle) : parseBattleTime(next.t) * 60;
   // The last phase holds: with nothing to tween toward, the fraction is moot.
-  const f = next === undefined ? 0 : Math.min(Math.max((clock - startSeconds) / (endSeconds - startSeconds), 0), 1);
+  const elapsed = (clock - interval.startSeconds) / (interval.endSeconds - interval.startSeconds);
+  const f = next === undefined ? 0 : Math.min(Math.max(elapsed, 0), 1);
 
-  const from = snapshotsById(phase);
-  const to = next === undefined ? undefined : snapshotsById(next);
+  const from = snapshotLookup(phase);
+  const to = next === undefined ? undefined : snapshotLookup(next);
 
   return {
-    phaseIndex,
+    phaseIndex: interval.index,
     phase,
     clock,
-    units: battle.units.map((unit) =>
-      unitPicture(
-        unit.id,
-        snapshotFor(from, phase, unit.id),
-        to === undefined || next === undefined ? undefined : snapshotFor(to, next, unit.id),
-        f,
-      ),
-    ),
+    units: battle.units.map((unit) => unitPicture(unit.id, from(unit.id), to?.(unit.id), f)),
     wind: phase.wind,
     caption: phase.caption,
     label: phase.label,
