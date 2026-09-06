@@ -68,10 +68,19 @@
       "license_note": "Published 1911; author died 1934. Wikisource's EB1911 transcription carries its public-domain notice."
     }
   },
+  "levels": ["Columns", "Squadrons"],
   "units": [
-    { "id": "weather-column", "side": "British", "label": "Weather column", "commander": "Nelson", "arm": "ship" },
-    { "id": "lee-column", "side": "British", "label": "Lee column", "commander": "Collingwood", "arm": "ship" },
-    { "id": "combined-fleet", "side": "Combined Fleet", "label": "Combined Fleet", "commander": "Villeneuve", "arm": "ship" }
+    { "id": "weather-column", "side": "British", "label": "Weather column", "short_label": "Weather", "commander": "Nelson", "arm": "ship" },
+    { "id": "weather-van", "side": "British", "label": "Van of the weather column", "short_label": "Weather van", "commander": "Nelson", "arm": "ship", "parent": "weather-column" },
+    { "id": "weather-rear", "side": "British", "label": "Rear of the weather column", "short_label": "Weather rear", "arm": "ship", "parent": "weather-column" },
+    { "id": "lee-column", "side": "British", "label": "Lee column", "short_label": "Lee", "commander": "Collingwood", "arm": "ship" },
+    { "id": "lee-van", "side": "British", "label": "Van of the lee column", "short_label": "Lee van", "commander": "Collingwood", "arm": "ship", "parent": "lee-column" },
+    { "id": "lee-rear", "side": "British", "label": "Rear of the lee column", "short_label": "Lee rear", "arm": "ship", "parent": "lee-column" },
+    { "id": "combined-fleet", "side": "Combined Fleet", "label": "Combined Fleet", "short_label": "Combined", "commander": "Villeneuve", "arm": "ship" },
+    { "id": "combined-van", "side": "Combined Fleet", "label": "Van of the Combined Fleet", "short_label": "Van", "commander": "Dumanoir", "arm": "ship", "parent": "combined-fleet" },
+    { "id": "combined-centre", "side": "Combined Fleet", "label": "Centre of the Combined Fleet", "short_label": "Centre", "commander": "Villeneuve", "arm": "ship", "parent": "combined-fleet" },
+    { "id": "combined-rear", "side": "Combined Fleet", "label": "Rear of the Combined Fleet", "short_label": "Rear", "commander": "Alava", "arm": "ship", "parent": "combined-fleet" },
+    { "id": "observation-squadron", "side": "Combined Fleet", "label": "Squadron of observation", "short_label": "Observation", "commander": "Gravina", "arm": "ship", "parent": "combined-fleet" }
   ],
   "phases": [
     {
@@ -81,7 +90,7 @@
       "playback_rate": 600,
       "wind": { "from": 292.5, "force": "light" },
       "caption": "At daylight, Cape Trafalgar bearing east by south about seven leagues, the enemy is discovered six or seven miles to the eastward, the wind about west and very light. The British, twenty-seven of the line in the two loose columns of their order of sailing, are standing to the north-east; Nelson's twelve keep the weather station, Collingwood's fifteen lie to leeward. The Combined Fleet, thirty-three of the line under Villeneuve, stands south for the Straits in a single line of battle five miles from end to end.",
-      "notes": "Positions are constructed from Collingwood's fix, not read from prose. Cape Trafalgar (36.183N 6.034W) bore E. by S. (101.25 degrees) about seven leagues (21 nautical miles) from the British, which puts them near 36.25N 6.46W; the lee column, from which Collingwood took the bearing, is placed at 36.235N 6.44W (Cape then bears 099 at 20 miles) and the weather column a mile and a half to windward at 36.26N 6.47W. The enemy's distance is disputed: Collingwood six or seven miles, Nelson's codicil about ten, Mahan and Southey ten or twelve. The Combined Fleet's centre is placed 7 miles east of the lee column and 9 from the Victory at 36.22N 6.29W, which also satisfies Hannay's twelve miles off the Cape. The time is the modern consensus for the sighting; Mahan gives only 'when the day broke'. Africa, separated in the night, is counted in the weather column's opening strength and rejoins alone from the north; her separation is not taken to lower strength.",
+      "notes": "Positions are constructed from Collingwood's fix, not read from prose. Cape Trafalgar (36.183N 6.034W) bore E. by S. (101.25 degrees) about seven leagues (21 nautical miles) from the British, which puts them near 36.25N 6.46W; the lee column, from which Collingwood took the bearing, is placed at 36.235N 6.44W (Cape then bears 099 at 20 miles) and the weather column a mile and a half to windward at 36.26N 6.47W. The enemy's distance is disputed: Collingwood six or seven miles, Nelson's codicil about ten, Mahan and Southey ten or twelve. The Combined Fleet's centre is placed 7 miles east of the lee column and 9 from the Victory at 36.22N 6.29W, which also satisfies Hannay's twelve miles off the Cape. The time is the modern consensus for the sighting; Mahan gives only 'when the day broke'. Africa, separated in the night, is counted in the weather column's opening strength and rejoins alone from the north; her separation is not taken to lower strength. Squadrons: each column is divided into a van and a rear half whose centres lie a mile and a half (the weather column, twelve ships) and a mile and four fifths (the lee column, fifteen) ahead of and astern of the column's own centre along its heading, a length Mahan's Spartiate and Minotaur \"two miles astern\" supports for a twelve-ship column in this air; the division into halves is the author's, not a command of the day, so neither rear half carries a commander. The Combined Fleet's line, five miles from end to end, is divided at the fractions Collingwood's two cuts fix: counting from the head of the line as it stood after the wear, Dumanoir's ten make the van, then Villeneuve's eight, then Alava's seven, with Gravina's eight the rearmost, which puts Nelson's cut about the tenth ship from the van at the van's foot and Collingwood's about the twelfth from the rear inside Alava's division. Before the wear the fleet heads south, so Gravina's squadron leads it and Dumanoir's is sternmost; the ship counts are the author's reading of the sources for strengths only, and no count is carried in the file.",
       "references": [
         {
           "source": "collingwood-dispatch",
@@ -111,8 +120,16 @@
       ],
       "units": [
         { "id": "weather-column", "position": { "lat": 36.26, "lon": -6.47 }, "heading": 45, "formation": "column", "state": "intact" },
+        { "id": "weather-van", "position": { "lat": 36.278, "lon": -6.448 }, "heading": 45, "formation": "column", "state": "intact" },
+        { "id": "weather-rear", "position": { "lat": 36.242, "lon": -6.492 }, "heading": 45, "formation": "column", "state": "intact" },
         { "id": "lee-column", "position": { "lat": 36.235, "lon": -6.44 }, "heading": 45, "formation": "column", "state": "intact" },
-        { "id": "combined-fleet", "position": { "lat": 36.22, "lon": -6.29 }, "heading": 180, "formation": "column", "state": "intact" }
+        { "id": "lee-van", "position": { "lat": 36.256, "lon": -6.414 }, "heading": 45, "formation": "column", "state": "intact" },
+        { "id": "lee-rear", "position": { "lat": 36.214, "lon": -6.466 }, "heading": 45, "formation": "column", "state": "intact" },
+        { "id": "combined-fleet", "position": { "lat": 36.22, "lon": -6.29 }, "heading": 180, "formation": "column", "state": "intact" },
+        { "id": "combined-van", "position": { "lat": 36.249, "lon": -6.29 }, "heading": 180, "formation": "column", "state": "intact" },
+        { "id": "combined-centre", "position": { "lat": 36.226, "lon": -6.29 }, "heading": 180, "formation": "column", "state": "intact" },
+        { "id": "combined-rear", "position": { "lat": 36.208, "lon": -6.29 }, "heading": 180, "formation": "column", "state": "intact" },
+        { "id": "observation-squadron", "position": { "lat": 36.189, "lon": -6.29 }, "heading": 180, "formation": "column", "state": "intact" }
       ]
     },
     {
@@ -122,7 +139,7 @@
       "playback_rate": 600,
       "wind": { "from": 292.5, "force": "light" },
       "caption": "The commander in chief immediately makes the signal for the fleet to bear up in two columns as they are formed in order of sailing, a mode of attack he had previously directed to avoid the delay of forming a line of battle in the usual manner: Victory leads the weather column east by north and Royal Sovereign the lee column east, about a mile apart. Villeneuve, wanting Cadiz under his lee, orders the Combined Fleet to wear together: ship by ship it turns from south to north, the van becoming the rear and Gravina's flagship the rearmost ship. Nothing is left to signals; as Nelson's memorandum says, no captain can do very wrong if he places his ship alongside that of an enemy.",
-      "notes": "The wear is the disputed time of the morning: Hannay has it ordered at 06:00, Nelson's private journal notes it beginning at 07:00, the modern consensus puts the order at 08:00, and Mahan and Hannay agree it was not complete until near 10:00. The phase is placed at 06:40, Nelson's signal to form the order of sailing, with the Combined Fleet already heading north as the issue directs, so that its picture holds through the wear. The half turn from 180 to 5 is authored counter-clockwise through east, which is how a fleet wears with the wind on its starboard quarter; the player tweens it over the interval. The British have stood north-east about a mile since dawn; positions are dead-reckoned from the dawn fix. The intent moves point at the parts of the enemy line the memorandum assigned each column, about the tenth ship from the van for Nelson and the twelfth from the rear for Collingwood, where the line lay at this hour; they are re-drawn on the noon line in the next phase.",
+      "notes": "The wear is the disputed time of the morning: Hannay has it ordered at 06:00, Nelson's private journal notes it beginning at 07:00, the modern consensus puts the order at 08:00, and Mahan and Hannay agree it was not complete until near 10:00. The phase is placed at 06:40, Nelson's signal to form the order of sailing, with the Combined Fleet already heading north as the issue directs, so that its picture holds through the wear. The half turn from 180 to 5 is authored counter-clockwise through east, which is how a fleet wears with the wind on its starboard quarter; the player tweens it over the interval. The British have stood north-east about a mile since dawn; positions are dead-reckoned from the dawn fix. The intent moves point at the parts of the enemy line the memorandum assigned each column, about the tenth ship from the van for Nelson and the twelfth from the rear for Collingwood, where the line lay at this hour; they are re-drawn on the noon line in the next phase. Squadrons: the four Combined Fleet squadrons keep their places along the line and wear with it, because a wear together turns every ship where she lies and moves none, so only their headings change and the order of the line inverts. The van half of each British column carries its column's intent arrow, the leading ships being what cut the line; the rear halves carry none.",
       "references": [
         {
           "source": "collingwood-dispatch",
@@ -167,6 +184,15 @@
           "moves": [{ "kind": "intent", "to": { "lat": 36.245, "lon": -6.26 } }]
         },
         {
+          "id": "weather-van",
+          "position": { "lat": 36.281, "lon": -6.425 },
+          "heading": 75,
+          "formation": "column",
+          "state": "intact",
+          "moves": [{ "kind": "intent", "to": { "lat": 36.245, "lon": -6.26 } }]
+        },
+        { "id": "weather-rear", "position": { "lat": 36.269, "lon": -6.485 }, "heading": 75, "formation": "column", "state": "intact" },
+        {
           "id": "lee-column",
           "position": { "lat": 36.25, "lon": -6.425 },
           "heading": 90,
@@ -174,7 +200,20 @@
           "state": "intact",
           "moves": [{ "kind": "intent", "to": { "lat": 36.21, "lon": -6.265 } }]
         },
-        { "id": "combined-fleet", "position": { "lat": 36.225, "lon": -6.265 }, "heading": 5, "formation": "column", "state": "intact" }
+        {
+          "id": "lee-van",
+          "position": { "lat": 36.25, "lon": -6.388 },
+          "heading": 90,
+          "formation": "column",
+          "state": "intact",
+          "moves": [{ "kind": "intent", "to": { "lat": 36.21, "lon": -6.265 } }]
+        },
+        { "id": "lee-rear", "position": { "lat": 36.25, "lon": -6.462 }, "heading": 90, "formation": "column", "state": "intact" },
+        { "id": "combined-fleet", "position": { "lat": 36.225, "lon": -6.265 }, "heading": 5, "formation": "column", "state": "intact" },
+        { "id": "combined-van", "position": { "lat": 36.254, "lon": -6.265 }, "heading": 5, "formation": "column", "state": "intact" },
+        { "id": "combined-centre", "position": { "lat": 36.231, "lon": -6.265 }, "heading": 5, "formation": "column", "state": "intact" },
+        { "id": "combined-rear", "position": { "lat": 36.213, "lon": -6.265 }, "heading": 5, "formation": "column", "state": "intact" },
+        { "id": "observation-squadron", "position": { "lat": 36.194, "lon": -6.265 }, "heading": 5, "formation": "column", "state": "intact" }
       ]
     },
     {
@@ -184,7 +223,7 @@
       "playback_rate": 600,
       "wind": { "from": 292.5, "force": "light" },
       "caption": "Near ten o'clock the wear is complete, and the Combined Fleet lies heading north in a crescent five miles from horn to horn, convex to leeward, its ships often two and three abreast; carrying sail to hold their places, they drift all the while nearer Cadiz. The British columns crowd on all sail before a long swell and make barely a mile and a half in the hour, Nelson steering two points more to the north than Collingwood to cut off the enemy's escape into Cadiz. Towards noon Nelson makes his last signal to the fleet: England expects that every man will do his duty.",
-      "notes": "The Combined Fleet is authored as a line with heading 275: its front faces the attack coming from the west and its ticks run north and south as the fleet did, with the ships' heads at 005, north by east, as in Johnston's 1848 map. From the column heading of 5 at 06:40 this is a quarter turn, so no extra phase is needed. Mahan has the Victory six miles from the enemy at 09:30 and three miles or more at 11:00, so at 10:00 she is placed five and a quarter miles west of the enemy's centre, the column's centre a mile astern of her at 36.285N 6.35W; the lee column, a little ahead per Southey, at 36.235N 6.31W. The Combined Fleet has drifted north-east about two miles since the wear began, to 36.24N 6.225W. Mahan puts the signal 'England expects' towards noon and the modern consensus at 11:45; it is caption matter here and fixes no phase. Southey's 'light winds from the south-west' contradicts every other source; west-north-west is kept.",
+      "notes": "The Combined Fleet is authored as a line with heading 275: its front faces the attack coming from the west and its ticks run north and south as the fleet did, with the ships' heads at 005, north by east, as in Johnston's 1848 map. From the column heading of 5 at 06:40 this is a quarter turn, so no extra phase is needed. Mahan has the Victory six miles from the enemy at 09:30 and three miles or more at 11:00, so at 10:00 she is placed five and a quarter miles west of the enemy's centre, the column's centre a mile astern of her at 36.285N 6.35W; the lee column, a little ahead per Southey, at 36.235N 6.31W. The Combined Fleet has drifted north-east about two miles since the wear began, to 36.24N 6.225W. Mahan puts the signal 'England expects' towards noon and the modern consensus at 11:45; it is caption matter here and fixes no phase. Southey's 'light winds from the south-west' contradicts every other source; west-north-west is kept. Squadrons: the crescent is authored as a bulge of about a mile to leeward at the middle of the line, so Villeneuve's centre and Alava's rear lie a fifth of a mile east of the fleet's own meridian and Dumanoir's van and Gravina's squadron about the same to the west of it, the horns nearer the attack as Collingwood describes. All four follow the parent's line and its heading of 275.",
       "references": [
         {
           "source": "collingwood-dispatch",
@@ -237,6 +276,15 @@
           "moves": [{ "kind": "intent", "to": { "lat": 36.267, "lon": -6.2 } }]
         },
         {
+          "id": "weather-van",
+          "position": { "lat": 36.296, "lon": -6.322 },
+          "heading": 65,
+          "formation": "column",
+          "state": "intact",
+          "moves": [{ "kind": "intent", "to": { "lat": 36.267, "lon": -6.2 } }]
+        },
+        { "id": "weather-rear", "position": { "lat": 36.274, "lon": -6.378 }, "heading": 65, "formation": "column", "state": "intact" },
+        {
           "id": "lee-column",
           "position": { "lat": 36.235, "lon": -6.31 },
           "heading": 90,
@@ -244,7 +292,20 @@
           "state": "intact",
           "moves": [{ "kind": "intent", "to": { "lat": 36.238, "lon": -6.205 } }]
         },
-        { "id": "combined-fleet", "position": { "lat": 36.24, "lon": -6.225 }, "heading": 275, "formation": "line", "state": "intact" }
+        {
+          "id": "lee-van",
+          "position": { "lat": 36.235, "lon": -6.273 },
+          "heading": 90,
+          "formation": "column",
+          "state": "intact",
+          "moves": [{ "kind": "intent", "to": { "lat": 36.238, "lon": -6.205 } }]
+        },
+        { "id": "lee-rear", "position": { "lat": 36.235, "lon": -6.347 }, "heading": 90, "formation": "column", "state": "intact" },
+        { "id": "combined-fleet", "position": { "lat": 36.24, "lon": -6.225 }, "heading": 275, "formation": "line", "state": "intact" },
+        { "id": "combined-van", "position": { "lat": 36.269, "lon": -6.23 }, "heading": 275, "formation": "line", "state": "intact" },
+        { "id": "combined-centre", "position": { "lat": 36.246, "lon": -6.219 }, "heading": 275, "formation": "line", "state": "intact" },
+        { "id": "combined-rear", "position": { "lat": 36.228, "lon": -6.221 }, "heading": 275, "formation": "line", "state": "intact" },
+        { "id": "observation-squadron", "position": { "lat": 36.209, "lon": -6.231 }, "heading": 275, "formation": "line", "state": "intact" }
       ]
     },
     {
@@ -254,7 +315,7 @@
       "playback_rate": 90,
       "wind": { "from": 292.5, "force": "light" },
       "caption": "The action begins at twelve o'clock: the Fougueux fires the first gun at the Royal Sovereign, which stands on alone for ten minutes under the fire of the enemy's rear and then breaks through astern of the Santa Ana, about the twelfth ship from the rear, engaging her at the muzzles of her guns. 'See how that noble fellow Collingwood carries his ship into action,' says Nelson; 'what would Nelson give to be here,' says Collingwood to Rotherham. The Victory is still two miles to the north-west with a mile and a half to run, under fire from the enemy's centre and not yet replying; the ten ships of the enemy's van stand on to the north, unengaged.",
-      "notes": "Times agree within ten minutes: Collingwood and Mahan twelve o'clock, Southey ten minutes before. The fighting is fitted around the accepted site, roughly 36.25N 6.20W, ten miles west-north-west of the Cape; the Combined Fleet's centre is placed there with the line running from about 36.21N to 36.29N. Collingwood's cut about the twelfth ship from the rear falls near 36.238N and Nelson's about the tenth from the van near 36.267N. The lee column's centre is put a mile and a half astern of the Royal Sovereign at 36.235N 6.236W; the weather column's centre, with the Victory a mile and three quarters from the line per Mahan and the column strung out behind her, at 36.275N 6.275W. The weather column stays intact, being under fire but not yet in action.",
+      "notes": "Times agree within ten minutes: Collingwood and Mahan twelve o'clock, Southey ten minutes before. The fighting is fitted around the accepted site, roughly 36.25N 6.20W, ten miles west-north-west of the Cape; the Combined Fleet's centre is placed there with the line running from about 36.21N to 36.29N. Collingwood's cut about the twelfth ship from the rear falls near 36.238N and Nelson's about the tenth from the van near 36.267N. The lee column's centre is put a mile and a half astern of the Royal Sovereign at 36.235N 6.236W; the weather column's centre, with the Victory a mile and three quarters from the line per Mahan and the column strung out behind her, at 36.275N 6.275W. The weather column stays intact, being under fire but not yet in action. Squadrons: the line runs from about 36.21N to 36.29N, which places Dumanoir's van at 36.278N, Villeneuve's centre at 36.256N, Alava's rear at 36.238N (the latitude of Collingwood's cut) and Gravina's squadron at 36.220N. The van is the one squadron with a picture of its own: Collingwood's \"leaving the Van of the Enemy unoccupied\" has it standing on to the north out of the action, so it is authored as a column heading 5 and stays intact while the rest of the line is engaged. Gravina's squadron in the southern horn is likewise still intact at noon, Collingwood's followers not having reached it. On the British side only the lee column's van half is engaged; its centre is authored only a mile ahead of the column, not the mile and four fifths the other phases use, because the Royal Sovereign stood on alone for ten minutes and the rest of her half was still coming down astern of her. Its rear half is a mile and four fifths astern, and both halves of the weather column are under fire without replying.",
       "references": [
         {
           "source": "collingwood-dispatch",
@@ -289,8 +350,16 @@
       ],
       "units": [
         { "id": "weather-column", "position": { "lat": 36.275, "lon": -6.275 }, "heading": 65, "formation": "column", "state": "intact" },
+        { "id": "weather-van", "position": { "lat": 36.286, "lon": -6.247 }, "heading": 65, "formation": "column", "state": "intact" },
+        { "id": "weather-rear", "position": { "lat": 36.264, "lon": -6.303 }, "heading": 65, "formation": "column", "state": "intact" },
         { "id": "lee-column", "position": { "lat": 36.235, "lon": -6.236 }, "heading": 90, "formation": "column", "state": "engaged" },
-        { "id": "combined-fleet", "position": { "lat": 36.25, "lon": -6.2 }, "heading": 275, "formation": "line", "state": "engaged" }
+        { "id": "lee-van", "position": { "lat": 36.235, "lon": -6.215 }, "heading": 90, "formation": "column", "state": "engaged" },
+        { "id": "lee-rear", "position": { "lat": 36.235, "lon": -6.273 }, "heading": 90, "formation": "column", "state": "intact" },
+        { "id": "combined-fleet", "position": { "lat": 36.25, "lon": -6.2 }, "heading": 275, "formation": "line", "state": "engaged" },
+        { "id": "combined-van", "position": { "lat": 36.278, "lon": -6.205 }, "heading": 5, "formation": "column", "state": "intact" },
+        { "id": "combined-centre", "position": { "lat": 36.256, "lon": -6.194 }, "heading": 275, "formation": "line", "state": "engaged" },
+        { "id": "combined-rear", "position": { "lat": 36.238, "lon": -6.196 }, "heading": 275, "formation": "line", "state": "engaged" },
+        { "id": "observation-squadron", "position": { "lat": 36.22, "lon": -6.206 }, "heading": 275, "formation": "line", "state": "intact" }
       ]
     },
     {
@@ -300,7 +369,7 @@
       "playback_rate": 120,
       "wind": { "from": 292.5, "force": "light" },
       "caption": "The succeeding ships break through in all parts astern of their leaders, engaging the enemy at the muzzles of their guns, and the conflict is severe. The Victory, under the fire of seven or eight ships without replying ('this is too warm work, Hardy, to last long'), at one o'clock crosses the wake of the Bucentaure within thirty feet, rakes the French flagship from end to end, and runs on board the Redoutable, the two ships falling off with their heads to the eastward. About a quarter after one Nelson is shot from the Redoutable's mizzen-top: 'they have done for me at last, Hardy; my backbone is shot through.'",
-      "notes": "The most disputed hour of the day. Southey has the Victory open fire at four minutes after twelve and Nelson hit about a quarter after one; Mahan has her under effective fire at 12:30, crossing the Bucentaure's wake at 13:00, alongside the Redoutable at 13:10 and Nelson hit about fifteen minutes later; the modern consensus has the Victory cut the line at 12:45. The spread is about an hour, consistent with the known drift between ships' clocks. The phase is placed at 12:30, Mahan's moment the Victory came under effective fire, which is when the weather column is first in action. Positions: the Victory about a mile from the line and the column's centre a mile astern of her at 36.27N 6.255W; the lee column's head through the line and its centre closing it at 36.23N 6.215W; the Combined Fleet's centre held at the accepted site.",
+      "notes": "The most disputed hour of the day. Southey has the Victory open fire at four minutes after twelve and Nelson hit about a quarter after one; Mahan has her under effective fire at 12:30, crossing the Bucentaure's wake at 13:00, alongside the Redoutable at 13:10 and Nelson hit about fifteen minutes later; the modern consensus has the Victory cut the line at 12:45. The spread is about an hour, consistent with the known drift between ships' clocks. The phase is placed at 12:30, Mahan's moment the Victory came under effective fire, which is when the weather column is first in action. Positions: the Victory about a mile from the line and the column's centre a mile astern of her at 36.27N 6.255W; the lee column's head through the line and its centre closing it at 36.23N 6.215W; the Combined Fleet's centre held at the accepted site. Squadrons: Alava's rear is the first squadron authored broken, because by half past twelve Collingwood's leaders had cut it in several places and it was fighting ship against ship, while Villeneuve's centre, engaged by the Victory alone, still holds as a body. Gravina's squadron goes engaged as the lee column's followers reach the southern horn. Dumanoir's van has stood about two thirds of a mile further north and is still intact. The weather column's rear half stays intact on Mahan's \"two ships of Nelson's column, as yet not engaged\": the Spartiate and the Minotaur were two miles astern.",
       "references": [
         {
           "source": "mahan",
@@ -335,8 +404,16 @@
       ],
       "units": [
         { "id": "weather-column", "position": { "lat": 36.27, "lon": -6.255 }, "heading": 80, "formation": "column", "state": "engaged" },
+        { "id": "weather-van", "position": { "lat": 36.274, "lon": -6.224 }, "heading": 80, "formation": "column", "state": "engaged" },
+        { "id": "weather-rear", "position": { "lat": 36.266, "lon": -6.286 }, "heading": 80, "formation": "column", "state": "intact" },
         { "id": "lee-column", "position": { "lat": 36.23, "lon": -6.215 }, "heading": 90, "formation": "column", "state": "engaged" },
-        { "id": "combined-fleet", "position": { "lat": 36.25, "lon": -6.197 }, "heading": 275, "formation": "line", "state": "engaged" }
+        { "id": "lee-van", "position": { "lat": 36.23, "lon": -6.178 }, "heading": 90, "formation": "column", "state": "engaged" },
+        { "id": "lee-rear", "position": { "lat": 36.23, "lon": -6.252 }, "heading": 90, "formation": "column", "state": "intact" },
+        { "id": "combined-fleet", "position": { "lat": 36.25, "lon": -6.197 }, "heading": 275, "formation": "line", "state": "engaged" },
+        { "id": "combined-van", "position": { "lat": 36.288, "lon": -6.203 }, "heading": 5, "formation": "column", "state": "intact" },
+        { "id": "combined-centre", "position": { "lat": 36.256, "lon": -6.191 }, "heading": 275, "formation": "line", "state": "engaged" },
+        { "id": "combined-rear", "position": { "lat": 36.238, "lon": -6.193 }, "heading": 275, "formation": "line", "state": "broken", "strength": 0.8 },
+        { "id": "observation-squadron", "position": { "lat": 36.22, "lon": -6.203 }, "heading": 275, "formation": "line", "state": "engaged" }
       ]
     },
     {
@@ -346,7 +423,7 @@
       "playback_rate": 150,
       "wind": { "from": 292.5, "force": "light" },
       "caption": "The conflict is severe: the Redoutable strikes, and at five minutes past two the Bucentaure surrenders, Villeneuve's last signal ordering his unengaged van into action. The ten ships of the van go about, five to leeward of the line and five to windward, and have their heads to the south by half past two, while the fresh Spartiate and Minotaur haul to the wind to cover the Victory. 'We have got twelve or fourteen of the enemy's ships in our possession,' Hardy tells Nelson, 'but five of their van have tacked, and show an intention of bearing down upon the Victory.'",
-      "notes": "Strength 0.6 is the middle of the interval: the Redoutable struck about 13:55 and the Bucentaure at 14:05, and by Hardy's report near 14:25 twelve or fourteen of the thirty-three had struck (Southey says ten), leaving about twenty in company. The Combined Fleet is authored broken from 13:30 because its centre has ceased to fight as a body and its van is acting on its own; the formation stays line as a label for the wreck of the crescent. Positions: the fighting ships drift slowly east-south-east before the wind, so the Combined Fleet's centre moves to 36.245N 6.19W and both British columns close on the line, the weather column at 36.265N 6.21W heading east through the gap and the lee column at 36.228N 6.20W along the former rear.",
+      "notes": "Strength 0.6 is the middle of the interval: the Redoutable struck about 13:55 and the Bucentaure at 14:05, and by Hardy's report near 14:25 twelve or fourteen of the thirty-three had struck (Southey says ten), leaving about twenty in company. The Combined Fleet is authored broken from 13:30 because its centre has ceased to fight as a body and its van is acting on its own; the formation stays line as a label for the wreck of the crescent. Positions: the fighting ships drift slowly east-south-east before the wind, so the Combined Fleet's centre moves to 36.245N 6.19W and both British columns close on the line, the weather column at 36.265N 6.21W heading east through the gap and the lee column at 36.228N 6.20W along the former rear. Squadrons: Villeneuve's centre goes broken here with its flagship struck, at 0.4 of its eight ships, Alava's rear falls to the same, and Gravina's squadron, still fighting as a body in the southern horn, to 0.8. Dumanoir's van is authored going about, at 36.306N with a heading of 330: Mahan has the ten with their heads to the south by half past two, and an intermediate heading authors the turn to windward rather than leaving the player to guess which way round it went. The three fighting squadrons drift east-south-east with the parent.",
       "references": [
         {
           "source": "mahan",
@@ -376,8 +453,16 @@
       ],
       "units": [
         { "id": "weather-column", "position": { "lat": 36.265, "lon": -6.21 }, "heading": 90, "formation": "column", "state": "engaged" },
+        { "id": "weather-van", "position": { "lat": 36.265, "lon": -6.179 }, "heading": 90, "formation": "column", "state": "engaged" },
+        { "id": "weather-rear", "position": { "lat": 36.265, "lon": -6.241 }, "heading": 90, "formation": "column", "state": "engaged" },
         { "id": "lee-column", "position": { "lat": 36.228, "lon": -6.2 }, "heading": 90, "formation": "column", "state": "engaged" },
-        { "id": "combined-fleet", "position": { "lat": 36.245, "lon": -6.19 }, "heading": 275, "formation": "line", "state": "broken", "strength": 0.6 }
+        { "id": "lee-van", "position": { "lat": 36.228, "lon": -6.163 }, "heading": 90, "formation": "column", "state": "engaged" },
+        { "id": "lee-rear", "position": { "lat": 36.228, "lon": -6.237 }, "heading": 90, "formation": "column", "state": "engaged" },
+        { "id": "combined-fleet", "position": { "lat": 36.245, "lon": -6.19 }, "heading": 275, "formation": "line", "state": "broken", "strength": 0.6 },
+        { "id": "combined-van", "position": { "lat": 36.306, "lon": -6.208 }, "heading": 330, "formation": "column", "state": "intact" },
+        { "id": "combined-centre", "position": { "lat": 36.252, "lon": -6.183 }, "heading": 275, "formation": "line", "state": "broken", "strength": 0.4 },
+        { "id": "combined-rear", "position": { "lat": 36.236, "lon": -6.185 }, "heading": 275, "formation": "line", "state": "broken", "strength": 0.4 },
+        { "id": "observation-squadron", "position": { "lat": 36.219, "lon": -6.196 }, "heading": 275, "formation": "line", "state": "engaged", "strength": 0.8 }
       ]
     },
     {
@@ -387,7 +472,7 @@
       "playback_rate": 150,
       "wind": { "from": 292.5, "force": "light" },
       "caption": "About three o'clock, many of the enemy's ships having struck their colours, their line gives way. The five headmost ships of the van, passing to windward of the British within gunshot, exchange a distant fire with the Victory and her consorts; the sternmost of them is cut off and taken by the Minotaur and Spartiate, and the other four hold on to the south-west and escape to sea. Gravina, with ten ships, joins his frigates to leeward and stands towards Cadiz; the Royal Sovereign, all masts gone but the foremast, is taken in tow by the Euryalus, and Nelson dies at half past four.",
-      "notes": "Collingwood's 'about Three P.M.' is the collapse of the line, not the end of the action; Mahan puts the van's passing at about 15:00 and Gravina's signal to retreat at 16:45, fifteen minutes after Nelson's death at 16:30. Strength 0.33 counts Dumanoir's four escaping ships as detached from this instant, since they are drawn as the detachment move and detached ships leave the unit; eleven of thirty-three remain in company with Gravina (the alternative, counting them until they pass out of gunshot, would be 0.45). The unit's own position follows Gravina's remnant north-north-east to join the frigates to leeward, at 36.285N 6.175W; Cadiz itself bears north by west from the battle. The detachment move points south-west to seaward for Dumanoir's four. The British columns lie among their prizes where they fought, the weather column with the Victory's head to the north, the lee column along the former rear.",
+      "notes": "Collingwood's 'about Three P.M.' is the collapse of the line, not the end of the action; Mahan puts the van's passing at about 15:00 and Gravina's signal to retreat at 16:45, fifteen minutes after Nelson's death at 16:30. Strength 0.33 counts Dumanoir's four escaping ships as detached from this instant, since they are drawn as the detachment move and detached ships leave the unit; eleven of thirty-three remain in company with Gravina (the alternative, counting them until they pass out of gunshot, would be 0.45). The unit's own position follows Gravina's remnant north-north-east to join the frigates to leeward, at 36.285N 6.175W; Cadiz itself bears north by west from the battle. The detachment move points south-west to seaward for Dumanoir's four. The British columns lie among their prizes where they fought, the weather column with the Victory's head to the north, the lee column along the former rear. Squadrons: the arrow to seaward moves down to Dumanoir's van, which is the unit the four escaping ships leave, while the parent keeps its own arrow unchanged. The van is placed south-west of the Victory at 36.255N 6.235W, passing to windward of the British within gunshot, heading 200, and its strength is 0.1 on the accounting the parent uses: of the ten, five went to leeward and out of the action, four are detached from this instant, and only the sternmost, cut off and taken by the Minotaur and the Spartiate, is still fighting as part of the squadron. Gravina's squadron carries the retreat, at 36.265N 6.181W and about two knots for Cadiz, and stays engaged because it retires as a body. The weather column's rear half is given a heading of 245 for the two fresh ships that hauled to the wind to cover the Victory; the British halves otherwise keep their columns' headings among the prizes.",
       "references": [
         {
           "source": "collingwood-dispatch",
@@ -423,7 +508,11 @@
       ],
       "units": [
         { "id": "weather-column", "position": { "lat": 36.27, "lon": -6.2 }, "heading": 0, "formation": "column", "state": "engaged" },
+        { "id": "weather-van", "position": { "lat": 36.28, "lon": -6.196 }, "heading": 0, "formation": "column", "state": "engaged" },
+        { "id": "weather-rear", "position": { "lat": 36.258, "lon": -6.218 }, "heading": 245, "formation": "column", "state": "engaged" },
         { "id": "lee-column", "position": { "lat": 36.225, "lon": -6.195 }, "heading": 90, "formation": "column", "state": "engaged" },
+        { "id": "lee-van", "position": { "lat": 36.225, "lon": -6.17 }, "heading": 90, "formation": "column", "state": "engaged" },
+        { "id": "lee-rear", "position": { "lat": 36.225, "lon": -6.22 }, "heading": 90, "formation": "column", "state": "engaged" },
         {
           "id": "combined-fleet",
           "position": { "lat": 36.285, "lon": -6.175 },
@@ -432,7 +521,19 @@
           "state": "broken",
           "strength": 0.33,
           "moves": [{ "kind": "detachment", "to": { "lat": 36.08, "lon": -6.48 } }]
-        }
+        },
+        {
+          "id": "combined-van",
+          "position": { "lat": 36.255, "lon": -6.235 },
+          "heading": 200,
+          "formation": "column",
+          "state": "broken",
+          "strength": 0.1,
+          "moves": [{ "kind": "detachment", "to": { "lat": 36.08, "lon": -6.48 } }]
+        },
+        { "id": "combined-centre", "position": { "lat": 36.253, "lon": -6.172 }, "heading": 275, "formation": "line", "state": "broken", "strength": 0.1 },
+        { "id": "combined-rear", "position": { "lat": 36.234, "lon": -6.174 }, "heading": 275, "formation": "line", "state": "broken", "strength": 0.1 },
+        { "id": "observation-squadron", "position": { "lat": 36.265, "lon": -6.181 }, "heading": 5, "formation": "column", "state": "engaged", "strength": 0.5 }
       ]
     },
     {
@@ -442,7 +543,7 @@
       "playback_rate": 150,
       "wind": { "from": 292.5, "force": "light" },
       "caption": "Gravina makes the signal for the ships that have not struck to rally round his flag and retreats upon Cadiz with eleven of the line; the last of the eighteen prizes strikes and firing ceases altogether about an hour after Nelson's death. The Achille, having surrendered, takes fire and blows up before sunset. The whole British fleet, many dismasted and all shattered, lies in thirteen fathom water off the shoals of Trafalgar with its prizes, the Victory and the Royal Sovereign each the centre of a cluster of ships, and few have an anchor left to let go.",
-      "notes": "The end is disputed: the Victory's log has partial firing until 16:30, Hannay ends the battle about 17:00, Mahan has the last prize strike and firing cease an hour after 16:30; the battle's end is set at 17:30 on Mahan's reading and this phase holds until then. The prize count is likewise disputed (Collingwood nineteen on the evening of the battle, Mahan and Hannay eighteen, Southey twenty); strength stays at 0.33, eleven of thirty-three in company with Gravina, whatever the exact tally struck. The remnant is placed about six miles north of the fighting at 36.345N 6.185W, making for Cadiz at about two knots since 15:00, which matches the Belleisle eyewitness's 'to the northward'; the detachment move for Dumanoir's four, still standing to the south-west, is re-listed. The British clusters have drifted a little to leeward toward the shoals.",
+      "notes": "The end is disputed: the Victory's log has partial firing until 16:30, Hannay ends the battle about 17:00, Mahan has the last prize strike and firing cease an hour after 16:30; the battle's end is set at 17:30 on Mahan's reading and this phase holds until then. The prize count is likewise disputed (Collingwood nineteen on the evening of the battle, Mahan and Hannay eighteen, Southey twenty); strength stays at 0.33, eleven of thirty-three in company with Gravina, whatever the exact tally struck. The remnant is placed about six miles north of the fighting at 36.345N 6.185W, making for Cadiz at about two knots since 15:00, which matches the Belleisle eyewitness's 'to the northward'; the detachment move for Dumanoir's four, still standing to the south-west, is re-listed. The British clusters have drifted a little to leeward toward the shoals. Squadrons: Villeneuve's centre and Alava's rear are authored destroyed at 0, the schema's word for struck, both flag officers and the ships round them being prizes; Dumanoir's van is broken at 0 with its arrow re-listed, nine of its ten ships still afloat but none of them fighting as part of it; Gravina's squadron is broken at 0.4, its remnant rallied round his flag at 36.325N 6.183W, a little south of the parent's position for the fleet's remnant. The prizes of the centre and the rear lie where they fought, drifting slowly east-south-east.",
       "references": [
         {
           "source": "collingwood-dispatch",
@@ -477,7 +578,11 @@
       ],
       "units": [
         { "id": "weather-column", "position": { "lat": 36.275, "lon": -6.19 }, "heading": 0, "formation": "column", "state": "engaged" },
+        { "id": "weather-van", "position": { "lat": 36.286, "lon": -6.186 }, "heading": 0, "formation": "column", "state": "engaged" },
+        { "id": "weather-rear", "position": { "lat": 36.262, "lon": -6.204 }, "heading": 245, "formation": "column", "state": "engaged" },
         { "id": "lee-column", "position": { "lat": 36.22, "lon": -6.19 }, "heading": 90, "formation": "column", "state": "engaged" },
+        { "id": "lee-van", "position": { "lat": 36.22, "lon": -6.165 }, "heading": 90, "formation": "column", "state": "engaged" },
+        { "id": "lee-rear", "position": { "lat": 36.22, "lon": -6.215 }, "heading": 90, "formation": "column", "state": "engaged" },
         {
           "id": "combined-fleet",
           "position": { "lat": 36.345, "lon": -6.185 },
@@ -486,7 +591,19 @@
           "state": "broken",
           "strength": 0.33,
           "moves": [{ "kind": "detachment", "to": { "lat": 36.08, "lon": -6.48 } }]
-        }
+        },
+        {
+          "id": "combined-van",
+          "position": { "lat": 36.215, "lon": -6.275 },
+          "heading": 215,
+          "formation": "column",
+          "state": "broken",
+          "strength": 0,
+          "moves": [{ "kind": "detachment", "to": { "lat": 36.08, "lon": -6.48 } }]
+        },
+        { "id": "combined-centre", "position": { "lat": 36.256, "lon": -6.163 }, "heading": 275, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "combined-rear", "position": { "lat": 36.236, "lon": -6.165 }, "heading": 275, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "observation-squadron", "position": { "lat": 36.325, "lon": -6.183 }, "heading": 340, "formation": "column", "state": "broken", "strength": 0.4 }
       ]
     }
   ]
