@@ -1,0 +1,208 @@
+/**
+ * The plate glyph: a unit as ink ship-ticks (ADR-0009), with **Billow** as the
+ * engaged mark (#58) — outlined puffs merging into one scalloped cloud that
+ * drifts to the lee flank under the phase's wind.
+ *
+ * Used by both plate views: the Chart plate and the Night plate differ only in
+ * their palettes, which is the seam's first claim. Everything here is drawn at
+ * the origin heading up the negative y axis; the caller has rotated.
+ */
+import type { Formation, UnitState } from "../../schema/types.ts";
+import { seeded } from "../primitives.ts";
+import type { Glyph, GlyphRequest } from "../view.ts";
+
+/** Ticks a unit shows at full strength. A renderer constant: no data field carries a ship count. */
+const TICKS_PER_GLYPH = 8;
+/** Half the footprint of one ship tick, across and along the heading. */
+const TICK_HALF_WIDTH = 2.6;
+const TICK_HALF_HEIGHT = 3.25;
+
+export const ticks: Glyph = { mark, body, halfWidth: (scale) => TICK_HALF_WIDTH * scale };
+
+/** The smoke, laid down before any unit's ships so a melee does not erase itself. */
+function mark(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
+  if (request.state !== "engaged" && request.state !== "broken") return;
+  drawBillow(ctx, request, seeded(request.seed));
+}
+
+function body(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
+  const { length, formation, state, strength, colour, seed, scale } = request;
+  // Its own generator from the same seed: the body draws the same ticks whether
+  // or not the mark ran before it, which is what lets the two halves be
+  // separate passes over separate loops.
+  const random = seeded(seed);
+
+  ctx.save();
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = 1.4 * scale;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  if (state === "destroyed") {
+    drawHollowOutline(ctx, length, formation, scale);
+  } else {
+    const shown = shownTicks(state, strength);
+    for (const index of occupiedSlots(state, shown, random)) {
+      const along = -length / 2 + ((index + 0.5) * length) / TICKS_PER_GLYPH;
+      const slot = formation === "column" ? { x: 0, y: along } : { x: along, y: 0 };
+      // A broken unit's ticks are knocked out of line as well as thinned out.
+      drawTick(ctx, slot, state === "broken" ? (random() - 0.5) * 0.9 : 0, scale);
+    }
+  }
+  ctx.restore();
+}
+
+/** Ticks a glyph shows: `round(ticks * strength)`, at least one unless destroyed. */
+function shownTicks(state: UnitState, strength: number): number {
+  if (state === "destroyed") return 0;
+  return Math.max(1, Math.round(TICKS_PER_GLYPH * strength));
+}
+
+/** Which slots carry a tick: a centred contiguous run when the unit holds together, scattered with gaps when broken. */
+function occupiedSlots(state: UnitState, shown: number, random: () => number): number[] {
+  if (state !== "broken") {
+    const start = Math.floor((TICKS_PER_GLYPH - shown) / 2);
+    return Array.from({ length: shown }, (_, i) => start + i);
+  }
+  const indices = new Set<number>();
+  for (let i = 0; i < shown; i++) {
+    const ideal = ((i + 0.5) * TICKS_PER_GLYPH) / shown;
+    const nudge = Math.floor(random() * 2) - 1;
+    let index = Math.min(TICKS_PER_GLYPH - 1, Math.max(0, Math.floor(ideal) + nudge));
+    while (indices.has(index) && index < TICKS_PER_GLYPH - 1) index++;
+    indices.add(index);
+  }
+  return [...indices];
+}
+
+/** One ship as a chevron pointing ahead. */
+function drawTick(ctx: CanvasRenderingContext2D, at: { x: number; y: number }, rotation: number, scale: number): void {
+  const w = TICK_HALF_WIDTH * scale;
+  const h = TICK_HALF_HEIGHT * scale;
+  ctx.save();
+  ctx.translate(at.x, at.y);
+  ctx.rotate(rotation);
+  ctx.beginPath();
+  ctx.moveTo(-w, h);
+  ctx.lineTo(0, -h);
+  ctx.lineTo(w, h);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/** The destroyed glyph: the outline the ticks would have filled, and nothing inside it. */
+function drawHollowOutline(ctx: CanvasRenderingContext2D, length: number, formation: Formation, scale: number): void {
+  const across = (TICK_HALF_WIDTH + 2) * scale;
+  const along = length / 2;
+  const w = formation === "column" ? across : along;
+  const h = formation === "column" ? along : across;
+  ctx.save();
+  ctx.lineWidth = 1 * scale;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.roundRect(-w, -h, 2 * w, 2 * h, Math.min(w, h));
+  ctx.stroke();
+  ctx.restore();
+}
+
+interface Puff {
+  x: number;
+  y: number;
+  r: number;
+}
+
+/**
+ * Billow: outlined puffs merging into one scalloped cloud, hatched on the lee
+ * side of each puff, drifting off the unit's flank under the wind.
+ *
+ * The union outline is drawn as a band rather than as strokes, so no puff's
+ * outline shows inside another: the union of the puffs is filled in ink, then
+ * the union of the same puffs eroded by the line width is filled back in
+ * paper. The cloud is therefore opaque, as the design canvas drew it.
+ */
+function drawBillow(ctx: CanvasRenderingContext2D, request: GlyphRequest, random: () => number): void {
+  const { length, formation, state, scale, palette } = request;
+  const thin = state === "broken";
+  const drift = driftDirection(request);
+
+  // Along the unit's body, and away from it in the drift's direction. The cloud
+  // starts clear of the ticks and widens as it goes, so it reads as a plume off
+  // one flank rather than a halo the unit sits inside.
+  const along = formation === "column" ? { x: 0, y: 1 } : { x: 1, y: 0 };
+  const count = Math.max(4, Math.round((thin ? 8 : 16) * scale));
+  const clearance = (TICK_HALF_WIDTH + 3) * scale;
+  const reach = (thin ? 16 : 26) * scale;
+
+  const puffs: Puff[] = [];
+  for (let i = 0; i < count; i++) {
+    const out = i / Math.max(1, count - 1);
+    // Narrow at the hull, broad downwind: the cloud fans out as it drifts.
+    const spread = (random() - 0.5) * length * (0.5 + out * 0.5);
+    const distance = clearance + out * reach;
+    puffs.push({
+      x: along.x * spread + drift.x * distance,
+      y: along.y * spread + drift.y * distance,
+      r: ((thin ? 3 : 3.5) + out * (thin ? 3.5 : 6.5)) * scale,
+    });
+  }
+
+  const width = Math.max(0.4, 0.7 * scale);
+  ctx.save();
+  tracePuffs(ctx, puffs, 0);
+  ctx.fillStyle = palette.ink;
+  ctx.fill();
+  tracePuffs(ctx, puffs, -width);
+  ctx.fillStyle = palette.paper;
+  ctx.fill();
+
+  // Three chords on each puff's lee side. Too fine to read in the legend's sample, so skipped there.
+  if (scale >= 0.9) {
+    ctx.strokeStyle = palette.ink;
+    ctx.lineWidth = 0.55 * scale;
+    for (const puff of puffs) {
+      for (const fraction of [0.3, 0.52, 0.74]) {
+        const offset = puff.r * fraction;
+        const half = Math.sqrt(Math.max(0, puff.r * puff.r - offset * offset)) * 0.82;
+        const cx = puff.x + drift.x * offset;
+        const cy = puff.y + drift.y * offset;
+        ctx.beginPath();
+        ctx.moveTo(cx - drift.y * half, cy + drift.x * half);
+        ctx.lineTo(cx + drift.y * half, cy - drift.x * half);
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.restore();
+}
+
+/** Every puff in one path, so a non-zero fill paints their union. `grow` erodes or dilates each radius. */
+function tracePuffs(ctx: CanvasRenderingContext2D, puffs: readonly Puff[], grow: number): void {
+  ctx.beginPath();
+  for (const { x, y, r } of puffs) {
+    const radius = Math.max(0.1, r + grow);
+    ctx.moveTo(x + radius, y);
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+  }
+}
+
+/**
+ * Where the cloud goes: downwind, but always clear of the ticks. The component
+ * across the unit's body is never less than half, and the component along it is
+ * damped, so smoke clears a column running dead downwind (#58, ADR-0008).
+ */
+function driftDirection({ windTo, formation }: GlyphRequest): { x: number; y: number } {
+  const along = formation === "column" ? { x: 0, y: 1 } : { x: 1, y: 0 };
+  const across = formation === "column" ? { x: 1, y: 0 } : { x: 0, y: 1 };
+  if (windTo === undefined) return across;
+
+  // The glyph is heading-up, so an angle clockwise from the heading is (sin, -cos).
+  const wind = { x: Math.sin(windTo), y: -Math.cos(windTo) };
+  const alongPart = (wind.x * along.x + wind.y * along.y) * 0.35;
+  const acrossRaw = wind.x * across.x + wind.y * across.y;
+  const acrossPart = Math.abs(acrossRaw) < 0.5 ? (acrossRaw < 0 ? -0.5 : 0.5) : acrossRaw;
+
+  const x = along.x * alongPart + across.x * acrossPart;
+  const y = along.y * alongPart + across.y * acrossPart;
+  const magnitude = Math.hypot(x, y) || 1;
+  return { x: x / magnitude, y: y / magnitude };
+}

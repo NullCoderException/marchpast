@@ -1,12 +1,15 @@
 /**
- * The map pass (ADR-0005): land polygons in a darker parchment with a fine
- * ink coastline shaded inward, and places as a small mark with the name in
- * the plate face. The caller has already clipped to the extent.
+ * The map pass (ADR-0005): land polygons in the view's land tone with a fine
+ * coastline shaded inward, and places as a small mark with the name in the
+ * plate face. The caller has already clipped to the extent.
+ *
+ * A **shared pass**: no view replaces it. Every colour it draws with comes off
+ * the palette, which is how the Night plate gets a dark shore for nothing.
  */
 import type { LonLat, MapFile } from "../schema/types.ts";
 import type { Projection } from "./projection.ts";
 import type { Plate } from "./plate.ts";
-import { font, INK, INK_RGB, LAND } from "./style.ts";
+import { atAlpha, font } from "./style.ts";
 
 /** Engraved shading inside the shoreline: wide faint strokes under a fine dark one. */
 const COASTLINE_STROKES: ReadonlyArray<readonly [width: number, alpha: number]> = [
@@ -18,12 +21,13 @@ const COASTLINE_STROKES: ReadonlyArray<readonly [width: number, alpha: number]> 
 
 export function drawMap(plate: Plate): void {
   const { ctx, map, projection } = plate;
+  const { palette } = plate.view;
   if (map === undefined) return;
 
   const rings = landRings(map);
   if (rings.length > 0) {
     tracePolygons(ctx, projection, rings);
-    ctx.fillStyle = LAND;
+    ctx.fillStyle = palette.land;
     ctx.fill("evenodd");
 
     // Shade inward only: clip to the land so the strokes never spill into the sea.
@@ -33,13 +37,13 @@ export function drawMap(plate: Plate): void {
     for (const [width, alpha] of COASTLINE_STROKES) {
       tracePolygons(ctx, projection, rings);
       ctx.lineWidth = width;
-      ctx.strokeStyle = `rgba(${INK_RGB},${alpha})`;
+      ctx.strokeStyle = atAlpha(palette.coast, alpha);
       ctx.stroke();
     }
     ctx.restore();
   }
 
-  ctx.fillStyle = INK;
+  ctx.fillStyle = palette.ink;
   ctx.font = font(15, true);
   ctx.textBaseline = "middle";
   ctx.textAlign = "left";

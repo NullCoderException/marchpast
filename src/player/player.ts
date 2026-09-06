@@ -10,12 +10,13 @@
  * transitions and state to pixels.
  */
 import type { Battle, MapFile } from "../schema/types.ts";
-import { createRenderer } from "../render/index.ts";
+import { createRenderer, viewById } from "../render/index.ts";
 import { pictureAt } from "../timeline/pictureAt.ts";
 import { createControls } from "./controls.ts";
 import { createDetailsPanel } from "./details.ts";
 import { Listeners } from "./dom.ts";
 import "./player.css";
+import { createViewSwitcher, viewFromSearch } from "./prototypeViewSwitcher.ts";
 import {
   initialState,
   jumpNext,
@@ -23,6 +24,7 @@ import {
   jumpToPhase,
   scrubTo,
   setMultiplier,
+  setView,
   tick,
   togglePlay,
   type PlayerState,
@@ -55,7 +57,7 @@ export function createPlayer({ canvas, controlsRoot, battle, map }: PlayerOption
   const listeners = new Listeners();
   const details = createDetailsPanel(battle);
 
-  let state: PlayerState = initialState(battle);
+  let state: PlayerState = initialState(battle, 1, viewFromSearch(window.location.search));
   let dirty = true;
 
   /** Takes the state a transition returned, and marks the next frame for redrawing. */
@@ -77,6 +79,9 @@ export function createPlayer({ canvas, controlsRoot, battle, map }: PlayerOption
     },
   });
   controlsRoot.append(details.root, controls.root);
+
+  // PROTOTYPE (#40): stands in for the view control #47 decides.
+  const switcher = import.meta.env.DEV ? createViewSwitcher(state.view, (view) => apply(setView(state, view))) : undefined;
 
   // Space plays and pauses, the arrows jump phases. A focused control that
   // already answers the key keeps it: space is how a button is pressed, and a
@@ -107,9 +112,10 @@ export function createPlayer({ canvas, controlsRoot, battle, map }: PlayerOption
     dirty = false;
 
     const picture = pictureAt(battle, state.clock);
-    renderer.render(battle, map, picture);
+    renderer.render(battle, map, picture, viewById(state.view));
     details.update(picture);
     controls.update(state, picture, details.isOpen());
+    switcher?.update(state.view);
   });
 
   return {
@@ -118,6 +124,7 @@ export function createPlayer({ canvas, controlsRoot, battle, map }: PlayerOption
       listeners.removeAll();
       controls.destroy();
       details.root.remove();
+      switcher?.destroy();
     },
   };
 }

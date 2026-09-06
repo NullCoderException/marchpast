@@ -3,10 +3,14 @@
  * plate face. Left, the battle clock and date; right, the phase label, the
  * caption word-wrapped, and beneath it the phase's reference source labels.
  * Part of the picture, so a screenshot stands alone.
+ *
+ * A **shared pass**: the band's anatomy is fixed across views (#58), so a view
+ * changes only the paper and ink it is drawn in.
  */
 import type { Battle } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
-import { font, INK, PARCHMENT } from "./style.ts";
+import { font } from "./style.ts";
+import type { Palette } from "./view.ts";
 import { formatClock, wrapText } from "./text.ts";
 
 const PAD_X = 24;
@@ -63,11 +67,12 @@ export function drawCaption(
   layout: CaptionLayout,
   top: number,
   width: number,
+  palette: Palette,
 ): void {
   ctx.save();
-  ctx.fillStyle = PARCHMENT;
+  ctx.fillStyle = palette.paper;
   ctx.fillRect(0, top, width, layout.height);
-  ctx.strokeStyle = INK;
+  ctx.strokeStyle = palette.ink;
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(0, top + 0.5);
@@ -76,7 +81,7 @@ export function drawCaption(
   ctx.lineTo(width, top + 3.5);
   ctx.stroke();
 
-  ctx.fillStyle = INK;
+  ctx.fillStyle = palette.ink;
   ctx.textBaseline = "top";
   ctx.textAlign = "left";
 
