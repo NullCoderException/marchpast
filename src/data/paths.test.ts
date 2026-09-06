@@ -1,9 +1,5 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { battleUrl, mapUrl } from "./paths";
-
-afterEach(() => {
-  vi.unstubAllEnvs();
-});
 
 describe("data served by name", () => {
   it("resolves a battle name to data/battles/<name>.json", () => {
@@ -16,13 +12,19 @@ describe("data served by name", () => {
 });
 
 describe("data under a base path", () => {
-  it("puts a battle beneath the app's base URL", () => {
+  beforeEach(() => {
     vi.stubEnv("BASE_URL", "/sandtable/");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("puts a battle beneath the app's base URL", () => {
     expect(battleUrl("trafalgar")).toBe("/sandtable/data/battles/trafalgar.json");
   });
 
   it("puts a map beneath the app's base URL", () => {
-    vi.stubEnv("BASE_URL", "/sandtable/");
     expect(mapUrl("cadiz")).toBe("/sandtable/data/maps/cadiz.geojson");
   });
 });

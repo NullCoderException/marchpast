@@ -9,7 +9,7 @@
  * these URLs real live in `vite/serve-data.ts`.
  */
 
-/** Directory the data files are served under, beneath the app's base URL. Mirrors the repo's `data/`; `vite/serve-data.ts` mounts the same name. */
+/** Directory the data files are served under, beneath the app's base URL. Mirrors the repo's `data/`, which `vite/serve-data.ts` mounts at the dev server's root (where the dev base leaves it) and copies into `dist/data/` for the build. */
 const DATA_DIR = "data";
 
 /** The data prefix for this deployment, e.g. `/data` in dev and `/sandtable/data` on GitHub Pages. `BASE_URL` always ends in a slash. */

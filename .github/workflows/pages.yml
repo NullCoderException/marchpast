@@ -29,6 +29,12 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # The same checks ci.yml runs, repeated here rather than assumed: this
+      # workflow triggers on the push independently of CI, so without them a
+      # main with failing tests or a broken data file would still publish.
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run validate
       # `base` is /sandtable/ for the build (vite.config.ts), which is the path
       # Pages serves a project site under, and `vite/serve-data.ts` copies
       # data/ into dist/data/.
