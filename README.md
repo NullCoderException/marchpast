@@ -29,7 +29,7 @@ CI (`.github/workflows/ci.yml`) runs `npm ci`, `typecheck`, `test`, `validate` a
 ## Adding a battle
 
 1. Write `data/battles/<name>.json` following [`docs/schema.md`](docs/schema.md). `data/battles/trafalgar.json` is the worked example.
-2. If the battle plays over a coastline, add `data/maps/<name>.geojson` and set the battle's `map` field to that bare name. The map is a GeoJSON `FeatureCollection` with its own `license` and `attribution` members.
+2. If the battle plays over a coastline, add `data/maps/<name>.geojson` and set the battle's `map` field to that bare name. The map is a GeoJSON `FeatureCollection` with its own `license` and `attribution` members, holding six kinds of feature: `land` and `shoal` as polygons, `river` and `contour` as lines, `place` and `work` as points.
 3. Run `npm run validate`. It reports every error with the file and the JSON-pointer path of the offending value, and exits 1 if there is any.
 4. Open `http://localhost:5173/?battle=<name>`. The app fetches the battle, validates it in the browser too, follows its `map`, and plays it; if the file cannot be fetched or fails validation, the errors are drawn on the plate instead, file, path and message as the command line prints them, and logged to the console.
 
