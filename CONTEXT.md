@@ -101,11 +101,11 @@ How far down the tree of parents and children the plate is drawing, counted from
 _Avoid_: Resolution, granularity, tier, zoom, depth (in prose)
 
 **State**:
-Which of four conditions a unit is in during a phase: intact (not yet in action), engaged (in the action or its aftermath, cohesion held), broken (cohesion lost, no longer fighting as a body), or destroyed (ceased to exist as a fighting unit). A unit that has fought stays engaged when the firing stops.
-_Avoid_: Status, condition, morale, struck
+Which of four conditions a unit is in during a phase: intact (not yet in action), engaged (in the action or its aftermath, cohesion held), broken (cohesion lost, no longer acting as one body, whether it flees or fights on in fragments), or destroyed (ceased to exist as a fighting unit, whatever became of its men). A unit that has fought stays engaged when the firing stops. A state says what condition a unit is in and never where it is: a wing that has ridden off the field keeps whatever state its condition earns.
+_Avoid_: Status, condition, morale, struck, routed, annihilated
 
 **Strength**:
-The fraction, 0 to 1, of a unit's opening fighting strength still fighting as part of the unit during a phase. Damage to ships or men who stay in the fight does not reduce it; ships or men that have struck, or been detached from the unit, have left it and do.
+The fraction, 0 to 1, of a unit's opening fighting strength still fighting as part of the unit during a phase. Damage to ships or men who stay in the fight does not reduce it; ships or men that have struck, fled, or been detached from the unit for the rest of the battle have left it and do. A detachment that returns to the unit never left it and costs nothing. Never a casualty count: a unit that has run is near zero before any of its men are dead.
 _Avoid_: Health, casualties, hit points, size, losses
 
 **Commander**:
