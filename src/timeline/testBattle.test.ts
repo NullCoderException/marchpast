@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { validateBattle } from "../schema/validateBattle.ts";
-import { TEST_BATTLE } from "./testBattle.ts";
+import { NIGHT_BATTLE, TEST_BATTLE } from "./testBattle.ts";
 
-describe("the timeline's test battle", () => {
+describe.each([
+  ["TEST_BATTLE", TEST_BATTLE],
+  ["NIGHT_BATTLE", NIGHT_BATTLE],
+])("the timeline's %s", (_name, battle) => {
   it("is a battle file the validator accepts, so no timeline rule is proved on an impossible file", () => {
-    const result = validateBattle(structuredClone(TEST_BATTLE));
+    const result = validateBattle(structuredClone(battle));
     expect(result.ok ? [] : result.errors).toEqual([]);
   });
 });

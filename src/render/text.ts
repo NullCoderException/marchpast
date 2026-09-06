@@ -33,7 +33,13 @@ export function compassPoint(degreesTrue: number): string {
   return COMPASS_POINTS[index] ?? "N";
 }
 
-/** The battle clock as `HH:MM`, whole minutes; seconds are dropped, never rounded up. */
+/**
+ * The battle clock as the `"HH:MM"` time of day, whole minutes; seconds are
+ * dropped, never rounded up. The clock is a total from midnight of the first
+ * day, so `formatBattleTime` takes the remainder and the readout stays a time
+ * the viewer recognises: day 1 at `05:05` reads `"05:05"`, never `"29:05"`
+ * (ADR-0013).
+ */
 export function formatClock(clock: ClockSeconds): string {
   return formatBattleTime(Math.floor(clock / 60));
 }

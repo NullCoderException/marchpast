@@ -3,28 +3,29 @@
  * long each takes to play at a given speed, and which phase holds a given
  * instant.
  *
- * A phase carries one instant, `t`, not a start and an end (ADR-0002): its
- * interval runs to the next phase's `t`, and the last phase's runs to the
- * battle's `end`. Intervals come in two units because the battle has two:
- * `intervals` is minutes, since `"HH:MM"` is all the schema stores, and
- * `clockIntervals` is the same stretch in the seconds the playing clock
- * counts, a wall frame being worth a fraction of a minute. Everything a
- * player holds is seconds.
+ * A phase carries one instant, `t` on its `day`, not a start and an end
+ * (ADR-0002, ADR-0013): its interval runs to the next phase's instant, and the
+ * last phase's runs to the battle's `end` on `end_day`. Intervals come in two
+ * units because the battle has two: `intervals` is minutes, since `"HH:MM"`
+ * and a day offset are all the schema stores, and `clockIntervals` is the same
+ * stretch in the seconds the playing clock counts, a wall frame being worth a
+ * fraction of a minute. Everything a player holds is seconds.
  *
- * This module still reads `t` alone and ignores a phase's `day`, so it is
- * right for a battle inside one day and wrong across midnight. The clock that
- * counts from the first day's midnight (`instantMinutes` in
- * `src/schema/time.ts`) is the battle-clock slice's work, not this one's.
+ * Every number here counts from midnight of the battle's first day
+ * (`instantMinutes` in `src/schema/time.ts`), so a battle that crosses
+ * midnight stays monotonic and every comparison below stays a comparison of
+ * plain numbers. Only converting back to `"HH:MM"` takes the remainder, and
+ * that is `formatBattleTime`'s work, never this module's.
  */
-import type { Battle } from "../schema/types.ts";
-import { parseBattleTime } from "../schema/time.ts";
+import type { Battle, Phase } from "../schema/types.ts";
+import { instantMinutes } from "../schema/time.ts";
 import type { ClockSeconds } from "./picture.ts";
 
-/** One phase's stretch of battle clock, in minutes since midnight, and the rate it plays at. */
+/** One phase's stretch of battle clock, in minutes from midnight of the first day, and the rate it plays at. */
 export interface Interval {
-  /** The phase's own `t`. */
+  /** The phase's own instant, `t` on its `day`. */
   startMinutes: number;
-  /** The next phase's `t`, or the battle's `end` for the last phase. */
+  /** The next phase's instant, or the battle's `end` on `end_day` for the last phase. */
   endMinutes: number;
   /** Battle-clock seconds per real second, before any viewer multiplier. */
   playbackRate: number;
@@ -34,9 +35,9 @@ export interface Interval {
 export interface ClockInterval {
   /** Index into `battle.phases`. */
   index: number;
-  /** The phase's own `t`, in battle-clock seconds. */
+  /** The phase's own instant, in battle-clock seconds. */
   startSeconds: ClockSeconds;
-  /** The next phase's `t`, or the battle's `end` for the last phase, in battle-clock seconds. */
+  /** The next phase's instant, or the battle's `end` on `end_day` for the last phase, in battle-clock seconds. */
   endSeconds: ClockSeconds;
   /** Battle-clock seconds per real second, before any viewer multiplier. */
   playbackRate: number;
@@ -44,7 +45,7 @@ export interface ClockInterval {
 
 /** How long the whole battle and each of its phases take to play, in wall seconds. */
 export interface WallDuration {
-  /** Wall seconds from the first phase's `t` to `end`. */
+  /** Wall seconds from the first phase's instant to `end`. */
   total: number;
   /** Wall seconds per phase, in phase order. */
   perPhase: number[];
@@ -57,14 +58,28 @@ export function checkMultiplier(multiplier: number): void {
   }
 }
 
+/** A phase's instant in minutes from midnight of the first day; an absent `day` is day 0 (schema.md 2.4). */
+function phaseInstantMinutes(phase: Phase): number {
+  return instantMinutes(phase.day ?? 0, phase.t);
+}
+
+/**
+ * The battle's `end` in the same minutes. `end_day` defaults to the last
+ * phase's `day` rather than to 0, because "later than the last phase" is only
+ * meaningful on the same day (ADR-0013).
+ */
+function endInstantMinutes(battle: Battle): number {
+  return instantMinutes(battle.end_day ?? battle.phases.at(-1)?.day ?? 0, battle.end);
+}
+
 /** Each phase's interval, in phase order. */
 export function intervals(battle: Battle): Interval[] {
-  const end = parseBattleTime(battle.end);
+  const end = endInstantMinutes(battle);
   return battle.phases.map((phase, index) => {
     const next = battle.phases[index + 1];
     return {
-      startMinutes: parseBattleTime(phase.t),
-      endMinutes: next === undefined ? end : parseBattleTime(next.t),
+      startMinutes: phaseInstantMinutes(phase),
+      endMinutes: next === undefined ? end : phaseInstantMinutes(next),
       playbackRate: phase.playback_rate,
     };
   });
@@ -80,19 +95,19 @@ export function clockIntervals(battle: Battle): ClockInterval[] {
   }));
 }
 
-/** The instant playback starts from: the first phase's `t`, in battle-clock seconds. */
+/** The instant playback starts from: the first phase's instant, in battle-clock seconds. */
 export function startClock(battle: Battle): ClockSeconds {
   const first = battle.phases[0];
   if (first === undefined) throw new RangeError("A battle has at least one phase");
-  return parseBattleTime(first.t) * 60;
+  return phaseInstantMinutes(first) * 60;
 }
 
-/** The instant playback finishes at: the battle's `end`, in battle-clock seconds. */
+/** The instant playback finishes at: the battle's `end` on `end_day`, in battle-clock seconds. */
 export function endClock(battle: Battle): ClockSeconds {
-  return parseBattleTime(battle.end) * 60;
+  return endInstantMinutes(battle) * 60;
 }
 
-/** `clock` held inside the battle: never before the first phase's `t`, never past `end`. */
+/** `clock` held inside the battle: never before the first phase's instant, never past `end`. */
 export function clampClock(battle: Battle, clock: ClockSeconds): ClockSeconds {
   return Math.min(Math.max(clock, startClock(battle)), endClock(battle));
 }
@@ -121,15 +136,16 @@ export function scrubberSegments(battle: Battle, multiplier = 1): number[] {
 }
 
 /**
- * The index of the phase whose interval holds `clockMinutes`: from its own `t`
- * up to but not including the next phase's. An instant before the first phase
- * clamps to the first; `end` and anything past it clamps to the last, which is
- * what makes the last phase hold.
+ * The index of the phase whose interval holds `clockMinutes`, counted from
+ * midnight of the first day: from the phase's own instant up to but not
+ * including the next phase's. An instant before the first phase clamps to the
+ * first; `end` and anything past it clamps to the last, which is what makes
+ * the last phase hold.
  */
 export function phaseIndexAt(battle: Battle, clockMinutes: number): number {
   const phases = battle.phases;
   for (let index = phases.length - 1; index > 0; index -= 1) {
-    if (clockMinutes >= parseBattleTime(phases[index]!.t)) return index;
+    if (clockMinutes >= phaseInstantMinutes(phases[index]!)) return index;
   }
   return 0;
 }

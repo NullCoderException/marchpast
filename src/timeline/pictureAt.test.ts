@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Battle } from "../schema/types.ts";
 import { pictureAt } from "./pictureAt.ts";
-import { TEST_BATTLE, clock, cloneTestBattle } from "./testBattle.ts";
+import { NIGHT_BATTLE, TEST_BATTLE, clock, cloneTestBattle } from "./testBattle.ts";
 
 /** The unit of that id in the picture; fails loudly rather than returning undefined. */
 function unit(picture: ReturnType<typeof pictureAt>, id: string) {
@@ -130,5 +130,28 @@ describe("pictureAt: the clock", () => {
 
   it("lists every roster unit in roster order", () => {
     expect(pictureAt(TEST_BATTLE, clock("10:05")).units.map((u) => u.id)).toEqual(["alpha", "beta"]);
+  });
+});
+
+describe("pictureAt across midnight", () => {
+  it("tweens through midnight as one interval, because the clock never resets", () => {
+    // Halfway from 23:00 to 05:05 is 02:02:30 on day 1. Nothing about the day
+    // break interrupts the tween or restarts the fraction.
+    const picture = pictureAt(NIGHT_BATTLE, clock("02:02:30", 1));
+
+    expect(picture.phaseIndex).toBe(0);
+    expect(unit(picture, "alpha").position.lat).toBeCloseTo(15, 12);
+    expect(unit(picture, "alpha").position.lon).toBeCloseTo(30, 12);
+  });
+
+  it("carries the phase's own day, which is what the caption band's date reads", () => {
+    expect(pictureAt(NIGHT_BATTLE, clock("23:30")).phase.day).toBeUndefined();
+    expect(pictureAt(NIGHT_BATTLE, clock("05:05", 1)).phase.day).toBe(1);
+    expect(pictureAt(NIGHT_BATTLE, clock("11:30", 1)).phase.day).toBe(1);
+  });
+
+  it("clamps to the battle's own ends, which lie on different days", () => {
+    expect(pictureAt(NIGHT_BATTLE, clock("06:00")).clock).toBe(clock("23:00"));
+    expect(pictureAt(NIGHT_BATTLE, clock("23:00", 1)).clock).toBe(clock("14:00", 1));
   });
 });

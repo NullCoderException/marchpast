@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { drawCaption, layoutCaption } from "./drawCaption.ts";
 import type { Battle } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
+import { pictureAt } from "../timeline/pictureAt.ts";
+import { NIGHT_BATTLE, clock } from "../timeline/testBattle.ts";
 import { DEFAULT_VIEW } from "./views.ts";
 
 /** A measuring context: every glyph six pixels wide, which is all the layout needs. */
@@ -115,5 +117,28 @@ describe("the caption band's date", () => {
     const { ctx, texts } = recordingContext();
     drawCaption(ctx, battle, noDay, layoutCaption(fakeContext(), battle, noDay, 1280), 0, 1280, DEFAULT_VIEW.palette);
     expect(texts).toContain("21 October 1805");
+  });
+});
+
+describe("the caption band on a battle that crosses midnight", () => {
+  /** Draws the band for the real picture at `at`, and gives back every string it drew. */
+  function draw(at: number): string[] {
+    const picture = pictureAt(NIGHT_BATTLE, at);
+    const layout = layoutCaption(fakeContext(), NIGHT_BATTLE, picture, 1280);
+    const { ctx, texts } = recordingContext();
+    drawCaption(ctx, NIGHT_BATTLE, picture, layout, 0, 1280, DEFAULT_VIEW.palette);
+    return texts;
+  }
+
+  it("shows the first day's date before midnight and the second after, with the time of day beside it", () => {
+    expect(draw(clock("23:30"))).toEqual(expect.arrayContaining(["23:30", "1 January 1800"]));
+    expect(draw(clock("11:30", 1))).toEqual(expect.arrayContaining(["11:30", "2 January 1800"]));
+  });
+
+  it("reads the small hours as a time of day, under the date of the phase that is still running", () => {
+    // 02:20 is past midnight but still inside the evening phase, so the clock
+    // takes the remainder while the date stays the one that phase falls on:
+    // the band follows the phase's day, not the clock's calendar day.
+    expect(draw(clock("02:20", 1))).toEqual(expect.arrayContaining(["02:20", "1 January 1800"]));
   });
 });

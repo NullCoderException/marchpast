@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { formatBattleTime } from "../schema/time.ts";
 import { startClock } from "./intervals.ts";
 import { advance, nextPhaseStart, previousPhaseStart } from "./playback.ts";
-import { TEST_BATTLE, clock } from "./testBattle.ts";
+import { NIGHT_BATTLE, TEST_BATTLE, clock } from "./testBattle.ts";
 
 describe("advance", () => {
   it("converts wall seconds through the current phase's playback rate", () => {
@@ -79,5 +80,32 @@ describe("previousPhaseStart", () => {
     // whole interval, so under a wall second into it is not a state the
     // player can be in, and the issue decides nothing about it.
     expect(previousPhaseStart(TEST_BATTLE, clock("10:30"), 1.5)).toBe(clock("10:20"));
+  });
+});
+
+describe("driving the clock across midnight", () => {
+  it("carries the clock past midnight without resetting it", () => {
+    // 20 wall seconds at 600x is 12,000 battle seconds from 23:00, which the
+    // clock holds as 94,800 and never as 8,400. It reads 02:20 the next morning.
+    expect(advance(NIGHT_BATTLE, clock("23:00"), 20, 1)).toEqual({ clockSeconds: 94_800, finished: false });
+    expect(formatBattleTime(94_800 / 60)).toBe("02:20");
+  });
+
+  it("changes phase at daybreak, a boundary on the far side of midnight", () => {
+    // 36.5 wall seconds finish the evening phase at 05:05; the remaining 3.5
+    // buy 2,100 battle seconds of the daybreak phase, landing at 05:40.
+    expect(advance(NIGHT_BATTLE, clock("23:00"), 40, 1)).toEqual({ clockSeconds: clock("05:40", 1), finished: false });
+  });
+
+  it("stops at end on the second day and reports finished", () => {
+    expect(advance(NIGHT_BATTLE, clock("23:00"), 90, 1)).toEqual({ clockSeconds: clock("14:00", 1), finished: true });
+    expect(advance(NIGHT_BATTLE, clock("23:00"), 1000, 1)).toEqual({ clockSeconds: clock("14:00", 1), finished: true });
+  });
+
+  it("jumps to a phase instant on the day it falls on", () => {
+    expect(nextPhaseStart(NIGHT_BATTLE, clock("23:30"))).toBe(clock("05:05", 1));
+    expect(nextPhaseStart(NIGHT_BATTLE, clock("11:30", 1))).toBe(clock("14:00", 1));
+    expect(previousPhaseStart(NIGHT_BATTLE, clock("05:05", 1), 0)).toBe(clock("23:00"));
+    expect(previousPhaseStart(NIGHT_BATTLE, clock("06:00", 1), 2)).toBe(clock("05:05", 1));
   });
 });

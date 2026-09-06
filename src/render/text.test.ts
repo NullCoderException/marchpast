@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { pictureAt } from "../timeline/pictureAt.ts";
+import { NIGHT_BATTLE, clock } from "../timeline/testBattle.ts";
 import { compassPoint, formatClock, wrapText } from "./text.ts";
 
 /** A fake measurer: every character is 10 px wide. */
@@ -51,10 +53,29 @@ describe("compassPoint", () => {
 });
 
 describe("formatClock", () => {
-  it("writes battle-clock seconds since midnight as HH:MM, dropping seconds", () => {
+  it("writes battle-clock seconds as the HH:MM time of day, dropping seconds", () => {
     expect(formatClock(0)).toBe("00:00");
     expect(formatClock(12 * 3600 + 15 * 60)).toBe("12:15");
     expect(formatClock(16 * 3600 + 59)).toBe("16:00");
     expect(formatClock(23 * 3600 + 59 * 60 + 59)).toBe("23:59");
+  });
+});
+
+describe("formatClock past the first midnight", () => {
+  it("shows the time of day, so the readout never runs to 29:05 (ADR-0013)", () => {
+    // The battle clock counts from midnight of the battle's first day, so
+    // 05:05 on day 1 is 104,700 seconds; the readout takes the remainder.
+    expect(formatClock(104_700)).toBe("05:05");
+    expect(formatClock(94_800)).toBe("02:20");
+    expect(formatClock(136_800)).toBe("14:00");
+  });
+
+  it("gives the daybreak phase the readout the scrubber shows, on a real picture", () => {
+    // `formatClock(picture.clock)` is the scrubber readout verbatim
+    // (`src/player/controls.ts`), which has no test of its own because the
+    // controls need a DOM. Driving the same expression off the fixture's own
+    // picture is as close as this suite gets to the readout itself.
+    expect(formatClock(pictureAt(NIGHT_BATTLE, clock("05:05", 1)).clock)).toBe("05:05");
+    expect(formatClock(pictureAt(NIGHT_BATTLE, clock("23:30")).clock)).toBe("23:30");
   });
 });
