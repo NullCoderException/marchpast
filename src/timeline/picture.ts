@@ -10,7 +10,13 @@
  */
 import type { Formation, Heading, Move, Phase, Position, Reference, UnitState, Wind } from "../schema/types.ts";
 
-/** Battle-clock seconds since midnight on the battle's date. */
+/**
+ * Battle-clock seconds counted from midnight of the battle's **first** day, so
+ * a battle that crosses midnight stays monotonic: `05:05` on day 1 is 104,700,
+ * never 18,300, and the total never resets (ADR-0013). A reading, never an
+ * instant: no timezone, never UTC, never a `Date`. Only what formats it back
+ * to `"HH:MM"` takes the remainder, to give the time of day.
+ */
 export type ClockSeconds = number;
 
 /** The current interval's tween endpoints for one unit, so the renderer can draw the arrow ahead. Absent in the last phase. */
@@ -47,7 +53,7 @@ export interface Picture {
   phaseIndex: number;
   /** That phase, for anything the renderer reads straight from it. */
   phase: Phase;
-  /** The instant, in battle-clock seconds since midnight. */
+  /** The instant, in battle-clock seconds from midnight of the first day. The day it falls on is `phase.day`. */
   clock: ClockSeconds;
   /** Every roster unit, in roster order. */
   units: UnitPicture[];

@@ -19,7 +19,7 @@ export const MULTIPLIERS = [0.5, 1, 2, 4] as const;
 
 /** Everything the player knows between frames. */
 export interface PlayerState {
-  /** The battle-clock instant on screen, in seconds since midnight. */
+  /** The battle-clock instant on screen, in seconds from midnight of the battle's first day. */
   clock: ClockSeconds;
   /** Whether the loop is advancing the clock. */
   playing: boolean;

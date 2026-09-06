@@ -58,3 +58,13 @@ describe("formatClock", () => {
     expect(formatClock(23 * 3600 + 59 * 60 + 59)).toBe("23:59");
   });
 });
+
+describe("formatClock past the first midnight", () => {
+  it("shows the time of day, so the readout never runs to 29:05 (ADR-0013)", () => {
+    // The battle clock counts from midnight of the battle's first day, so
+    // 05:05 on day 1 is 104,700 seconds; the readout takes the remainder.
+    expect(formatClock(104_700)).toBe("05:05");
+    expect(formatClock(94_800)).toBe("02:20");
+    expect(formatClock(136_800)).toBe("14:00");
+  });
+});

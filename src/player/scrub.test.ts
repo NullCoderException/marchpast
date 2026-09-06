@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { barSegments, clockToFraction, fractionToClock } from "./scrub.ts";
-import { TEST_BATTLE, clock } from "../timeline/testBattle.ts";
+import { NIGHT_BATTLE, TEST_BATTLE, clock } from "../timeline/testBattle.ts";
 
 // The fixture plays in 1 + 10 + 5 = 16 wall seconds, so the three segments are
 // 1/16, 10/16 and 5/16 of the bar.
@@ -62,5 +62,30 @@ describe("fractionToClock", () => {
   it("clamps a fraction outside the bar", () => {
     expect(fractionToClock(TEST_BATTLE, -0.5)).toBe(clock("10:00"));
     expect(fractionToClock(TEST_BATTLE, 1.5)).toBe(clock("10:30"));
+  });
+});
+
+// The two-day fixture plays in 36.5 + 35.5 + 18 = 90 wall seconds, so its
+// segments are the intervals the days give the phases, not the times of day.
+describe("the bar for a battle that crosses midnight", () => {
+  it("sizes one segment per phase by the interval its day puts it in", () => {
+    expect(barSegments(NIGHT_BATTLE)).toEqual([
+      { index: 0, start: 0, end: 36.5 / 90 },
+      { index: 1, start: 36.5 / 90, end: 36.5 / 90 + 35.5 / 90 },
+      { index: 2, start: 36.5 / 90 + 35.5 / 90, end: 1 },
+    ]);
+  });
+
+  it("puts the battle's ends at the bar's ends and midnight inside the first segment", () => {
+    expect(clockToFraction(NIGHT_BATTLE, clock("23:00"))).toBe(0);
+    expect(clockToFraction(NIGHT_BATTLE, clock("14:00", 1))).toBe(1);
+    expect(clockToFraction(NIGHT_BATTLE, clock("00:00", 1))).toBeGreaterThan(0);
+    expect(clockToFraction(NIGHT_BATTLE, clock("00:00", 1))).toBeLessThan(36.5 / 90);
+  });
+
+  it("converts a fraction back to a clock on the day it falls on", () => {
+    expect(fractionToClock(NIGHT_BATTLE, 36.5 / 90)).toBe(clock("05:05", 1));
+    expect(fractionToClock(NIGHT_BATTLE, 0)).toBe(clock("23:00"));
+    expect(fractionToClock(NIGHT_BATTLE, 1)).toBe(clock("14:00", 1));
   });
 });
