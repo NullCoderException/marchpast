@@ -1,7 +1,8 @@
 /**
  * The controls beneath the plate: play/pause, the phase-segmented scrubber and
  * its battle-clock readout, the phase-jump buttons, the speed multiplier, the
- * View chooser and the details-panel toggle. Plain DOM, no framework.
+ * View chooser, the Level chooser when the battle has more than one level, and
+ * the details-panel toggle. Plain DOM, no framework.
  *
  * Nothing here decides anything: every gesture calls one of the transitions in
  * `state.ts` through the handlers it was given, and `update` is the only way
@@ -13,7 +14,7 @@ import type { Battle } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
 import { Listeners, element } from "./dom.ts";
 import { barSegments, clockToFraction, type BarFraction } from "./scrub.ts";
-import { MULTIPLIERS, type PlayerState } from "./state.ts";
+import { levelOptions, MULTIPLIERS, type PlayerState } from "./state.ts";
 
 /** What the viewer's gestures ask the player to do. */
 export interface ControlHandlers {
@@ -27,6 +28,8 @@ export interface ControlHandlers {
   setMultiplier(multiplier: number): void;
   /** Picking a view, which takes effect on the next frame and interrupts nothing (#47). */
   setView(view: ViewId): void;
+  /** Picking a level by its depth, which changes only which units are drawn (ADR-0017). */
+  setLevel(level: number): void;
   toggleDetails(): void;
 }
 
@@ -53,12 +56,13 @@ export function createControls(battle: Battle, handlers: ControlHandlers): Contr
   const readout = element("output", "st-readout", "--:--");
   const multiplier = multiplierChooser(listeners, handlers);
   const view = viewChooser(listeners, handlers);
+  const level = levelChooser(battle, listeners, handlers);
   const details = button("st-details-toggle", "Details", () => handlers.toggleDetails());
   details.setAttribute("aria-expanded", "false");
 
-  // The tail of the strip is the two controls that change how the battle is
-  // presented rather than where in it we are (#47).
-  root.append(previous, play, next, bar, readout, multiplier, view, details);
+  // The tail of the strip is the controls that change how the battle is
+  // presented rather than where in it we are (#47, ADR-0017).
+  root.append(previous, play, next, bar, readout, multiplier, view, ...(level === undefined ? [] : [level]), details);
 
   return {
     root,
@@ -77,6 +81,7 @@ export function createControls(battle: Battle, handlers: ControlHandlers): Contr
 
       for (const option of multiplier.options) option.selected = Number(option.value) === state.multiplier;
       for (const option of view.options) option.selected = option.value === state.view;
+      if (level !== undefined) for (const option of level.options) option.selected = Number(option.value) === state.level;
       details.setAttribute("aria-expanded", String(detailsOpen));
       details.classList.toggle("st-on", detailsOpen);
     },
@@ -189,5 +194,30 @@ function viewChooser(listeners: Listeners, handlers: ControlHandlers): HTMLSelec
     select.append(option);
   }
   listeners.on<Event>(select, "change", () => handlers.setView(viewById(select.value).id));
+  return select;
+}
+
+/**
+ * The Level chooser (ADR-0017): the battle's own level names, coarsest first,
+ * beside the View chooser and for the same reasons — a short fixed list of
+ * viewer preferences that has to show what is picked without being opened.
+ * `undefined`, and so no chooser at all, when the battle has one level.
+ *
+ * An option's value is its depth, which is the whole of what the renderer
+ * needs. There is no `?level=` and no keyboard shortcut: the player's keys are
+ * all transport, and the choice lasts the visit.
+ */
+function levelChooser(battle: Battle, listeners: Listeners, handlers: ControlHandlers): HTMLSelectElement | undefined {
+  const levels = levelOptions(battle);
+  if (levels.length === 0) return undefined;
+
+  const select = element("select", "st-level");
+  select.setAttribute("aria-label", "Level");
+  for (const [depth, name] of levels.entries()) {
+    const option = element("option", undefined, name);
+    option.value = String(depth);
+    select.append(option);
+  }
+  listeners.on<Event>(select, "change", () => handlers.setLevel(Number(select.value)));
   return select;
 }

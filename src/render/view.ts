@@ -26,11 +26,17 @@ export type ViewId = "plate" | "night" | "atlas";
 /**
  * What one viewer chose, for one frame. Per-frame viewer state, never renderer
  * state: the renderer holds nothing but its canvases, and two viewers of the
- * same instant hold the same picture and different viewers of it. The level
- * chooser and the unit card extend this object in their own slices.
+ * same instant hold the same picture and different viewers of it. The unit
+ * card extends this object in its own slice.
  */
 export interface Viewer {
   view: ViewId;
+  /**
+   * The depth of the unit tree to draw: `0` is the coarsest. Every unit has a
+   * picture at every level, so this narrows what is drawn and nothing else
+   * (ADR-0017, schema.md 2.11).
+   */
+  level: number;
 }
 
 /** The materials a view is drawn in. */

@@ -4,10 +4,15 @@
  * animation loop lives here; the player owns that and calls `render` whenever
  * the picture, the viewer's choices or the canvas changes.
  *
- * The viewer's state is as per-frame as the picture is — a view may be
- * switched at any instant — so it is an argument to `render`, not construction
- * config. The renderer holds nothing but the canvas and its context (and the
- * one scratch canvas the plate's smoke is composited on).
+ * The viewer's state is as per-frame as the picture is — a view or a level may
+ * be switched at any instant — so it is an argument to `render`, not
+ * construction config. The renderer holds nothing but the canvas and its
+ * context (and the one scratch canvas the plate's smoke is composited on).
+ *
+ * The viewer's **level** is applied once, here, before any pass runs: the
+ * timeline hands over every roster unit's picture and `level.ts` narrows it to
+ * the units this level draws (schema.md 2.11). Nothing else in the frame
+ * varies with it.
  *
  * Sizing: each call reads the canvas's CSS size and the devicePixelRatio and
  * resizes the backing store when either changed, so resizes and zooms need
@@ -19,6 +24,7 @@ import { drawCaption, layoutCaption } from "./drawCaption.ts";
 import { drawFurniture } from "./drawFurniture.ts";
 import { drawMap } from "./drawMap.ts";
 import { drawUnits } from "./drawUnits.ts";
+import { unitsDrawn } from "./level.ts";
 import { seeded } from "./primitives.ts";
 import { fitProjection, type Rect } from "./projection.ts";
 import type { Plate } from "./plate.ts";
@@ -73,6 +79,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
         battle,
         map,
         picture,
+        unitsDrawn: unitsDrawn(battle.units, picture.units, viewer.level),
         projection,
         colours: sideColours(battle, palette),
         glyphLength: Math.max(MIN_GLYPH_PX, NOMINAL_GLYPH_NMI * METRES_PER_UNIT.nmi * pixelsPerMetre),
