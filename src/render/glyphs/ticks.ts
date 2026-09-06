@@ -6,7 +6,7 @@
  *
  * The sign is the arm's: a ship's chevron tick unchanged from v1, a solid rank
  * bar for foot, the same bar barred for horse (ADR-0015, ADR-0016). Where the
- * signs sit is `arrangement.ts`, which every view shares; this file is only
+ * signs sit is `slots.ts`, which every view shares; this file is only
  * what they look like on paper.
  *
  * Used by both plate views: the Chart plate and the Night plate differ only in
