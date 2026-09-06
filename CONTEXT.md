@@ -94,6 +94,10 @@ _Avoid_: Arrow, order, action, track
 The narration text a phase shows, one plain string chosen by the author, holding until the next phase begins.
 _Avoid_: Narration, subtitle, alternate, label
 
+**Summary**:
+One plain sentence a battle carries to describe itself where the whole battle is named but not played, such as the library.
+_Avoid_: Description, blurb, abstract, tagline
+
 **Source**:
 A work the battle draws on, listed once per battle with its display label, work details, and licence, whether or not any phase references it.
 _Avoid_: Bibliography, citation, reference (for the work itself)
@@ -117,7 +121,7 @@ _Avoid_: Commentary, alternates, uncertainty, confidence
 ### Player
 
 **Controls**:
-What the viewer operates to drive playback: play and pause, the scrubber, the phase-jump buttons, the speed multiplier, and the toggle for the details panel. Never authored in a battle file.
+What the viewer operates to drive playback: play and pause, the scrubber, the phase-jump buttons, the speed multiplier, the picker, and the toggle for the details panel. Never authored in a battle file.
 _Avoid_: Furniture, UI, transport, toolbar
 
 **Scrubber**:
@@ -131,3 +135,13 @@ _Avoid_: Speed, playback rate (the authored per-phase value), time scale
 **Details panel**:
 The on-demand view that shows the current phase's notes and references, then the battle's attribution and sources table. Hidden by default and never pauses playback.
 _Avoid_: Sidebar, drawer, info box, credits screen
+
+### Site
+
+**Library**:
+The collection of every battle the site holds, and the front-door page that lists them oldest first, each by title, date and summary, drawn from the battle files themselves.
+_Avoid_: Catalogue, index, list, home page, menu, gallery
+
+**Picker**:
+The control in the player's controls that switches to another battle in the library, starting a fresh visit to it.
+_Avoid_: Switcher, dropdown, battle select, menu
