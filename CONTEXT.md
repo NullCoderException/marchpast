@@ -89,8 +89,16 @@ _Avoid_: Speed, time scale, compression, duration
 ### Units
 
 **Unit**:
-A body of force the battle follows as one marker on the map, such as a fleet column, a squadron, or an army wing. Every phase lists every unit.
+A body of force the battle follows as one marker on the map, such as a fleet column, a squadron, or an army wing. Every phase lists every unit, whether or not it has a parent or is drawn at the level shown.
 _Avoid_: Marker, force, group, side, formation
+
+**Parent**:
+The unit a smaller unit belongs to, named once per battle as part of the smaller unit's identity: a squadron's column, a legion's wing. The parent and its children are all units in their own right, each authored in every phase; nothing about a parent is worked out from its children. A parent's children share its side.
+_Avoid_: Group, container, formation, superunit, root
+
+**Level**:
+How far down the tree of parents and children the plate is drawing, counted from the units with no parent: at Trafalgar, columns or squadrons. A battle names its levels. A unit that has no children is drawn at every level below its own.
+_Avoid_: Resolution, granularity, tier, zoom, depth (in prose)
 
 **State**:
 Which of four conditions a unit is in during a phase: intact (not yet in action), engaged (in the action or its aftermath, cohesion held), broken (cohesion lost, no longer fighting as a body), or destroyed (ceased to exist as a fighting unit). A unit that has fought stays engaged when the firing stops.
@@ -168,6 +176,10 @@ _Avoid_: Theme, skin, style, mode, layer, variant
 The control in the player's controls that switches the picture to another view, taking effect at once without interrupting playback and lasting only the current visit.
 _Avoid_: Theme switcher, view toggle, style menu, mode
 
+**Level chooser**:
+The control in the player's controls that switches the picture to another level, present only when a battle has more than one, taking effect at once without interrupting playback and lasting only the current visit. Every visit opens on the coarsest level.
+_Avoid_: Resolution switch, zoom, detail toggle, drill-down
+
 **Glyph**:
 How a view draws one unit: the chart plate's ship-ticks, atlas's block. Drawn in two parts, the mark its state puts on the plate around it and the unit itself, so that every unit's mark is laid down before any unit's body and a melee does not erase itself.
 _Avoid_: Icon, symbol, marker, sprite, token
@@ -177,7 +189,7 @@ The shape by which a view tells one arm from another inside a glyph: the chart p
 _Avoid_: Mark (the state's), icon, symbol, tick (except for the ship sign), badge
 
 **Controls**:
-What the viewer operates to drive playback: play and pause, the scrubber, the phase-jump buttons, the speed multiplier, the view chooser, the picker, and the toggle for the details panel. Never authored in a battle file.
+What the viewer operates to drive playback: play and pause, the scrubber, the phase-jump buttons, the speed multiplier, the view chooser, the level chooser, the picker, and the toggle for the details panel. Never authored in a battle file.
 _Avoid_: Furniture, UI, transport, toolbar
 
 **Scrubber**:
