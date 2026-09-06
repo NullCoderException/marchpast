@@ -57,6 +57,14 @@ describe("unitsAtLevel", () => {
     expect(drawn(units, 1)).toEqual(["a1", "b", "c1"]);
   });
 
+  it("draws the grandchildren, the unsubdivided children and the unsubdivided roots at level 2", () => {
+    // Three deep, with something left whole at each of the two shallower depths.
+    const units = roster(["a"], ["a1", "a"], ["a1x", "a1"], ["a2", "a"], ["b"]);
+    expect(drawn(units, 0)).toEqual(["a", "b"]);
+    expect(drawn(units, 1)).toEqual(["a1", "a2", "b"]);
+    expect(drawn(units, 2)).toEqual(["a1x", "a2", "b"]);
+  });
+
   it("draws only the leaves at a level past the deepest unit", () => {
     const units = roster(["a"], ["a1", "a"], ["a1x", "a1"], ["b"]);
     expect(drawn(units, 2)).toEqual(["a1x", "b"]);

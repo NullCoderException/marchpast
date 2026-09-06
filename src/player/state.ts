@@ -1,11 +1,13 @@
 /**
  * What the player holds between frames, and every way a control moves it.
  *
- * The state is three numbers, a flag and a view: nothing here is authored,
- * nothing survives a reload (issue #13's resolution, and #47 for the view). Every transition is a pure
- * function of the battle and the state before it, so the controls can be read
- * as "which transition does this button call" and the rules are tested without
- * a DOM.
+ * The state is a clock, a flag and the viewer's three choices — speed, view
+ * and level: nothing here is authored, and nothing survives a reload (issue
+ * #13's resolution, #47 for the view, ADR-0017 for the level). Every
+ * transition is a pure function of the battle and the state before it, so the
+ * controls can be read as "which transition does this button call" and the
+ * rules are tested without a DOM. The fixed lists a chooser offers live here
+ * for the same reason.
  */
 import { DEFAULT_VIEW, type ViewId } from "../render/index.ts";
 import type { Battle } from "../schema/types.ts";
@@ -17,9 +19,21 @@ import { fractionToClock, type BarFraction } from "./scrub.ts";
 /** The speed multipliers the viewer may choose, applied uniformly to every phase's authored rate. */
 export const MULTIPLIERS = [0.5, 1, 2, 4] as const;
 
+/**
+ * The levels the viewer may choose, coarsest first: the battle's own `levels`
+ * names, and none at all when there is nothing to choose. A battle with no
+ * `levels` has one level and gets no Level chooser; so would a `levels` of one
+ * name, which the validator does not allow but which is one level all the same
+ * (ADR-0017).
+ */
+export function levelOptions(battle: Battle): readonly string[] {
+  const levels = battle.levels ?? [];
+  return levels.length < 2 ? [] : levels;
+}
+
 /** Everything the player knows between frames. */
 export interface PlayerState {
-  /** The battle-clock instant on screen, in seconds since midnight. */
+  /** The battle-clock instant on screen, in seconds from midnight of the battle's first day. */
   clock: ClockSeconds;
   /** Whether the loop is advancing the clock. */
   playing: boolean;
@@ -31,12 +45,19 @@ export interface PlayerState {
    * the same battle in whichever treatment each has picked (ADR-0014).
    */
   view: ViewId;
+  /**
+   * The depth of the unit tree the plate draws: `0` is the coarsest, and every
+   * visit opens on it. Player state like the view — never authored, never on
+   * the URL, never remembered — and a battle with one level never moves it off
+   * `0` (ADR-0017).
+   */
+  level: number;
 }
 
-/** Paused on the first phase in the default view, which is what loading lands on (schema.md 2.10, #47). */
+/** Paused on the first phase in the default view at the coarsest level, which is what loading lands on (schema.md 2.11, #47). */
 export function initialState(battle: Battle, multiplier = 1): PlayerState {
   checkMultiplier(multiplier);
-  return { clock: startClock(battle), playing: false, multiplier, view: DEFAULT_VIEW.id };
+  return { clock: startClock(battle), playing: false, multiplier, view: DEFAULT_VIEW.id, level: 0 };
 }
 
 /** Whether the clock has reached `end`, where the last picture holds. */
@@ -100,6 +121,14 @@ export function setMultiplier(state: PlayerState, multiplier: number): PlayerSta
 /** Switch the view, leaving the clock and the play state where they are: a switch never interrupts (#47). */
 export function setView(state: PlayerState, view: ViewId): PlayerState {
   return { ...state, view };
+}
+
+/**
+ * Switch the level drawn, leaving the clock and the play state where they are:
+ * only the renderer's choice of units changes, mid-playback included (ADR-0017).
+ */
+export function setLevel(state: PlayerState, level: number): PlayerState {
+  return { ...state, level };
 }
 
 /** Jump to a phase's own `t` — what a scrubber tick clicks to — keeping the play state. */

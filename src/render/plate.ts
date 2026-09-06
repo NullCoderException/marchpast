@@ -4,7 +4,7 @@
  * derived from them once per pass.
  */
 import type { Battle, MapFile } from "../schema/types.ts";
-import type { Picture } from "../timeline/picture.ts";
+import type { Picture, UnitPicture } from "../timeline/picture.ts";
 import type { Projection } from "./projection.ts";
 import type { View } from "./view.ts";
 
@@ -15,6 +15,13 @@ export interface Plate {
   battle: Battle;
   map: MapFile | undefined;
   picture: Picture;
+  /**
+   * The picture's units the viewer's level draws, in roster order: what every
+   * pass that puts a unit on the plate reads, so no two passes disagree about
+   * what is there. `picture.units` stays the whole roster, which is what the
+   * labels' numerals are indexed by (schema.md 2.9, 2.11).
+   */
+  unitsDrawn: readonly UnitPicture[];
   projection: Projection;
   /** Side name to ink colour, by roster order, in the view's palette. */
   colours: Map<string, string>;

@@ -212,10 +212,23 @@ export interface Move {
 /** A GeoJSON position in the map file: `[lon, lat]`, WGS84. Exactly two elements (ADR-0005). */
 export type LonLat = [lon: number, lat: number];
 
+/** The geometry of a kind drawn as an area: land and a shoal. */
+export type AreaGeometry =
+  | { type: "Polygon"; coordinates: LonLat[][] }
+  | { type: "MultiPolygon"; coordinates: LonLat[][][] };
+
+/** The geometry of a kind drawn as a line: a river and a contour. */
+export type LineGeometry =
+  | { type: "LineString"; coordinates: LonLat[] }
+  | { type: "MultiLineString"; coordinates: LonLat[][] };
+
+/** The geometry of a kind drawn at a point: a place and a work. */
+export type PointGeometry = { type: "Point"; coordinates: LonLat };
+
 /** The map file, `data/maps/<name>.geojson`: a GeoJSON FeatureCollection with two foreign members and nothing else. */
 export interface MapFile {
   type: "FeatureCollection";
-  /** Only `land` and `place` features. */
+  /** Only the six feature kinds. */
   features: MapFeature[];
   /** The map file's own licence, share-alike allowed: a map is an independent database the battle only points at. */
   license: LicenseId;
@@ -223,20 +236,73 @@ export interface MapFile {
   attribution?: string;
 }
 
-export type MapFeature = LandFeature | PlaceFeature;
+/**
+ * The six feature kinds (schema.md 3.2). A feature's `properties` carry only
+ * the keys listed for its kind: natural features carry no name, a contour
+ * carries its level, named things carry a name.
+ */
+export type MapFeature = LandFeature | RiverFeature | ShoalFeature | ContourFeature | PlaceFeature | WorkFeature;
 
-/** Land. Everything not covered by a land polygon is sea. */
+/** Land. Everything not covered by a land polygon is sea. An island, artificial or not, is `land`. */
 export interface LandFeature {
   type: "Feature";
   properties: { kind: "land" };
-  geometry:
-    | { type: "Polygon"; coordinates: LonLat[][] }
-    | { type: "MultiPolygon"; coordinates: LonLat[][][] };
+  geometry: AreaGeometry;
 }
 
-/** A named point drawn as a label so captions can refer to it: Cadiz, Cape Trafalgar. */
+/**
+ * A watercourse, drawn as a line: two banks with the sea's material between.
+ * No name and no width. Where the ancient channel is unknown, the modern line
+ * stands in and the battle's caption says so.
+ */
+export interface RiverFeature {
+  type: "Feature";
+  properties: { kind: "river" };
+  geometry: LineGeometry;
+}
+
+/**
+ * Water too shallow to fight over, drawn as an outline with a fine stipple:
+ * the Aboukir shoal, the Middle Ground. No name and no depth; neither land nor
+ * open sea.
+ */
+export interface ShoalFeature {
+  type: "Feature";
+  properties: { kind: "shoal" };
+  geometry: AreaGeometry;
+}
+
+/**
+ * A line joining ground at one height. The set of them is how a map holds
+ * elevation; nothing else does. `MultiLineString` because `gdal_contour` emits
+ * many segments per level. No index flag: the renderer weights every fifth
+ * level from the levels it is given.
+ */
+export interface ContourFeature {
+  type: "Feature";
+  /** `elevation` is metres, `-500 <= x <= 9000` (ADR-0012). */
+  properties: { kind: "contour"; elevation: number };
+  geometry: LineGeometry;
+}
+
+/**
+ * A named point drawn as a label so captions can refer to it: Cadiz, Cape
+ * Trafalgar, the Aufidus, the Middle Ground. The one naming mechanism: a river
+ * or a shoal that must be labelled gets a place on it.
+ */
 export interface PlaceFeature {
   type: "Feature";
   properties: { kind: "place"; name: string };
-  geometry: { type: "Point"; coordinates: LonLat };
+  geometry: PointGeometry;
+}
+
+/**
+ * A named built thing on the ground, drawn as a plan sign with its name in
+ * small capitals: a fort, a battery, a camp. Trekroner, Abu Qir castle, the
+ * Roman camps. A point, never a polygon; independent of any `land` under it.
+ */
+export interface WorkFeature {
+  type: "Feature";
+  properties: { kind: "work"; name: string };
+  geometry: PointGeometry;
 }

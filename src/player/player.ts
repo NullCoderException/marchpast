@@ -22,6 +22,7 @@ import {
   jumpPrevious,
   jumpToPhase,
   scrubTo,
+  setLevel,
   setMultiplier,
   setView,
   tick,
@@ -75,6 +76,7 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
     jumpToPhase: (index) => apply(jumpToPhase(battle, state, index)),
     setMultiplier: (multiplier) => apply(setMultiplier(state, multiplier)),
     setView: (view) => apply(setView(state, view)),
+    setLevel: (level) => apply(setLevel(state, level)),
     toggleDetails: () => {
       details.setOpen(!details.isOpen());
       dirty = true;
@@ -111,7 +113,7 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
     dirty = false;
 
     const picture = pictureAt(battle, state.clock);
-    renderer.render(battle, map, picture, { view: state.view });
+    renderer.render(battle, map, picture, { view: state.view, level: state.level });
     details.update(picture);
     controls.update(state, picture, details.isOpen());
   });
