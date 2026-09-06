@@ -9,7 +9,7 @@
  * Gravina's retreat: the Combined Fleet `broken` at 0.33 with a `detachment`
  * move whose head lies outside the extent and is clipped.
  */
-import type { Battle, MapFile, Phase, UnitSnapshot } from "../../schema/types.ts";
+import type { Battle, MapFile, Phase, PlaceFeature, UnitSnapshot } from "../../schema/types.ts";
 import { parseBattleTime } from "../../schema/time.ts";
 import type { Picture, UnitPicture } from "../../timeline/picture.ts";
 
@@ -184,7 +184,7 @@ export const CADIZ: MapFile = {
   ],
 };
 
-function place(name: string, lon: number, lat: number): MapFile["features"][number] {
+function place(name: string, lon: number, lat: number): PlaceFeature {
   return { type: "Feature", properties: { kind: "place", name }, geometry: { type: "Point", coordinates: [lon, lat] } };
 }
 

@@ -1,6 +1,6 @@
 /**
- * The renderer: one synchronous pass that draws a frame of the engraved chart
- * plate (ADR-0009) from a battle, an optional map, and the picture the timeline
+ * The renderer: one synchronous pass that draws the engraved chart plate
+ * (ADR-0009) from a battle, an optional map, and the picture the timeline
  * hands it for one instant. No animation loop lives here; the controls slice
  * owns that and calls `render` whenever the picture or the canvas changes.
  *
@@ -15,13 +15,13 @@ import { drawFurniture } from "./drawFurniture.ts";
 import { drawMap } from "./drawMap.ts";
 import { drawUnits } from "./drawUnits.ts";
 import { seeded } from "./primitives.ts";
-import { fitProjection } from "./projection.ts";
-import type { Scene } from "./scene.ts";
+import { fitProjection, type Rect } from "./projection.ts";
+import type { Plate } from "./plate.ts";
 import { METRES_PER_UNIT } from "./scaleBar.ts";
 import { LETTERBOX, MIN_GLYPH_PX, NOMINAL_GLYPH_NMI, PARCHMENT, sideColours } from "./style.ts";
 
 export interface Renderer {
-  /** Draws one frame. Synchronous; returns when the canvas holds the picture. */
+  /** Draws the picture. Synchronous; returns when the canvas holds it. */
   render(battle: Battle, map: MapFile | undefined, picture: Picture): void;
 }
 
@@ -50,46 +50,45 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
         width: Math.max(1, width - PLATE_MARGIN * 2),
         height: Math.max(1, plateHeight - PLATE_MARGIN * 2),
       });
-      const { frame } = projection;
+      const { extentRect } = projection;
 
       // Letterbox: a darker tone outside the extent, the plate itself back in parchment.
       ctx.fillStyle = LETTERBOX;
       ctx.fillRect(0, 0, width, plateHeight);
       ctx.fillStyle = PARCHMENT;
-      ctx.fillRect(frame.x, frame.y, frame.width, frame.height);
-      mottle(ctx, frame.x, frame.y, frame.width, frame.height);
+      ctx.fillRect(extentRect.x, extentRect.y, extentRect.width, extentRect.height);
+      mottle(ctx, extentRect);
 
       const centreLat = (battle.extent.north + battle.extent.south) / 2;
-      const pixelsPerNmi = METRES_PER_UNIT.nmi / projection.metresPerPixel(centreLat);
-      const scene: Scene = {
+      const pixelsPerMetre = 1 / projection.metresPerPixel(centreLat);
+      const plate: Plate = {
         ctx,
         battle,
         map,
         picture,
         projection,
-        frame,
         colours: sideColours(battle),
-        glyphLength: Math.max(MIN_GLYPH_PX, NOMINAL_GLYPH_NMI * pixelsPerNmi),
-        pixelsPerNmi,
+        glyphLength: Math.max(MIN_GLYPH_PX, NOMINAL_GLYPH_NMI * METRES_PER_UNIT.nmi * pixelsPerMetre),
+        pixelsPerMetre,
       };
 
       // The picture is clipped to the extent; furniture is not.
       ctx.save();
       ctx.beginPath();
-      ctx.rect(frame.x, frame.y, frame.width, frame.height);
+      ctx.rect(extentRect.x, extentRect.y, extentRect.width, extentRect.height);
       ctx.clip();
-      drawMap(scene);
-      drawUnits(scene);
+      drawMap(plate);
+      drawUnits(plate);
       ctx.restore();
 
-      drawFurniture(scene);
+      drawFurniture(plate);
       drawCaption(ctx, battle, picture, caption, plateHeight, width);
     },
   };
 }
 
 /** Sizes the backing store to the canvas's CSS size at the current devicePixelRatio. Returns the CSS size. */
-function fitBackingStore(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): { width: number; height: number } {
+export function fitBackingStore(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): { width: number; height: number } {
   const dpr = window.devicePixelRatio || 1;
   const width = canvas.clientWidth || canvas.width;
   const height = canvas.clientHeight || canvas.height;
@@ -103,8 +102,8 @@ function fitBackingStore(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2
   return { width, height };
 }
 
-/** A faint fixed mottle so the paper is not a flat fill. Seeded, so it never shimmers between frames. */
-function mottle(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number): void {
+/** A faint fixed mottle so the paper is not a flat fill. Seeded, so it never shimmers from one render to the next. */
+function mottle(ctx: CanvasRenderingContext2D, { x, y, width, height }: Rect): void {
   const random = seeded(7);
   ctx.save();
   ctx.fillStyle = "rgba(120,90,40,0.06)";

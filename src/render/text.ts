@@ -1,7 +1,7 @@
 /**
  * Text helpers the plate draws with: word wrapping for the caption band, the
- * compass point a wind direction is written as, and the battle clock's
- * `HH:MM`. Pure functions; the measurer is injected so they test without a
+ * compass point an angle in degrees true is written as, and the battle
+ * clock's `HH:MM`. Pure functions; the measurer is injected so they test without a
  * canvas.
  */
 import { formatBattleTime } from "../schema/time.ts";

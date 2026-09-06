@@ -5,31 +5,35 @@
  * picture, inside the frame, with nothing clipped.
  */
 import type { Wind, WindForce } from "../schema/types.ts";
+import type { Plate } from "./plate.ts";
 import { drawArrow, drawGlyph, type Point } from "./primitives.ts";
-import type { Scene } from "./scene.ts";
+import { toRadians } from "./projection.ts";
 import { METRES_PER_UNIT, scaleBarLength, UNIT_LABEL } from "./scaleBar.ts";
-import { detachmentStyle, font, INK, INTENT_STYLE, STATE_WORDS, STATES, TRACK_STYLE } from "./style.ts";
+import { detachmentStyle, font, INK, INTENT_STYLE, PARCHMENT_PANEL, STATES, TRACK_STYLE } from "./style.ts";
 import { compassPoint } from "./text.ts";
-
-const toRadians = (degrees: number): number => (degrees * Math.PI) / 180;
 
 /** Feathers on the wind arrow's tail: none at calm, one for light through four for gale (ADR-0008). */
 const FEATHERS: Readonly<Record<WindForce, number>> = { calm: 0, light: 1, moderate: 2, fresh: 3, gale: 4 };
 
 const ROSE_RADIUS = 30;
+/** Inset of the bottom-left furniture from the extent's edge. */
 const MARGIN = 26;
+/** Gap between the scale bar's label and the bar, and between the label and the legend above it. */
+const SCALE_BAR_LABEL_GAP = 8;
+const SCALE_BAR_LABEL_HEIGHT = 14;
+const LEGEND_GAP = 14;
 
-export function drawFurniture(scene: Scene): void {
-  drawPlateBorder(scene);
-  drawCompassRose(scene, scene.picture.wind);
-  drawTitle(scene);
-  const scaleTop = drawScaleBar(scene);
-  drawLegend(scene, scaleTop - 14);
-  drawCredit(scene);
+export function drawFurniture(plate: Plate): void {
+  drawPlateBorder(plate);
+  drawCompassRose(plate, plate.picture.wind);
+  drawTitle(plate);
+  const scaleTop = drawScaleBar(plate);
+  drawLegend(plate, scaleTop - LEGEND_GAP);
+  drawCredit(plate);
 }
 
 /** A double ink rule at the extent's edge, where the letterbox begins. */
-function drawPlateBorder({ ctx, frame }: Scene): void {
+function drawPlateBorder({ ctx, projection: { extentRect: frame } }: Plate): void {
   ctx.save();
   ctx.strokeStyle = INK;
   ctx.lineWidth = 1;
@@ -38,8 +42,9 @@ function drawPlateBorder({ ctx, frame }: Scene): void {
   ctx.restore();
 }
 
-function drawCompassRose(scene: Scene, wind: Wind | undefined): void {
-  const { ctx, frame } = scene;
+function drawCompassRose(plate: Plate, wind: Wind | undefined): void {
+  const { ctx } = plate;
+  const frame = plate.projection.extentRect;
   const cx = frame.x + 74;
   const cy = frame.y + 78;
 
@@ -115,7 +120,7 @@ function drawCompassRose(scene: Scene, wind: Wind | undefined): void {
 }
 
 /** The battle's title, top right, as the plate's cartouche. */
-function drawTitle({ ctx, frame, battle }: Scene): void {
+function drawTitle({ ctx, battle, projection: { extentRect: frame } }: Plate): void {
   ctx.save();
   ctx.fillStyle = INK;
   ctx.textAlign = "right";
@@ -126,11 +131,11 @@ function drawTitle({ ctx, frame, battle }: Scene): void {
 }
 
 /** The scale bar, bottom left, in the battle's unit. Returns the y of its label's top so the legend can sit above it. */
-function drawScaleBar(scene: Scene): number {
-  const { ctx, frame, battle, projection } = scene;
+function drawScaleBar(plate: Plate): number {
+  const { ctx, battle } = plate;
+  const frame = plate.projection.extentRect;
   const unit = battle.scale_unit;
-  const centreLat = (battle.extent.north + battle.extent.south) / 2;
-  const pixelsPerUnit = METRES_PER_UNIT[unit] / projection.metresPerPixel(centreLat);
+  const pixelsPerUnit = METRES_PER_UNIT[unit] * plate.pixelsPerMetre;
   const bar = scaleBarLength({ pixelsPerUnit, maxPixels: Math.max(40, Math.min(180, frame.width / 4)) });
 
   const x = frame.x + MARGIN;
@@ -149,7 +154,8 @@ function drawScaleBar(scene: Scene): number {
   ctx.moveTo(x + bar.pixels, y - 5);
   ctx.lineTo(x + bar.pixels, y + 5);
   ctx.stroke();
-  const divisions = bar.units / 10 ** Math.floor(Math.log10(bar.units)) === 2 ? 4 : 5;
+  // A bar of 2 units divides into halves; 1 and 5 divide into fifths.
+  const divisions = bar.mantissa === 2 ? 4 : 5;
   for (let i = 1; i < divisions; i++) {
     const tx = x + (bar.pixels * i) / divisions;
     ctx.beginPath();
@@ -160,9 +166,9 @@ function drawScaleBar(scene: Scene): number {
   ctx.font = font(12, true);
   ctx.textAlign = "left";
   ctx.textBaseline = "bottom";
-  ctx.fillText(label, x, y - 8);
+  ctx.fillText(label, x, y - SCALE_BAR_LABEL_GAP);
   ctx.restore();
-  return y - 8 - 14;
+  return y - SCALE_BAR_LABEL_GAP - SCALE_BAR_LABEL_HEIGHT;
 }
 
 const LEGEND_ROW = 18;
@@ -170,15 +176,16 @@ const LEGEND_WIDTH = 168;
 const LEGEND_SAMPLE = 40;
 
 /** The always-on legend: each side's colour and name, the four state glyphs, the three line styles. Its bottom sits at `bottom`. */
-function drawLegend(scene: Scene, bottom: number): void {
-  const { ctx, frame, colours } = scene;
+function drawLegend(plate: Plate, bottom: number): void {
+  const { ctx, colours } = plate;
+  const frame = plate.projection.extentRect;
   const rows = colours.size + STATES.length + 3;
   const height = rows * LEGEND_ROW + 16;
   const x = frame.x + MARGIN;
   const y = bottom - height;
 
   ctx.save();
-  ctx.fillStyle = "rgba(239,227,198,0.92)";
+  ctx.fillStyle = PARCHMENT_PANEL;
   ctx.fillRect(x, y, LEGEND_WIDTH, height);
   ctx.strokeStyle = INK;
   ctx.lineWidth = 1;
@@ -219,7 +226,7 @@ function drawLegend(scene: Scene, bottom: number): void {
       scale: 0.75,
     });
     ctx.restore();
-    ctx.fillText(STATE_WORDS[state], textX, rowY);
+    ctx.fillText(state, textX, rowY);
     rowY += LEGEND_ROW;
   }
 
@@ -239,7 +246,7 @@ function drawLegend(scene: Scene, bottom: number): void {
 }
 
 /** The map file's attribution, bottom right, whenever a map is loaded and has one (ADR-0007). */
-function drawCredit({ ctx, frame, map }: Scene): void {
+function drawCredit({ ctx, map, projection: { extentRect: frame } }: Plate): void {
   const credit = map?.attribution;
   if (credit === undefined || credit === "") return;
   ctx.save();

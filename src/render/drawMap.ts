@@ -1,12 +1,12 @@
 /**
- * The map layer (ADR-0005): land polygons in a darker parchment with a fine
+ * The map pass (ADR-0005): land polygons in a darker parchment with a fine
  * ink coastline shaded inward, and places as a small mark with the name in
  * the plate face. The caller has already clipped to the extent.
  */
 import type { LonLat, MapFile } from "../schema/types.ts";
 import type { Projection } from "./projection.ts";
-import type { Scene } from "./scene.ts";
-import { font, INK, LAND } from "./style.ts";
+import type { Plate } from "./plate.ts";
+import { font, INK, INK_RGB, LAND } from "./style.ts";
 
 /** Engraved shading inside the shoreline: wide faint strokes under a fine dark one. */
 const COASTLINE_STROKES: ReadonlyArray<readonly [width: number, alpha: number]> = [
@@ -16,8 +16,8 @@ const COASTLINE_STROKES: ReadonlyArray<readonly [width: number, alpha: number]> 
   [1.6, 0.6],
 ];
 
-export function drawMap(scene: Scene): void {
-  const { ctx, map, projection } = scene;
+export function drawMap(plate: Plate): void {
+  const { ctx, map, projection } = plate;
   if (map === undefined) return;
 
   const rings = landRings(map);
@@ -33,7 +33,7 @@ export function drawMap(scene: Scene): void {
     for (const [width, alpha] of COASTLINE_STROKES) {
       tracePolygons(ctx, projection, rings);
       ctx.lineWidth = width;
-      ctx.strokeStyle = `rgba(43,36,24,${alpha})`;
+      ctx.strokeStyle = `rgba(${INK_RGB},${alpha})`;
       ctx.stroke();
     }
     ctx.restore();

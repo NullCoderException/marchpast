@@ -1,6 +1,6 @@
-import { loadPlateFont, plateFont } from "./fonts/plate";
+import { loadPlateFont, plateFont } from "./fonts/plate.ts";
 import { FIXTURES } from "./render/fixtures/trafalgar.ts";
-import { createRenderer } from "./render/index.ts";
+import { createRenderer, fitBackingStore } from "./render/index.ts";
 import { INK, PARCHMENT } from "./render/style.ts";
 
 /** Calls `onChange` whenever devicePixelRatio changes (zoom, or a move between monitors). */
@@ -23,12 +23,7 @@ function watchDevicePixelRatio(onChange: () => void): void {
 function paintTitle(canvas: HTMLCanvasElement, message: string): void {
   const ctx = canvas.getContext("2d");
   if (ctx === null) throw new Error("Canvas 2D is not available in this browser");
-  const dpr = window.devicePixelRatio || 1;
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-  canvas.width = Math.round(width * dpr);
-  canvas.height = Math.round(height * dpr);
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const { width, height } = fitBackingStore(canvas, ctx);
 
   ctx.fillStyle = PARCHMENT;
   ctx.fillRect(0, 0, width, height);

@@ -25,18 +25,21 @@ export interface ScaleBarLength {
   units: number;
   /** The bar's length on the canvas. */
   pixels: number;
+  /** Which round number `units` is: 1, 2 or 5 times a power of ten. Decides how the bar is divided. */
+  mantissa: 1 | 2 | 5;
 }
 
 /** The largest 1, 2 or 5 times a power of ten (in units) whose bar is at most `maxPixels` long. */
 export function scaleBarLength({ pixelsPerUnit, maxPixels }: { pixelsPerUnit: number; maxPixels: number }): ScaleBarLength {
   const maxUnits = maxPixels / pixelsPerUnit;
   const exponent = Math.floor(Math.log10(maxUnits));
-  let best = 10 ** (exponent - 1) * 5;
+  // Nothing at this decade fits only when maxUnits is just under a power of ten; then 5 of the decade below does.
+  let best: { units: number; mantissa: 1 | 2 | 5 } = { units: 10 ** (exponent - 1) * 5, mantissa: 5 };
   for (const mantissa of ROUND_MANTISSAS) {
     const candidate = mantissa * 10 ** exponent;
     // Compare in pixels with a little slack so an exact fit survives floating point.
-    if (Math.round(candidate * pixelsPerUnit * 1e6) / 1e6 <= maxPixels) best = candidate;
+    if (Math.round(candidate * pixelsPerUnit * 1e6) / 1e6 <= maxPixels) best = { units: candidate, mantissa };
   }
-  const units = Number(best.toPrecision(12));
-  return { units, pixels: Number((units * pixelsPerUnit).toPrecision(12)) };
+  const units = Number(best.units.toPrecision(12));
+  return { units, pixels: Number((units * pixelsPerUnit).toPrecision(12)), mantissa: best.mantissa };
 }

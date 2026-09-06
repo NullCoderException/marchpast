@@ -1,28 +1,27 @@
 /**
- * The units layer: every unit's track and moves first (so no arrow crosses a
+ * The units pass: every unit's track and moves first (so no arrow crosses a
  * glyph), then the ship-tick glyphs, then the labels. The caller has already
  * clipped to the extent, which is what clips a move head lying outside it
  * (ADR-0004).
  */
 import type { UnitPicture } from "../timeline/picture.ts";
+import type { Plate } from "./plate.ts";
 import { drawArrow, drawGlyph, hashString, type Point } from "./primitives.ts";
-import type { Scene } from "./scene.ts";
-import { detachmentStyle, font, INK, INTENT_STYLE, STATE_WORDS, TICK_HALF_WIDTH, TRACK_STYLE } from "./style.ts";
-
-const toRadians = (degrees: number): number => (degrees * Math.PI) / 180;
+import { toRadians } from "./projection.ts";
+import { detachmentStyle, font, INK, INTENT_STYLE, TICK_HALF_WIDTH, TRACK_STYLE } from "./style.ts";
 
 /** Below this many pixels a track is a dot under the glyph, not an arrow. */
 const MIN_ARROW_PX = 6;
 /** Clearance between the glyph's ticks and smoke and its label. */
 const LABEL_GAP = 30;
 
-export function drawUnits(scene: Scene): void {
-  const { ctx, battle, picture, projection } = scene;
+export function drawUnits(plate: Plate): void {
+  const { ctx, battle, picture, projection } = plate;
   const roster = new Map(battle.units.map((unit) => [unit.id, unit]));
 
   const colourOf = (unit: UnitPicture): string => {
     const side = roster.get(unit.id)?.side;
-    return (side === undefined ? undefined : scene.colours.get(side)) ?? INK;
+    return (side === undefined ? undefined : plate.colours.get(side)) ?? INK;
   };
 
   // Tracks and moves.
@@ -45,7 +44,7 @@ export function drawUnits(scene: Scene): void {
     ctx.translate(here.x, here.y);
     ctx.rotate(toRadians(unit.heading));
     drawGlyph(ctx, {
-      length: scene.glyphLength,
+      length: plate.glyphLength,
       formation: unit.formation,
       state: unit.state,
       strength: unit.strength,
@@ -58,14 +57,14 @@ export function drawUnits(scene: Scene): void {
   // Labels: the unit's name and beneath it the state word and, below full strength, the percentage.
   for (const unit of picture.units) {
     const here = projection.project(unit.position.lat, unit.position.lon);
-    drawLabel(scene, unit, here, roster.get(unit.id)?.label ?? unit.id, colourOf(unit));
+    drawLabel(plate, unit, here, roster.get(unit.id)?.label ?? unit.id, colourOf(unit));
   }
 }
 
-function drawLabel(scene: Scene, unit: UnitPicture, at: Point, label: string, colour: string): void {
-  const { ctx, frame } = scene;
-  const state = STATE_WORDS[unit.state];
-  const detail = unit.strength < 1 ? `${state} · ${Math.round(unit.strength * 100)}%` : state;
+function drawLabel(plate: Plate, unit: UnitPicture, at: Point, label: string, colour: string): void {
+  const { ctx } = plate;
+  const { extentRect } = plate.projection;
+  const detail = unit.strength < 1 ? `${unit.state} · ${Math.round(unit.strength * 100)}%` : unit.state;
 
   // The label sits on the glyph's flank, across its long axis, where the track and moves (which run
   // ahead of the unit) never go. A column's flank is beside the heading; a line's is behind it.
@@ -74,8 +73,10 @@ function drawLabel(scene: Scene, unit: UnitPicture, at: Point, label: string, co
   const reach = TICK_HALF_WIDTH + LABEL_GAP;
 
   ctx.save();
+  ctx.font = font(12);
+  const detailWidth = ctx.measureText(detail).width;
   ctx.font = font(14, true);
-  const width = Math.max(ctx.measureText(label).width, ctx.measureText(detail).width);
+  const width = Math.max(ctx.measureText(label).width, detailWidth);
   // Try the flank that puts the label rightward first, then the other, so it stays on the plate.
   const candidates = [flank, flank + Math.PI].sort((a, b) => Math.sin(b) - Math.sin(a));
   let placed: { x: number; y: number; align: CanvasTextAlign } | undefined;
@@ -86,7 +87,7 @@ function drawLabel(scene: Scene, unit: UnitPicture, at: Point, label: string, co
     const x = at.x + dx * reach;
     const y = at.y + dy * reach;
     const left = align === "left" ? x : x - width;
-    if (left >= frame.x + 6 && left + width <= frame.x + frame.width - 6) {
+    if (left >= extentRect.x + 6 && left + width <= extentRect.x + extentRect.width - 6) {
       placed = { x, y, align };
       break;
     }

@@ -1,7 +1,7 @@
 /**
- * Pen strokes shared by the layers: arrows in the three line styles, and the
- * unit glyph (ship-ticks, smoke, the destroyed outline) drawn at the origin
- * so the units layer and the legend draw the same thing at different sizes.
+ * Pen strokes shared by the drawing passes: arrows in the three line styles,
+ * and the unit glyph (ship-ticks, smoke, the destroyed outline) drawn at the
+ * origin so the units pass and the legend draw the same thing at different sizes.
  */
 import type { Formation, UnitState } from "../schema/types.ts";
 import { SMOKE, TICK_HALF_HEIGHT, TICK_HALF_WIDTH, TICKS_PER_GLYPH, type LineStyle } from "./style.ts";

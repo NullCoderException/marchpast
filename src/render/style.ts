@@ -7,8 +7,12 @@ import { plateFont } from "../fonts/plate.ts";
 import type { Battle, UnitState } from "../schema/types.ts";
 
 export const INK = "#2b2418";
+/** `INK` as an rgb triple, for strokes at an alpha. */
+export const INK_RGB = "43,36,24";
 /** The sea, and the ground of the whole canvas. */
 export const PARCHMENT = "#efe3c6";
+/** `PARCHMENT` nearly opaque, for a panel laid over the picture. */
+export const PARCHMENT_PANEL = "rgba(239,227,198,0.92)";
 /** Land: slightly darker parchment. */
 export const LAND = "#e3d3ac";
 /** The letterbox outside the extent: a darker tone so the plate's edge reads. */
@@ -36,17 +40,9 @@ export const TICKS_PER_GLYPH = 8;
 export const MIN_GLYPH_PX = 72;
 /** Nominal true length of a full-strength glyph: eight ships at two cables each. */
 export const NOMINAL_GLYPH_NMI = 1.6;
-/** Distance between ticks in the legend's miniature glyphs and the per-tick footprint on the plate. */
+/** Half the footprint of one ship tick, across and along the heading. */
 export const TICK_HALF_WIDTH = 2.6;
 export const TICK_HALF_HEIGHT = 3.25;
-
-/** The state words as written beside a unit and in the legend. */
-export const STATE_WORDS: Readonly<Record<UnitState, string>> = {
-  intact: "intact",
-  engaged: "engaged",
-  broken: "broken",
-  destroyed: "destroyed",
-};
 
 export const STATES: readonly UnitState[] = ["intact", "engaged", "broken", "destroyed"];
 
