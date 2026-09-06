@@ -19,12 +19,28 @@ The latitude/longitude bounding box a battle plays inside, fixed for the whole p
 _Avoid_: Viewport, bounds, camera, map box
 
 **Map**:
-The static geography a battle plays over, drawn behind the units: land polygons and named places, in a file the battle points at. A battle may have none.
+The static geography a battle plays over, drawn behind the units: land, rivers, shoals, contours, named places and works, in a file the battle points at. One map file is one moment in time, so a modern and a historical coastline are two files; a battle names at most one.
 _Avoid_: Basemap, background, terrain, layer, chart
 
 **Place**:
 A named point on the map, such as Cadiz or Cape Trafalgar, drawn as a label so captions can refer to it.
 _Avoid_: Landmark, POI, city, label
+
+**River**:
+A watercourse on the map, drawn as a line. It carries no name and no width; a river that must be labelled gets a Place on it.
+_Avoid_: Stream, waterway, creek, channel
+
+**Shoal**:
+Water too shallow to fight over, drawn as an outline: the Aboukir shoal, Copenhagen's Middle Ground. It carries no depth, and is neither land nor open sea.
+_Avoid_: Bank, reef, shallows, bathymetry
+
+**Work**:
+A named built thing on the ground that takes no part as a unit unless the battle file says otherwise: a fort, a battery, a camp. Trekroner, Abu Qir castle, the Roman camps on the Aufidus.
+_Avoid_: Fort, fortification, camp, structure, installation
+
+**Contour**:
+A line on the map joining ground at one height above sea level, carrying that height in metres. The set of them is how a map holds elevation; the interval between them is an authoring choice, not a fixed one.
+_Avoid_: Isoline, relief, terrain, hachure, elevation band
 
 **Track**:
 The line a unit's position follows between one phase and the next, derived by the player from the two positions and never written in a battle file.
