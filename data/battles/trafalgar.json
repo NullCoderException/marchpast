@@ -57,6 +57,13 @@
       "url": "https://commons.wikimedia.org/wiki/File:Map_of_the_Battle_of_Trafalgar_1848.jpg",
       "license": "public-domain",
       "license_note": "Wikimedia Commons: {{PD-US-expired}}{{PD-old-70}}"
+    },
+    "eb1911": {
+      "label": "Britannica 1911 (Hannay)",
+      "work": "David Hannay, 'Trafalgar, Battle of', Encyclopaedia Britannica, 11th edition (1911), vol. 27, pp. 168-170",
+      "url": "https://en.wikisource.org/wiki/1911_Encyclop%C3%A6dia_Britannica/Trafalgar,_Battle_of",
+      "license": "public-domain",
+      "license_note": "Published 1911; author died 1934. Wikisource's EB1911 transcription carries its public-domain notice."
     }
   },
   "units": [
@@ -88,6 +95,16 @@
           "source": "mahan",
           "locator": "vol. II, ch. XXIII, paragraph beginning 'In a general sense, then, it may be said'",
           "quote": "when daylight showed the enemies to each other, the British fleet was heading to the northward, and that of the allies to the southward; the latter being ten or twelve miles east of their opponents."
+        },
+        {
+          "source": "eb1911",
+          "locator": "vol. 27, paragraph beginning 'On the early morning of the 21st'",
+          "quote": "On the early morning of the 21st the allies were some twelve miles off Cape Trafalgar."
+        },
+        {
+          "source": "eb1911",
+          "locator": "vol. 27, same paragraph",
+          "quote": "The British fleet was some ten or twelve miles out at sea to the west of them."
         }
       ],
       "units": [
@@ -102,8 +119,8 @@
       "t": "06:40",
       "playback_rate": 600,
       "wind": { "from": 292.5, "force": "light" },
-      "caption": "Nelson signals the fleet to form the order of sailing, which by his memorandum is the order of battle, and to prepare for battle; ten minutes later the columns bear up for the enemy, Victory leading the weather column east by north and Royal Sovereign the lee column east, about a mile apart. Villeneuve, wanting Cadiz under his lee, orders the Combined Fleet to wear together: ship by ship it turns from south to north, the van becoming the rear and Gravina's flagship the rearmost ship. Nothing is left to signals: as the memorandum says, no captain can do very wrong if he places his ship alongside that of an enemy.",
-      "notes": "The wear is the disputed time of the morning: Hannay has it ordered at 06:00, Nelson's private journal notes it beginning at 07:00, the modern consensus puts the order at 08:00, and Mahan and Hannay agree it was not complete until near 10:00. The phase is placed at 06:40, Nelson's signal to form the order of sailing, with the Combined Fleet already heading north as the issue directs, so that its picture holds through the wear. The half turn from 180 to 5 is authored counter-clockwise through east, which is how a fleet wears with the wind on its starboard quarter; the player tweens it over the interval. The British have stood north-east about a mile since dawn; positions are dead-reckoned from the dawn fix. The intent arrows point at the parts of the enemy line the memorandum assigned each column, about the tenth ship from the van for Nelson and the twelfth from the rear for Collingwood, where the line lay at this hour; they are re-drawn on the noon line in the next phase.",
+      "caption": "The commander in chief immediately makes the signal for the fleet to bear up in two columns as they are formed in order of sailing, a mode of attack he had previously directed to avoid the delay of forming a line of battle in the usual manner: Victory leads the weather column east by north and Royal Sovereign the lee column east, about a mile apart. Villeneuve, wanting Cadiz under his lee, orders the Combined Fleet to wear together: ship by ship it turns from south to north, the van becoming the rear and Gravina's flagship the rearmost ship. Nothing is left to signals; as Nelson's memorandum says, no captain can do very wrong if he places his ship alongside that of an enemy.",
+      "notes": "The wear is the disputed time of the morning: Hannay has it ordered at 06:00, Nelson's private journal notes it beginning at 07:00, the modern consensus puts the order at 08:00, and Mahan and Hannay agree it was not complete until near 10:00. The phase is placed at 06:40, Nelson's signal to form the order of sailing, with the Combined Fleet already heading north as the issue directs, so that its picture holds through the wear. The half turn from 180 to 5 is authored counter-clockwise through east, which is how a fleet wears with the wind on its starboard quarter; the player tweens it over the interval. The British have stood north-east about a mile since dawn; positions are dead-reckoned from the dawn fix. The intent moves point at the parts of the enemy line the memorandum assigned each column, about the tenth ship from the van for Nelson and the twelfth from the rear for Collingwood, where the line lay at this hour; they are re-drawn on the noon line in the next phase.",
       "references": [
         {
           "source": "collingwood-dispatch",
@@ -131,6 +148,11 @@
           "source": "mahan",
           "locator": "vol. II, ch. XXIII, paragraph beginning 'In a general sense, then, it may be said'",
           "quote": "The two columns steered east, about a mile apart, that of Nelson being to the northward; from which circumstance, the wind being west-northwest, it has been called commonly the weather line."
+        },
+        {
+          "source": "eb1911",
+          "locator": "vol. 27, paragraph beginning 'The movement of conversion'",
+          "quote": "The movement of conversion ordered at 6 o'clock a.m. was not executed till about 10 o'clock, and it was ill done."
         }
       ],
       "units": [
@@ -200,7 +222,7 @@
         {
           "source": "johnston-1848",
           "locator": "whole plate: the Combined Fleet's line running north and south, the two British columns approaching from the west, Africa to the north",
-          "note": "Consulted for the relative geometry of the three units, not for coordinates."
+          "note": "Consulted for the relative geometry of the three units, not for positions."
         }
       ],
       "units": [
@@ -275,7 +297,7 @@
       "t": "12:30",
       "playback_rate": 120,
       "wind": { "from": 292.5, "force": "light" },
-      "caption": "The Victory comes under the fire of seven or eight ships without replying ('this is too warm work, Hardy, to last long'), then at one o'clock crosses the wake of the Bucentaure within thirty feet, rakes the French flagship from end to end, and runs on board the Redoutable, the two ships falling off with their heads to the eastward. About a quarter after one Nelson is shot from the Redoutable's mizzen-top: 'they have done for me at last, Hardy; my backbone is shot through.' Behind both leaders the succeeding ships break through in all parts astern of them, engaging the enemy at the muzzles of their guns.",
+      "caption": "The succeeding ships break through in all parts astern of their leaders, engaging the enemy at the muzzles of their guns, and the conflict is severe. The Victory, under the fire of seven or eight ships without replying ('this is too warm work, Hardy, to last long'), at one o'clock crosses the wake of the Bucentaure within thirty feet, rakes the French flagship from end to end, and runs on board the Redoutable, the two ships falling off with their heads to the eastward. About a quarter after one Nelson is shot from the Redoutable's mizzen-top: 'they have done for me at last, Hardy; my backbone is shot through.'",
       "notes": "The most disputed hour of the day. Southey has the Victory open fire at four minutes after twelve and Nelson hit about a quarter after one; Mahan has her under effective fire at 12:30, crossing the Bucentaure's wake at 13:00, alongside the Redoutable at 13:10 and Nelson hit about fifteen minutes later; the modern consensus has the Victory cut the line at 12:45. The spread is about an hour, consistent with the known drift between ships' clocks. The phase is placed at 12:30, Mahan's moment the Victory came under effective fire, which is when the weather column is first in action. Positions: the Victory about a mile from the line and the column's centre a mile astern of her at 36.27N 6.255W; the lee column's head through the line and its centre closing it at 36.23N 6.215W; the Combined Fleet's centre held at the accepted site.",
       "references": [
         {
@@ -363,7 +385,7 @@
       "playback_rate": 150,
       "wind": { "from": 292.5, "force": "light" },
       "caption": "About three o'clock, many of the enemy's ships having struck their colours, their line gives way. The five headmost ships of the van, passing to windward of the British within gunshot, exchange a distant fire with the Victory and her consorts; the sternmost of them is cut off and taken by the Minotaur and Spartiate, and the other four hold on to the south-west and escape to sea. Gravina, with ten ships, joins his frigates to leeward and stands towards Cadiz; the Royal Sovereign, all masts gone but the foremast, is taken in tow by the Euryalus, and Nelson dies at half past four.",
-      "notes": "Collingwood's 'about Three P.M.' is the collapse of the line, not the end of the action; Mahan puts the van's passing at about 15:00 and Gravina's signal to retreat at 16:45, fifteen minutes after Nelson's death at 16:30. Strength 0.33 counts Dumanoir's four escaping ships as detached from this instant, since they are drawn as the detachment arrow and detached ships leave the unit; eleven of thirty-three remain in company with Gravina (the alternative, counting them until they pass out of gunshot, would be 0.45). The unit's own position follows Gravina's remnant north-north-east to join the frigates to leeward, at 36.285N 6.175W; Cadiz itself bears north by west from the battle. The detachment arrow points south-west to seaward for Dumanoir's four. The British columns lie among their prizes where they fought, the weather column with the Victory's head to the north, the lee column along the former rear.",
+      "notes": "Collingwood's 'about Three P.M.' is the collapse of the line, not the end of the action; Mahan puts the van's passing at about 15:00 and Gravina's signal to retreat at 16:45, fifteen minutes after Nelson's death at 16:30. Strength 0.33 counts Dumanoir's four escaping ships as detached from this instant, since they are drawn as the detachment move and detached ships leave the unit; eleven of thirty-three remain in company with Gravina (the alternative, counting them until they pass out of gunshot, would be 0.45). The unit's own position follows Gravina's remnant north-north-east to join the frigates to leeward, at 36.285N 6.175W; Cadiz itself bears north by west from the battle. The detachment move points south-west to seaward for Dumanoir's four. The British columns lie among their prizes where they fought, the weather column with the Victory's head to the north, the lee column along the former rear.",
       "references": [
         {
           "source": "collingwood-dispatch",
@@ -418,7 +440,7 @@
       "playback_rate": 150,
       "wind": { "from": 292.5, "force": "light" },
       "caption": "Gravina makes the signal for the ships that have not struck to rally round his flag and retreats upon Cadiz with eleven of the line; the last of the eighteen prizes strikes and firing ceases altogether about an hour after Nelson's death. The Achille, having surrendered, takes fire and blows up before sunset. The whole British fleet, many dismasted and all shattered, lies in thirteen fathom water off the shoals of Trafalgar with its prizes, the Victory and the Royal Sovereign each the centre of a cluster of ships, and few have an anchor left to let go.",
-      "notes": "The end is disputed: the Victory's log has partial firing until 16:30, Hannay ends the battle about 17:00, Mahan has the last prize strike and firing cease an hour after 16:30; the battle's end is set at 17:30 on Mahan's reading and this phase holds until then. The prize count is likewise disputed (Collingwood nineteen on the evening of the battle, Mahan and Hannay eighteen, Southey twenty); strength stays at 0.33, eleven of thirty-three in company with Gravina, whatever the exact tally struck. The remnant is placed about six miles north of the fighting at 36.345N 6.185W, making for Cadiz at about two knots since 15:00, which matches the Belleisle eyewitness's 'to the northward'; the detachment arrow for Dumanoir's four, still standing to the south-west, is re-listed. The British clusters have drifted a little to leeward toward the shoals.",
+      "notes": "The end is disputed: the Victory's log has partial firing until 16:30, Hannay ends the battle about 17:00, Mahan has the last prize strike and firing cease an hour after 16:30; the battle's end is set at 17:30 on Mahan's reading and this phase holds until then. The prize count is likewise disputed (Collingwood nineteen on the evening of the battle, Mahan and Hannay eighteen, Southey twenty); strength stays at 0.33, eleven of thirty-three in company with Gravina, whatever the exact tally struck. The remnant is placed about six miles north of the fighting at 36.345N 6.185W, making for Cadiz at about two knots since 15:00, which matches the Belleisle eyewitness's 'to the northward'; the detachment move for Dumanoir's four, still standing to the south-west, is re-listed. The British clusters have drifted a little to leeward toward the shoals.",
       "references": [
         {
           "source": "collingwood-dispatch",
@@ -444,6 +466,11 @@
           "source": "mahan",
           "locator": "vol. II, ch. XXIII, the Belleisle eyewitness, paragraph beginning '\"Before sunset,\" wrote an eye-witness'",
           "quote": "Just under the setting rays were five or six dismantled prizes; on one hand lay the Victory with part of our fleet and prizes, and on the left hand the Royal Sovereign and a similar cluster of ships. To the northward, the remnant of the combined fleets was making for Cadiz."
+        },
+        {
+          "source": "eb1911",
+          "locator": "vol. 27, paragraph beginning 'The battle, which began at midday'",
+          "quote": "The battle, which began at midday, was terminated about five."
         }
       ],
       "units": [
