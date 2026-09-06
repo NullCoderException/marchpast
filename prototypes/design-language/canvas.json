@@ -1,0 +1,85 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 760,
+      "h": 1180,
+      "title": "The system"
+    },
+    {
+      "file": "ChartPlate.dc.html",
+      "x": 860,
+      "y": 0,
+      "w": 1120,
+      "h": 650,
+      "title": "Chart plate · default view (reference)"
+    },
+    {
+      "file": "Treatments.dc.html",
+      "x": 860,
+      "y": 790,
+      "w": 1120,
+      "h": 760,
+      "title": "Treatments · engaged, labels, collapse order"
+    },
+    {
+      "file": "NightPlate.dc.html",
+      "x": 2080,
+      "y": 0,
+      "w": 1120,
+      "h": 650,
+      "title": "Candidate second view · Night plate"
+    },
+    {
+      "file": "Atlas.dc.html",
+      "x": 2080,
+      "y": 790,
+      "w": 1120,
+      "h": 650,
+      "title": "Candidate second view · Atlas"
+    },
+    {
+      "file": "Phone.dc.html",
+      "x": 3300,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Phone · 390 wide"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "night-note",
+      "x": 2080,
+      "y": -150,
+      "w": 520,
+      "text": "NIGHT PLATE: the broadcast variant rebuilt in the system. Same plate, inverted: parchment ink on an indigo ground, side inks lifted to read on it, smoke as a pale wash.\nFor: the Nile is fought after dark, and this reads across a room. Against: loses the document feel; prints badly."
+    },
+    {
+      "id": "atlas-note",
+      "x": 2080,
+      "y": 640,
+      "w": 520,
+      "text": "ATLAS: the replay variant rebuilt in ink. Units as solid blocks with a heading nose, strength as the filled fraction, engaged as a hatched zone, thicker arrows.\nFor: mass and motion at a glance; Cannae’s envelopment is blocks and arrows. Against: closest to the game the concept rules out; no per-ship ticks."
+    },
+    {
+      "id": "pick-note",
+      "x": 3300,
+      "y": 900,
+      "w": 390,
+      "text": "TO DECIDE: (1) which engaged treatment, D Billow, E Flow or F Fire lines (switch the chip on the Chart plate); (2) which second view, Night plate or Atlas, or both; (3) whether collapse step 5 (numerals) is allowed; (4) the phone furniture collapse as drawn."
+    },
+    {
+      "id": "smoke-note",
+      "x": 860,
+      "y": -150,
+      "w": 520,
+      "text": "ENGAGED, REDRAWN: the v0.1 wash puffs read as airbrush. The three treatments here are all cut with the pen and blown by the plate’s wind. The chip above this artboard switches between them; the Treatments sheet below sets them side by side."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

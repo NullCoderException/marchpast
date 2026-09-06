@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: "IM Fell English", Georgia, "Times New Roman", serif; color: #2b2418; background: #efe3c6; }
+    a { color: #8f2f24; } a:hover { color: #2b2418; }
+    svg text { font-family: "IM Fell English", Georgia, "Times New Roman", serif; }
+    
+  </style>
+</helmet>
+<div style="width: 760px; padding: 32px 36px; box-sizing: border-box; background: #efe3c6; display: flex; flex-direction: column; gap: 26px;">
+  <div style="display: flex; flex-direction: column; gap: 6px;">
+    <div style="font-size: 30px;">Sandtable · the design language</div>
+    <div style="font-size: 15px; font-style: italic;">One engraved system. A view is a named treatment built from it, never a second aesthetic. Values below are the v0.1 renderer’s (src/render/style.ts), promoted to the rule.</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <div style="font-size: 20px;">Materials</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 14px;">
+      <div style="display: flex; flex-direction: column; gap: 4px; width: 132px;"><div style="height: 56px; background: #efe3c6; border: 1px solid rgba(43,36,24,0.55);"></div><div style="font-size: 13px;">Paper (sea)</div><div style="font-size: 11px; font-style: italic; opacity: 0.8;">#efe3c6</div></div>
+      <div style="display: flex; flex-direction: column; gap: 4px; width: 132px;"><div style="height: 56px; background: #e3d3ac; border: 1px solid rgba(43,36,24,0.55);"></div><div style="font-size: 13px;">Land, sunk</div><div style="font-size: 11px; font-style: italic; opacity: 0.8;">#e3d3ac</div></div>
+      <div style="display: flex; flex-direction: column; gap: 4px; width: 132px;"><div style="height: 56px; background: #d9c8a2; border: 1px solid rgba(43,36,24,0.55);"></div><div style="font-size: 13px;">Letterbox</div><div style="font-size: 11px; font-style: italic; opacity: 0.8;">#d9c8a2</div></div>
+      <div style="display: flex; flex-direction: column; gap: 4px; width: 132px;"><div style="height: 56px; background: #2b2418; border: 1px solid rgba(43,36,24,0.55);"></div><div style="font-size: 13px;">Ink</div><div style="font-size: 11px; font-style: italic; opacity: 0.8;">#2b2418</div></div>
+      <div style="display: flex; flex-direction: column; gap: 4px; width: 132px;"><div style="height: 56px; background: #8f2f24; border: 1px solid rgba(43,36,24,0.55);"></div><div style="font-size: 13px;">Side 1, red ink</div><div style="font-size: 11px; font-style: italic; opacity: 0.8;">#8f2f24</div></div>
+      <div style="display: flex; flex-direction: column; gap: 4px; width: 132px;"><div style="height: 56px; background: #24406b; border: 1px solid rgba(43,36,24,0.55);"></div><div style="font-size: 13px;">Side 2, blue ink</div><div style="font-size: 11px; font-style: italic; opacity: 0.8;">#24406b</div></div>
+      <div style="display: flex; flex-direction: column; gap: 4px; width: 132px;"><div style="height: 56px; background: #3e5a2a; border: 1px solid rgba(43,36,24,0.55);"></div><div style="font-size: 13px;">Side 3</div><div style="font-size: 11px; font-style: italic; opacity: 0.8;">#3e5a2a</div></div>
+      <div style="display: flex; flex-direction: column; gap: 4px; width: 132px;"><div style="height: 56px; background: #6b4a1e; border: 1px solid rgba(43,36,24,0.55);"></div><div style="font-size: 13px;">Side 4</div><div style="font-size: 11px; font-style: italic; opacity: 0.8;">#6b4a1e</div></div>
+      <div style="display: flex; flex-direction: column; gap: 4px; width: 132px;"><div style="height: 56px; background: rgba(60,55,50,0.13); border: 1px solid rgba(43,36,24,0.55);"></div><div style="font-size: 13px;">Smoke wash</div><div style="font-size: 11px; font-style: italic; opacity: 0.8;">rgba(60,55,50,.13)</div></div>
+      <div style="display: flex; flex-direction: column; gap: 4px; width: 132px;"><div style="height: 56px; background: rgba(43,36,24,0.55); border: 1px solid rgba(43,36,24,0.55);"></div><div style="font-size: 13px;">Rule</div><div style="font-size: 11px; font-style: italic; opacity: 0.8;">ink at .55</div></div>
+    </div>
+    <div style="font-size: 13px; font-style: italic;">Sides are coloured by roster order, never by data. Side inks are hues that must survive a ground change: a view that changes the paper re-tunes the inks (see Night plate) but keeps the order and the hue family.</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <div style="font-size: 20px;">Line weights</div>
+    <svg width="688" height="150" viewBox="0 0 688 150" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+      <g fill="#2b2418" font-size="12" font-style="italic">
+        <line x1="0" y1="12" x2="120" y2="12" stroke="#2b2418" stroke-width="1"/><text x="140" y="16">1 · plate rule (doubled, 5px apart), rose, legend box, coastline</text>
+        <line x1="0" y1="38" x2="120" y2="38" stroke="#2b2418" stroke-width="1.4"/><text x="140" y="42">1.4 · ship tick, wind arrow</text>
+        <line x1="0" y1="64" x2="120" y2="64" stroke="#2b2418" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="0.1 4"/><g transform="translate(120 64) rotate(0)"><path d="M-7 -3.8500000000000005 L0 0 L-7 3.8500000000000005" fill="none" stroke="#2b2418" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></g><text x="140" y="68">1.2 dotted [0.1, 4] · track, open head 7</text>
+        <line x1="0" y1="90" x2="120" y2="90" stroke="#2b2418" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="8 5"/><g transform="translate(120 90) rotate(0)"><path d="M-9 -4.95 L0 0 L-9 4.95" fill="none" stroke="#2b2418" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></g><text x="140" y="94">1.2 dashed [8, 5] · intent, open head 9</text>
+        <line x1="0" y1="116" x2="112.3" y2="116" stroke="#8f2f24" stroke-width="1.8" stroke-linecap="round"/><g transform="translate(120 116) rotate(0)"><path d="M0 0 L-11 -5.5 L-7.699999999999999 0 L-11 5.5 Z" fill="#8f2f24"/></g><text x="140" y="120">1.8 solid, side ink · detachment, filled head 11</text>
+        <line x1="0" y1="142" x2="120" y2="142" stroke="#2b2418" stroke-width="0.8"/><text x="140" y="146">0.8 · label leader, ending in a 1.6 dot</text>
+      </g>
+    </svg>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <div style="font-size: 20px;">Type · IM Fell English, one face, upright and italic</div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 24px; font-size: 13px;">
+      <div style="font-size: 26px;">26 · clock</div><div style="font-size: 22px;">22 · plate title</div>
+      <div style="font-size: 15px;">15 · caption</div><div style="font-size: 14px; font-style: italic; color: #8f2f24;">14 italic, side ink · unit name</div>
+      <div style="font-size: 13px; font-style: italic;">13 italic · wind, date, place names</div><div style="font-size: 12px;">12 · state word, phase label (caps, +0.5 tracking)</div>
+      <div style="font-size: 12px; font-style: italic;">12 italic · legend, scale bar, sources</div><div style="font-size: 11px; font-style: italic;">11 italic · credit line</div>
+    </div>
+    <div style="font-size: 13px; font-style: italic;">Italic is for names and asides (a place, the wind, a source); upright is for facts (the clock, a state, the caption). No bold anywhere: emphasis is size and ink, as on a plate.</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <div style="font-size: 20px;">What a view may and may not change</div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border: 1px solid #2b2418;">
+        <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">Fixed across views</div>
+        <div style="font-size: 13px; line-height: 1.4;">The typeface and the type ramp. Side order and hue family. The furniture set and its corners: rose top-left, title top-right, scale and legend bottom-left, credit bottom-right, the caption band below. The glyph’s meaning: formation is arrangement, state is one of four words, strength is the shown fraction. Three motion styles that stay tellable apart when overlaid. North up. No glow, no badge, no data-driven colour.</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border: 1px solid #2b2418;">
+        <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">A view owns</div>
+        <div style="font-size: 13px; line-height: 1.4;">Paper and ink values, and the side inks re-tuned to them. How a unit is drawn (ticks or a block) and how engaged is shown. Line weights, within the ramp’s proportions. Whether the sea is stippled. The label style, keeping the two-line anatomy and the collapse order. Nothing the schema does not carry: a view cannot show a ship count or a unit type it was not given.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
