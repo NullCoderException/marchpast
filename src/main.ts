@@ -1,85 +1,67 @@
-import { loadPlateFont, plateFont } from "./fonts/plate.ts";
-import { CADIZ, FIXTURES, TRAFALGAR } from "./render/fixtures/trafalgar.ts";
-import { createRenderer, fitBackingStore } from "./render/index.ts";
-import { INK, PARCHMENT } from "./render/style.ts";
+/**
+ * The app entry: play the battle named on the URL.
+ *
+ * `?battle=<name>` (default `trafalgar`) is fetched through the path module
+ * and validated, along with the map it names; the player takes over on
+ * success, and the page shows every error on the plate, and in the console,
+ * otherwise. The layout is the plate above and the controls beneath, set in
+ * `index.html`; this file only fills the two slots.
+ */
+import { battleNameFrom } from "./app/battleName.ts";
+import { formatLoadErrors, loadBattle } from "./app/loadBattle.ts";
+import { paintNotice, type Notice } from "./app/notice.ts";
+import { loadPlateFont } from "./fonts/plate.ts";
 import { createPlayer } from "./player/index.ts";
 
 /** Calls `onChange` whenever devicePixelRatio changes (zoom, or a move between monitors). */
-function watchDevicePixelRatio(onChange: () => void): void {
+function watchDevicePixelRatio(onChange: () => void): () => void {
+  let query: MediaQueryList | undefined;
   const listenForNextChange = (): void => {
-    const query = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
-    query.addEventListener(
-      "change",
-      () => {
-        onChange();
-        listenForNextChange();
-      },
-      { once: true },
-    );
+    query = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+    query.addEventListener("change", handleChange, { once: true });
+  };
+  const handleChange = (): void => {
+    onChange();
+    listenForNextChange();
   };
   listenForNextChange();
+  return () => query?.removeEventListener("change", handleChange);
 }
 
-/** The placeholder until a battle plays: the title on parchment. */
-function paintTitle(canvas: HTMLCanvasElement, message: string): void {
-  const ctx = canvas.getContext("2d");
-  if (ctx === null) throw new Error("Canvas 2D is not available in this browser");
-  const { width, height } = fitBackingStore(canvas, ctx);
-
-  ctx.fillStyle = PARCHMENT;
-  ctx.fillRect(0, 0, width, height);
-  ctx.fillStyle = INK;
-  ctx.font = plateFont(Math.max(24, Math.min(width, height) / 12));
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(message, width / 2, height / 2);
-}
-
-/**
- * `?play` plays the fixture battle through the player: the plate above, the
- * controls beneath. It is how the controls are checked by eye until the
- * integration slice loads a real battle by name and owns this layout.
- */
-function playFixture(canvas: HTMLCanvasElement): void {
-  const shell = document.createElement("div");
-  shell.style.cssText = "display:flex;flex-direction:column;height:100vh";
-  canvas.style.cssText = "flex:1;min-height:0;width:100%;height:auto";
-  const controlsRoot = document.createElement("div");
-  shell.append(canvas, controlsRoot);
-  document.body.append(shell);
-  createPlayer({ canvas, controlsRoot, battle: TRAFALGAR, map: CADIZ });
+/** Keeps `notice` painted on the canvas through resizes and zooms until the returned function is called. */
+function showNotice(canvas: HTMLCanvasElement, notice: Notice): () => void {
+  const paint = (): void => paintNotice(canvas, notice);
+  window.addEventListener("resize", paint);
+  const stopWatching = watchDevicePixelRatio(paint);
+  paint();
+  return () => {
+    window.removeEventListener("resize", paint);
+    stopWatching();
+  };
 }
 
 async function start(): Promise<void> {
+  const canvas = document.querySelector("canvas");
+  const controlsRoot = document.getElementById("controls");
+  if (canvas === null || controlsRoot === null) throw new Error("index.html must hold a <canvas> and a #controls element");
+
+  const name = battleNameFrom(window.location.search);
+  const loading = loadBattle(name);
+
   await loadPlateFont();
+  const hideNotice = showNotice(canvas, { heading: document.title, lines: [`Loading ${name}…`] });
+  const result = await loading;
+  hideNotice();
 
-  const params = new URLSearchParams(window.location.search);
-  const canvas = document.createElement("canvas");
-
-  // The player owns its own loop, controls and resizing.
-  if (params.has("play")) {
-    playFixture(canvas);
+  if (!result.ok) {
+    const lines = formatLoadErrors(result.errors);
+    console.error(`Sandtable could not load the battle "${name}":\n${lines.join("\n")}`);
+    showNotice(canvas, { heading: `Could not load the battle “${name}”`, lines });
     return;
   }
-  document.body.append(canvas);
 
-  // `?fixture=phase4` or `?fixture=phase7` renders a fixture battle at a fixed instant, for reproducible screenshots.
-  const fixtureName = params.get("fixture");
-  const fixture = fixtureName === null ? undefined : FIXTURES[fixtureName];
-
-  let redraw: () => void;
-  if (fixture === undefined) {
-    const message = fixtureName === null ? document.title : `No fixture named ${fixtureName}`;
-    redraw = () => paintTitle(canvas, message);
-  } else {
-    const { battle, map, picture } = fixture();
-    const renderer = createRenderer(canvas);
-    redraw = () => renderer.render(battle, map, picture);
-  }
-
-  window.addEventListener("resize", redraw);
-  watchDevicePixelRatio(redraw);
-  redraw();
+  document.title = `${result.battle.title} — Sandtable`;
+  createPlayer({ canvas, controlsRoot, battle: result.battle, map: result.map });
 }
 
 void start();
