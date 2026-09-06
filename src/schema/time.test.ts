@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatBattleTime, isBattleTime, parseBattleTime } from "./time.ts";
+import { formatBattleTime, instantMinutes, isBattleTime, parseBattleTime } from "./time.ts";
 
 describe("battle-clock time", () => {
   it("parses HH:MM to minutes since midnight", () => {
@@ -24,9 +24,33 @@ describe("battle-clock time", () => {
     expect(formatBattleTime(1439)).toBe("23:59");
   });
 
-  it("refuses to format a time off the day", () => {
-    expect(() => formatBattleTime(1440)).toThrow(RangeError);
+  it("formats an instant past the first midnight as the time of day it falls on", () => {
+    // ADR-0013: the clock runs from midnight of the battle's first day, and
+    // every readout is the time of day. The Nile's daybreak is day 1 at 05:05.
+    expect(formatBattleTime(1745)).toBe("05:05");
+    expect(formatBattleTime(1440)).toBe("00:00");
+    expect(formatBattleTime(1440 * 3 + 1439)).toBe("23:59");
+  });
+
+  it("refuses to format anything but a non-negative whole number of minutes", () => {
     expect(() => formatBattleTime(-1)).toThrow(RangeError);
     expect(() => formatBattleTime(12.5)).toThrow(RangeError);
+  });
+});
+
+describe("instantMinutes", () => {
+  it("counts minutes from midnight of the battle's first day", () => {
+    expect(instantMinutes(0, "00:00")).toBe(0);
+    expect(instantMinutes(0, "05:40")).toBe(340);
+    expect(instantMinutes(1, "05:05")).toBe(1745);
+    expect(instantMinutes(2, "00:00")).toBe(2880);
+  });
+
+  it("orders a later day above an earlier one whatever the times say", () => {
+    expect(instantMinutes(1, "00:01")).toBeGreaterThan(instantMinutes(0, "23:59"));
+  });
+
+  it("rejects a time that is not HH:MM", () => {
+    expect(() => instantMinutes(0, "5:40")).toThrow(RangeError);
   });
 });

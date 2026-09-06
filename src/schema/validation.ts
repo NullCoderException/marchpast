@@ -47,7 +47,12 @@ export interface NumberBounds {
   max?: number;
   exclusiveMin?: boolean;
   exclusiveMax?: boolean;
+  /** Rejects a fraction: for `day`, `end_day` and the parts of `sort_date`. */
+  integer?: boolean;
 }
+
+/** A non-negative whole number of days from the battle's first day (schema.md 2.10 rule 14). */
+export const DAY_BOUNDS: NumberBounds = { min: 0, integer: true };
 
 /** WGS84 latitude, decimal degrees (schema.md section 1). */
 export const LAT_BOUNDS: NumberBounds = { min: -90, max: 90 };
@@ -60,7 +65,11 @@ export function readNumber(value: unknown, path: string, bounds: NumberBounds, e
     errors.add(path, "expected a finite number");
     return undefined;
   }
-  const { min, max, exclusiveMin = false, exclusiveMax = false } = bounds;
+  const { min, max, exclusiveMin = false, exclusiveMax = false, integer = false } = bounds;
+  if (integer && !Number.isInteger(value)) {
+    errors.add(path, `expected a whole number, got ${value}`);
+    return undefined;
+  }
   const belowMin = min !== undefined && (exclusiveMin ? value <= min : value < min);
   const aboveMax = max !== undefined && (exclusiveMax ? value >= max : value > max);
   if (belowMin || aboveMax) {

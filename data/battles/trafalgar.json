@@ -1,7 +1,9 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "title": "The Battle of Trafalgar",
-  "date": "21 October 1805",
+  "summary": "Nelson's two columns cut Villeneuve's line off Cape Trafalgar and destroy the Combined Fleet in an afternoon.",
+  "dates": ["21 October 1805"],
+  "sort_date": { "year": 1805, "month": 10, "day": 21 },
   "extent": { "north": 36.61, "south": 36.05, "east": -6.0, "west": -6.8 },
   "scale_unit": "nmi",
   "map": "cadiz",
@@ -67,9 +69,9 @@
     }
   },
   "units": [
-    { "id": "weather-column", "side": "British", "label": "Weather column", "commander": "Nelson" },
-    { "id": "lee-column", "side": "British", "label": "Lee column", "commander": "Collingwood" },
-    { "id": "combined-fleet", "side": "Combined Fleet", "label": "Combined Fleet", "commander": "Villeneuve" }
+    { "id": "weather-column", "side": "British", "label": "Weather column", "commander": "Nelson", "arm": "ship" },
+    { "id": "lee-column", "side": "British", "label": "Lee column", "commander": "Collingwood", "arm": "ship" },
+    { "id": "combined-fleet", "side": "Combined Fleet", "label": "Combined Fleet", "commander": "Villeneuve", "arm": "ship" }
   ],
   "phases": [
     {

@@ -74,7 +74,7 @@ describe("loadBattle", () => {
   });
 
   it("reports every validation error of the battle with its JSON-pointer path", async () => {
-    const battle = { ...MINIMAL_BATTLE, schema_version: 2, title: 7 };
+    const battle = { ...MINIMAL_BATTLE, schema_version: 3, title: 7 };
     const result = await loadBattle("bad", fetchFrom({ [battleUrl("bad")]: json(battle) }));
     expect(result.ok).toBe(false);
     if (result.ok) return;

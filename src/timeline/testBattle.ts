@@ -22,9 +22,11 @@ import type { ClockSeconds } from "./picture.ts";
 
 /** A valid three-phase battle with clean interval arithmetic. Treat as frozen: tests that need a variant clone it. */
 export const TEST_BATTLE: Battle = {
-  schema_version: 1,
+  schema_version: 2,
   title: "The Test Action",
-  date: "1 January 1800",
+  summary: "Two invented units meet on an invented morning so the timeline's arithmetic is obvious.",
+  dates: ["1 January 1800"],
+  sort_date: { year: 1800, month: 1, day: 1 },
   extent: { north: 30, south: 0, east: 50, west: 0 },
   scale_unit: "nmi",
   end: "10:30",
@@ -34,8 +36,8 @@ export const TEST_BATTLE: Battle = {
     invented: { label: "An invented source", work: "Nothing at all, made up for the tests", license: "public-domain" },
   },
   units: [
-    { id: "alpha", side: "Red", label: "Alpha" },
-    { id: "beta", side: "Blue", label: "Beta" },
+    { id: "alpha", side: "Red", label: "Alpha", arm: "ship" },
+    { id: "beta", side: "Blue", label: "Beta", arm: "ship" },
   ],
   phases: [
     {

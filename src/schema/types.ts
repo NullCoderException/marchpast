@@ -1,22 +1,31 @@
 /**
- * Schema v1 for the two data files, the battle file and the map file.
+ * Schema v2 for the two data files, the battle file and the map file.
  *
  * These types are the schema's source of truth; `docs/schema.md` is kept in
  * step with them. Field names are `snake_case`. Doc comments carry the
  * one-line meaning from the spec so the types read alone. Runtime checking
  * lives in `validateBattle.ts` and `validateMap.ts`.
  */
+import type { Arm } from "./arms.ts";
 import type { LicenseId } from "./licenses.ts";
 
+export type { Arm } from "./arms.ts";
 export type { LicenseId } from "./licenses.ts";
 
-/** A 24-hour `"HH:MM"` battle-clock time on the battle's date, `00:00` to `23:59`. Nothing finer (ADR-0002). */
+/**
+ * A 24-hour `"HH:MM"` battle-clock time, `00:00` to `23:59`, read on the day
+ * its `day` names. Nothing finer. A reading, never an instant: no timezone,
+ * never UTC, never a `Date` (ADR-0002, ADR-0013).
+ */
 export type BattleTime = string;
+
+/** A non-negative integer counting days from the battle's first day at `0` (ADR-0013). */
+export type Day = number;
 
 /** An angle in degrees true: `0` is north, clockwise, `0 <= x < 360`. Decimals allowed so the sixteen compass points round-trip (WNW is `292.5`). */
 export type DegreesTrue = number;
 
-/** The direction a unit's front faces, in degrees true. */
+/** Where a unit's force is directed, in degrees true: its course while it moves, the way its line faces while it fights (ADR-0019). */
 export type Heading = DegreesTrue;
 
 /** WGS84 decimal degrees, north and east positive, `-90 <= lat <= 90`, `-180 <= lon <= 180` (battle-file convention, ADR-0001). */
@@ -33,31 +42,49 @@ export interface Extent {
   west: number;
 }
 
+/** The first day in machine form, for the Library to sort on. Only ever compared, never counted from (ADR-0013). */
+export interface SortDate {
+  /** Ordinary historical numbering, BC negative and no year zero: Cannae is `-216`. */
+  year: number;
+  /** `1` to `12`. */
+  month: number;
+  /** `1` to `31`. */
+  day: number;
+}
+
 /** The battle file, `data/battles/<name>.json`: the roster and the phases that play over an optional map. */
 export interface Battle {
-  /** Rejected if anything but `1`. */
-  schema_version: 1;
+  /** Rejected if anything but `2`. */
+  schema_version: 2;
   /** Display title, e.g. `"The Battle of Trafalgar"`. */
   title: string;
-  /** Human-readable battle date, e.g. `"21 October 1805"`. Display only; not parsed. */
-  date: string;
+  /** One plain sentence the battle carries wherever it is named but not played: the Library's list, the Picker. Display only (ADR-0011). */
+  summary: string;
+  /** Human-readable date of each day the battle spans, in order, one entry per day. Display only; never parsed (ADR-0013). */
+  dates: string[];
+  /** The first day as integers, for the Library to sort on. Restates `dates[0]`; nothing checks the two agree. */
+  sort_date: SortDate;
   /** The bounding box the renderer fits to the canvas, letterboxing the rest. */
   extent: Extent;
   /** The unit the renderer's scale bar is drawn in. */
   scale_unit: "nmi" | "km";
   /** Bare name of the map file, resolved to `data/maps/<map>.geojson`. Never a path. Absent means plain parchment. */
   map?: string;
-  /** When the last phase's picture stops holding. Later than the last phase's `t`. */
+  /** When the last phase's picture stops holding, on `end_day`. Later than the last phase on the pair (`day`, `t`). */
   end: BattleTime;
+  /** Which day `end` falls on. Default the last phase's `day`; never less than it. */
+  end_day?: Day;
   /** The battle file's own licence. `CC-BY-4.0` for files under `data/battles/`. */
   license: LicenseId;
   /** Credit line naming the licensor. Required when the licence class is attribution or share-alike. */
   attribution?: string;
   /** The works the battle draws on, keyed by a short id such as `collingwood-dispatch`. Unreferenced entries are allowed. */
   sources: Record<string, Source>;
-  /** The roster: identity only, no per-phase data. At least one unit; ids unique. */
+  /** One display name per depth of the unit tree, from the roots down. Required when any unit has a `parent`, forbidden otherwise (ADR-0017). */
+  levels?: string[];
+  /** The roster: identity only, no per-phase data. At least one unit; ids unique; a parent precedes its children. */
   units: Unit[];
-  /** At least one phase, in battle-clock order. */
+  /** At least one phase, in battle-clock order on (`day`, `t`). */
   phases: Phase[];
 }
 
@@ -77,14 +104,20 @@ export interface Source {
 
 /** A roster entry: a body of force the battle follows as one marker. */
 export interface Unit {
-  /** Unique across the roster; referenced from every phase. */
+  /** Unique across the roster; referenced from every phase and from `parent`. */
   id: string;
-  /** The side's display name, e.g. `"British"`. Sides are ordered by first appearance in `units[]`. */
+  /** The side's display name, e.g. `"British"`. Sides are ordered by first appearance in `units[]`. A unit's side equals its parent's. */
   side: string;
   /** The unit's display name, e.g. `"Weather column"`. */
   label: string;
+  /** A shorter name the label pass may fall back to when the full one will not fit. Never derived from `label` or `commander`. */
+  short_label?: string;
   /** Display only: the person the sources name the unit by, e.g. `"Nelson"`. A change of command is caption matter. */
   commander?: string;
+  /** What the unit is made of. Identity, never per-phase state; a closed list kept in `arms.ts` (ADR-0015). */
+  arm: Arm;
+  /** The id of the roster unit this one belongs to: an earlier entry with the same `side`. Nothing is computed between the two (ADR-0017). */
+  parent?: string;
 }
 
 /** The authored picture of every unit at one battle-clock instant, with the caption and wind that hold until the next phase. */
@@ -93,7 +126,9 @@ export interface Phase {
   id: string;
   /** Short title shown in the caption band. */
   label: string;
-  /** The instant this picture is true. Strictly increasing across `phases`. */
+  /** Which day of the battle `t` falls on. Default `0`; the first phase is on day `0` (ADR-0013). */
+  day?: Day;
+  /** The instant this picture is true, on `day`. Strictly increasing across `phases` on the pair (`day`, `t`). */
   t: BattleTime;
   /** Battle-clock seconds per real second while this phase plays; `> 0`. */
   playback_rate: number;
@@ -131,25 +166,36 @@ export interface Reference {
   note?: string;
 }
 
-/** `column` is ships or men in line ahead along the heading; `line` is abreast across it. A styled label, not geometry. */
-export type Formation = "column" | "line";
+/**
+ * `column` is signs in file along the heading; `line` is abreast across it;
+ * `mass` is in ranks, four across and two deep. A shape and never a condition:
+ * a fleet at anchor is drawn in the shape it lies in. One flat list for every
+ * arm, never cross-checked against it (ADR-0016).
+ */
+export type Formation = "column" | "line" | "mass";
 
-/** `intact`: not yet in action. `engaged`: in action, cohesion held. `broken`: cohesion lost. `destroyed`: ceased to exist as a fighting unit. */
+/**
+ * `intact`: not yet in action. `engaged`: in the action or its aftermath,
+ * cohesion held, under a flag of truce included. `broken`: no longer acting as
+ * one body, whether it flees or fights on in fragments. `destroyed`: ceased to
+ * exist as a fighting unit, whatever became of its men. A condition and never a
+ * place (ADR-0018, ADR-0019).
+ */
 export type UnitState = "intact" | "engaged" | "broken" | "destroyed";
 
 /** One unit's picture at the phase instant. */
 export interface UnitSnapshot {
   /** A roster `units[].id`. */
   id: string;
-  /** The unit's centre point. Tweens linearly to the next phase. */
+  /** The unit's centre point. Tweens linearly to the next phase. A unit that leaves the field keeps a position on the plate. */
   position: Position;
-  /** The direction the unit's front faces. Tweens along the shortest arc. */
+  /** Where the unit's force is directed: its course while it moves, the way its guns or its line face while it fights. Tweens along the shortest arc. */
   heading: Heading;
   /** Steps. */
   formation: Formation;
   /** Steps. Battle-neutral: `struck` is `destroyed`. */
   state: UnitState;
-  /** Fraction of the unit's opening fighting strength still fighting as part of the unit, `0 <= x <= 1`. Default `1`. Steps. */
+  /** Fraction of the unit's opening fighting strength still fighting as part of the unit, `0 <= x <= 1`. Never a casualty count. Default `1`. Steps; never tweens. */
   strength?: number;
   /** Authored arrows for what the position cannot show. Default empty. */
   moves?: Move[];

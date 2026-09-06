@@ -19,7 +19,7 @@ npm run build      # production build into dist/
 npm run preview    # serve the production build locally
 npm test           # Vitest, once
 npm run typecheck  # tsc over the app, the Vite config and the scripts
-npm run validate   # check data/ against schema v1 (or: npm run validate data/battles/x.json)
+npm run validate   # check data/ against schema v2 (or: npm run validate data/battles/x.json)
 ```
 
 Open the dev server's URL and Trafalgar loads, paused on the dawn phase. Space plays and pauses, the arrow keys jump a phase, the scrubber scrubs, and the "Details" button opens the phase notes and the sources table.
@@ -45,7 +45,7 @@ The full statement is [`data/LICENSE`](data/LICENSE). The plate typeface, IM Fel
 
 ## How it is put together
 
-- `src/schema/` is schema v1 in code: `types.ts` is the source of truth for both file kinds, `licenses.ts` the licence allowlist, `validateBattle.ts` and `validateMap.ts` the runtime validators. They never throw; they return every error with a JSON-pointer path. `docs/schema.md` is the prose copy, kept in step.
+- `src/schema/` is schema v2 in code: `types.ts` is the source of truth for both file kinds, `licenses.ts` the licence allowlist, `arms.ts` the arm allowlist, `hierarchy.ts` the roster tree and the units a level draws, `validateBattle.ts` and `validateMap.ts` the runtime validators. They never throw; they return every error with a JSON-pointer path. `docs/schema.md` is the prose copy, kept in step.
 - `src/timeline/` turns a battle and a battle-clock instant into a `Picture`: which phase, every unit's tweened position and heading, stepped formation and state, and the phase's caption.
 - `src/render/` draws a `Picture` on a Canvas as the chart plate: parchment, Web Mercator projection, coastline, ship-tick glyphs, tracks and move arrows, compass rose with the wind, scale bar, legend and caption band.
 - `src/player/` is the animation loop and the controls beneath the plate; every rule about what a control does lives in `state.ts` and is tested without a browser.
