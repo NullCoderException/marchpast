@@ -9,7 +9,7 @@
  * between the plate's ticks and Atlas's blocks. The label is drawn here, by
  * the same code, for every view: none of the three replaces it (ADR-0014).
  */
-import type { UnitPicture } from "../timeline/picture.ts";
+import type { Picture, UnitPicture } from "../timeline/picture.ts";
 import type { Plate } from "./plate.ts";
 import { drawArrow, hashString, type Point } from "./primitives.ts";
 import { toRadians } from "./projection.ts";
@@ -48,7 +48,7 @@ export function drawUnits(plate: Plate): void {
   // Glyphs, in two passes: every unit's mark, then every unit's body. One
   // unit's smoke must never cover the next unit's ships, and at 13:30 off
   // Trafalgar three units overlap (ADR-0014).
-  const windFrom = blowingWind(plate);
+  const windFrom = blowingWind(picture);
   const glyphs = picture.units.map((unit) => ({
     at: projection.project(unit.position.lat, unit.position.lon),
     heading: toRadians(unit.heading),
@@ -65,14 +65,13 @@ export function drawUnits(plate: Plate): void {
     } satisfies GlyphRequest,
   }));
 
-  const { mark, body } = view.glyph;
-  for (const stroke of [mark, body]) {
-    if (stroke === undefined) continue;
+  for (const half of ["mark", "body"] as const) {
+    if (view.glyph[half] === undefined) continue;
     for (const { at, heading, request } of glyphs) {
       ctx.save();
       ctx.translate(at.x, at.y);
       ctx.rotate(heading);
-      stroke(ctx, request);
+      view.glyph[half]?.(ctx, request);
       ctx.restore();
     }
   }
@@ -85,7 +84,7 @@ export function drawUnits(plate: Plate): void {
 }
 
 /** The bearing the phase's wind blows from, or `undefined` when there is no wind to speak of (ADR-0008). */
-function blowingWind({ picture }: Plate): number | undefined {
+function blowingWind(picture: Picture): number | undefined {
   const wind = picture.wind;
   if (wind === undefined || wind.force === "calm" || wind.from === undefined) return undefined;
   return wind.from;

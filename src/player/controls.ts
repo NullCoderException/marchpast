@@ -8,7 +8,7 @@
  * state reaches the DOM. That is the seam that keeps the rules testable
  * without a browser.
  */
-import { formatClock, VIEWS, type ViewId } from "../render/index.ts";
+import { formatClock, VIEWS, viewById, type ViewId } from "../render/index.ts";
 import type { Battle } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
 import { Listeners, element } from "./dom.ts";
@@ -188,6 +188,6 @@ function viewChooser(listeners: Listeners, handlers: ControlHandlers): HTMLSelec
     option.value = view.id;
     select.append(option);
   }
-  listeners.on<Event>(select, "change", () => handlers.setView(select.value as ViewId));
+  listeners.on<Event>(select, "change", () => handlers.setView(viewById(select.value).id));
   return select;
 }

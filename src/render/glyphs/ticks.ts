@@ -13,6 +13,28 @@ import { seeded } from "../primitives.ts";
 import { TICK_HALF_HEIGHT, TICK_HALF_WIDTH, TICKS_PER_GLYPH } from "../style.ts";
 import type { Glyph, GlyphRequest } from "../view.ts";
 
+/**
+ * Billow's two weights: a full cloud when a unit is engaged, the same cloud
+ * thinned when it is broken (#58). Radii grow from `radius` at the hull by
+ * `growth` over the cloud's `reach`.
+ */
+const BILLOW = {
+  engaged: { puffs: 16, reach: 26, radius: 3.5, growth: 6.5 },
+  broken: { puffs: 8, reach: 16, radius: 3, growth: 3.5 },
+} as const;
+/** However small the sample, a cloud is never fewer puffs than this. */
+const MIN_PUFFS = 4;
+/** Clearance between the ticks and the nearest puff, so the cloud starts off the hull. */
+const HULL_CLEARANCE = 3;
+/** The cloud's outline, in #58's engraved weight: 0.55 to 0.7px of ink, never finer. */
+const OUTLINE_WIDTH = 0.7;
+const MIN_OUTLINE_WIDTH = 0.55;
+/** Where the three hatch chords cross a puff, as fractions of its radius, and how much of each chord is drawn. */
+const CHORDS = [0.3, 0.52, 0.74];
+const CHORD_LENGTH = 0.82;
+/** Below this scale the chords are too fine to read, so the legend's sample leaves them off. */
+const CHORD_MIN_SCALE = 0.9;
+
 export const ticks: Glyph = { mark, body, halfWidth: (scale) => TICK_HALF_WIDTH * scale };
 
 /** The smoke, laid down before any unit's ships so a melee does not erase itself. */
@@ -123,31 +145,30 @@ interface Puff extends Point {
  */
 function drawBillow(ctx: CanvasRenderingContext2D, request: GlyphRequest, random: () => number): void {
   const { length, formation, state, scale, palette } = request;
-  const thin = state === "broken";
+  const cloud = state === "broken" ? BILLOW.broken : BILLOW.engaged;
   const drift = leeDrift(request.windTo, formation);
 
   // Along the unit's body, and away from it in the drift's direction. The cloud
   // starts clear of the ticks and widens as it goes, so it reads as a plume off
   // one flank rather than a halo the unit sits inside.
-  const along = formation === "column" ? { x: 0, y: 1 } : { x: 1, y: 0 };
-  const count = Math.max(4, Math.round((thin ? 8 : 16) * scale));
-  const clearance = (TICK_HALF_WIDTH + 3) * scale;
-  const reach = (thin ? 16 : 26) * scale;
+  const { along } = axes(formation);
+  const count = Math.max(MIN_PUFFS, Math.round(cloud.puffs * scale));
+  const clearance = (TICK_HALF_WIDTH + HULL_CLEARANCE) * scale;
 
   const puffs: Puff[] = [];
   for (let i = 0; i < count; i++) {
     const out = i / Math.max(1, count - 1);
     // Narrow at the hull, broad downwind: the cloud fans out as it drifts.
     const spread = (random() - 0.5) * length * (0.5 + out * 0.5);
-    const distance = clearance + out * reach;
+    const distance = clearance + out * cloud.reach * scale;
     puffs.push({
       x: along.x * spread + drift.x * distance,
       y: along.y * spread + drift.y * distance,
-      r: ((thin ? 3 : 3.5) + out * (thin ? 3.5 : 6.5)) * scale,
+      r: (cloud.radius + out * cloud.growth) * scale,
     });
   }
 
-  paintCloud(ctx, puffs, drift, Math.max(0.4, 0.7 * scale), scale, palette.ink);
+  paintCloud(ctx, puffs, drift, Math.max(MIN_OUTLINE_WIDTH, OUTLINE_WIDTH * scale), scale, palette.ink);
 }
 
 /**
@@ -195,13 +216,13 @@ function paintCloud(
   paint.globalCompositeOperation = "source-over";
 
   // Three chords on each puff's lee side. Too fine to read in the legend's sample, so skipped there.
-  if (scale >= 0.9) {
+  if (scale >= CHORD_MIN_SCALE) {
     paint.strokeStyle = ink;
-    paint.lineWidth = 0.55 * scale;
+    paint.lineWidth = MIN_OUTLINE_WIDTH * scale;
     for (const puff of puffs) {
-      for (const fraction of [0.3, 0.52, 0.74]) {
+      for (const fraction of CHORDS) {
         const offset = puff.r * fraction;
-        const half = Math.sqrt(Math.max(0, puff.r * puff.r - offset * offset)) * 0.82;
+        const half = Math.sqrt(Math.max(0, puff.r * puff.r - offset * offset)) * CHORD_LENGTH;
         const cx = puff.x + drift.x * offset;
         const cy = puff.y + drift.y * offset;
         paint.beginPath();
@@ -246,8 +267,8 @@ function tracePuffs(ctx: CanvasRenderingContext2D, puffs: readonly Puff[], grow:
  * the label beside a column and astern of a line.
  */
 export function leeDrift(windTo: number | undefined, formation: Formation): Point {
-  const along = formation === "column" ? { x: 0, y: 1 } : { x: 1, y: 0 };
-  const across = formation === "column" ? { x: 1, y: 0 } : { x: 0, y: 1 };
+  const { along, across } = axes(formation);
+  // Written out rather than negated from `across`, which would answer a negative zero.
   if (windTo === undefined) return formation === "column" ? { x: -1, y: 0 } : { x: 0, y: -1 };
 
   const wind = { x: Math.sin(windTo), y: -Math.cos(windTo) };
@@ -265,3 +286,13 @@ export function leeDrift(windTo: number | undefined, formation: Formation): Poin
 const MIN_ACROSS = 0.5;
 /** How much of the wind along the hull survives: damped, so the cloud never runs the length of the unit. */
 const ALONG_DAMPING = 0.35;
+
+/**
+ * A unit's own axes at the origin heading up: `along` its long axis, `across`
+ * its flanks. A column runs in line ahead, so its length is the heading; a
+ * line runs abreast, so its length is across it.
+ */
+function axes(formation: Formation): { along: Point; across: Point } {
+  if (formation === "column") return { along: { x: 0, y: 1 }, across: { x: 1, y: 0 } };
+  return { along: { x: 1, y: 0 }, across: { x: 0, y: 1 } };
+}

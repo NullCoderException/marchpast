@@ -28,7 +28,7 @@ describe("tick", () => {
   it("advances through the phase's rate and the multiplier while playing", () => {
     const playing = { clock: clock("10:10"), playing: true, multiplier: 1, view: "plate" as const };
     expect(tick(TEST_BATTLE, playing, 5).clock).toBe(clock("10:15"));
-    expect(tick(TEST_BATTLE, { ...playing, multiplier: 2, view: "plate" as const }, 5).clock).toBe(clock("10:20"));
+    expect(tick(TEST_BATTLE, { ...playing, multiplier: 2 }, 5).clock).toBe(clock("10:20"));
   });
 
   it("pauses on the last picture at end", () => {

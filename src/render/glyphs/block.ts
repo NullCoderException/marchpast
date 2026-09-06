@@ -23,6 +23,10 @@ const BARB = 4;
 const BARB_HALF_WIDTH = 2.5;
 /** A broken unit is drawn at this much of full strength, outline and fill alike. */
 const BROKEN_ALPHA = 0.55;
+/** The engaged hatching: its ink, its weight, and the gap between its lines. */
+const HATCH_ALPHA = 0.55;
+const HATCH_WIDTH = 0.9;
+const HATCH_STEP = 5;
 
 export const block: Glyph = { mark, body, halfWidth: (scale) => (THICKNESS / 2 + HATCH_PAD) * scale };
 
@@ -33,7 +37,7 @@ function mark(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
   const thickness = THICKNESS * scale;
   const w = formation === "column" ? thickness : length;
   const h = formation === "column" ? length : thickness;
-  drawHatch(ctx, w, h, HATCH_PAD * scale, palette.ink);
+  drawHatch(ctx, w, h, HATCH_PAD * scale, palette.ink, scale);
 }
 
 function body(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
@@ -74,7 +78,7 @@ function body(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
 }
 
 /** A 45° hatched zone standing off the block: the Atlas engaged mark. */
-function drawHatch(ctx: CanvasRenderingContext2D, w: number, h: number, pad: number, ink: string): void {
+function drawHatch(ctx: CanvasRenderingContext2D, w: number, h: number, pad: number, ink: string, scale: number): void {
   const left = -w / 2 - pad;
   const top = -h / 2 - pad;
   const width = w + pad * 2;
@@ -84,9 +88,11 @@ function drawHatch(ctx: CanvasRenderingContext2D, w: number, h: number, pad: num
   ctx.rect(left, top, width, height);
   ctx.clip();
   ctx.strokeStyle = ink;
-  ctx.globalAlpha = 0.55;
-  ctx.lineWidth = 0.9;
-  const step = 5;
+  ctx.globalAlpha = HATCH_ALPHA;
+  // The line thins with the sample; the gap does not, because closing it up
+  // would give the legend's small block *more* detail to read, not less.
+  ctx.lineWidth = HATCH_WIDTH * scale;
+  const step = HATCH_STEP;
   // Lines at 45°: sweeping the intercept across the diagonal covers the whole rectangle.
   for (let d = left - height; d <= left + width; d += step) {
     ctx.beginPath();

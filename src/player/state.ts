@@ -34,9 +34,9 @@ export interface PlayerState {
 }
 
 /** Paused on the first phase in the default view, which is what loading lands on (schema.md 2.10, #47). */
-export function initialState(battle: Battle, multiplier = 1, view: ViewId = DEFAULT_VIEW.id): PlayerState {
+export function initialState(battle: Battle, multiplier = 1): PlayerState {
   checkMultiplier(multiplier);
-  return { clock: startClock(battle), playing: false, multiplier, view };
+  return { clock: startClock(battle), playing: false, multiplier, view: DEFAULT_VIEW.id };
 }
 
 /** Whether the clock has reached `end`, where the last picture holds. */

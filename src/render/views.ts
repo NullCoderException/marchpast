@@ -6,7 +6,7 @@
  */
 import { block } from "./glyphs/block.ts";
 import { ticks } from "./glyphs/ticks.ts";
-import type { Pens, View, ViewId } from "./view.ts";
+import type { Pens, View } from "./view.ts";
 
 /** The plate's pens: fine dotted track, dashed intent, solid detachment (ADR-0009, #58). */
 const PLATE_PENS: Pens = {
@@ -74,6 +74,6 @@ export const VIEWS: readonly View[] = [CHART_PLATE, NIGHT_PLATE, ATLAS];
 export const DEFAULT_VIEW: View = CHART_PLATE;
 
 /** The view an id names, or the default when the id is one no view carries. */
-export function viewById(id: ViewId | string | null | undefined): View {
+export function viewById(id: string | null | undefined): View {
   return VIEWS.find((view) => view.id === id) ?? DEFAULT_VIEW;
 }
