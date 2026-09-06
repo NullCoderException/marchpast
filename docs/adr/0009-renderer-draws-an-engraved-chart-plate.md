@@ -1,5 +1,7 @@
 # The renderer draws an engraved chart plate: ink ships on parchment with the state written beside them
 
+*Amended 2026-09-06: the chart plate is the default **view**, not the only treatment (ADR-0014); the alpha-wash smoke is replaced by Billow and the phone collapses the furniture (#58); the glyph's nominal true length is gone, a glyph being a fixed plate constant, and formation has a third word with signs per arm (ADR-0015, ADR-0016); the label's placement and collapse order were proved and sharpened on #39. Everything else here stands as the system every view is built from.*
+
 The concept set the bar at "History Channel map with arrows" on a stylised parchment map, which left the actual visual language open. A throwaway static frame of Trafalgar at three units ([prototype/static-frame](https://github.com/NullCoderException/sandtable/blob/prototype/static-frame/prototypes/static-frame.html)) tried three structurally different treatments: an engraved 1805 **chart plate**, a dark **broadcast** map with solid blocks and a lower-third, and a strategy-game **replay** with badges and a timeline strip. We chose the chart plate's look and materials, and carried over from the broadcast variant the two things that made it more useful: a written state and strength beside every unit, and a full-width caption band that anchors each frame to the battle clock. The replay's timeline strip is player controls, not picture, and is covered by the player-controls decision.
 
 ## Considered options

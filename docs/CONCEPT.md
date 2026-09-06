@@ -1,6 +1,6 @@
 # Sandtable (working title)
 
-*Concept document — v0.1, September 2026. Living doc; expand freely.*
+*Concept document — started September 2026 for v0.1, roadmap and decisions log kept current through v0.2. Living doc; expand freely.*
 
 ## One-liner
 
@@ -31,6 +31,8 @@ I've been listening to military history podcasts and wanted to see the battles, 
 - **Agents:** Claude Code does most of the TypeScript. Keeping everything 2D and data-driven is what makes agent-driven development viable here — there is no visual scene an agent has to eyeball.
 
 ## Data model sketch
+
+*Superseded: the sketch below is the September 2026 starting point, kept for the record. The format as built is [`docs/schema.md`](schema.md) (schema v2 since 2026-09-06), with the reasoning in [`docs/adr/`](adr/) and the vocabulary in [`CONTEXT.md`](../CONTEXT.md). The sketch's `t_start`/`t_end` became one instant per phase, `struck` became the battle-neutral `destroyed`, moves nest under units, and units gained an arm and an authored hierarchy.*
 
 A battle file is a list of **phases**. Each phase has:
 
@@ -86,19 +88,19 @@ Explicitly out of scope this weekend: per-ship detail, terrain, the extraction p
 
 ## Roadmap (loose)
 
-- **v0.1** — Trafalgar plays. Schema v1.
-- **v0.2** — Second battle (Cannae: land, terrain-light, ancient sources) to force schema generalization.
+- **v0.1** — Trafalgar plays. Schema v1. *Done 2026-09-06; hosted on GitHub Pages.*
+- **v0.2** — Three more battles on the hosted site, one of them on land: Cannae forces schema v2 (arms, a third formation word, an authored hierarchy, rivers, shoals, works and contours in the map, a clock that crosses midnight); the Nile and Copenhagen are the naval reuse tests; the renderer becomes a set of viewer-picked views (chart plate, night plate, atlas); the site gets a library as its front door and a picker; Trafalgar is re-authored at squadron level. *Spec: [`docs/schema.md`](schema.md) and ADR-0011 to ADR-0019; build issues under the v0.2 milestone.*
 - **v0.3** — Extraction pipeline prototype.
-- **v0.4** — Battle library UI, real basemap option, subdivision to ship/unit level.
+- **v0.4** — Real basemap option; ship or unit level below squadrons where it earns its keep; library thumbnails.
 - **Someday** — 3D experiment in Godot, if the 2D version proves the data is the valuable part.
 
 ## Open questions
 
-- Coordinates: abstract map units per battle, or real lat/lon from day one? (Lat/lon makes basemaps possible later; abstract is simpler now.)
-- Interpolation between phases: linear tween, or keyframes within phases?
-- How to represent casualties/strength decay visually without turning it into a simulation?
-- Where does the "authoritative" narrative live when sources disagree? One `caption` field, or per-source alternates?
-- Name. "Sandtable" is the front-runner; also considered Dispatches, Engage, ORBAT.
+The v0.1 questions are all answered: real lat/lon from day one (ADR-0001), a linear tween between snapshots (ADR-0002), authored state and strength rather than a simulation (ADR-0003), one caption per phase with the argument in `notes` (ADR-0006). "Sandtable" stuck. What remains open is what the next map charts:
+
+- An extraction test on Cannae from Polybius, before or alongside the pipeline effort (v0.3).
+- Library thumbnails: a still per battle rendered by the build from a chosen phase in a decided view.
+- Little Bighorn and any WWII battle: the arms and elevation are designed with them in mind; each is its own effort.
 
 ## Decisions log
 
@@ -109,6 +111,17 @@ Explicitly out of scope this weekend: per-ship detail, terrain, the extraction p
 | 2026-09-05 | Battle = JSON timeline, renderer is battle-agnostic | Reusability is the whole point |
 | 2026-09-05 | First battle: Trafalgar | Stress-tests wind, heading, time compression; sources are rich and free |
 | 2026-09-05 | Three units first, subdivide later | Avoid the 60-ship rabbit hole before anything renders |
+| 2026-09-05 | Schema v1 locked after an extraction test, adding only `commander` (ADR-0001 to ADR-0010) | Two independent model runs produced valid files; the one unreliable field was position, a pipeline input, not a schema gap |
+| 2026-09-06 | v0.2 is Cannae, the Nile and Copenhagen on a hosted site; hosting is GitHub Pages | Cannae forces the land generalisation; the two naval battles test reuse; Azure and a custom domain wait |
+| 2026-09-06 | The library is the front door, built from the battle files; a battle plays at `?battle=<name>` (ADR-0011) | A battle joins the site by existing; pretty paths and hashes lose on Pages |
+| 2026-09-06 | Map format v2: `river`, `shoal`, `work`, `contour`; elevation as contour lines; one map file is one moment (ADR-0012) | The three battles need exactly these; contours are ordinary GeoJSON at a tenth of the cost of bands; hachures would need a raster |
+| 2026-09-06 | The battle clock crosses midnight by a per-phase `day` offset; the clock is a reading, never an instant (ADR-0013) | The Nile runs past midnight; ISO datetimes assert an instant the sources cannot give and break at 216 BC |
+| 2026-09-06 | One engraved design language; a view is a palette, pens and a glyph; three views, the chart plate default (ADR-0014) | Decided once above the renderer, so the views cannot drift into second aesthetics |
+| 2026-09-06 | Every unit carries an `arm` and every view draws every arm (ADR-0015) | Cannae's horse and foot must be tellable apart without reading the label |
+| 2026-09-06 | Land units draw as ranks of signs at a fixed plate size; formation gains `mass` (ADR-0016) | A nominal true length drew a 560px unit at Cannae; a glyph is type-sized, never geometry |
+| 2026-09-06 | Hierarchy is authored at every level and the viewer picks the level; sixteen units drawn at once is the ceiling (ADR-0017) | Both the coarse and the fine picture are facts from the sources, never a roll-up; the label proof set the ceiling |
+| 2026-09-06 | v1's states, strength and moves carry Cannae, the Nile and Copenhagen unchanged; `broken` widened; heading is the fighting front; anchoring and the truce are caption matter (ADR-0018, ADR-0019) | Every proposed fifth state or third move kind priced a glyph and a legend row for a sentence the caption already writes |
+| 2026-09-06 | Labels place by a sticky search with a five-step collapse and an authored `short_label`; the unit card is the label unfolded; the view and level choosers are `<select>`s that never remember | Measured over whole playbacks: the only algorithm with no overlap to sixteen units; neither derived short name survives Cannae |
 
 ## Known risks
 

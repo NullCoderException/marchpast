@@ -1,5 +1,7 @@
 # Units carry an arm, and every view draws every arm
 
+*Amended 2026-09-06: the chart plate's infantry and cavalry signs and the formation word v2 adds were decided by ADR-0016; a parent of mixed arms carries the arm of its main body (ADR-0017).*
+
 The v1 roster says who a unit is (`id`, `side`, `label`, `commander`) and nothing about what it is made of, so the renderer draws the same ship-ticks for Hasdrubal's horse, the Libyan foot and Nelson's column; only the label tells them apart. The Cannae research ([#41](https://github.com/NullCoderException/sandtable/issues/41)) lists that first among the things v1 cannot express. We decided that every roster unit carries a required **`arm`**, one word from a flat, closed, code-extensible list that v2 ships with exactly the values the four battles use: `infantry`, `cavalry` and `ship`. The arm is part of a unit's identity, like its commander, and never changes during a battle. It reaches the drawing as one field on the glyph request, and **every view draws every arm** with its own sign, enforced by the type so that a new arm cannot compile until each view has drawn it. The legend keys arms only when a battle has more than one. Trekroner stays a work on the map, not a unit, so no `battery` arm ships in v2.
 
 ## Considered options

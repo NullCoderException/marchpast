@@ -1,5 +1,7 @@
 # Anchoring and the truce are caption matter, and a unit's heading is its fighting front
 
+*Amended 2026-09-06: `docs/schema.md` is now the v2 spec, written at the handoff (#53).*
+
 ADR-0003 fixed a four-value **state** enum; ADR-0008 gave a phase its wind; ADR-0016 gave formation a third word and kept heading as the front; ADR-0018 held all of it against Cannae, the hardest land case, and left the two naval questions open. The Nile ([#42](https://github.com/NullCoderException/sandtable/issues/42)) and Copenhagen ([#43](https://github.com/NullCoderException/sandtable/issues/43)) are the naval reuse tests, and between them they put three things to v1 that Trafalgar never did: fleets that fight at anchor and cannot move, a battle that ends in a truce rather than a rout, and ships that ground and are still aground when the file runs out.
 
 We decided that **v1's vocabulary carries both battles unchanged**. Being at anchor is caption matter, the truce is caption matter, and the groundings are the `detachment` moves and strength decay ADR-0018 already describes. Nothing is added to `src/schema/`. What does change is that a rule authored into one Trafalgar phase's `notes` and never written down becomes a glossary rule: **`heading` is where a unit's force is directed, not where its bows point**, so a moored fleet in line of battle is a `line` whose heading is its broadside.
