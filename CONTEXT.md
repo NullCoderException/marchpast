@@ -67,12 +67,20 @@ _Avoid_: Beaufort, strength, speed, knots
 ### Time
 
 **Phase**:
-The authored picture of every unit at one battle-clock instant, together with the caption and wind that hold until the next phase begins. The player tweens unit positions and headings between one phase and the next.
+The authored picture of every unit at one moment on the battle clock, together with the caption and wind that hold until the next phase begins. The player tweens unit positions and headings between one phase and the next.
 _Avoid_: Snapshot, keyframe, frame, step, scene, interval
 
 **Battle clock**:
-Historical time of day on the battle's date, and the player's master timeline; every phase is pinned to it.
-_Avoid_: Game time, sim time, timestamp
+Historical time of day as the sources read it, running from the start of the battle's first day, and the player's master timeline; every phase is pinned to it. It is a reading, not an instant: it carries no timezone and is never UTC.
+_Avoid_: Game time, sim time, timestamp, datetime
+
+**Day**:
+Which day of the battle a phase falls on, counted from its first at zero. A battle that never crosses midnight has only day zero.
+_Avoid_: Date, offset, session, part
+
+**Sort date**:
+The battle's first day written as numbers so the library can order battles by it, its year negative before Christ. It is only ever compared, never counted from.
+_Avoid_: Timestamp, epoch, start date, key
 
 **Playback rate**:
 How many battle-clock seconds elapse per real second while a phase plays.
