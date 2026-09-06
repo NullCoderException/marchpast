@@ -63,7 +63,8 @@ export function drawMap(plate: Plate): void {
 function landRings(map: MapFile): LonLat[][] {
   const rings: LonLat[][] = [];
   for (const feature of map.features) {
-    // The kind and the geometry type agree by validation; checking the geometry is what narrows the type.
+    // A shoal is a polygon too, so the kind is what selects; checking the geometry is what narrows the type.
+    if (feature.properties.kind !== "land") continue;
     const { geometry } = feature;
     if (geometry.type === "Polygon") rings.push(...geometry.coordinates);
     else if (geometry.type === "MultiPolygon") for (const polygon of geometry.coordinates) rings.push(...polygon);

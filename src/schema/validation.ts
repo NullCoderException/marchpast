@@ -58,6 +58,8 @@ export const DAY_BOUNDS: NumberBounds = { min: 0, integer: true };
 export const LAT_BOUNDS: NumberBounds = { min: -90, max: 90 };
 /** WGS84 longitude, decimal degrees (schema.md section 1). */
 export const LON_BOUNDS: NumberBounds = { min: -180, max: 180 };
+/** A contour's height above sea level, metres (schema.md 3.2, ADR-0012). */
+export const ELEVATION_BOUNDS: NumberBounds = { min: -500, max: 9000 };
 
 /** A finite number within `bounds`, or `undefined` with the error recorded at `path`. */
 export function readNumber(value: unknown, path: string, bounds: NumberBounds, errors: Errors): number | undefined {

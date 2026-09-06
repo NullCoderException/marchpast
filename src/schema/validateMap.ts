@@ -1,17 +1,21 @@
 /**
  * Runtime validator for the map file (schema.md section 3): a GeoJSON
- * FeatureCollection with exactly two foreign members, holding only `land`
- * (Polygon or MultiPolygon) and `place` (Point with a name) features, every
- * coordinate a `[lon, lat]` pair in range and nothing else anywhere.
+ * FeatureCollection with exactly two foreign members, holding only the six
+ * feature kinds — `land`, `river`, `shoal`, `contour`, `place` and `work` —
+ * each with a geometry its kind allows and only the properties its kind lists,
+ * every coordinate a `[lon, lat]` pair in range and nothing else anywhere.
+ *
+ * The two tables below are what a kind is: one row in each adds a seventh.
  *
  * Never throws on bad data; collects every error with a JSON-pointer path.
  * Ring winding and polygon validity are not checked (schema.md 3.3).
  */
 import { readAttribution, readLicense } from "./licenseFields.ts";
-import type { LandFeature, LonLat, MapFeature, MapFile, PlaceFeature } from "./types.ts";
+import type { LonLat, MapFeature, MapFile } from "./types.ts";
 import {
   allDefined,
   appendPointer,
+  ELEVATION_BOUNDS,
   Errors,
   LAT_BOUNDS,
   LON_BOUNDS,
@@ -23,13 +27,47 @@ import {
 
 export type MapValidation = { ok: true; map: MapFile } | { ok: false; errors: ValidationError[] };
 
-const KINDS = ["land", "place"] as const;
-const LAND_GEOMETRIES = ["Polygon", "MultiPolygon"] as const;
-const PLACE_GEOMETRIES = ["Point"] as const;
-const ALL_GEOMETRIES = [...LAND_GEOMETRIES, ...PLACE_GEOMETRIES] as const;
+type MapKind = MapFeature["properties"]["kind"];
+type Geometry = MapFeature["geometry"];
+type GeometryType = Geometry["type"];
+
+const AREA_GEOMETRIES = ["Polygon", "MultiPolygon"] as const;
+const LINE_GEOMETRIES = ["LineString", "MultiLineString"] as const;
+const POINT_GEOMETRIES = ["Point"] as const;
+
+/** Rule 4: the geometry types each kind allows. Areas, lines and points, in the order of schema.md 3.2. */
+const KIND_GEOMETRIES: Record<MapKind, readonly GeometryType[]> = {
+  land: AREA_GEOMETRIES,
+  river: LINE_GEOMETRIES,
+  shoal: AREA_GEOMETRIES,
+  contour: LINE_GEOMETRIES,
+  place: POINT_GEOMETRIES,
+  work: POINT_GEOMETRIES,
+};
+
+/** Rules 5 and 7: what each kind carries beyond `kind`. Natural features carry nothing; a contour its level; named things a name. */
+const KIND_PROPERTIES: Record<MapKind, readonly string[]> = {
+  land: [],
+  river: [],
+  shoal: [],
+  contour: ["elevation"],
+  place: ["name"],
+  work: ["name"],
+};
+
+const KINDS = Object.keys(KIND_GEOMETRIES) as MapKind[];
+
+/** The geometries allowed when the kind itself did not read, so a bad kind reports once rather than twice. */
+const ALL_GEOMETRIES: readonly GeometryType[] = [...AREA_GEOMETRIES, ...LINE_GEOMETRIES, ...POINT_GEOMETRIES];
 
 /** Nesting depth of `coordinates` below a single `[lon, lat]` position, per geometry type. */
-const COORDINATE_DEPTH = { Point: 0, Polygon: 2, MultiPolygon: 3 } as const;
+const COORDINATE_DEPTH: Record<GeometryType, number> = {
+  Point: 0,
+  LineString: 1,
+  MultiLineString: 2,
+  Polygon: 2,
+  MultiPolygon: 3,
+};
 
 export function validateMap(json: unknown): MapValidation {
   const errors = new Errors();
@@ -52,7 +90,7 @@ function readMap(json: unknown, errors: Errors): MapFile | undefined {
   return withoutUndefined({ type, features: features.items, license, attribution });
 }
 
-/** Rules 3, 4 and 6: one feature. */
+/** Rule 3: one feature, its properties and geometry read against each other. */
 function readFeature(value: unknown, path: string, errors: Errors): MapFeature | undefined {
   const obj = ObjectReader.of(value, path, errors, ["type", "properties", "geometry"]);
   if (obj === undefined) return undefined;
@@ -60,39 +98,43 @@ function readFeature(value: unknown, path: string, errors: Errors): MapFeature |
   const properties = readProperties(obj);
   const geometry = readGeometry(obj, properties?.kind);
   if (type === undefined || properties === undefined || geometry === undefined) return undefined;
-
-  if (properties.kind === "land") {
-    if (geometry.type === "Point") return undefined;
-    const feature: LandFeature = { type, properties: { kind: "land" }, geometry };
-    return feature;
-  }
-  if (geometry.type !== "Point") return undefined;
-  const feature: PlaceFeature = { type, properties: { kind: "place", name: properties.name }, geometry };
-  return feature;
+  // `readGeometry` accepted only a geometry the kind allows, so this pair is one
+  // of the six features; the two unions are read apart, so the compiler cannot see it.
+  return { type, properties, geometry } as MapFeature;
 }
 
-type Properties = { kind: "land" } | { kind: "place"; name: string };
-
-/** `properties` may carry only the keys listed for its kind: `kind` for land, `kind` and a non-empty `name` for place. */
-function readProperties(feature: ObjectReader): Properties | undefined {
-  const obj = feature.object("properties", (raw) => (raw["kind"] === "place" ? ["kind", "name"] : ["kind"]));
+/** Rules 3, 5 and 7: `properties` carries a known `kind` and only what `KIND_PROPERTIES` lists for it. */
+function readProperties(feature: ObjectReader): MapFeature["properties"] | undefined {
+  const obj = feature.object("properties", (raw) => allowedProperties(raw["kind"]));
   if (obj === undefined) return undefined;
   const kind = obj.oneOf("kind", KINDS);
   if (kind === undefined) return undefined;
-  if (kind === "land") return { kind };
-  const name = obj.string("name");
-  if (name === undefined) return undefined;
-  if (name === "") {
-    obj.errors.add(obj.at("name"), "expected a non-empty place name");
-    return undefined;
+
+  if (kind === "contour") {
+    const elevation = obj.number("elevation", ELEVATION_BOUNDS);
+    if (elevation === undefined) return undefined;
+    return { kind, elevation };
   }
-  return { kind, name };
+  if (kind === "place" || kind === "work") {
+    const name = obj.string("name");
+    if (name === undefined) return undefined;
+    if (name === "") {
+      obj.errors.add(obj.at("name"), `expected a non-empty ${kind} name`);
+      return undefined;
+    }
+    return { kind, name };
+  }
+  return { kind };
 }
 
-type Geometry = MapFeature["geometry"];
+/** The keys a `properties` object may carry, read off its own `kind` so anything else is reported as an unknown key. */
+function allowedProperties(kind: unknown): readonly string[] {
+  const known = KINDS.find((candidate) => candidate === kind);
+  return known === undefined ? ["kind"] : ["kind", ...KIND_PROPERTIES[known]];
+}
 
-/** Rules 4 and 5: a non-null geometry of the type the kind allows, with `[lon, lat]` coordinates nested to that type's depth. */
-function readGeometry(feature: ObjectReader, kind: Properties["kind"] | undefined): Geometry | undefined {
+/** Rules 4 and 6: a non-null geometry of a type the kind allows, with `[lon, lat]` coordinates nested to that type's depth. */
+function readGeometry(feature: ObjectReader, kind: MapKind | undefined): Geometry | undefined {
   const raw = feature.raw("geometry");
   if (raw === undefined) return undefined;
   if (raw === null) {
@@ -101,8 +143,7 @@ function readGeometry(feature: ObjectReader, kind: Properties["kind"] | undefine
   }
   const obj = ObjectReader.of(raw, feature.at("geometry"), feature.errors, ["type", "coordinates"]);
   if (obj === undefined) return undefined;
-  const allowed = kind === "land" ? LAND_GEOMETRIES : kind === "place" ? PLACE_GEOMETRIES : ALL_GEOMETRIES;
-  const type = obj.oneOf("type", allowed);
+  const type = obj.oneOf("type", kind === undefined ? ALL_GEOMETRIES : KIND_GEOMETRIES[kind]);
   const rawCoordinates = obj.raw("coordinates");
   if (type === undefined || rawCoordinates === undefined) return undefined;
   const coordinates = readCoordinates(rawCoordinates, obj.at("coordinates"), COORDINATE_DEPTH[type], obj.errors);

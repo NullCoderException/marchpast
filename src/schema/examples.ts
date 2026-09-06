@@ -99,20 +99,47 @@ export const MINIMAL_BATTLE: Battle = {
 export const MINIMAL_MAP: MapFile = {
   type: "FeatureCollection",
   license: "public-domain",
-  attribution: "Coastline from Natural Earth (public domain)",
+  attribution:
+    "Coastline and river from Natural Earth (public domain); contours from SRTM 1 arc-second (NASA, public domain)",
   features: [
     {
       type: "Feature",
       properties: { kind: "land" },
       geometry: {
         type: "Polygon",
-        coordinates: [[[-6.03, 36.18], [-6.0, 36.2], [-5.95, 36.25], [-5.95, 36.18], [-6.03, 36.18]]],
+        coordinates: [[[16.05, 41.25], [16.3, 41.25], [16.3, 41.38], [16.05, 41.38], [16.05, 41.25]]],
       },
     },
     {
       type: "Feature",
-      properties: { kind: "place", name: "Cape Trafalgar" },
-      geometry: { type: "Point", coordinates: [-6.034, 36.183] },
+      properties: { kind: "river" },
+      geometry: { type: "LineString", coordinates: [[16.06, 41.28], [16.15, 41.31], [16.2, 41.36]] },
+    },
+    {
+      type: "Feature",
+      properties: { kind: "shoal" },
+      geometry: {
+        type: "Polygon",
+        coordinates: [[[16.26, 41.36], [16.29, 41.36], [16.29, 41.375], [16.26, 41.375], [16.26, 41.36]]],
+      },
+    },
+    {
+      type: "Feature",
+      properties: { kind: "contour", elevation: 50 },
+      geometry: {
+        type: "MultiLineString",
+        coordinates: [[[16.14, 41.29], [16.16, 41.3], [16.15, 41.31]], [[16.2, 41.27], [16.22, 41.28]]],
+      },
+    },
+    {
+      type: "Feature",
+      properties: { kind: "place", name: "Aufidus" },
+      geometry: { type: "Point", coordinates: [16.15, 41.31] },
+    },
+    {
+      type: "Feature",
+      properties: { kind: "work", name: "Roman camp" },
+      geometry: { type: "Point", coordinates: [16.12, 41.32] },
     },
   ],
 };
