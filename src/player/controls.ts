@@ -1,14 +1,14 @@
 /**
  * The controls beneath the plate: play/pause, the phase-segmented scrubber and
- * its battle-clock readout, the phase-jump buttons, the speed multiplier and
- * the details-panel toggle. Plain DOM, no framework.
+ * its battle-clock readout, the phase-jump buttons, the speed multiplier, the
+ * View chooser and the details-panel toggle. Plain DOM, no framework.
  *
  * Nothing here decides anything: every gesture calls one of the transitions in
  * `state.ts` through the handlers it was given, and `update` is the only way
  * state reaches the DOM. That is the seam that keeps the rules testable
  * without a browser.
  */
-import { formatClock } from "../render/index.ts";
+import { formatClock, VIEWS, viewById, type ViewId } from "../render/index.ts";
 import type { Battle } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
 import { Listeners, element } from "./dom.ts";
@@ -25,6 +25,8 @@ export interface ControlHandlers {
   /** Clicking a segment tick. */
   jumpToPhase(index: number): void;
   setMultiplier(multiplier: number): void;
+  /** Picking a view, which takes effect on the next frame and interrupts nothing (#47). */
+  setView(view: ViewId): void;
   toggleDetails(): void;
 }
 
@@ -50,10 +52,13 @@ export function createControls(battle: Battle, handlers: ControlHandlers): Contr
   const { bar, thumb } = scrubber(battle, listeners, handlers, button);
   const readout = element("output", "st-readout", "--:--");
   const multiplier = multiplierChooser(listeners, handlers);
+  const view = viewChooser(listeners, handlers);
   const details = button("st-details-toggle", "Details", () => handlers.toggleDetails());
   details.setAttribute("aria-expanded", "false");
 
-  root.append(previous, play, next, bar, readout, multiplier, details);
+  // The tail of the strip is the two controls that change how the battle is
+  // presented rather than where in it we are (#47).
+  root.append(previous, play, next, bar, readout, multiplier, view, details);
 
   return {
     root,
@@ -71,6 +76,7 @@ export function createControls(battle: Battle, handlers: ControlHandlers): Contr
       bar.setAttribute("aria-valuetext", `${time}, ${picture.label}`);
 
       for (const option of multiplier.options) option.selected = Number(option.value) === state.multiplier;
+      for (const option of view.options) option.selected = option.value === state.view;
       details.setAttribute("aria-expanded", String(detailsOpen));
       details.classList.toggle("st-on", detailsOpen);
     },
@@ -165,5 +171,23 @@ function multiplierChooser(listeners: Listeners, handlers: ControlHandlers): HTM
     select.append(option);
   }
   listeners.on<Event>(select, "change", () => handlers.setMultiplier(Number(select.value)));
+  return select;
+}
+
+/**
+ * The View chooser (#47): the three views by their own names, as a select for
+ * the same reason the multiplier is one — a short fixed list of viewer
+ * preferences that has to show what is picked without being opened. No
+ * keyboard shortcut: the player's keys are all transport.
+ */
+function viewChooser(listeners: Listeners, handlers: ControlHandlers): HTMLSelectElement {
+  const select = element("select", "st-view");
+  select.setAttribute("aria-label", "View");
+  for (const view of VIEWS) {
+    const option = element("option", undefined, view.name);
+    option.value = view.id;
+    select.append(option);
+  }
+  listeners.on<Event>(select, "change", () => handlers.setView(viewById(select.value).id));
   return select;
 }

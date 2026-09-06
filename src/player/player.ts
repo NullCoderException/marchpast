@@ -23,6 +23,7 @@ import {
   jumpToPhase,
   scrubTo,
   setMultiplier,
+  setView,
   tick,
   togglePlay,
   type PlayerState,
@@ -71,6 +72,7 @@ export function createPlayer({ canvas, controlsRoot, battle, map }: PlayerOption
     scrub: (fraction) => apply(scrubTo(battle, state, fraction)),
     jumpToPhase: (index) => apply(jumpToPhase(battle, state, index)),
     setMultiplier: (multiplier) => apply(setMultiplier(state, multiplier)),
+    setView: (view) => apply(setView(state, view)),
     toggleDetails: () => {
       details.setOpen(!details.isOpen());
       dirty = true;
@@ -107,7 +109,7 @@ export function createPlayer({ canvas, controlsRoot, battle, map }: PlayerOption
     dirty = false;
 
     const picture = pictureAt(battle, state.clock);
-    renderer.render(battle, map, picture);
+    renderer.render(battle, map, picture, { view: state.view });
     details.update(picture);
     controls.update(state, picture, details.isOpen());
   });

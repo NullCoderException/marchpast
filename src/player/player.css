@@ -3,8 +3,11 @@
  * quiet strip beneath the picture. Nothing here competes with the plate, so
  * there are no fills brighter than the paper and no colour but the ink.
  *
- * The palette matches src/render/style.ts; the face is loaded by
- * src/fonts/plate.ts, which the app awaits before the first frame.
+ * The view stops at the canvas edge (ADR-0014, #47): whichever view the
+ * chooser is on, the strip stays in the Chart plate's language, so these
+ * values are copied from CHART_PLATE in src/render/views.ts rather than
+ * published from it. The face is loaded by src/fonts/plate.ts, which the app
+ * awaits before the first frame.
  */
 
 .st-controls,

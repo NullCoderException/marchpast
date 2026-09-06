@@ -1,15 +1,17 @@
 /**
  * The plate with no battle on it: what the page shows while a battle loads and
  * what it shows when the battle cannot be played. The same materials as the
- * renderer (parchment, letterbox, double ink rule, the plate face; ADR-0009),
- * so the two states read as the app rather than as a browser page.
+ * renderer (paper, letterbox, double ink rule, the plate face; ADR-0009), so
+ * the two states read as the app rather than as a browser page. It is painted
+ * before there is any player state to hold a view, so it takes the default
+ * view's palette (ADR-0014).
  *
  * Lines are word-wrapped to the plate; when they overrun, the last visible
  * line says how many more there are, since the full list is also logged.
  */
-import { fitBackingStore } from "../render/index.ts";
+import { DEFAULT_VIEW, fitBackingStore } from "../render/index.ts";
 import { drawPlateRule } from "../render/primitives.ts";
-import { INK, LETTERBOX, PARCHMENT, PLATE_MARGIN, font } from "../render/style.ts";
+import { PLATE_MARGIN, font } from "../render/style.ts";
 import { wrapText } from "../render/text.ts";
 
 /** Inset from the plate's rule to its text. */
@@ -53,18 +55,19 @@ export function paintNotice(canvas: HTMLCanvasElement, notice: Notice): void {
     height: Math.max(1, height - PLATE_MARGIN * 2),
   };
 
-  ctx.fillStyle = LETTERBOX;
+  const { palette } = DEFAULT_VIEW;
+  ctx.fillStyle = palette.letterbox;
   ctx.fillRect(0, 0, width, height);
-  ctx.fillStyle = PARCHMENT;
+  ctx.fillStyle = palette.paper;
   ctx.fillRect(frame.x, frame.y, frame.width, frame.height);
-  drawPlateRule(ctx, frame);
+  drawPlateRule(ctx, frame, palette.ink);
 
   const left = frame.x + PAD;
   const maxWidth = Math.max(1, frame.width - PAD * 2);
   const measure = (text: string): number => ctx.measureText(text).width;
   let y = frame.y + PAD;
 
-  ctx.fillStyle = INK;
+  ctx.fillStyle = palette.ink;
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
   ctx.font = font(HEADING_SIZE);
