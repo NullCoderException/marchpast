@@ -9,7 +9,7 @@
  * state reaches the DOM. That is the seam that keeps the rules testable
  * without a browser.
  */
-import type { BattleIndexEntry } from "../data/battleIndex.ts";
+import type { LibraryEntry } from "../data/library.ts";
 import { formatClock, VIEWS, viewById, type ViewId } from "../render/index.ts";
 import type { Battle } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
@@ -33,13 +33,13 @@ export interface ControlHandlers {
 }
 
 /**
- * What the Picker is built from: the Library, which battle is playing, and
- * what choosing another one does. Absent when the Library's index could not be
- * loaded, in which case the strip simply has no Picker.
+ * What the Picker is built from: the library, which battle is playing, and
+ * what choosing another one does. Absent when the library could not be loaded,
+ * in which case the strip simply has no Picker.
  */
 export interface PickerOptions {
-  /** Every battle in the Library, in its order. */
-  battles: readonly BattleIndexEntry[];
+  /** Every battle in the library, in its order. */
+  battles: readonly LibraryEntry[];
   /** The name of the battle playing now: the one the Picker shows. */
   current: string;
   /** What choosing another battle does. Navigation, not a transition, which is why it is not one of the handlers. */
@@ -72,9 +72,9 @@ export function createControls(battle: Battle, handlers: ControlHandlers, picker
   const details = button("st-details-toggle", "Details", () => handlers.toggleDetails());
   details.setAttribute("aria-expanded", "false");
 
-  // The tail of the strip is what changes how the battle is presented rather
-  // than where in it we are (#47), and last of all, apart from the transport
-  // because it leaves the battle altogether, the Picker (ADR-0011).
+  // The tail of the strip changes how the battle is presented rather than
+  // where in it we are (#47). The Picker comes after even that: it leaves the
+  // battle altogether, so it sits apart from the transport (ADR-0011).
   root.append(previous, play, next, bar, readout, multiplier, view, details);
   if (picker !== undefined) root.append(battlePicker(listeners, picker));
 
@@ -193,7 +193,7 @@ function multiplierChooser(listeners: Listeners, handlers: ControlHandlers): HTM
 }
 
 /**
- * The Picker (ADR-0011): every battle in the Library by title, the one playing
+ * The Picker (ADR-0011): every battle in the library by title, the one playing
  * selected. Choosing another navigates to it as a fresh visit, so no player
  * state survives the change — which is what makes the view, the level and the
  * speed multiplier properties of a visit rather than of the site.

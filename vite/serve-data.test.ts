@@ -5,7 +5,8 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { MINIMAL_BATTLE } from "../src/schema/examples.ts";
 import type { Battle, SortDate } from "../src/schema/types.ts";
-import { battleIndex, contentTypeFor, isDataUrl, isIndexUrl, resolveDataFile, serveData } from "./serve-data";
+import { readLibrary } from "./library.ts";
+import { contentTypeFor, isDataUrl, isIndexUrl, resolveDataFile, serveData } from "./serve-data";
 
 const dataDir = path.resolve("/repo/data");
 
@@ -64,7 +65,7 @@ describe("route ownership", () => {
     expect(isDataUrl("/src/data/paths.ts")).toBe(false);
   });
 
-  it("recognises the generated index, and only it", () => {
+  it("recognises the generated library, and only it", () => {
     expect(isIndexUrl("/data/index.json")).toBe(true);
     expect(isIndexUrl("/data/index.json?t=1")).toBe(true);
     expect(isIndexUrl("/data/battles/index.json")).toBe(false);
@@ -90,44 +91,6 @@ function writeBattle(name: string, sort_date: SortDate, fields: Partial<Battle> 
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, JSON.stringify(battle, null, 2));
 }
-
-describe("the index generated from the battle files", () => {
-  it("is empty when there are no battle files, or no data directory at all", () => {
-    expect(battleIndex(path.join(root, "data"))).toEqual([]);
-    fs.mkdirSync(path.join(root, "data", "battles"), { recursive: true });
-    expect(battleIndex(path.join(root, "data"))).toEqual([]);
-  });
-
-  it("holds one entry per battle file, oldest first", () => {
-    writeBattle("trafalgar", { year: 1805, month: 10, day: 21 });
-    writeBattle("cannae", { year: -216, month: 8, day: 2 });
-    const index = battleIndex(path.join(root, "data"));
-    expect(index.map((entry) => entry.name)).toEqual(["cannae", "trafalgar"]);
-    expect(index[1]).toMatchObject({
-      title: "The Battle of trafalgar",
-      date: "21 October 1805",
-      sides: ["British", "Combined Fleet"],
-    });
-  });
-
-  it("ignores anything in the directory that is not a battle file", () => {
-    writeBattle("trafalgar", { year: 1805, month: 10, day: 21 });
-    fs.writeFileSync(path.join(root, "data", "battles", "notes.md"), "not a battle");
-    expect(battleIndex(path.join(root, "data")).map((entry) => entry.name)).toEqual(["trafalgar"]);
-  });
-
-  it("refuses to build an index over a battle file that fails validation", () => {
-    writeBattle("trafalgar", { year: 1805, month: 10, day: 21 });
-    writeBattle("broken", { year: 1798, month: 8, day: 1 }, { summary: 7 as unknown as string });
-    expect(() => battleIndex(path.join(root, "data"))).toThrow(/broken\.json[\s\S]*\/summary/);
-  });
-
-  it("refuses to build an index over a battle file that is not JSON", () => {
-    fs.mkdirSync(path.join(root, "data", "battles"), { recursive: true });
-    fs.writeFileSync(path.join(root, "data", "battles", "half-written.json"), "{");
-    expect(() => battleIndex(path.join(root, "data"))).toThrow(/half-written\.json[\s\S]*not valid JSON/);
-  });
-});
 
 /** What a middleware is handed, reduced to the parts the plugin touches. */
 interface Response {
@@ -165,15 +128,15 @@ function devServer(): (url: string, method?: string) => Response {
   };
 }
 
-describe("the dev route for the index", () => {
-  it("serves JSON generated from the battle files, without the file being on disk", () => {
+describe("the dev route for the library", () => {
+  it("serves JSON generated from the battle files, with no such file on disk", () => {
     writeBattle("trafalgar", { year: 1805, month: 10, day: 21 });
     writeBattle("cannae", { year: -216, month: 8, day: 2 });
 
     const response = devServer()("/data/index.json");
     expect(response.statusCode).toBe(200);
     expect(response.headers.get("Content-Type")).toBe("application/json");
-    expect(JSON.parse(response.body)).toEqual(battleIndex(path.join(root, "data")));
+    expect(JSON.parse(response.body)).toEqual(readLibrary(path.join(root, "data")));
     expect(fs.existsSync(path.join(root, "data", "index.json"))).toBe(false);
   });
 
@@ -183,7 +146,7 @@ describe("the dev route for the index", () => {
     expect(JSON.parse(request("/data/index.json").body)).toHaveLength(1);
 
     writeBattle("cannae", { year: -216, month: 8, day: 2 });
-    expect(JSON.parse(request("/data/index.json").body).map((entry: { name: string }) => entry.name)).toEqual([
+    expect(JSON.parse(request("/data/index.json").body).map((battle: { name: string }) => battle.name)).toEqual([
       "cannae",
       "trafalgar",
     ]);
@@ -196,7 +159,7 @@ describe("the dev route for the index", () => {
     expect(response.body).toBe("");
   });
 
-  it("reports a battle file that fails validation rather than serving a short index", () => {
+  it("reports a battle file that fails validation rather than serving a short library", () => {
     writeBattle("broken", { year: 1798, month: 8, day: 1 }, { summary: 7 as unknown as string });
     const response = devServer()("/data/index.json");
     expect(response.statusCode).toBe(500);

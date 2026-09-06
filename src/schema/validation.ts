@@ -13,6 +13,17 @@ export interface ValidationError {
   message: string;
 }
 
+/**
+ * One error as a line for a person: its JSON-pointer path, `(root)` for a
+ * whole-file failure, then the message, indented under the file it was found
+ * in. The command line (`scripts/validate.ts`), the page (`src/app/load.ts`)
+ * and the build (`vite/library.ts`) all report errors this way, so a battle
+ * file reads the same wherever it is rejected.
+ */
+export function errorLine(error: ValidationError): string {
+  return `  ${error.path || "(root)"}: ${error.message}`;
+}
+
 /** Escapes one JSON-pointer segment (RFC 6901: `~` becomes `~0`, `/` becomes `~1`). */
 function escapeSegment(segment: string | number): string {
   return String(segment).replaceAll("~", "~0").replaceAll("/", "~1");

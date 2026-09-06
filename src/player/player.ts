@@ -39,7 +39,7 @@ export interface PlayerOptions {
   battle: Battle;
   /** The battle's map, when it names one. */
   map?: MapFile;
-  /** What the Picker offers. Absent when the Library's index could not be loaded: the battle still plays, without a Picker. */
+  /** What the Picker offers. Absent when the library could not be loaded: the battle still plays, without a Picker. */
   picker?: PickerOptions;
 }
 
