@@ -1,5 +1,7 @@
 # The library is built from the battle files and the URL names a battle by query parameter
 
+*Amended 2026-09-07: the URL clause below — "a battle plays at the same page with `?battle=<name>`" — is superseded by ADR-0028. A battle is addressed by path, `/<name>/`, from a document the build emits per battle so that a link unfurls as that battle; `?battle=` survives as a legacy reading the app never emits. That takes up this ADR's own "per-battle copies of the page can be emitted later without changing what the app reads", and its "build emits `data/index.json`" clause gains a third output, `data/cards/<name>.png`. Everything else stands: the library is still the front door, still built from the battle files, still chronological (#150).*
+
 *Amended 2026-09-07: the thumbnail clause below — "No thumbnails in v0.2. A rendered still needs the renderer at build time and a decided view to render; it stays in the fog." — is answered by ADR-0025: both conditions arrived, and the library now shows a still the build renders of the phase a battle marks. The "build emits `data/index.json`" clause gains a second output, `data/stills/<name>.png`, on the same terms — generated, never committed, and made the same way by the dev server (#134).*
 
 *Amended 2026-09-07: the grouping clause below — "grouping the library is out of scope until the list is long enough to need it" — is superseded by ADR-0022, which answered it in the negative at seven battles and gave the library a chronology rail instead. Everything else this ADR decided stands (#129).*
