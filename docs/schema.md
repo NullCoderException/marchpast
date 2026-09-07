@@ -23,8 +23,9 @@ v2 is the land-battle generalisation forced by Cannae, plus what the Nile, Copen
 | Map features gain `river`, `shoal`, `work` and `contour`; `LineString` and `MultiLineString` become legal for the two line kinds | 3.2 | ADR-0012 |
 | Map features gain `rampart`, a built line drawn with its ditch, the teeth on the side it faces | 3.2 | ADR-0026 |
 | More than sixteen units drawn at one level is a validation error | 2.10 rule 17 | ADR-0017 |
+| Longitude is continuous: the extent fixes the frame, `east` may run past 180, and a longitude is bounded against that frame rather than by a flat `-180..180` | 1, 2.10 rule 2, 3.2 rule 6 | ADR-0001 (amended 2026-09-07) |
 
-Everything else in v1 stands: positions, the extent, wind, sources and references, licences, moves, the track, the tween rules. A v1 **map** file is a valid v2 map file unchanged. A v1 **battle** file needs `schema_version: 2`, `summary`, `dates` in place of `date`, `sort_date`, and `arm` on every unit.
+Everything else in v1 stands: positions, the extent's shape and fit, wind, sources and references, licences, moves, the track, the tween rules. A v1 **map** file is a valid v2 map file unchanged. A v1 **battle** file needs `schema_version: 2`, `summary`, `dates` in place of `date`, `sort_date`, and `arm` on every unit.
 
 ## 1. Conventions shared by both files
 
@@ -33,8 +34,8 @@ Everything else in v1 stands: positions, the extent, wind, sources and reference
 | Angles | Degrees true, `0` is north, clockwise, a number with `0 <= x < 360`. Decimals allowed so the sixteen compass points round-trip exactly (WNW is `292.5`). Used by `heading` and `wind.from`. | ADR-0001, ADR-0008 |
 | Battle-clock time | A 24-hour `"HH:MM"` string, two digits each, `00:00` to `23:59`, on the day its `day` names. Nothing finer: ships' logs are quarter-hour precision at best. The clock is a **reading**, not an instant: it carries no timezone, is never UTC and is never a `Date`. Every time in a file is copied verbatim from the source that gives it. | ADR-0002, ADR-0013 |
 | Day | A non-negative integer counting days from the battle's first day at `0`. A battle that never crosses midnight has only day `0`. | ADR-0013 |
-| Coordinates in the battle file | `{ "lat": number, "lon": number }` objects, WGS84 decimal degrees, north and east positive, `-90 <= lat <= 90`, `-180 <= lon <= 180`. | ADR-0001 |
-| Coordinates in the map file | GeoJSON `[lon, lat]` arrays, WGS84. Nothing converts one file into the other's convention. | ADR-0005 |
+| Coordinates in the battle file | `{ "lat": number, "lon": number }` objects, WGS84 decimal degrees, north and east positive, `-90 <= lat <= 90`. Longitude is continuous rather than folded: it is bounded relative to the extent, not by `-180..180` (rule 2). | ADR-0001 |
+| Coordinates in the map file | GeoJSON `[lon, lat]` arrays, WGS84, in the frame of the battle the map serves. Nothing converts one file into the other's convention. | ADR-0005 |
 | Lengths | None in the battle file. The only unit-bearing fields are `scale_unit`, a display unit for the scale bar, and a contour's `elevation` in metres in the map file. | ADR-0001, ADR-0012 |
 | Uncertainty | No uncertainty or confidence field anywhere, and nothing marks a position, a state or a phase as conjectural. Disagreement between sources, an estimated time or position, a position read off the ground rather than from a witness, and a modern river standing in for an ancient channel are caption and `notes` matter; the battle authors one reading and names the one it declined. | ADR-0001, ADR-0006, ADR-0012, ADR-0018, ADR-0027 |
 | Styling | None in data. No colour, glyph, stroke, style, index-contour or view field in either file; the renderer styles each state, move kind, formation, arm and feature kind, and the viewer picks the view and the level. | ADR-0003, ADR-0004, ADR-0005, ADR-0012, ADR-0014, ADR-0017 |
@@ -66,7 +67,7 @@ Classes rank `public-domain` < `attribution` < `share-alike`. Adding an identifi
 | `summary` | string | yes | One plain sentence the battle carries to describe itself wherever it is named but not played: the Library's list, the Picker. Display only. |
 | `dates` | string[] | yes, at least one | Human-readable date of each day the battle spans, in order, one entry per day: `["21 October 1805"]`, `["1 August 1798", "2 August 1798"]`. Display only; never parsed, so an entry need not be a calendar date: where no source dates the battle, the strings say what they can (`"September 52 BC (the relief army's first day)"`). The caption band shows `dates[day]` for the current phase; the Library shows `dates[0]`. |
 | `sort_date` | `{ year, month, day }` | yes | The first day as integers, for the Library to sort on: `month` `1` to `12`, `day` `1` to `31`, `year` in ordinary historical numbering with BC negative and no year zero (Cannae is `-216`, not `-215`). Compared freely; counted from only for the interval between two battles that the Library's chronology rail writes, never for any duration within one battle (ADR-0013, ADR-0022). Restates `dates[0]` in machine form; nothing checks the two agree. |
-| `extent` | `{ north, south, east, west }` | yes | The lat/lon bounding box the battle plays inside, fixed for the whole playback. Numbers in degrees; `south < north`, `west < east`, each within range. The renderer fits it to the canvas preserving aspect ratio and letterboxes the rest. Authoring guideline, not a rule: make it landscape. |
+| `extent` | `{ north, south, east, west }` | yes | The lat/lon bounding box the battle plays inside, fixed for the whole playback. Numbers in degrees; `south < north` and `west < east` (rule 2). The extent also fixes the **frame** every longitude in the file is read in: `west` is spelled canonically in `-180..180` and `east` runs east of it, so a battle crossing the antimeridian writes an `east` past 180. Midway is `west: 173, east: 187.25`; `west: -187, east: -172.75` is the same box and is not expressible. The renderer fits it to the canvas preserving aspect ratio and letterboxes the rest. Authoring guideline, not a rule: make it landscape. |
 | `scale_unit` | `"nmi"` or `"km"` | yes | The unit the renderer's scale bar is drawn in. |
 | `map` | string | no | Bare name of the map file, resolved to `data/maps/<map>.geojson`. Never a path. One map per battle. Absent means plain parchment inside the extent. |
 | `end` | battle-clock time | yes | When the last phase's picture stops holding, on day `end_day`. Must be later than the last phase on the pair (`day`, `t`). |
@@ -189,7 +190,7 @@ A battle with no `parent` anywhere has one level, no `levels` field, and no Leve
 Shape rules follow from the tables above (types, required fields, enums, ranges, no unknown keys). The rules that cross fields:
 
 1. `schema_version` is exactly `2`. A `1` is rejected with a message naming the v2 fields (section 0), not silently read.
-2. `extent.south < extent.north` and `extent.west < extent.east`, all four in range.
+2. **The extent and the frame.** `-90 <= extent.south < extent.north <= 90`; `-180 <= extent.west <= 180`; and `extent.west < extent.east <= extent.west + 360`. Every longitude in the file — a `position`, a move's `to` — is then within 180 degrees of the extent's centre longitude, half-open at the upper end so no place has two spellings. That is the only bound on longitude; there is no flat `-180..180`. It catches the failure continuous longitude would otherwise make silent: at Midway's frame the normalised spelling of Mikuma's grave, `-172.75`, is a legal WGS84 longitude that projects 353 degrees west of the plate and draws nowhere. The bound is not a pure relaxation — it is narrower on one side than a flat `-180..180`, so a hypothetical v2 file with a longitude more than 180 degrees from its own extent's centre would now fail. No such file exists; every position in the four shipped battles sits within a degree or so of its extent. The cap at `west + 360` is the ambiguity bound and nothing more: past it a longitude has two spellings inside one extent. A merely silly extent — 200 degrees wide — is an authoring choice the validator does not police, like the rest of section 2.10's closing list.
 3. `units[].id` unique; `phases[].id` unique.
 4. Phases strictly increase on (`day`, `t`); the first phase's `day` is `0`; (`end_day`, `end`) is later than the last phase, and `end_day` is not less than the last phase's `day`.
 5. `dates` has exactly `max(last phase's day, end_day) + 1` entries: no `day` points past it and no trailing entry goes unused. A day **in the middle** with no phase is legal and its entry is authored and never shown, because a battle may have a quiet day: Alesia's day 2 is one of hurdle-making that the next phase's caption carries. Nothing requires every day to have a phase (ADR-0026).
@@ -324,7 +325,7 @@ No other foreign member (`bbox`, `name`, `crs`, `sources`, a raster, a contour i
 
 ### 3.2 Features
 
-Every feature is `{ "type": "Feature", "geometry": ..., "properties": { "kind": ... } }`. Coordinates are `[lon, lat]` in WGS84, exactly two elements. A feature's `properties` may carry only the keys listed for its kind. Natural features and a rampart carry no name; a contour carries its level; named things carry a name. The two built kinds are a point and a line: a `work` is a thing at a place, a `rampart` a thing along a line.
+Every feature is `{ "type": "Feature", "geometry": ..., "properties": { "kind": ... } }`. Coordinates are `[lon, lat]` in WGS84, exactly two elements, written in the frame of the battle the map serves (rule 2 of section 2.10), so a map for a battle crossing the antimeridian carries longitudes past 180 rather than the split geometries RFC 7946 section 3.1.9 recommends. That is a knowing departure: these files are a constrained profile read by one loader, not general GeoJSON for interchange — they already require `kind` as a foreign member and reject anything else — and the alternative, normalised files with the loader adding 360, puts the frame in a second place that can silently disagree with the projection. Nothing splits in practice at Midway: Natural Earth's Sand, Eastern and Kure rings all sit east of the line, so the file is one whole-file shift and no stitching. A feature's `properties` may carry only the keys listed for its kind. Natural features and a rampart carry no name; a contour carries its level; named things carry a name. The two built kinds are a point and a line: a `work` is a thing at a place, a `rampart` a thing along a line.
 
 | `properties.kind` | Geometry | Properties | Meaning |
 |---|---|---|---|
@@ -345,7 +346,7 @@ Any other kind, any other geometry type for a kind (`LineString` for `land`, `Po
 3. Every feature has `type: "Feature"`, a non-null geometry, and `properties.kind` of `land`, `river`, `shoal`, `contour`, `place`, `work` or `rampart`.
 4. `land` and `shoal` geometry is `Polygon` or `MultiPolygon`; `river`, `contour` and `rampart` geometry is `LineString` or `MultiLineString`; `place` and `work` geometry is `Point`.
 5. `contour` carries a finite `properties.elevation` with `-500 <= x <= 9000`; `place` and `work` carry a non-empty `properties.name`.
-6. Every coordinate is `[lon, lat]` with `-180 <= lon <= 180`, `-90 <= lat <= 90` (a third element is rejected).
+6. Every coordinate is `[lon, lat]` with `-180 <= lon <= 360`, `-90 <= lat <= 90` (a third element is rejected). The wider longitude range is for a map serving a battle that crosses the antimeridian, whose coordinates are written in that battle's frame: Midway's atoll is `182.63`, not `-177.37`. The map validator sees a file, never a pairing, so it cannot bound longitude against an extent the way the battle file does (rule 2) — and it need not, because a mis-spelled map coordinate is clipped and costs a piece of the picture, where a mis-spelled position lies about where a force was.
 7. No property beyond those listed for the kind.
 
 Not checked: ring winding, polygon validity, whether contours are closed or nested, whether a shoal overlaps land, or whether the map covers the battle's extent. A map may extend beyond the extent and the renderer clips. Winding is unchecked **including a rampart's, where it carries meaning**: a rampart drawn the wrong way round gets its teeth on the wrong side, and only the plate will say so. This sits beside `sort_date` not being checkable against `dates[0]` as something the format knows it cannot verify (ADR-0026).
@@ -409,7 +410,7 @@ For the reader wondering where a field went: these are renderer or player behavi
 
 | Topic | Where |
 |---|---|
-| Real lat/lon, extent, heading, no lengths, no uncertainty | [ADR-0001](adr/0001-real-lat-lon-coordinates.md) |
+| Real lat/lon, extent, continuous longitude, heading, no lengths, no uncertainty | [ADR-0001](adr/0001-real-lat-lon-coordinates.md) |
 | Phases as snapshots, `t`, `end`, `playback_rate`, tween and step rules | [ADR-0002](adr/0002-phases-are-snapshots-tweened-by-the-player.md) |
 | `state` enum and `strength` fraction | [ADR-0003](adr/0003-casualties-are-authored-state-and-strength.md) |
 | `moves[]` with `kind` and `to`; the track | [ADR-0004](adr/0004-moves-are-authored-arrows-not-unit-motion.md) |
