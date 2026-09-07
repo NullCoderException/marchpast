@@ -21,7 +21,7 @@ const STRETCH = { plex: "", archivo: ` style="font-stretch: 75%; font-variation-
 
 // The face is one tweak that cuts across the whole board, so it is bound rather than branched: three
 // faces on a chip cost one hole, where three <sc-if> branches would cost three copies of the picture.
-const FACE_PROPS = `"face":{"editor":"enum","options":["plex","archivo","barlow"],"default":"plex","section":"View"}`;
+const FACE_PROPS = `"face":{"editor":"enum","options":["plex","archivo","barlow"],"default":"archivo","section":"View"}`;
 const faceLogic = `const FACES = ${JSON.stringify(FACES)};
 const STRETCH = { plex: "normal", archivo: "75%", barlow: "normal" };`;
 
@@ -62,7 +62,7 @@ function sceneBoard(title, key, { variants, props, logic, w = 1120, h = 650 }) {
 const GLYPH_PROP = `"glyph":{"editor":"enum","options":["A · frame to frontage","B · symbol on the trace"],"default":"A · frame to frontage","section":"Candidates"}`;
 const MOVES_PROP = `"moves":{"editor":"enum","options":["pen (today)","tapered (a moves hand)"],"default":"tapered (a moves hand)","section":"Candidates"}`;
 const AIR_PROP = `"strikes":{"editor":"boolean","default":true,"section":"Candidates"}`;
-const SEA_PROP = `"sea":{"editor":"enum","options":["#138's tone","lightened"],"default":"#138&#39;s tone","section":"Candidates"}`;
+const SEA_PROP = `"sea":{"editor":"enum","options":["lightened","#138's tone"],"default":"lightened","section":"Candidates"}`;
 
 out("Main.dc.html", sceneBoard("Trafalgar 13:30 · staff map", "trafalgar", {
   variants: [
@@ -91,14 +91,14 @@ out("Cannae.dc.html", sceneBoard("Cannae phase 6 · staff map", "cannae", {
 
 out("Midway.dc.html", sceneBoard("Midway 10:25 · staff map", "midway", {
   variants: [
-    { when: "is_c1", opts: { kind: "A", aircraft: true, sea: "chosen" }, first: true },
-    { when: "is_c0", opts: { kind: "A", aircraft: false, sea: "chosen" } },
-    { when: "is_l1", opts: { kind: "A", aircraft: true, sea: "lightened" } },
+    { when: "is_l1", opts: { kind: "A", aircraft: true, sea: "lightened" }, first: true },
     { when: "is_l0", opts: { kind: "A", aircraft: false, sea: "lightened" } },
+    { when: "is_c1", opts: { kind: "A", aircraft: true, sea: "chosen" } },
+    { when: "is_c0", opts: { kind: "A", aircraft: false, sea: "chosen" } },
   ],
   props: `${AIR_PROP},${SEA_PROP}`,
   logic: `(() => {
-      const sea = (this.props.sea ?? "#138").startsWith("light") ? "l" : "c";
+      const sea = (this.props.sea ?? "lightened").startsWith("light") ? "l" : "c";
       const a = this.props.strikes === false ? "0" : "1";
       const key = sea + a;
       return { is_c1: key === "c1", is_c0: key === "c0", is_l1: key === "l1", is_l0: key === "l0" };
@@ -215,8 +215,8 @@ function glyphSheet(size) {
   const topNotesA = ["The unit's whole footprint is the symbol: the box IS the 72 px. For: mass at a glance; strength reads as area; nothing to learn. Against: a 4:1 box is not the aspect the symbol tradition reads at, and a mass at 36 × 36 is a small square."];
   const topNotesB = ["A 72 px unit trace with a true-aspect symbol box astride it. For: the real operations-map shape, and the arm mark gets a 3:2 field. Against: two marks per unit, and lighter, so a weak unit reads faintly at a crowded extent."];
   const topH = Math.max(cardHeight(552, topNotesA, 166), cardHeight(552, topNotesB, 166));
-  s += card(20, y, 552, topH, "A · FRAME TO FRONTAGE", topNotesA, anatomy("A"), 276);
-  s += card(588, y, 552, topH, "B · SYMBOL ON THE TRACE", topNotesB, anatomy("B"), 276);
+  s += card(20, y, 552, topH, "A · FRAME TO FRONTAGE — CHOSEN", topNotesA, anatomy("A"), 276);
+  s += card(588, y, 552, topH, "B · SYMBOL ON THE TRACE — NOT CHOSEN", topNotesB, anatomy("B"), 276);
   y += topH + 24;
 
   const band = (title, notes, inner, innerH = 78) => {
@@ -275,8 +275,8 @@ function movesSheet(size) {
   const nPen = ["A width, a dash, a head shape and a head size. Nothing else. Legible, cheap, and no new slot: `pens` stays exactly as ADR-0021 left it. But a 5 px stroked line with a barb is a THICK LINE, not a broad arrow."];
   const nTap = ["A polygon that tapers from tail to shoulder and opens into the head: hollow for intent, solid for a detachment, curved along its axis, and sized to its own run. It cannot come out of a Pen at any values."];
   const h1 = Math.max(cardHeight(552, nPen, 232), cardHeight(552, nTap, 232));
-  s += card(20, y, 552, h1, "PEN · WHAT `Pens` CAN EXPRESS TODAY", nPen, strip("pen"), 20);
-  s += card(588, y, 552, h1, "TAPER · WHAT AN OPERATIONS MAP DRAWS", nTap, strip("taper"), 20);
+  s += card(20, y, 552, h1, "PEN · WHAT `Pens` CAN EXPRESS TODAY — NOT CHOSEN", nPen, strip("pen"), 20);
+  s += card(588, y, 552, h1, "TAPER · WHAT AN OPERATIONS MAP DRAWS — CHOSEN", nTap, strip("taper"), 20);
   y += h1 + 24;
 
   const nPen2 = ["The anatomy's test: three motion styles tellable apart where they overlap. Pen passes it — dash and weight are enough — but all three read as one family of line."];
@@ -287,12 +287,12 @@ function movesSheet(size) {
   y += h2 + 24;
 
   const nDec = [
-    "ADR-0021: \"if #139's drawing shows that a tapered operations arrow cannot be had from a width, a dash and a head, the handoff cuts a `moves` hand then, against a drawing. Coming back to ask is the expected path, not a failure.\"",
+    "DECIDED: the staff map takes the taper, so ADR-0021's fifth slot is cut — a view supplies a `moves` hand of three functions beside `glyph`, `type`, `ground` and `furniture`, and the engraved three wrap the arrow they already draw. ADR-0021: \"if #139's drawing shows that a tapered operations arrow cannot be had from a width, a dash and a head, the handoff cuts a `moves` hand then, against a drawing. Coming back to ask is the expected path, not a failure.\"",
     "It cannot. A taper needs a width that VARIES along the shaft, which is a polygon and not a stroke; and a hollow head needs a fill distinct from its stroke, which `Pen` has no field for. So either the staff map takes the fifth slot — a `moves` hand of three functions — or it accepts the PEN column, which is a legitimate answer: the three styles stay tellable apart and no view yet needs the taper except on aesthetic grounds.",
     "What is NOT an option is a taper factor on `Pen`. It would put a value on every view for one view's polygon, which is exactly the general table of overridable passes ADR-0021 rejected.",
   ];
   const h3 = cardHeight(1120, nDec, 8);
-  s += card(20, y, 1120, h3, "THE DECISION ADR-0021 ASKED FOR, AGAINST A DRAWING", nDec, "", 20);
+  s += card(20, y, 1120, h3, "THE DECISION ADR-0021 ASKED FOR — THE SLOT IS CUT", nDec, "", 20);
   y += h3 + 20;
 
   size.h = y;
@@ -350,12 +350,12 @@ function furnitureSheet(size) {
   const unit = `<g transform="rotate(100)">${frameGlyph({ formation: "column", arm: "ship", state: "engaged", strength: 0.9, colour: RED, ink })}</g>`;
   const labelNotes = [
     "Two lines on the glyph's flank, never ahead of the unit, in the collapse order the anatomy fixes. The hand: the NAME IN CAPS AND TRACKED in the side ink, the fact upper-lower beneath it.",
-    "ADR-0021 gives the label pass no slot of its own, and it also names \"its own label leader\" as one of the four places this view broke the old list. If the elbow is chosen, one of those has to give: either `type` owns the leader — a view's hand for setting a name against a thing, the leader included — or a fifth slot is cut after all.",
+    "ADR-0021 gives the label pass no slot of its own, and it also names \"its own label leader\" as one of the four places this view broke the old list. DECIDED: the elbow, and `type` owns it — a view's hand for setting a name against a thing, the leader included — so the label pass still gains no slot of its own and ADR-0021 is narrowed rather than contradicted.",
   ];
   const lh = cardHeight(1120, labelNotes, 176);
   s += card(20, y, 1120, lh, "THE LABEL AND ITS LEADER", labelNotes, [
-    ["THE PLATE'S: A HAIRLINE TO A DOT", false],
-    ["THE SHEET'S: AN ELBOW ENDING IN A TICK", true],
+    ["THE PLATE'S: A HAIRLINE TO A DOT — NOT CHOSEN", false],
+    ["THE SHEET'S: AN ELBOW ENDING IN A TICK — CHOSEN", true],
   ].map(([name, elbow], i) => `<g transform="translate(${i * 340 + 130} 108)">${unit}` +
     staffLabel(48, -54, "Weather column", "engaged · 90%", RED, ink, "start", { x1: 0, y1: 0, x2: 44, y2: -54 }, { elbow }) +
     text(-44, 52, name, "credit", ink, { opacity: 0.8 }) + `</g>`).join("") +
@@ -377,7 +377,7 @@ function furnitureSheet(size) {
   ];
   const fh = cardHeight(1120, faceNotes, 320);
   s += card(20, y, 1120, fh, "THE FACE", faceNotes,
-    [["plex", "IBM PLEX SANS CONDENSED", "the terrain stand-in; two static files"], ["archivo", "ARCHIVO, wdth 75", "one variable file; American gothic roots"], ["barlow", "BARLOW CONDENSED", "two static files; the narrowest of the three"]]
+    [["archivo", "ARCHIVO, wdth 75 — CHOSEN", "one variable file, both weights; 179 px"], ["plex", "IBM PLEX SANS CONDENSED", "the terrain stand-in; two files; 197 px"], ["barlow", "BARLOW CONDENSED", "two files; the narrowest, 157 px"]]
       .map(([key, name, note], i) => `<g transform="translate(${i * 372} 34)">${column(key, name, note)}</g>`).join(""), 30);
   y += fh + 20;
 
@@ -403,7 +403,7 @@ function nameSheet() {
   return page("The name in the chooser", `<div style="width: ${W}px; padding: 24px; box-sizing: border-box; background: ${STAFF.letterbox}; display: flex; flex-direction: column; gap: 14px; font-family: ${FACES.plex}; color: ${ink};">
   <div style="font-size: 17px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;">The name of the view</div>
   <div style="font-size: 13px; line-height: 1.45;">The three names it stands beside are all <b>the physical object</b> — a plate, a plate, a bound atlas — never what the picture is about. The fourth should be an object too, and one word or two.</div>
-  ${case_("Staff map", "<b>The object.</b> The map a staff works on, and the ticket's own working name. Keeps the rhythm of the three beside it and says <i>whose</i> map it is, which is the whole idiom: a working sheet, marked up, rather than a published engraving.")}
+  ${case_("Staff map — CHOSEN", "<b>The object.</b> The map a staff works on, and the ticket's own working name. Keeps the rhythm of the three beside it and says <i>whose</i> map it is, which is the whole idiom: a working sheet, marked up, rather than a published engraving.")}
   ${case_("Situation map", "<b>The doctrinal term</b> (SITMAP) for a map showing the present disposition — which is exactly what our picture is, at every phase. The most accurate of the three, and the only one that describes the <i>content</i>, which breaks the pattern the other three set.")}
   ${case_("Operations map", "<b>Also real</b>, and the most familiar of the three to a general reader. Leans toward the plan rather than the present state, which is slightly wrong for a view whose whole job is to show where things are now.")}
   <div style="font-size: 12px; line-height: 1.45; opacity: 0.75;">Whatever wins is only what the chooser shows. The id stays <code>staff</code> either way, and the id is what player state, the remembered view (ADR-0023) and the URL carry.</div>
@@ -432,7 +432,7 @@ const canvas = {
   annotations: [
     {
       id: "view-intro", x: 0, y: -260, w: 1120, page: "page-1",
-      text: "THE STAFF-MAP VIEW (#139) — the first view built outside the engraved system. ADR-0021 fixed the rule it works to: what the picture shows, where each thing sits and what it means is the same in every view; HOW any of it is drawn is the view's. So every board here is one hand redrawing an unchanged anatomy — same extent and north up, same furniture in the same corners, same caption band with the clock at the left, same label on the flank, same four states, same 72 px glyph, same side ink by roster order.\nTwo glyph candidates and two ways of drawing a move run through the frames on the chips. The GROUND is not reopened: #138 chose the `ops` sheet and it is imported unchanged.",
+      text: "THE STAFF-MAP VIEW (#139), RESOLVED 2026-09-07 — the first view built outside the engraved system. ADR-0021 fixed the rule it works to: what the picture shows, where each thing sits and what it means is the same in every view; HOW any of it is drawn is the view's. So every board here is one hand redrawing an unchanged anatomy — same extent and north up, same furniture in the same corners, same caption band with the clock at the left, same label on the flank, same four states, same 72 px glyph, same side ink by roster order.\nThe chips open on what was CHOSEN — candidate A for the glyph, the tapered arrow for the moves, Archivo for the face, the lightened sea — and the unchosen candidates stay behind them. The GROUND is not reopened: #138 chose the `ops` sheet and it is imported unchanged.",
     },
     {
       id: "view-test", x: 1240, y: -260, w: 1120, page: "page-1",
@@ -440,11 +440,11 @@ const canvas = {
     },
     {
       id: "view-sea", x: 0, y: 1490, w: 1120, page: "page-1",
-      text: "ONE THING #138 COULD NOT HAVE SEEN. Its water tone was chosen against a sliver of sea on a land battle; Midway is the first frame that is water edge to edge, and at full frame `#93a9b6` reads as a blue sheet rather than a buff one with sea on it. The chip carries both tones. Whether this is a correction to the chosen `ops` palette or the price of a fleet battle is a decision, not a bug.",
+      text: "ONE THING #138 COULD NOT HAVE SEEN, now settled. Its water tone was chosen against a sliver of sea on a land battle; Midway is the first frame that is water edge to edge, and at full frame `#93a9b6` read as a blue sheet rather than a buff one with sea on it. DECIDED: open water is lightened to `#b3c4cb`, and `#93a9b6` becomes the shallow and reef tone — a correction to the chosen `ops` palette, not a reopening of it. The old tone stays on the chip.",
     },
     {
       id: "hand-decide", x: 0, y: -330, w: 1160, page: "page-2",
-      text: "TO DECIDE.\n1 · THE GLYPH: candidate A (the frame is the unit's footprint) or B (a symbol box astride a unit trace). Judge it on Trafalgar, not here.\n2 · THE MOVES: whether the staff map takes the tapered operations arrow — which cannot come out of a `Pen`, and therefore cuts ADR-0021's fifth slot, a `moves` hand — or accepts the pen column, which is legible and free.\n3 · THE FACE: IBM Plex Sans Condensed, Archivo at wdth 75, or Barlow Condensed.\n4 · THE LEADER: the plate's hairline-and-dot, or the sheet's elbow-and-tick — and if the elbow, whether `type` owns it or a slot is cut.\n5 · THE NAME the chooser shows.\n6 · THE SEA at full frame (see the note under Midway).\nNOT this ticket: the aircraft sign (#140, blocked on #131) is a candidate only; the player's controls and chooser are #137's; the ground is #138's, closed.",
+      text: "DECIDED, 2026-09-07. The chips open on what was chosen; the unchosen candidates stay behind them.\n1 · THE GLYPH: A, the frame to frontage — the box IS the unit's 72 px footprint.\n2 · THE MOVES: the tapered operations arrow, which cannot come out of a `Pen`. ADR-0021's fifth slot is CUT: a view supplies a `moves` hand of three functions, and the engraved three wrap the arrow they already draw.\n3 · THE FACE: Archivo at wdth 75 — the only variable one of the three, so one file carries the condensed width and both weights.\n4 · THE LEADER: the elbow ending in a tick, owned by `type`, so the label pass still gains no slot of its own.\n5 · THE NAME: Staff map.\n6 · THE SEA: lightened at full frame.\nNOT this ticket: the aircraft sign (#140, blocked on #131) is a candidate only; the player's controls and chooser are #137's; the ground is #138's, closed.",
     },
   ],
   launch: { view: "canvas", page: "page-1" },
