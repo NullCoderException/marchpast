@@ -205,11 +205,11 @@ The shape by which a view tells one arm from another inside a glyph: the chart p
 _Avoid_: Mark (the state's), icon, symbol, tick (except for the ship sign), badge
 
 **Surface**:
-The player's page around the plate — the control strip, the details panel and the ground they sit on — drawn as a page rather than on the canvas, and drawn in the current view's inks and face. It is what a view reaches beyond the picture; the library is not part of it and never follows a view.
+The player's page around the plate — the control strip, the details panel and the ground they sit on — drawn as a page rather than on the canvas, and drawn in the current view's inks and face. It is what a view reaches beyond the picture; the library is not part of it and never follows a view. It holds those inks whatever the operating system says, and declines forced colours: the picture cannot follow a system palette, and a surface repainted around an unchanged plate would split the two.
 _Avoid_: Chrome, UI, shell, skin, theme, frame
 
 **Controls**:
-What the viewer operates to drive playback: play and pause, the scrubber, the phase-jump buttons, the speed multiplier, the view chooser, the level chooser, the picker, and the toggle for the details panel. Drawn in the current view's language, on the surface. Never authored in a battle file.
+What the viewer operates to drive playback: play and pause, the scrubber, the phase-jump buttons, the speed multiplier, the view chooser, the level chooser, the picker, and the toggle for the details panel. Drawn in the current view's language, on the surface. Never authored in a battle file. A phase jump **cuts** where playback tweens, so the jump buttons and the caption band are a way through a battle that never moves.
 _Avoid_: Furniture, UI, transport, toolbar
 
 **Scrubber**:
@@ -231,7 +231,7 @@ _Avoid_: Tooltip, popup, popover, info box, unit panel
 ### Site
 
 **Library**:
-The collection of every battle the site holds, and the front-door page that lists them oldest first, each by its still, title, date, sides and summary, drawn from the battle files themselves. It is never grouped. It sits at the site's root, and each battle it lists has a page of its own beneath it.
+The collection of every battle the site holds, and the front-door page that lists them oldest first, each by its still, title, date, sides and summary, drawn from the battle files themselves. It is never grouped. It has one look, the brand's, and follows neither a view nor the operating system. It sits at the site's root, and each battle it lists has a page of its own beneath it.
 _Avoid_: Catalogue, index, list, home page, menu, gallery
 
 **Battle page**:
