@@ -22,6 +22,14 @@ export interface Plate {
    * labels' numerals are indexed by (schema.md 2.9, 2.11).
    */
   unitsDrawn: readonly UnitPicture[];
+  /**
+   * Every distinct level the map's contours are cut at, ascending; empty when
+   * the map carries no relief, or there is no map. Derived once because two
+   * passes read it: the map pass for the index levels and the tint bands, the
+   * furniture for the panels a land plate needs and the interval its scale bar
+   * carries (#62).
+   */
+  contourLevels: readonly number[];
   projection: Projection;
   /** Side name to ink colour, by roster order, in the view's palette. */
   colours: Map<string, string>;

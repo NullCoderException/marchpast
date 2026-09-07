@@ -43,3 +43,22 @@ export function scaleBarLength({ pixelsPerUnit, maxPixels }: { pixelsPerUnit: nu
   const units = Number(best.units.toPrecision(12));
   return { units, pixels: Number((units * pixelsPerUnit).toPrecision(12)), mantissa: best.mantissa };
 }
+
+/**
+ * What the bar is captioned with: the distance it shows and, on a map that
+ * carries relief, the interval its contours are cut at. The interval rides
+ * here rather than in the legend because a land plate's legend is crowded
+ * enough already (#62); a map without contours is captioned exactly as before.
+ */
+export function scaleBarCaption({
+  units,
+  unit,
+  contourInterval,
+}: {
+  units: number;
+  unit: Battle["scale_unit"];
+  contourInterval: number | undefined;
+}): string {
+  const distance = `${units} ${units === 1 ? UNIT_LABEL[unit].one : UNIT_LABEL[unit].many}`;
+  return contourInterval === undefined ? distance : `${distance} · contours at ${contourInterval} m`;
+}

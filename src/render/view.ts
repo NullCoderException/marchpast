@@ -53,8 +53,27 @@ export interface Palette {
   coast: string;
   /** The sea's mottle; `undefined` leaves the paper flat. */
   stipple: string | undefined;
+  /** How heavily relief is laid on: the one thing a view re-tunes about the map pass. */
+  relief: ReliefInks;
   /** Side inks by roster order. Order and hue family are fixed across views; the values are not. */
   sides: readonly string[];
+}
+
+/**
+ * The alphas relief is inked at, all of them the palette's own ink (#62). The
+ * two contour weights are fixed across views and only these alphas move, which
+ * is why they sit on the palette: it keeps the map pass shared, with no pass
+ * anywhere testing a view id.
+ */
+export interface ReliefInks {
+  /** Every contour, at the fine weight. */
+  contour: number;
+  /** Every fifth level, at the heavy weight. */
+  index: number;
+  /** The numeral an index contour is labelled with, on its paper knock-out. */
+  numeral: number;
+  /** Ink per tint band under the contours; `undefined` lays no bands, which is every view but Atlas. */
+  band: number | undefined;
 }
 
 /** Arrow head shapes: `open` is two pen strokes, `filled` a solid barb. */

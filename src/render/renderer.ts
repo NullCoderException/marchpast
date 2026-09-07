@@ -27,6 +27,7 @@ import { drawUnits } from "./drawUnits.ts";
 import { unitsDrawn } from "./level.ts";
 import { seeded } from "./primitives.ts";
 import { fitProjection, type Rect } from "./projection.ts";
+import { contourLevels } from "./relief.ts";
 import type { Plate } from "./plate.ts";
 import { PLATE_MARGIN, sideColours } from "./style.ts";
 import type { Viewer } from "./view.ts";
@@ -81,6 +82,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
         map,
         picture,
         unitsDrawn: unitsDrawn(battle.units, picture.units, viewer.level),
+        contourLevels: contourLevels(map),
         projection,
         colours: sideColours(battle, palette),
         pixelsPerMetre,

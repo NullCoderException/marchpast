@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { METRES_PER_UNIT, scaleBarLength } from "./scaleBar.ts";
+import { METRES_PER_UNIT, scaleBarCaption, scaleBarLength } from "./scaleBar.ts";
 
 describe("scaleBarLength", () => {
   it("picks the largest round length that fits the pixel budget", () => {
@@ -27,5 +27,23 @@ describe("scaleBarLength", () => {
     expect(METRES_PER_UNIT.nmi).toBe(1852);
     expect(METRES_PER_UNIT.km).toBe(1000);
     expect(scaleBarLength({ pixelsPerUnit: METRES_PER_UNIT.nmi / 10, maxPixels: 1000 })).toEqual({ units: 5, pixels: 926, mantissa: 5 });
+  });
+});
+
+describe("scaleBarCaption", () => {
+  it("names the distance in the battle's unit, singular at one", () => {
+    expect(scaleBarCaption({ units: 2, unit: "km", contourInterval: undefined })).toBe("2 kilometres");
+    expect(scaleBarCaption({ units: 1, unit: "km", contourInterval: undefined })).toBe("1 kilometre");
+    expect(scaleBarCaption({ units: 5, unit: "nmi", contourInterval: undefined })).toBe("5 nautical miles");
+    expect(scaleBarCaption({ units: 1, unit: "nmi", contourInterval: undefined })).toBe("1 nautical mile");
+  });
+
+  it("carries the contour interval when the map has relief, so the legend gains no row", () => {
+    expect(scaleBarCaption({ units: 2, unit: "km", contourInterval: 10 })).toBe("2 kilometres · contours at 10 m");
+    expect(scaleBarCaption({ units: 0.5, unit: "nmi", contourInterval: 20 })).toBe("0.5 nautical miles · contours at 20 m");
+  });
+
+  it("leaves a map whose levels give no interval reading as one without contours", () => {
+    expect(scaleBarCaption({ units: 2, unit: "km", contourInterval: undefined })).toBe("2 kilometres");
   });
 });

@@ -34,6 +34,7 @@ export const CHART_PLATE: View = {
     panel: "rgba(239,227,198,0.92)",
     coast: "#2b2418",
     stipple: "rgba(120,90,40,0.06)",
+    relief: { contour: 0.32, index: 0.62, numeral: 0.75, band: undefined },
     sides: ["#8f2f24", "#24406b", "#3e5a2a", "#6b4a1e", "#5a3a6b", "#2f5f5a"],
   },
   pens: PLATE_PENS,
@@ -52,6 +53,7 @@ export const NIGHT_PLATE: View = {
     panel: "rgba(27,36,48,0.92)",
     coast: "#a9b6c6",
     stipple: "rgba(239,227,198,0.05)",
+    relief: { contour: 0.22, index: 0.5, numeral: 0.65, band: undefined },
     sides: ["#e2685a", "#86a9e8", "#8fc08a", "#d3a765", "#b892d8", "#79c4bd"],
   },
   pens: PLATE_PENS,
@@ -62,7 +64,12 @@ export const NIGHT_PLATE: View = {
 export const ATLAS: View = {
   id: "atlas",
   name: "Atlas",
-  palette: { ...CHART_PLATE.palette, stipple: undefined },
+  palette: {
+    ...CHART_PLATE.palette,
+    stipple: undefined,
+    // The one view that lays height as tone: a wash is quiet under blocks, and darkens the ground the side inks sit on anywhere else (#62).
+    relief: { contour: 0.22, index: 0.45, numeral: 0.65, band: 0.075 },
+  },
   pens: ATLAS_PENS,
   glyph: block,
 };
