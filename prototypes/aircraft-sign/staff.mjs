@@ -115,10 +115,12 @@ export function armMark(arm, half, colour, w = 1.3) {
     const a = Math.min(p.x, p.y) * 0.95, b = Math.min(p.x, p.y) * 1.5;
     return `<path d="M0 ${f(-b)} Q${f(a)} 0 0 ${f(b)} Q${f(-a)} 0 0 ${f(-b)} Z" fill="none" stroke="${colour}" stroke-width="${w}" stroke-linejoin="round"/>`;
   }
-  // A CANDIDATE ONLY: whether aircraft is an arm at all is #131's and its sign is #140's.
+  // DECIDED by #140: the swept arrowhead this view greyed in, drawn STROKED rather than filled, so it
+  // weighs what its three siblings weigh. The shape is the symbol tradition's and stays this view's own;
+  // the chart plate and Atlas draw the arm as an aeroplane in plan instead.
   if (arm === "aircraft") {
     const a = Math.max(p.x, p.y) * 1.05, b = Math.min(p.x, p.y) * 1.15;
-    return `<path d="M${f(-a)} ${f(b)} L0 ${f(-b)} L${f(a)} ${f(b)} L0 ${f(b * 0.25)} Z" fill="${colour}" stroke="${colour}" stroke-width="${f(w * 0.8)}" stroke-linejoin="round"/>`;
+    return `<path d="M${f(-a)} ${f(b)} L0 ${f(-b)} L${f(a)} ${f(b)} L0 ${f(b * 0.25)} Z" fill="none" stroke="${colour}" stroke-width="${f(w)}" stroke-linejoin="round"/>`;
   }
   return "";
 }

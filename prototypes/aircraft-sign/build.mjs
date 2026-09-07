@@ -67,12 +67,13 @@ function wrap(body, cols) {
 }
 
 /** A card: a ruled box, a small-caps head, a drawing, and italic notes along the foot. */
-function card(x, y, w, h, head, notes, inner, { ink = PLATE.ink, paper = PLATE.paper, innerX = w / 2, innerY = 44, face } = {}) {
+function card(x, y, w, h, head, notes, inner, { ink = PLATE.ink, paper = PLATE.paper, innerX = w / 2, innerY = 44, chosen = false } = {}) {
   const lines = wrap(notes, Math.floor((w - 28) / 5.5));
   return `<g transform="translate(${x} ${y})">` +
-    `<rect width="${w}" height="${h}" fill="${paper}" stroke="${ink}" stroke-width="1"/>` +
+    `<rect width="${w}" height="${h}" fill="${paper}" stroke="${ink}" stroke-width="${chosen ? 2.4 : 1}"/>` +
     `<text x="14" y="24" font-size="14" fill="${ink}" letter-spacing="0.6">${head}</text>` +
-    `<line x1="14" y1="33" x2="${w - 14}" y2="33" stroke="${ink}" stroke-width="0.6" stroke-opacity="0.5"/>` +
+    (chosen ? `<text x="${w - 14}" y="24" font-size="10.5" fill="${ink}" text-anchor="end" letter-spacing="1.6">CHOSEN</text>` : "") +
+    `<line x1="14" y1="33" x2="${w - 14}" y2="33" stroke="${ink}" stroke-width="${chosen ? 1.6 : 0.6}" stroke-opacity="${chosen ? 0.9 : 0.5}"/>` +
     lines.map((t, i) => `<text x="14" y="${h - 14 - (lines.length - 1 - i) * 15}" font-size="11.5" font-style="italic" fill="${ink}" fill-opacity="0.9">${t}</text>`).join("") +
     `<g transform="translate(${innerX} ${innerY})">${inner}</g></g>`;
 }
@@ -142,7 +143,7 @@ function boardMain() {
       `<g transform="translate(40 106)">${plateGlyph({ arm: "ship", formation: "line", colour: JP, seed: 4 })}</g>` +
       `<g transform="translate(40 128)">${plateGlyph({ arm: "aircraft", candidate: k, formation: "line", colour: US, seed: 4 })}</g>` +
       cap(40, 166, "a strike over a carrier, 22 px apart");
-    s += card(x, y, 390, candH, head, note, inner, { innerX: 195, innerY: 74 });
+    s += card(x, y, 390, candH, head, note, inner, { innerX: 195, innerY: 74, chosen: k === "A" });
   });
   y += candH + 34;
 
@@ -210,7 +211,7 @@ function boardStates() {
       inner += `<g transform="translate(${cx} 0)">${plateGlyph({ arm: "aircraft", candidate: k, formation: "line", state: st, strength, colour: US, seed: 8 })}</g>`;
       inner += cap(cx, 74, st);
     });
-    s += card(x, yy, W - 80, 206, `${k} · the four states`, r === 0 ? states.map(([st, , n]) => `${st}: ${n}`).join("  ") : PER_CANDIDATE[k], inner, { innerX: 130, innerY: 78 });
+    s += card(x, yy, W - 80, 206, `${k} · the four states${k === "A" ? " — chosen" : ""}`, r === 0 ? states.map(([st, , n]) => `${st}: ${n}`).join("  ") : PER_CANDIDATE[k], inner, { innerX: 130, innerY: 78, chosen: k === "A" });
   });
   y += 3 * 224 + 22;
 
@@ -288,15 +289,15 @@ function boardEngaged() {
 
   const note = "ADR-0016 made Billow the engaged mark for EVERY arm and refused a second one by name: a separate land mark would be a second vocabulary the legend keys twice. On land the cloud reads as dust; over the sea it is gunsmoke. On a body of aeroplanes three thousand feet up it reads as flak — outlined puffs hanging in the air is exactly what a 1940s plate draws anti-aircraft fire as — so the mark needs no change at all. What is worth arguing about is the WIND: ADR-0014 blows the cloud to the unit's lee flank under the phase's surface wind, and a burst at altitude does not drift with the surface wind. The two are drawn side by side; neither is a new mark, and only the second costs an arm-dependent branch in the shared mark pass.";
   const drifts = [
-    ["Surface wind — the rule today", surfaceDrift(WIND_TO, 200, "line")],
-    ["Astern of the strike's own heading", 180],
+    ["Surface wind — the rule today, and kept", surfaceDrift(WIND_TO, 200, "line")],
+    ["Astern of the strike's own heading — not taken", 180],
   ];
   const inner = drifts.map(([label, deg], i) =>
     `<g transform="translate(${i * 420} 0)">` +
     `<g transform="rotate(200)">${billow({ formation: "line", state: "engaged", seed: 12, ink, paper: PLATE.paper, driftDeg: deg })}</g>` +
     `<g transform="rotate(200)">${plateGlyph({ arm: "aircraft", candidate: "A", formation: "line", state: "engaged", colour: US, seed: 12 })}</g>` +
     cap(0, 72, label) + `</g>`).join("");
-  s += card(40, y, W - 80, cardH(W - 80, note, 100, 92), "Where the cloud goes", note, inner, { innerX: 250, innerY: 92 });
+  s += card(40, y, W - 80, cardH(W - 80, note, 100, 92), "Where the cloud goes — the surface wind stays", note, inner, { innerX: 250, innerY: 92, chosen: true });
   y += cardH(W - 80, note, 100, 92) + 30;
 
   const note2 = "10:25, drawn at the two positions the sources give: the dive bombers are over the carriers, and both are engaged. Two Billows at one place is not a new problem — Trafalgar at 13:30 already puts four of them in the same two hundred pixels, which is why the units pass runs every mark before any body — but it is the first time two of them belong to units at different ALTITUDES, and the plate has no way to say so. The reading it does give is the honest one: the fight is here.";
@@ -350,7 +351,7 @@ function boardAtlas() {
       `<g transform="translate(90 76) rotate(90)">${atlasGlyph({ arm: "aircraft", candidate: k, formation: "column", length: 34, scale: 0.75, colour: ink, paper: ATLAS.paper, clipId: `at${k}4` })}</g>` +
       cap(-90, 24, "line, full strength") + cap(90, 24, "line, at 55%") +
       cap(-90, 100, "mass") + cap(90, 100, "legend scale");
-    s += card(x, y, 390, atlasH, head, n, inner, { innerX: 195, innerY: 60 });
+    s += card(x, y, 390, atlasH, head, n, inner, { innerX: 195, innerY: 60, chosen: k === "A" });
   });
   y += atlasH + 30;
 
@@ -380,8 +381,8 @@ function boardStaff() {
   let s = "";
   let y = headTop(SF, W);
 
-  const scard = (x, yy, w, h, head, notes, inner, innerX = w / 2, innerY = 44) =>
-    card(x, yy, w, h, head, notes, inner, { ink, paper: STAFF.paper, innerX, innerY });
+  const scard = (x, yy, w, h, head, notes, inner, innerX = w / 2, innerY = 44, chosen = false) =>
+    card(x, yy, w, h, head, notes, inner, { ink, paper: STAFF.paper, innerX, innerY, chosen });
 
   const cands = [
     ["A · Delta", "#139's own, drawn greyed on its boards and labelled a candidate for this ticket. A filled swept arrowhead with a notched tail: the symbol tradition's mark for air, and the loudest thing in the box."],
@@ -412,7 +413,7 @@ function boardStaff() {
       cap(0, 30, "on #139's A, the chosen glyph", ink) +
       cap(0, 92, "on #139's B, left on the chip", ink) +
       cap(0, 158, "legend scale, 0.62", ink);
-    s += scard(x, y, 390, staffH, head, n, inner, 175, 60);
+    s += scard(x, y, 390, staffH, head, n, inner, 175, 60, k === "B");
   });
   y += staffH + 30;
 
@@ -430,7 +431,7 @@ function boardStaff() {
     "The staff map: the symbol-tradition mark",
     [
       "#139 drew three arm marks and greyed the fourth, saying in words that whether aircraft is an arm at all was #131's and what its sign looks like is this ticket's. ADR-0024 answered the first. This answers the second.",
-      "The glyph itself is still #139's open choice (A frame-to-frontage or B symbol-on-the-trace); the mark is drawn on both, because it has to survive either.",
+      "#139 has since closed and chose its glyph A, the frame to frontage; the mark is drawn on that and on the B it left on the chip, because a mark that only works on the winner is a mark fitted to one drawing.",
     ],
     s, W, y, { face: FACES.plex, font: FONT_LINK, ground: STAFF.letterbox, ink });
 }
@@ -506,7 +507,7 @@ function boardAboard() {
   ];
   const wayH = Math.max(...ways.map(([, n]) => cardH(390, n, 86, 64)));
   ways.forEach(([head, n, draw], i) => {
-    s += card(40 + i * 414, y, 390, wayH, head, n, draw() + cap(0, 60, "07:05 — Enterprise's strike ranging on deck"), { innerX: 195, innerY: 64 });
+    s += card(40 + i * 414, y, 390, wayH, head, n, draw() + cap(0, 60, "07:05 — Enterprise's strike ranging on deck"), { innerX: 195, innerY: 64, chosen: head.startsWith("3") });
   });
   y += wayH + 30;
 
