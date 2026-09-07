@@ -429,6 +429,16 @@ function overlapping(a: { x: number; y: number; width: number; height: number },
   return a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
 }
 
+/** Whether `outer` holds the whole of `inner`, which is what keeps a pointer resting on `inner` resolved. */
+function covering(outer: { x: number; y: number; width: number; height: number }, inner: typeof outer): boolean {
+  return (
+    inner.x >= outer.x &&
+    inner.y >= outer.y &&
+    inner.x + inner.width <= outer.x + outer.width &&
+    inner.y + inner.height <= outer.y + outer.height
+  );
+}
+
 function shortest(radians: number): number {
   let d = radians % (Math.PI * 2);
   if (d > Math.PI) d -= Math.PI * 2;
@@ -491,6 +501,30 @@ describe("the unit card in the label pass", () => {
     const first = place(units, { card: CARD });
     const second = place(units, { card: CARD, memory: first.memory });
     expect(byId(second.placed, "a").box).toEqual(byId(first.placed, "a").box);
+  });
+
+  it("opens on the slot its label held, so it lands under the pointer that opened it", () => {
+    // A label pushed right out to the far ring, due north of its glyph, as a
+    // crowd would have pushed it. The card unfolds from *there* (#116): the
+    // ring's own order starts at the flank, which is not where the pointer is.
+    const units = [unit({ id: "a", heading: 90 })];
+    const displaced: ReadonlyMap<string, Slot> = new Map([["a", { angle: 0, extra: 104, step: 1, clean: 0 }]]);
+    const label = byId(place(units, { memory: displaced }).placed, "a");
+    const opened = place(units, { card: CARD, memory: displaced });
+    expect(opened.memory.get("a")).toEqual({ angle: 0, extra: 104, step: CARD_STEP, clean: 0 });
+    expect(covering(byId(opened.placed, "a").box, label.box)).toBe(true);
+  });
+
+  it("leaves the label's slot for the ring when the wider card will not fit there", () => {
+    // The same displacement with the plate's north edge close under it: the
+    // card cannot open where the label stood, so the search goes on as before.
+    const units = [unit({ id: "a", heading: 90, anchor: { x: 400, y: 150 } })];
+    const displaced: ReadonlyMap<string, Slot> = new Map([["a", { angle: 0, extra: 104, step: 1, clean: 0 }]]);
+    const opened = place(units, { card: CARD, memory: displaced });
+    const card = byId(opened.placed, "a");
+    expect(opened.memory.get("a")).not.toMatchObject({ angle: 0, extra: 104 });
+    expect(card.box.y).toBeGreaterThanOrEqual(PLATE.y);
+    expect(card.box.y + card.box.height).toBeLessThanOrEqual(PLATE.y + PLATE.height);
   });
 
   it("gives the unit its ordinary label back the moment the card closes", () => {

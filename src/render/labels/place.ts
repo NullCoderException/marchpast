@@ -288,9 +288,9 @@ function choose(
 }
 
 /**
- * Where the card stands this frame: the slot it already had while that is
- * free, else the first free slot on the ring, else the least-bad one. There is
- * no collapse and so no recovery — a card says the same words wherever it goes.
+ * Where the card stands this frame: the remembered slot while that is free,
+ * else the first free slot on the ring, else the least-bad one. There is no
+ * collapse and so no recovery — a card says the same words wherever it goes.
  */
 function chooseCard(
   unit: LabelUnit,
@@ -300,13 +300,20 @@ function chooseCard(
   cost: (box: Rect) => number,
 ): Omit<Slot, "clean"> {
   const angles = ringAngles(unit, previous?.angle);
-  const slots = RING_RADII.flatMap((extra) => angles.map((angle) => ({ angle, extra, step: CARD_STEP })));
+  const ring = RING_RADII.flatMap((extra) => angles.map((angle) => ({ angle, extra, step: CARD_STEP })));
 
-  // Stay: the sticky search holds the card still while its unit moves under it.
-  if (previous?.step === CARD_STEP) {
-    const held = { angle: previous.angle, extra: previous.extra, step: CARD_STEP };
-    if (free(cardSlot(unit, held, layout).box, true)) return held;
-  }
+  // Stay: the whole remembered slot first, its displacement as much as its
+  // angle, and whatever step the memory was on. The ring is ordered by
+  // displacement, so a card that took the angle back alone would open on the
+  // glyph's flank while the label it unfolds from stands out at 104px — away
+  // from the pointer resting on that label, which the next frame then resolves
+  // to bare plate, closing the card again (#116). The same line holds an open
+  // card still while its unit moves under it. It heads both passes, so a card
+  // whose slot is under someone's billow crosses the smoke rather than leaving
+  // the pointer: a card is transient and asked for, and smoke was never worth
+  // a jump across the plate.
+  const held = previous === undefined ? [] : [{ angle: previous.angle, extra: previous.extra, step: CARD_STEP }];
+  const slots = [...held, ...ring];
 
   for (const avoidSmoke of [true, false]) {
     for (const slot of slots) {
