@@ -62,10 +62,9 @@
   margin-bottom: -3px;
 }
 
+/* The mark is drawn at its size (MARK_SIZE in libraryPage.ts); only the phone below overrides it. */
 .st-library-mark svg {
   display: block;
-  width: 40px;
-  height: 40px;
 }
 
 .st-library-name {

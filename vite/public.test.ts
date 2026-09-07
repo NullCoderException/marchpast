@@ -38,6 +38,9 @@ interface Manifest {
 }
 const manifest = JSON.parse(fs.readFileSync(path.join(PUBLIC, "site.webmanifest"), "utf-8")) as Manifest;
 
+/** The head, as the crawlers read it. */
+const INDEX = fs.readFileSync(path.join(ROOT, "index.html"), "utf-8");
+
 /** A PNG's real pixel box, straight out of its header. */
 function pngSize(file: string): string {
   const bytes = fs.readFileSync(file);
@@ -109,7 +112,16 @@ describe("the social card", () => {
   });
 
   it("is the image index.html hands the crawlers, at an absolute URL", () => {
-    const head = fs.readFileSync(path.join(ROOT, "index.html"), "utf-8");
-    expect(head).toContain('<meta property="og:image" content="https://marchpast.com/social-card.png" />');
+    // A crawler resolves og:image against nothing: a relative path unfurls as no image at all.
+    expect(INDEX).toContain('<meta property="og:image" content="https://marchpast.com/social-card.png" />');
+  });
+});
+
+describe("the description", () => {
+  it("is one sentence, in the three places that cannot import it from each other", () => {
+    // index.html's meta description and og:description; the manifest's own.
+    const copies = [...INDEX.matchAll(/content="(Famous battles[^"]*)"/g)].map((match) => match[1] ?? "");
+    expect(copies).toHaveLength(2);
+    for (const copy of copies) expect(copy).toBe(manifest.description);
   });
 });
