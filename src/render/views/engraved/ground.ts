@@ -519,4 +519,3 @@ function tracePolyline(ctx: CanvasRenderingContext2D, projection: Projection, li
     else ctx.lineTo(x, y);
   });
 }
-

@@ -40,9 +40,9 @@ import { toRadians } from "../../projection.ts";
 import { contourInterval } from "../../relief.ts";
 import { METRES_PER_UNIT, scaleBarCaption, scaleBarLength } from "../../scaleBar.ts";
 import { compassPoint } from "../../text.ts";
-import type { Furniture, FurniturePlace, LegendPlace, Palette, ScaleBarPlace } from "../../view.ts";
+import type { Furniture, FurniturePlace, LegendHand, LegendPlace, Palette, Piece, ScaleBarPlace } from "../../view.ts";
 import { engravedCaption } from "./caption.ts";
-import { engravedType, font } from "./type.ts";
+import { font } from "./type.ts";
 
 /** Feathers on the wind arrow's tail: none at calm, one for light through four for gale (ADR-0008). */
 const FEATHERS: Readonly<Record<WindForce, number>> = { calm: 0, light: 1, moderate: 2, fresh: 3, gale: 4 };
@@ -253,9 +253,34 @@ const LEGEND_WIDTH = 168;
 /** Gap between the legend's edge and what it carries. */
 const LEGEND_PAD = 12;
 
+/** The first side's ink, which a detachment sample is drawn in. */
+function firstSideInk(colours: ReadonlyMap<string, string>, palette: Palette): string {
+  return colours.values().next().value ?? palette.ink;
+}
+
+/**
+ * The paper and the rule a key stands on. A ground that runs under this corner
+ * has already been given paper, so the panel is the palette's at .92 once and
+ * not twice over (#62); the rule is the key's own and is drawn either way.
+ */
+function drawKeyGround(ctx: CanvasRenderingContext2D, box: Rect, palette: Palette, onPanel: boolean): void {
+  if (!onPanel) {
+    ctx.fillStyle = palette.panel;
+    ctx.fillRect(box.x, box.y, box.width, box.height);
+  }
+  ctx.strokeStyle = palette.ink;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(box.x + 0.5, box.y + 0.5, box.width - 1, box.height - 1);
+}
+
 /** One row of the numeral key: the numeral the plate showed, and the name it stood in for. */
 function numeralRowText(row: NumeralRow): string {
   return `${row.numeral} · ${row.label}`;
+}
+
+/** How wide the widest numeral row runs in a face: what widens either form of the key (#39). */
+function widestNumeral(plate: Plate, key: readonly NumeralRow[], face: string): number {
+  return key.reduce((wide, row) => Math.max(wide, textWidth(plate.ctx, numeralRowText(row), face)), 0);
 }
 
 /** The same in pixels, padding and all: the panel a land plate lays under the legend has to know before either is drawn. */
@@ -265,11 +290,9 @@ function legendHeight(plate: Plate, key: readonly NumeralRow[]): number {
 
 /** How wide the legend stands: its own width, or wider when the numeral key has a longer name to carry (#39). */
 function legendWidth(plate: Plate, key: readonly NumeralRow[]): number {
-  const face = engravedType.role("legendLine", "desktop").font;
-  const longest = key.reduce((wide, row) => Math.max(wide, textWidth(plate.ctx, numeralRowText(row), face)), 0);
+  const longest = widestNumeral(plate, key, plate.view.type.role("legendLine", "desktop").font);
   return Math.max(LEGEND_WIDTH, longest + LEGEND_PAD * 2);
 }
-
 
 /** Where the legend's bottom hangs from: the top of the scale bar's caption, a gap above it. */
 function legendBottom(bar: ScaleBarPlace): number {
@@ -305,15 +328,14 @@ const STRIP_INSET_Y = 12;
 
 /** How wide one side's sample and name run together. */
 function stripSideWidth(plate: Plate, side: string): number {
-  return STRIP_SAMPLE + STRIP_SAMPLE_GAP + textWidth(plate.ctx, side, engravedType.role("legendLine", "phone").font);
+  return STRIP_SAMPLE + STRIP_SAMPLE_GAP + textWidth(plate.ctx, side, plate.view.type.role("legendLine", "phone").font);
 }
 
 /** The strip's own rectangle, which is both the paper it is drawn on and the obstacle a label clears. */
 function stripRect({ plate, frame }: FurniturePlace, key: readonly NumeralRow[]): Rect {
-  const face = engravedType.role("legendLine", "phone").font;
   const sides = [...plate.colours.keys()];
   const sidesWidth = sides.reduce((wide, side) => wide + stripSideWidth(plate, side) + STRIP_SIDE_GAP, -STRIP_SIDE_GAP);
-  const keyWidth = key.reduce((wide, row) => Math.max(wide, textWidth(plate.ctx, numeralRowText(row), face)), 0);
+  const keyWidth = widestNumeral(plate, key, plate.view.type.role("legendLine", "phone").font);
   const width = Math.max(sidesWidth, keyWidth) + STRIP_PAD * 2;
   const height = STRIP_ROW + key.length * STRIP_KEY_ROW;
   return {
@@ -347,22 +369,16 @@ function drawLegend(place: FurniturePlace, legend: LegendPlace): HitRegion[] {
     scale: KEY_SAMPLE_SCALE,
     // Trafalgar is all ships, so it keys no arm and its legend is unchanged.
     arm: legendArm(plate.battle.units),
-    firstSide: colours.values().next().value ?? palette.ink,
+    firstSide: firstSideInk(colours, palette),
   };
   const { x, y, width, height } = legendRect(place, legend);
 
   ctx.save();
-  if (!onPanel) {
-    ctx.fillStyle = palette.panel;
-    ctx.fillRect(x, y, width, height);
-  }
-  ctx.strokeStyle = palette.ink;
-  ctx.lineWidth = 1;
-  ctx.strokeRect(x + 0.5, y + 0.5, width - 1, height - 1);
+  drawKeyGround(ctx, { x, y, width, height }, palette, onPanel);
 
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
-  ctx.font = engravedType.role("legendLine", "desktop").font;
+  ctx.font = view.type.role("legendLine", "desktop").font;
   const textX = x + 12 + KEY_SAMPLE_WIDTH + 10;
   let rowY = y + 8 + KEY_ROW_HEIGHT / 2;
 
@@ -399,17 +415,11 @@ function drawSideStrip(place: FurniturePlace, { key, onPanel }: LegendPlace): Hi
   const panel = stripRect(place, key);
 
   ctx.save();
-  if (!onPanel) {
-    ctx.fillStyle = palette.panel;
-    ctx.fillRect(panel.x, panel.y, panel.width, panel.height);
-  }
-  ctx.strokeStyle = palette.ink;
-  ctx.lineWidth = 1;
-  ctx.strokeRect(panel.x + 0.5, panel.y + 0.5, panel.width - 1, panel.height - 1);
+  drawKeyGround(ctx, panel, palette, onPanel);
 
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
-  ctx.font = engravedType.role("legendLine", "phone").font;
+  ctx.font = view.type.role("legendLine", "phone").font;
 
   // The numeral key first, stacked above the sides: the strip grows upward, so
   // the line of sides stays where it is however many numerals a frame shows.
@@ -426,7 +436,7 @@ function drawSideStrip(place: FurniturePlace, { key, onPanel }: LegendPlace): Hi
     width: STRIP_SAMPLE,
     scale: STRIP_SCALE,
     arm: legendArm(plate.battle.units),
-    firstSide: colours.values().next().value ?? palette.ink,
+    firstSide: firstSideInk(colours, palette),
   };
   let x = panel.x + STRIP_PAD;
   const centreY = panel.y + panel.height - STRIP_ROW / 2;
@@ -439,6 +449,22 @@ function drawSideStrip(place: FurniturePlace, { key, onPanel }: LegendPlace): Hi
   ctx.restore();
   return rows;
 }
+
+/* ------------------------------------------------- what the width chooses */
+
+/**
+ * The two forms each of the two pieces the width thins, and the one place the
+ * choice is made. `layout.ts` decides which; this only says what each is, so
+ * neither `panel` nor `draw` repeats the question (#86).
+ */
+const ROSE: Piece = { panel: rosePanel, draw: drawCompassRose };
+const NEEDLE: Piece = { panel: arrowPanel, draw: drawNorthArrow };
+const compassFor = (place: FurniturePlace): Piece => (furnitureFor(place.plate.mode).compass === "rose" ? ROSE : NEEDLE);
+
+/** A desktop's legend stands on the scale bar's corner panel and lays none of its own; a phone's strip is a panel in its own right. */
+const FULL_LEGEND: LegendHand = { panel: () => undefined, draw: drawLegend };
+const SIDE_STRIP: LegendHand = { panel: (place, legend) => stripRect(place, legend.key), draw: drawSideStrip };
+const keyFor = (place: FurniturePlace): LegendHand => (furnitureFor(place.plate.mode).legend === "full" ? FULL_LEGEND : SIDE_STRIP);
 
 /* ------------------------------------------------------------- scale bar */
 
@@ -467,17 +493,14 @@ export const engravedFurniture: Furniture = {
   },
 
   compass: {
-    panel: (place) => (furnitureFor(place.plate.mode).compass === "rose" ? rosePanel(place) : arrowPanel(place)),
-    draw: (place) => {
-      if (furnitureFor(place.plate.mode).compass === "rose") drawCompassRose(place);
-      else drawNorthArrow(place);
-    },
+    panel: (place) => compassFor(place).panel(place),
+    draw: (place) => compassFor(place).draw(place),
   },
 
   title: {
     /** Paper behind the title, cut to the title's own width. */
     panel({ plate, frame }) {
-      const { font: face, size } = engravedType.role("title", plate.mode);
+      const { font: face, size } = plate.view.type.role("title", plate.mode);
       const width = textWidth(plate.ctx, plate.battle.title, face) + PANEL_PAD * 2;
       const right = frame.x + frame.width - CORNER_PANEL_INSET;
       return { x: right - width, y: titleTop(frame) - PANEL_LEAD, width, height: size + PANEL_LEAD * 2 };
@@ -488,7 +511,7 @@ export const engravedFurniture: Furniture = {
       ctx.fillStyle = view.palette.ink;
       ctx.textAlign = "right";
       ctx.textBaseline = "top";
-      ctx.font = engravedType.role("title", mode).font;
+      ctx.font = view.type.role("title", mode).font;
       ctx.fillText(battle.title, titleRight(frame), titleTop(frame));
       ctx.restore();
     },
@@ -501,7 +524,7 @@ export const engravedFurniture: Furniture = {
       const pixelsPerUnit = METRES_PER_UNIT[unit] * plate.pixelsPerMetre;
       const bar = scaleBarLength({ pixelsPerUnit, maxPixels: Math.max(40, Math.min(180, frame.width / 4)) });
       const y = frame.y + frame.height - (phone ? PHONE_SCALE_INSET_Y : MARGIN);
-      const { font: face, size } = engravedType.role("scaleCaption", plate.mode);
+      const { font: face, size } = plate.view.type.role("scaleCaption", plate.mode);
       const caption = scaleBarCaption({ units: bar.units, unit, contourInterval: contourInterval(plate.contourLevels) });
       return {
         x: frame.x + (phone ? PHONE_SCALE_INSET_X : MARGIN),
@@ -561,7 +584,7 @@ export const engravedFurniture: Furniture = {
         ctx.lineTo(tx, y + 3);
         ctx.stroke();
       }
-      ctx.font = engravedType.role("scaleCaption", mode).font;
+      ctx.font = plate.view.type.role("scaleCaption", mode).font;
       ctx.textAlign = "left";
       ctx.textBaseline = "bottom";
       ctx.fillText(caption, x, y - SCALE_BAR_LABEL_GAP);
@@ -570,13 +593,8 @@ export const engravedFurniture: Furniture = {
   },
 
   legend: {
-    /** A phone's strip lays its own paper; a desktop's legend stands on the scale bar's corner panel. */
-    panel(place, legend) {
-      return furnitureFor(place.plate.mode).legend === "full" ? undefined : stripRect(place, legend.key);
-    },
-    draw(place, legend) {
-      return furnitureFor(place.plate.mode).legend === "full" ? drawLegend(place, legend) : drawSideStrip(place, legend);
-    },
+    panel: (place, legend) => keyFor(place).panel(place, legend),
+    draw: (place, legend) => keyFor(place).draw(place, legend),
   },
 
   credit: {
@@ -584,7 +602,7 @@ export const engravedFurniture: Furniture = {
     panel({ plate, frame }) {
       const credit = plate.map?.attribution;
       if (credit === undefined || credit === "") return undefined;
-      const { font: face, size } = engravedType.role("credit", plate.mode);
+      const { font: face, size } = plate.view.type.role("credit", plate.mode);
       const width = textWidth(plate.ctx, credit, face) + PANEL_PAD;
       const right = frame.x + frame.width - CORNER_PANEL_INSET;
       const baseline = creditBaseline(frame);
@@ -597,7 +615,7 @@ export const engravedFurniture: Furniture = {
       if (credit === undefined || credit === "") return;
       ctx.save();
       ctx.fillStyle = view.palette.ink;
-      ctx.font = engravedType.role("credit", mode).font;
+      ctx.font = view.type.role("credit", mode).font;
       ctx.textAlign = "right";
       ctx.textBaseline = "bottom";
       ctx.fillText(credit, creditRight(frame), creditBaseline(frame));

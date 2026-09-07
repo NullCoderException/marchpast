@@ -206,6 +206,7 @@ describe.each(named)("%s keeps the anatomy", (_name, view) => {
       width: CANVAS.width,
       mode: "desktop",
       palette: view.palette,
+      type: view.type,
     });
     const top = CANVAS.height - band.height;
     band.draw(top);

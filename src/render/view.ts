@@ -295,9 +295,14 @@ export interface Naming extends Setting {
 /**
  * How a view draws the ground: everything in map space, through the
  * projection, under the units. The shared half keeps the order — the sea,
- * the land, the relief treatment, the water, whatever is ruled over all of it,
- * and the named things last — and the clipping to the extent; every mark
- * inside that order is the view's (ADR-0021, #138).
+ * the land, the relief treatment, the water, and the named things last — and
+ * the clipping to the extent; every mark inside that order is the view's
+ * (ADR-0021, #138).
+ *
+ * A staff map's kilometre graticule is ground too (#138), and it gets no slot
+ * here: it runs over the whole of a ground its own hand draws, so that hand
+ * lays it down, and a slot is cut for a view that exists rather than one that
+ * might (ADR-0021).
  */
 export interface Ground {
   /** The sea inside the extent: the plate's mottled paper, Atlas's flat paper. */
@@ -308,8 +313,6 @@ export interface Ground {
   relief(request: GroundRequest): void;
   /** The water on the land: the shoals and the rivers. */
   water(request: GroundRequest): void;
-  /** Anything ruled over the whole ground — a staff map's graticule. Omitted by a view that rules none. */
-  graticule?(request: GroundRequest): void;
   /** The mark a named point stands on, drawn at the origin: a place's dot, a work's plan sign. */
   mark(ctx: CanvasRenderingContext2D, kind: MapLabelKind, palette: Palette): void;
   /** How this view sets a named point's name. The placer measures with it and the pass draws with it, so the two cannot disagree. */
@@ -396,6 +399,8 @@ export interface CaptionRequest {
   width: number;
   mode: LayoutMode;
   palette: Palette;
+  /** The view's own type: the clock and the caption are two of the eight roles. */
+  type: Type;
 }
 
 /**

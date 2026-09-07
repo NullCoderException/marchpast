@@ -21,8 +21,8 @@ import type { Battle } from "../../../schema/types.ts";
 import type { Picture } from "../../../timeline/picture.ts";
 import type { LayoutMode } from "../../layout.ts";
 import { formatClock, wrapText } from "../../text.ts";
-import type { CaptionHand, CaptionRequest, MeasuredCaption, Palette } from "../../view.ts";
-import { engravedType, font } from "./type.ts";
+import type { CaptionHand, CaptionRequest, MeasuredCaption, Palette, Type } from "../../view.ts";
+import { font } from "./type.ts";
 
 const PAD_X = 24;
 const PAD_Y = 14;
@@ -85,7 +85,7 @@ function dateOf(battle: Battle, picture: Picture): string {
 }
 
 /** Measures the band for a canvas `width`: wraps the caption so the height is known before the projection is fitted. */
-export function layoutCaption(ctx: CanvasRenderingContext2D, battle: Battle, picture: Picture, width: number, mode: LayoutMode): CaptionLayout {
+export function layoutCaption(ctx: CanvasRenderingContext2D, battle: Battle, picture: Picture, width: number, mode: LayoutMode, type: Type): CaptionLayout {
   const phone = mode === "phone";
   const padX = phone ? PHONE_PAD_X : PAD_X;
   ctx.save();
@@ -95,7 +95,7 @@ export function layoutCaption(ctx: CanvasRenderingContext2D, battle: Battle, pic
   ctx.font = font(phone ? PHONE_LABEL_SIZE : LABEL_SIZE);
   const labelLines = wrapText(picture.label.toUpperCase(), textWidth, measure);
 
-  ctx.font = engravedType.role("caption", mode).font;
+  ctx.font = type.role("caption", mode).font;
   const lines = wrapText(picture.caption, textWidth, measure);
 
   // The title rides the date line on a phone, and stays on the plate on a
@@ -137,6 +137,7 @@ export function drawCaption(
   width: number,
   palette: Palette,
   mode: LayoutMode,
+  type: Type,
 ): void {
   ctx.save();
   ctx.fillStyle = palette.paper;
@@ -154,8 +155,8 @@ export function drawCaption(
   ctx.textBaseline = "top";
   ctx.textAlign = "left";
 
-  if (mode === "phone") drawPhoneBand(ctx, picture, layout, top);
-  else drawDesktopBand(ctx, picture, layout, top);
+  if (mode === "phone") drawPhoneBand(ctx, picture, layout, top, type);
+  else drawDesktopBand(ctx, picture, layout, top, type);
   ctx.restore();
 }
 
@@ -164,8 +165,8 @@ export function drawCaption(
  * phase's day, so it advances with a battle that crosses midnight (ADR-0013).
  * Right, the phase label, the caption, the sources.
  */
-function drawDesktopBand(ctx: CanvasRenderingContext2D, picture: Picture, layout: CaptionLayout, top: number): void {
-  ctx.font = engravedType.role("clock", "desktop").font;
+function drawDesktopBand(ctx: CanvasRenderingContext2D, picture: Picture, layout: CaptionLayout, top: number, type: Type): void {
+  ctx.font = type.role("clock", "desktop").font;
   ctx.fillText(formatClock(picture.clock), PAD_X, top + PAD_Y + 2);
   ctx.font = font(DATE_SIZE, true);
   ctx.fillText(layout.dateLines[0] ?? "", PAD_X, top + PAD_Y + 36);
@@ -177,7 +178,7 @@ function drawDesktopBand(ctx: CanvasRenderingContext2D, picture: Picture, layout
     ctx.fillText(line, x, y);
     y += LABEL_LINE;
   }
-  ctx.font = engravedType.role("caption", "desktop").font;
+  ctx.font = type.role("caption", "desktop").font;
   for (const line of layout.lines) {
     ctx.fillText(line, x, y);
     y += CAPTION_LINE;
@@ -196,8 +197,8 @@ function drawDesktopBand(ctx: CanvasRenderingContext2D, picture: Picture, layout
  * dropped: a phone reads the same band a desktop does, set down the page
  * instead of across it.
  */
-function drawPhoneBand(ctx: CanvasRenderingContext2D, picture: Picture, layout: CaptionLayout, top: number): void {
-  ctx.font = engravedType.role("clock", "phone").font;
+function drawPhoneBand(ctx: CanvasRenderingContext2D, picture: Picture, layout: CaptionLayout, top: number, type: Type): void {
+  ctx.font = type.role("clock", "phone").font;
   ctx.fillText(formatClock(picture.clock), PHONE_PAD_X, top + PHONE_PAD_Y);
 
   ctx.font = font(PHONE_DATE_SIZE, true);
@@ -213,7 +214,7 @@ function drawPhoneBand(ctx: CanvasRenderingContext2D, picture: Picture, layout: 
     ctx.fillText(line, PHONE_PAD_X, y);
     y += PHONE_LABEL_LINE;
   }
-  ctx.font = engravedType.role("caption", "phone").font;
+  ctx.font = type.role("caption", "phone").font;
   for (const line of layout.lines) {
     ctx.fillText(line, PHONE_PAD_X, y);
     y += PHONE_CAPTION_LINE;
@@ -227,11 +228,11 @@ function drawPhoneBand(ctx: CanvasRenderingContext2D, picture: Picture, layout: 
 }
 
 export const engravedCaption: CaptionHand = {
-  measure({ ctx, battle, picture, width, mode, palette }: CaptionRequest): MeasuredCaption {
-    const layout = layoutCaption(ctx, battle, picture, width, mode);
+  measure({ ctx, battle, picture, width, mode, palette, type }: CaptionRequest): MeasuredCaption {
+    const layout = layoutCaption(ctx, battle, picture, width, mode, type);
     return {
       height: layout.height,
-      draw: (top) => drawCaption(ctx, picture, layout, top, width, palette, mode),
+      draw: (top) => drawCaption(ctx, picture, layout, top, width, palette, mode, type),
     };
   },
 };

@@ -111,4 +111,3 @@ export const DEFAULT_VIEW: View = CHART_PLATE;
 export function viewById(id: string | null | undefined): View {
   return VIEWS.find((view) => view.id === id) ?? DEFAULT_VIEW;
 }
-

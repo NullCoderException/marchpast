@@ -47,8 +47,12 @@ export function createGroundBuffer(): GroundBuffer {
     paint(plate, size, dpr) {
       const sheet = (canvas ??= document.createElement("canvas"));
       const wanted = keyOf(plate, size, dpr);
-      const deviceWidth = Math.max(1, Math.round(size.width * dpr));
-      const deviceHeight = Math.max(1, Math.round(size.plateHeight * dpr));
+      // Rounded **up**, not to nearest: at a fractional ratio a rounded-down
+      // sheet leaves the plate's last device row uncovered, and the seam under
+      // the caption band would show the page's paper where the letterbox
+      // belongs. A surplus row is painted over by the band a moment later.
+      const deviceWidth = Math.max(1, Math.ceil(size.width * dpr));
+      const deviceHeight = Math.max(1, Math.ceil(size.plateHeight * dpr));
       const stale =
         key !== wanted ||
         drawn?.battle !== plate.battle ||

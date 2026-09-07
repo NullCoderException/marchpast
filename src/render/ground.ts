@@ -4,8 +4,8 @@
  * named things' names go. Every mark is the view's `ground` hand.
  *
  * The order is the anatomy's — **the sea, the land, the relief treatment, the
- * water, anything ruled over all of it, and the named things last** — and it
- * is the whole of what stays shared once every view supplies its own ground.
+ * water, and the named things last** — and it is the whole of what stays
+ * shared once every view supplies its own ground.
  * #138 found that out by drawing four: the night plate lights its contours,
  * Atlas ramps its bands, and a staff map sets its heights into the line, so
  * there is no shared hand left, only this frame.
@@ -67,7 +67,6 @@ export function paintGround(ctx: CanvasRenderingContext2D, plate: Plate, size: P
   ground.land(request);
   ground.relief(request);
   ground.water(request);
-  ground.graticule?.(request);
   ctx.restore();
 }
 
@@ -161,7 +160,6 @@ export function mapPoints({ ctx, map, projection, view }: Plate): MapPoint[] {
   ctx.restore();
   return points;
 }
-
 
 /** The named points of one kind, projected onto the plate. */
 function namedPoints(map: MapFile, projection: Projection, kind: MapLabelKind): { at: Point }[] {

@@ -94,8 +94,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
       // Every box the placer judges is measured in the view's own face, so the
       // measurer is built per frame rather than per renderer (ADR-0021).
       const measure = canvasMeasure(ctx, view.type);
-      const dpr = window.devicePixelRatio || 1;
-      const { width, height } = fitBackingStore(canvas, ctx);
+      const { width, height, dpr } = fitBackingStore(canvas, ctx);
       // One global rule about width, read once and handed to every pass that
       // answers to it: the furniture set, the band's anatomy, and the step the
       // labels start collapsing from (#86).
@@ -109,7 +108,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
       // band is one of the view's own hands — measured and inked together,
       // because a view lays it out however it likes and the shared half knows
       // only that it runs the whole width below the plate (ADR-0021).
-      const caption = view.furniture.caption.measure({ ctx, battle, picture, width, mode, palette });
+      const caption = view.furniture.caption.measure({ ctx, battle, picture, width, mode, palette, type: view.type });
       const plateHeight = Math.max(1, height - caption.height);
 
       const plateArea: Rect = {
@@ -262,8 +261,12 @@ function hitRegions(placed: readonly Placed[], rows: readonly HitRegion[]): HitR
   return [...glyphs, ...rows, ...labels, ...cards];
 }
 
-/** Sizes the backing store to the canvas's CSS size at the current devicePixelRatio. Returns the CSS size. */
-export function fitBackingStore(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): { width: number; height: number } {
+/**
+ * Sizes the backing store to the canvas's CSS size at the current
+ * devicePixelRatio. Answers the CSS size and the ratio it was fitted at, so
+ * nothing downstream reads `window` again and finds a different one.
+ */
+export function fitBackingStore(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): { width: number; height: number; dpr: number } {
   const dpr = window.devicePixelRatio || 1;
   const width = canvas.clientWidth || canvas.width;
   const height = canvas.clientHeight || canvas.height;
@@ -274,5 +277,5 @@ export function fitBackingStore(canvas: HTMLCanvasElement, ctx: CanvasRenderingC
     canvas.height = storeHeight;
   }
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  return { width, height };
+  return { width, height, dpr };
 }

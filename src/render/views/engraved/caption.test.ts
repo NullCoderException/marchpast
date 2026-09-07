@@ -6,6 +6,9 @@ import { pictureAt } from "../../../timeline/pictureAt.ts";
 import { NIGHT_BATTLE, clock } from "../../../timeline/testBattle.ts";
 import { DEFAULT_VIEW } from "../../views.ts";
 
+/** The default view's ramp, which is the engraved one these tests read. */
+const TYPE = DEFAULT_VIEW.type;
+
 /** A measuring context: every glyph six pixels wide, which is all the layout needs. */
 function fakeContext(): CanvasRenderingContext2D {
   return {
@@ -58,7 +61,7 @@ const picture = {
 
 describe("the caption band's sources", () => {
   it("wraps the sources to the text column instead of running past it", () => {
-    const layout = layoutCaption(fakeContext(), battle, picture, 390, "desktop");
+    const layout = layoutCaption(fakeContext(), battle, picture, 390, "desktop", TYPE);
     const widest = Math.max(...layout.sourceLines.map((line) => line.length * 6));
 
     expect(layout.sourceLines.length).toBeGreaterThan(1);
@@ -66,16 +69,16 @@ describe("the caption band's sources", () => {
   });
 
   it("counts every source line in the band's height, so the plate above it shrinks to fit", () => {
-    const narrow = layoutCaption(fakeContext(), battle, picture, 390, "desktop");
-    const wide = layoutCaption(fakeContext(), battle, picture, 1280, "desktop");
+    const narrow = layoutCaption(fakeContext(), battle, picture, 390, "desktop", TYPE);
+    const wide = layoutCaption(fakeContext(), battle, picture, 1280, "desktop", TYPE);
 
     expect(narrow.sourceLines.length).toBeGreaterThan(wide.sourceLines.length);
     expect(narrow.height).toBeGreaterThan(wide.height);
   });
 
   it("keeps one line when the sources fit, and none when the phase cites nothing", () => {
-    const wide = layoutCaption(fakeContext(), battle, picture, 1280, "desktop");
-    const unsourced = layoutCaption(fakeContext(), battle, { ...picture, references: [] } as unknown as Picture, 1280, "desktop");
+    const wide = layoutCaption(fakeContext(), battle, picture, 1280, "desktop", TYPE);
+    const unsourced = layoutCaption(fakeContext(), battle, { ...picture, references: [] } as unknown as Picture, 1280, "desktop", TYPE);
 
     expect(wide.sourceLines).toHaveLength(1);
     expect(wide.sourceLines[0]).toBe("— Collingwood's dispatch, Southey, Mahan, Britannica 1911 (Hannay)");
@@ -85,7 +88,7 @@ describe("the caption band's sources", () => {
 
 describe("the caption band's phase label", () => {
   it("wraps the label to the text column instead of running past it", () => {
-    const layout = layoutCaption(fakeContext(), battle, picture, 390, "desktop");
+    const layout = layoutCaption(fakeContext(), battle, picture, 390, "desktop", TYPE);
     const widest = Math.max(...layout.labelLines.map((line) => line.length * 6));
 
     expect(layout.labelLines.length).toBeGreaterThan(1);
@@ -93,7 +96,7 @@ describe("the caption band's phase label", () => {
   });
 
   it("keeps a short label on one line, upper case", () => {
-    const layout = layoutCaption(fakeContext(), battle, picture, 1280, "desktop");
+    const layout = layoutCaption(fakeContext(), battle, picture, 1280, "desktop", TYPE);
 
     expect(layout.labelLines).toEqual(["DAWN: THE FLEETS SIGHT EACH OTHER"]);
   });
@@ -105,18 +108,18 @@ describe("the caption band's date", () => {
     const daybreak = { ...picture, phase: { day: 1 }, clock: 0 } as unknown as Picture;
 
     const first = recordingContext();
-    drawCaption(first.ctx, { ...picture, clock: 0 } as unknown as Picture, layoutCaption(fakeContext(), twoDays, picture, 1280, "desktop"), 0, 1280, DEFAULT_VIEW.palette, "desktop");
+    drawCaption(first.ctx, { ...picture, clock: 0 } as unknown as Picture, layoutCaption(fakeContext(), twoDays, picture, 1280, "desktop", TYPE), 0, 1280, DEFAULT_VIEW.palette, "desktop", TYPE);
     expect(first.texts).toContain("1 August 1798");
 
     const second = recordingContext();
-    drawCaption(second.ctx, daybreak, layoutCaption(fakeContext(), twoDays, daybreak, 1280, "desktop"), 0, 1280, DEFAULT_VIEW.palette, "desktop");
+    drawCaption(second.ctx, daybreak, layoutCaption(fakeContext(), twoDays, daybreak, 1280, "desktop", TYPE), 0, 1280, DEFAULT_VIEW.palette, "desktop", TYPE);
     expect(second.texts).toContain("2 August 1798");
   });
 
   it("draws the first day's date for a phase with no day, the single-day case", () => {
     const noDay = { ...picture, phase: {}, clock: 0 } as unknown as Picture;
     const { ctx, texts } = recordingContext();
-    drawCaption(ctx, noDay, layoutCaption(fakeContext(), battle, noDay, 1280, "desktop"), 0, 1280, DEFAULT_VIEW.palette, "desktop");
+    drawCaption(ctx, noDay, layoutCaption(fakeContext(), battle, noDay, 1280, "desktop", TYPE), 0, 1280, DEFAULT_VIEW.palette, "desktop", TYPE);
     expect(texts).toContain("21 October 1805");
   });
 });
@@ -125,9 +128,9 @@ describe("the caption band on a battle that crosses midnight", () => {
   /** Draws the band for the real picture at `at`, and gives back every string it drew. */
   function draw(at: number): string[] {
     const picture = pictureAt(NIGHT_BATTLE, at);
-    const layout = layoutCaption(fakeContext(), NIGHT_BATTLE, picture, 1280, "desktop");
+    const layout = layoutCaption(fakeContext(), NIGHT_BATTLE, picture, 1280, "desktop", TYPE);
     const { ctx, texts } = recordingContext();
-    drawCaption(ctx, picture, layout, 0, 1280, DEFAULT_VIEW.palette, "desktop");
+    drawCaption(ctx, picture, layout, 0, 1280, DEFAULT_VIEW.palette, "desktop", TYPE);
     return texts;
   }
 
@@ -148,9 +151,9 @@ describe("the caption band on a phone", () => {
   /** The band as it is laid out and drawn at 390px, and every string it drew. */
   function phone(over: Partial<Battle> = {}): { texts: string[]; height: number } {
     const narrow = { ...battle, ...over } as unknown as Battle;
-    const layout = layoutCaption(fakeContext(), narrow, picture, 390, "phone");
+    const layout = layoutCaption(fakeContext(), narrow, picture, 390, "phone", TYPE);
     const { ctx, texts } = recordingContext();
-    drawCaption(ctx, picture, layout, 0, 390, DEFAULT_VIEW.palette, "phone");
+    drawCaption(ctx, picture, layout, 0, 390, DEFAULT_VIEW.palette, "phone", TYPE);
     return { texts, height: layout.height };
   }
 
@@ -160,8 +163,8 @@ describe("the caption band on a phone", () => {
 
   it("leaves the date alone on a desktop, where the title is still on the plate", () => {
     const { ctx, texts } = recordingContext();
-    const layout = layoutCaption(fakeContext(), battle, picture, 1280, "desktop");
-    drawCaption(ctx, picture, layout, 0, 1280, DEFAULT_VIEW.palette, "desktop");
+    const layout = layoutCaption(fakeContext(), battle, picture, 1280, "desktop", TYPE);
+    drawCaption(ctx, picture, layout, 0, 1280, DEFAULT_VIEW.palette, "desktop", TYPE);
     expect(texts).toContain("21 October 1805");
     expect(texts).not.toContain("21 October 1805 · The Battle of Trafalgar");
   });
@@ -175,8 +178,8 @@ describe("the caption band on a phone", () => {
   it("runs the caption the whole width instead of a column beside the clock", () => {
     // The desktop band keeps a 150px clock column; the phone band puts the
     // clock on its own line and gives the prose all of the width but the pads.
-    const desktop = layoutCaption(fakeContext(), battle, picture, 390, "desktop");
-    const narrow = layoutCaption(fakeContext(), battle, picture, 390, "phone");
+    const desktop = layoutCaption(fakeContext(), battle, picture, 390, "desktop", TYPE);
+    const narrow = layoutCaption(fakeContext(), battle, picture, 390, "phone", TYPE);
     expect(narrow.lines.length).toBeLessThan(desktop.lines.length);
     const widest = Math.max(...narrow.lines.map((line) => line.length * 6));
     expect(widest).toBeLessThanOrEqual(390 - 14 * 2);
