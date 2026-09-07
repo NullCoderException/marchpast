@@ -8,8 +8,10 @@
  * error on the plate, and in the console.
  *
  * `?fixture=<name>` plays a renderer fixture from `app/fixtures.ts` instead:
- * no fetch, no map, no library and no Picker. It is a way to look at a slice
- * before its battle file exists, and nothing else uses it.
+ * no fetch, no library and no Picker. It is a way to look at a slice before
+ * its battle file exists, and nothing else uses it. `&map=<name>` draws a map
+ * fixture from `app/mapFixtures.ts` under it, for the same reason; without it
+ * a fixture plays over bare parchment.
  *
  * The layout is the plate above and the controls beneath, set in `index.html`;
  * this file only fills the two slots, and takes them both down again when the
@@ -21,6 +23,7 @@ import { createLibraryLink, createLibraryPage } from "./app/libraryPage.ts";
 import { formatLoadErrors, type LoadError } from "./app/load.ts";
 import { loadBattle, type LoadResult } from "./app/loadBattle.ts";
 import { loadLibrary, type LibraryResult } from "./app/loadLibrary.ts";
+import { mapFixtureNameFrom, MAP_FIXTURES } from "./app/mapFixtures.ts";
 import { showNotice } from "./app/notice.ts";
 import { loadPlateFont } from "./fonts/plate.ts";
 import { createPlayer } from "./player/index.ts";
@@ -41,7 +44,7 @@ async function start(): Promise<void> {
   const fixture = fixtureNameFrom(window.location.search);
   if (fixture !== undefined) {
     await loadFace();
-    playFixture(page, fixture);
+    playFixture(page, fixture, mapFixtureNameFrom(window.location.search));
     return;
   }
 
@@ -108,10 +111,11 @@ async function playBattle(page: Page, name: string, loading: Promise<LoadResult>
 }
 
 /**
- * A renderer fixture straight from code. It carries no Picker: a fixture is not
- * in the library, so there is nothing for the chooser to put it among.
+ * A renderer fixture straight from code, over a map fixture when the URL names
+ * one. It carries no Picker: a fixture is not in the library, so there is
+ * nothing for the chooser to put it among.
  */
-function playFixture(page: Page, name: string): void {
+function playFixture(page: Page, name: string, mapName: string | undefined): void {
   const battle = FIXTURES[name];
   if (battle === undefined) {
     console.error(`Sandtable has no fixture "${name}"`);
@@ -119,8 +123,18 @@ function playFixture(page: Page, name: string): void {
     page.controlsRoot.append(createLibraryLink());
     return;
   }
+  const map = mapName === undefined ? undefined : MAP_FIXTURES[mapName];
+  if (mapName !== undefined && map === undefined) {
+    console.error(`Sandtable has no map fixture "${mapName}"`);
+    showNotice(page.canvas, {
+      heading: `No map fixture “${mapName}”`,
+      lines: [`The map fixtures there are: ${Object.keys(MAP_FIXTURES).join(", ")}.`],
+    });
+    page.controlsRoot.append(createLibraryLink());
+    return;
+  }
   document.title = `${battle.title} — Sandtable`;
-  createPlayer({ canvas: page.canvas, controlsRoot: page.controlsRoot, battle, map: undefined });
+  createPlayer({ canvas: page.canvas, controlsRoot: page.controlsRoot, battle, map });
 }
 
 /** The plate face. It is bundled, so this is quick; if it fails all the same, the fallback serif in every font string is better than a blank page. */

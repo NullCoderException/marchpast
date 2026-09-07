@@ -309,10 +309,12 @@ function drawPlaces({ ctx, projection }: Plate, map: MapFile): void {
 function drawWorks(plate: Plate, map: MapFile): void {
   const { ctx, projection } = plate;
   const { palette } = plate.view;
+  const works = map.features.filter((feature) => feature.properties.kind === "work");
+  if (works.length === 0) return;
+
   ctx.font = font(WORK_LABEL_SIZE);
   ctx.letterSpacing = WORK_LABEL_TRACKING;
-  for (const feature of map.features) {
-    const { geometry, properties } = feature;
+  for (const { geometry, properties } of works) {
     if (properties.kind !== "work" || geometry.type !== "Point") continue;
     const [lon, lat] = geometry.coordinates;
     const { x, y } = projection.project(lat, lon);
