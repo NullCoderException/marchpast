@@ -99,7 +99,11 @@ export function numeralsSvg(v, r, opts = {}) {
     }
     if (!best) continue;
     const face = opts.numeralFace ?? `font-style="italic"`;
-    s += `<text x="${f1(best.p[0])}" y="${f1(best.p[1])}" font-size="${opts.numeralSize ?? 10}" ${face} fill="${opts.numeralInk ?? v.ink}" fill-opacity="${r.numA}" stroke="${opts.knockout ?? v.paper}" stroke-width="3" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">${L}</text>`;
+    // The knockout has to be the colour of the ground the numeral stands on, not the paper. On a plate
+    // that is the same thing; under a hypsometric ramp it is not, and a paper knockout leaves a pale
+    // box on a tinted band. So a view that tints its ground says what to knock out to, per level.
+    const knock = opts.knockoutFor ? opts.knockoutFor(L) : (opts.knockout ?? v.paper);
+    s += `<text x="${f1(best.p[0])}" y="${f1(best.p[1])}" font-size="${opts.numeralSize ?? 10}" ${face} fill="${opts.numeralInk ?? v.ink}" fill-opacity="${r.numA}" stroke="${knock}" stroke-width="3" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">${L}</text>`;
   }
   return s;
 }
@@ -203,7 +207,14 @@ export function hypsoSvg(v, r, ramp) {
   bands.forEach((L, i) => {
     s += `<path d="${levelPath(L)}" fill="${ramp[i]}" stroke="none"/>`;
   });
-  return s + contoursSvg(v, { ...r, indexW: r.indexW * 0.7, indexA: r.indexA * 0.7 }, { indexOnly: true, stroke: r.hypsoLine ?? v.ink });
+  // The numeral knocks out to the band it stands in — the highest band at or below its own level —
+  // so the figures sit in the ground rather than in pale boxes cut out of it.
+  const knockoutFor = (L) => {
+    let colour = v.land;
+    bands.forEach((b, i) => { if (b <= L) colour = ramp[i]; });
+    return colour;
+  };
+  return s + contoursSvg(v, { ...r, indexW: r.indexW * 0.7, indexA: r.indexA * 0.7 }, { indexOnly: true, stroke: r.hypsoLine ?? v.ink, knockoutFor });
 }
 
 // ---------------------------------------------------------------------------------------------------
