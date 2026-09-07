@@ -243,7 +243,7 @@ export type AreaGeometry =
   | { type: "Polygon"; coordinates: LonLat[][] }
   | { type: "MultiPolygon"; coordinates: LonLat[][][] };
 
-/** The geometry of a kind drawn as a line: a river and a contour. */
+/** The geometry of a kind drawn as a line: a river, a contour and a rampart. */
 export type LineGeometry =
   | { type: "LineString"; coordinates: LonLat[] }
   | { type: "MultiLineString"; coordinates: LonLat[][] };
@@ -254,7 +254,7 @@ export type PointGeometry = { type: "Point"; coordinates: LonLat };
 /** The map file, `data/maps/<name>.geojson`: a GeoJSON FeatureCollection with two foreign members and nothing else. */
 export interface MapFile {
   type: "FeatureCollection";
-  /** Only the six feature kinds. */
+  /** Only the seven feature kinds. */
   features: MapFeature[];
   /** The map file's own licence, share-alike allowed: a map is an independent database the battle only points at. */
   license: LicenseId;
@@ -263,11 +263,18 @@ export interface MapFile {
 }
 
 /**
- * The six feature kinds (schema.md 3.2). A feature's `properties` carry only
- * the keys listed for its kind: natural features carry no name, a contour
- * carries its level, named things carry a name.
+ * The seven feature kinds (schema.md 3.2). A feature's `properties` carry only
+ * the keys listed for its kind: natural features and a rampart carry no name,
+ * a contour carries its level, named things carry a name.
  */
-export type MapFeature = LandFeature | RiverFeature | ShoalFeature | ContourFeature | PlaceFeature | WorkFeature;
+export type MapFeature =
+  | LandFeature
+  | RiverFeature
+  | ShoalFeature
+  | ContourFeature
+  | PlaceFeature
+  | WorkFeature
+  | RampartFeature;
 
 /** Land. Everything not covered by a land polygon is sea. An island, artificial or not, is `land`. */
 export interface LandFeature {
@@ -331,4 +338,21 @@ export interface WorkFeature {
   type: "Feature";
   properties: { kind: "work"; name: string };
   geometry: PointGeometry;
+}
+
+/**
+ * A built line on the ground, drawn with its ditch and the teeth on the side
+ * it faces: Alesia's contravallation and circumvallation, a trench line, a
+ * wall, a berm. The kind names the drawn line, not what it was made of, and
+ * the caption says which. Nameless like a river — one a caption must name gets
+ * a `place` on it — and no width.
+ *
+ * **The direction the line is drawn in is the side it faces**: the teeth fall
+ * on the right of its direction of travel. Winding is meaning for this kind
+ * and for no other, and nothing checks it (schema.md 3.3, ADR-0026).
+ */
+export interface RampartFeature {
+  type: "Feature";
+  properties: { kind: "rampart" };
+  geometry: LineGeometry;
 }

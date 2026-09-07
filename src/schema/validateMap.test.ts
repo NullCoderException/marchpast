@@ -2,13 +2,14 @@ import { describe, expect, it } from "vitest";
 import { MINIMAL_MAP } from "./examples.ts";
 import { validateMap } from "./validateMap.ts";
 
-/** The six features of `MINIMAL_MAP` by index, one of each kind (schema.md 3.4). */
+/** The seven features of `MINIMAL_MAP` by index, one of each kind (schema.md 3.4). */
 const LAND = 0;
 const RIVER = 1;
 const SHOAL = 2;
 const CONTOUR = 3;
 const PLACE = 4;
 const WORK = 5;
+const RAMPART = 6;
 
 function validateBroken(mutate: (map: any) => void) {
   const map = structuredClone(MINIMAL_MAP) as any;
@@ -77,16 +78,16 @@ describe("validateMap: rules (schema.md 3.3)", () => {
     expect(errorPaths(validateBroken((m) => (m.attribution = 1)))).toEqual(["/attribution"]);
   });
 
-  it("3. every feature is a Feature with a non-null geometry and one of the six kinds", () => {
+  it("3. every feature is a Feature with a non-null geometry and one of the seven kinds", () => {
     expect(errorPaths(validateBroken((m) => (m.features[LAND].type = "feature")))).toEqual(["/features/0/type"]);
     expect(errorPaths(validateBroken((m) => (m.features[PLACE].geometry = null)))).toEqual(["/features/4/geometry"]);
     expect(errorPaths(validateBroken((m) => delete m.features[RIVER].geometry))).toEqual(["/features/1/geometry"]);
     expect(errorPaths(validateBroken((m) => delete m.features[LAND].properties))).toEqual(["/features/0/properties"]);
     expect(errorPaths(validateBroken((m) => (m.features[LAND].properties = null)))).toEqual(["/features/0/properties"]);
     expect(errorPaths(validateBroken((m) => m.features.push(m.features[PLACE].geometry)))).toEqual(
-      expect.arrayContaining(["/features/6/type", "/features/6/properties"]),
+      expect.arrayContaining(["/features/7/type", "/features/7/properties"]),
     );
-    expect(errorPaths(validateBroken((m) => m.features.push("land")))).toEqual(["/features/6"]);
+    expect(errorPaths(validateBroken((m) => m.features.push("land")))).toEqual(["/features/7"]);
   });
 
   it('3. an unknown kind is rejected: "road" arrives additively when a battle needs one', () => {
@@ -101,7 +102,7 @@ describe("validateMap: rules (schema.md 3.3)", () => {
     ]);
   });
 
-  it("4. land and shoal are areas; river and contour are lines; place and work are points", () => {
+  it("4. land and shoal are areas; river, contour and rampart are lines; place and work are points", () => {
     expect(
       validateBroken((m) => {
         m.features[RIVER].geometry = {
@@ -131,6 +132,23 @@ describe("validateMap: rules (schema.md 3.3)", () => {
         m.features[CONTOUR].geometry = { type: "LineString", coordinates: [[16.14, 41.29], [16.16, 41.3]] };
       }).ok,
     ).toBe(true);
+    // A rampart is a line like a river. The example ships the disjoint runs
+    // one actually comes in; a single unbroken stretch is just as legal. Both
+    // are asserted here rather than left to the example, so an edit to the
+    // fixture cannot quietly take half of this rule's coverage with it.
+    expect(
+      validateBroken((m) => {
+        m.features[RAMPART].geometry = {
+          type: "MultiLineString",
+          coordinates: [[[16.1, 41.33], [16.13, 41.34]], [[16.16, 41.34], [16.18, 41.33]]],
+        };
+      }).ok,
+    ).toBe(true);
+    expect(
+      validateBroken((m) => {
+        m.features[RAMPART].geometry = { type: "LineString", coordinates: [[16.1, 41.33], [16.13, 41.34]] };
+      }).ok,
+    ).toBe(true);
 
     expect(errorPaths(validateBroken((m) => (m.features[LAND].geometry.type = "LineString")))).toEqual([
       "/features/0/geometry/type",
@@ -152,6 +170,12 @@ describe("validateMap: rules (schema.md 3.3)", () => {
     ]);
     expect(errorPaths(validateBroken((m) => (m.features[PLACE].geometry.type = "GeometryCollection")))).toEqual([
       "/features/4/geometry/type",
+    ]);
+    expect(errorPaths(validateBroken((m) => (m.features[RAMPART].geometry = m.features[LAND].geometry)))).toEqual([
+      "/features/6/geometry/type",
+    ]);
+    expect(errorPaths(validateBroken((m) => (m.features[RAMPART].geometry = m.features[WORK].geometry)))).toEqual([
+      "/features/6/geometry/type",
     ]);
   });
 
@@ -200,7 +224,7 @@ describe("validateMap: rules (schema.md 3.3)", () => {
       "/features/0/geometry/coordinates/0/1",
     ]);
     expect(errorPaths(validateBroken((m) => (ring(m)[2] = [16.3])))).toEqual(["/features/0/geometry/coordinates/0/2"]);
-    expect(errorPaths(validateBroken((m) => (ring(m)[2] = [181, 41.38])))).toEqual([
+    expect(errorPaths(validateBroken((m) => (ring(m)[2] = [-181, 41.38])))).toEqual([
       "/features/0/geometry/coordinates/0/2/0",
     ]);
     expect(errorPaths(validateBroken((m) => (ring(m)[2] = [16.3, -91])))).toEqual([
@@ -221,6 +245,20 @@ describe("validateMap: rules (schema.md 3.3)", () => {
     ]);
     expect(errorPaths(validateBroken((m) => (m.features[LAND].geometry.coordinates = "ring")))).toEqual([
       "/features/0/geometry/coordinates",
+    ]);
+  });
+
+  it("6. longitude runs to 360, so a map for a battle across the antimeridian is written in its frame", () => {
+    // Midway's atoll is 182.63 in the frame its battle fixes, not -177.37; the
+    // map validator sees a file and never a pairing, so nothing narrows it further.
+    expect(validateBroken((m) => (m.features[PLACE].geometry.coordinates = [182.63, 28.2])).ok).toBe(true);
+    expect(validateBroken((m) => (m.features[WORK].geometry.coordinates = [360, 28.2])).ok).toBe(true);
+    expect(validateBroken((m) => (m.features[WORK].geometry.coordinates = [-180, 28.2])).ok).toBe(true);
+    expect(errorPaths(validateBroken((m) => (m.features[PLACE].geometry.coordinates = [361, 28.2])))).toEqual([
+      "/features/4/geometry/coordinates/0",
+    ]);
+    expect(errorPaths(validateBroken((m) => (m.features[PLACE].geometry.coordinates = [-180.5, 28.2])))).toEqual([
+      "/features/4/geometry/coordinates/0",
     ]);
   });
 
@@ -249,6 +287,14 @@ describe("validateMap: rules (schema.md 3.3)", () => {
     ]);
     expect(errorPaths(validateBroken((m) => (m.features[RIVER].properties.conjectural = true)))).toEqual([
       "/features/1/properties/conjectural",
+    ]);
+    // A rampart carries `kind` and nothing else: one a caption must name gets a
+    // `place` on it, exactly as the Aufidus does (ADR-0026).
+    expect(errorPaths(validateBroken((m) => (m.features[RAMPART].properties.name = "Contravallation")))).toEqual([
+      "/features/6/properties/name",
+    ]);
+    expect(errorPaths(validateBroken((m) => (m.features[RAMPART].properties.faces = "in")))).toEqual([
+      "/features/6/properties/faces",
     ]);
     expect(errorPaths(validateBroken((m) => (m.features[SHOAL].properties.depth = 3)))).toEqual([
       "/features/2/properties/depth",

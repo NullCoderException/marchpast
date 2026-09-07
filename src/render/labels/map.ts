@@ -25,7 +25,12 @@ import { insidePlate, overlaps, touches } from "./geometry.ts";
 import type { Point } from "../primitives.ts";
 import type { Rect } from "../projection.ts";
 
-/** The two named feature kinds (schema.md 3.5). Carried through so the drawing pass can set the right face. */
+/**
+ * The two named feature kinds (schema.md 3.5). Carried through so the drawing
+ * pass can set the right face. It stays a pair as the map file grows kinds: a
+ * rampart is nameless like a river, and one a caption must name gets a `place`
+ * on it, so nothing new ever reaches the placer (ADR-0026, #167).
+ */
 export type MapLabelKind = "place" | "work";
 
 /**

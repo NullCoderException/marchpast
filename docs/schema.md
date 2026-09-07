@@ -374,7 +374,7 @@ Not checked: ring winding, polygon validity, whether contours are closed or nest
 
 ### 3.4 Minimal example
 
-A test parses this block and runs it through `validateMap`, so it shows only the kinds the validator ships today: `rampart` joins it when the code does.
+A test parses this block and runs it through `validateMap`, so the spec cannot drift from the validator. It shows one feature of every kind.
 
 ```json
 {
@@ -393,7 +393,9 @@ A test parses this block and runs it through `validateMap`, so it shows only the
     { "type": "Feature", "properties": { "kind": "place", "name": "Aufidus" },
       "geometry": { "type": "Point", "coordinates": [16.15, 41.31] } },
     { "type": "Feature", "properties": { "kind": "work", "name": "Roman camp" },
-      "geometry": { "type": "Point", "coordinates": [16.12, 41.32] } }
+      "geometry": { "type": "Point", "coordinates": [16.12, 41.32] } },
+    { "type": "Feature", "properties": { "kind": "rampart" },
+      "geometry": { "type": "MultiLineString", "coordinates": [[[16.10, 41.33], [16.13, 41.34]], [[16.16, 41.34], [16.18, 41.33]]] } }
   ]
 }
 ```

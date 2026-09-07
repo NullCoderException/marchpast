@@ -142,5 +142,13 @@ export const MINIMAL_MAP: MapFile = {
       properties: { kind: "work", name: "Roman camp" },
       geometry: { type: "Point", coordinates: [16.12, 41.32] },
     },
+    {
+      type: "Feature",
+      properties: { kind: "rampart" },
+      geometry: {
+        type: "MultiLineString",
+        coordinates: [[[16.1, 41.33], [16.13, 41.34]], [[16.16, 41.34], [16.18, 41.33]]],
+      },
+    },
   ],
 };
