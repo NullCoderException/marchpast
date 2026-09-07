@@ -21,7 +21,7 @@ import {
   ELEVATION_BOUNDS,
   Errors,
   LAT_BOUNDS,
-  LON_BOUNDS,
+  type NumberBounds,
   ObjectReader,
   readNumber,
   type ValidationError,
@@ -29,6 +29,17 @@ import {
 } from "./validation.ts";
 
 export type MapValidation = { ok: true; map: MapFile } | { ok: false; errors: ValidationError[] };
+
+/**
+ * WGS84 longitude for a map file. A map has no extent of its own, so it can
+ * never use the battle file's frame rule (2.10 rule 2); it takes a flat range
+ * of its own instead.
+ *
+ * Still the folded `-180..180` the v2 of 2026-09-06 shipped. schema.md 3.3
+ * rule 6 has already widened it to `-180..360`, for a map serving a battle
+ * that crosses the antimeridian, and #167 brings this line to it.
+ */
+const MAP_LON_BOUNDS: NumberBounds = { min: -180, max: 180 };
 
 type MapKind = MapFeature["properties"]["kind"];
 type Geometry = MapFeature["geometry"];
@@ -177,7 +188,7 @@ function readLonLat(value: unknown, path: string, errors: Errors): LonLat | unde
     errors.add(path, "expected a [lon, lat] pair with exactly two elements");
     return undefined;
   }
-  const lon = readNumber(value[0], appendPointer(path, 0), LON_BOUNDS, errors);
+  const lon = readNumber(value[0], appendPointer(path, 0), MAP_LON_BOUNDS, errors);
   const lat = readNumber(value[1], appendPointer(path, 1), LAT_BOUNDS, errors);
   if (lon === undefined || lat === undefined) return undefined;
   return [lon, lat];

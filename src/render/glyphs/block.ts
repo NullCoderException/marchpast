@@ -61,6 +61,12 @@ const signs: Record<Arm, Sign> = {
   cavalry: (ctx, half) => {
     diagonal(ctx, half, 1);
   },
+  /**
+   * Stopgap: the ship's own plain block, so Atlas compiles with the arm in the
+   * allowlist. It is the wrong sign — a viewer cannot tell an aeroplane from a
+   * ship — and it goes with TODO #171.
+   */
+  aircraft: () => undefined,
 };
 
 /** One diagonal across the sign's field at the block's centre. `rise` picks which way it leans. */

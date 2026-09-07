@@ -65,10 +65,14 @@ export interface NumberBounds {
 /** A non-negative whole number of days from the battle's first day (schema.md 2.10 rule 14). */
 export const DAY_BOUNDS: NumberBounds = { min: 0, integer: true };
 
-/** WGS84 latitude, decimal degrees (schema.md section 1). */
+/**
+ * WGS84 latitude, decimal degrees (schema.md section 1).
+ *
+ * Longitude has no sibling here. It is continuous rather than folded, and the
+ * battle file bounds it against the frame its own extent fixes (rule 2), so
+ * there is no shared flat `-180..180` for the two validators to agree on.
+ */
 export const LAT_BOUNDS: NumberBounds = { min: -90, max: 90 };
-/** WGS84 longitude, decimal degrees (schema.md section 1). */
-export const LON_BOUNDS: NumberBounds = { min: -180, max: 180 };
 /** A contour's height above sea level, metres (schema.md 3.2, ADR-0012). */
 export const ELEVATION_BOUNDS: NumberBounds = { min: -500, max: 9000 };
 

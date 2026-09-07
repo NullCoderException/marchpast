@@ -15,6 +15,7 @@ import { unitsAtLevel } from "../schema/hierarchy.ts";
 import type { Battle } from "../schema/types.ts";
 import { checkMultiplier, clockIntervals, endClock, intervalAt, startClock } from "../timeline/intervals.ts";
 import type { ClockSeconds } from "../timeline/picture.ts";
+import { presentAt } from "../timeline/pictureAt.ts";
 import { advance, nextPhaseStart, previousPhaseStart } from "../timeline/playback.ts";
 import { fractionToClock, type BarFraction } from "./scrub.ts";
 
@@ -166,16 +167,19 @@ export function closeCard(state: PlayerState): PlayerState {
  * only the renderer's choice of units changes, mid-playback included
  * (ADR-0017).
  *
- * The one thing it does close is a card on a unit the new level stops drawing.
+ * The one thing it does close is a card on a unit the new level does not draw.
  * A card is anchored at its unit's glyph, so a card on a unit with no glyph
  * has nowhere to be; there is no re-pinning to a drawn ancestor, which is a
- * rule nobody asked for (#60).
+ * rule nobody asked for (#60). A unit that is absent at this instant has no
+ * glyph either, whatever the level says of the roster (ADR-0024), so the same
+ * rule closes the card on it.
  */
 export function setLevel(battle: Battle, state: PlayerState, level: number): PlayerState {
   const next = { ...state, level };
   const id = state.card?.id;
   if (id === undefined) return next;
-  return unitsAtLevel(battle.units, level).some((unit) => unit.id === id) ? next : closeCard(next);
+  const drawn = unitsAtLevel(battle.units, level).some((unit) => unit.id === id) && presentAt(battle, state.clock).has(id);
+  return drawn ? next : closeCard(next);
 }
 
 /** Jump to a phase's own `t` — what a scrubber tick clicks to — keeping the play state. */

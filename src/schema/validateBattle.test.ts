@@ -48,7 +48,6 @@ describe("validateBattle: a well-formed file", () => {
       for (const p of b.phases) {
         delete p.day;
         delete p.wind;
-        delete p.notes;
       }
       delete b.phases[0].references[0].quote;
       delete b.phases[0].units[4].moves;
@@ -228,18 +227,19 @@ describe("validateBattle: shape rules", () => {
   });
 
   it("checks position and extent ranges", () => {
+    // Longitude has no flat range of its own: rule 2 reads it against the
+    // extent's frame, and an extent that did not read leaves nothing to read
+    // it against.
     const result = validateBroken((b) => {
       b.extent.north = 91;
       b.extent.west = -181;
       b.phases[0].units[0].position.lat = -90.5;
-      b.phases[0].units[0].position.lon = 180.5;
       b.phases[0].units[4].moves[0].to.lat = 100;
     });
     expect(errorPaths(result)).toEqual([
       "/extent/north",
       "/extent/west",
       "/phases/0/units/0/position/lat",
-      "/phases/0/units/0/position/lon",
       "/phases/0/units/4/moves/0/to/lat",
     ]);
   });
@@ -269,6 +269,11 @@ describe("validateBattle: shape rules", () => {
 
   it("requires each source to be an object", () => {
     expect(errorPaths(validateBroken((b) => (b.sources.mahan = "Mahan")))).toEqual(["/sources/mahan"]);
+  });
+
+  it("requires notes on every phase, naming the field", () => {
+    expect(errorPaths(validateBroken((b) => delete b.phases[1].notes))).toEqual(["/phases/1/notes"]);
+    expect(errorPaths(validateBroken((b) => (b.phases[0].notes = 7)))).toEqual(["/phases/0/notes"]);
   });
 });
 
@@ -303,6 +308,26 @@ function retime(b: any, phases: [day: number | undefined, t: string][], end: str
   else b.end_day = endDay;
   const lastDay = Math.max(endDay ?? 0, ...phases.map(([day]) => day ?? 0));
   b.dates = Array.from({ length: lastDay + 1 }, (_, index) => `day ${index}`);
+}
+
+/**
+ * Moves the battle into Midway's frame, where the extent runs east past 180
+ * and every longitude in the file is spelled inside it (ADR-0001 as amended on
+ * #143).
+ */
+function midwayFrame(b: any): void {
+  b.extent = { north: 29.5, south: 27.5, east: 187.25, west: 173 };
+  for (const phase of b.phases) {
+    for (const snapshot of phase.units) {
+      snapshot.position.lon = 180;
+      for (const move of snapshot.moves ?? []) move.to.lon = 185;
+    }
+  }
+}
+
+/** Removes one unit's snapshot from phase `index`, so the unit does not exist on the plate then (schema.md 2.9). */
+function dropSnapshot(b: any, index: number, id: string): void {
+  b.phases[index].units = b.phases[index].units.filter((snapshot: any) => snapshot.id !== id);
 }
 
 /** Gives every phase one snapshot per roster unit, copied from the first unit's. */
@@ -376,6 +401,49 @@ describe("validateBattle: cross-field rules (schema.md 2.10)", () => {
     expect(errorPaths(validateBroken((b) => (b.extent.south = 37)))).toEqual(["/extent"]);
     expect(errorPaths(validateBroken((b) => (b.extent.west = -6.0)))).toEqual(["/extent"]);
     expect(errorPaths(validateBroken((b) => (b.extent.west = 0)))).toEqual(["/extent"]);
+  });
+
+  it("2. west is spelled in -180..180 and east runs no more than 360 degrees east of it", () => {
+    expect(errorPaths(validateBroken((b) => (b.extent.west = -180.1)))).toEqual(["/extent/west"]);
+    expect(errorPaths(validateBroken((b) => (b.extent.west = 180.1)))).toEqual(["/extent/west"]);
+    expect(
+      errorPaths(
+        validateBroken((b) => {
+          b.extent.west = 0;
+          b.extent.east = 360.1;
+        }),
+      ),
+    ).toEqual(["/extent"]);
+    expect(validateBroken((b) => (b.extent.west = -180)).ok).toBe(true);
+  });
+
+  it("2. an extent may run east past 180, and a longitude outside its frame is told the spelling that was meant", () => {
+    expect(validateBroken(midwayFrame).ok).toBe(true);
+    const wrong = validateBroken((b) => {
+      midwayFrame(b);
+      // The normalised spelling of a place 353 degrees west of the frame's
+      // centre: legal WGS84, and it would draw nowhere.
+      b.phases[0].units[0].position.lon = -172.75;
+    });
+    expect(errorPaths(wrong)).toEqual(["/phases/0/units/0/position/lon"]);
+    expect(errorMessage(wrong, "/phases/0/units/0/position/lon")).toContain("187.25");
+  });
+
+  it("2. a move's head is read in the same frame", () => {
+    const wrong = validateBroken((b) => {
+      midwayFrame(b);
+      b.phases[0].units[4].moves[0].to.lon = -172.75;
+    });
+    expect(errorPaths(wrong)).toEqual(["/phases/0/units/4/moves/0/to/lon"]);
+    expect(errorMessage(wrong, "/phases/0/units/4/moves/0/to/lon")).toContain("187.25");
+  });
+
+  it("2. the frame is half-open at the top, so no place inside it has two spellings", () => {
+    const centre = (MINIMAL_BATTLE.extent.west + MINIMAL_BATTLE.extent.east) / 2;
+    expect(validateBroken((b) => (b.phases[0].units[0].position.lon = centre - 180)).ok).toBe(true);
+    expect(errorPaths(validateBroken((b) => (b.phases[0].units[0].position.lon = centre + 180)))).toEqual([
+      "/phases/0/units/0/position/lon",
+    ]);
   });
 
   it("3. unit ids and phase ids are unique", () => {
@@ -467,20 +535,40 @@ describe("validateBattle: cross-field rules (schema.md 2.10)", () => {
     expect(validateBroken((b) => (b.sort_date = { year: -216, month: 8, day: 2 })).ok).toBe(true);
   });
 
-  it("7. every phase lists every roster unit exactly once and nothing else", () => {
-    expect(errorPaths(validateBroken((b) => b.phases[0].units.pop()))).toEqual(["/phases/0/units"]);
-    expect(errorPaths(validateBroken((b) => (b.phases[0].units[4].id = "lee-column")))).toEqual([
-      "/phases/0/units/4/id",
-      "/phases/0/units",
-    ]);
-    expect(errorPaths(validateBroken((b) => (b.phases[0].units[4].id = "frigates")))).toEqual([
-      "/phases/0/units/4/id",
-      "/phases/0/units",
-    ]);
-    const result = validateBroken((b) => {
+  it("7. every snapshot names a roster unit, and no phase names one twice", () => {
+    expect(errorPaths(validateBroken((b) => (b.phases[0].units[4].id = "frigates")))).toEqual(["/phases/0/units/4/id"]);
+    expect(errorPaths(validateBroken((b) => (b.phases[0].units[4].id = "lee-column")))).toEqual(["/phases/0/units/4/id"]);
+    const duplicate = validateBroken((b) => {
       b.phases[1].units.push(structuredClone(b.phases[1].units[0]));
     });
-    expect(errorPaths(result)).toEqual(["/phases/1/units/5/id"]);
+    expect(errorPaths(duplicate)).toEqual(["/phases/1/units/5/id"]);
+  });
+
+  it("7. a unit may be absent at the start of the battle and at the end of it", () => {
+    // The Combined Fleet is not on the plate at dawn; the lee van has gone by
+    // the melee. Each run is contiguous, so both are legal (ADR-0024).
+    const result = validateBroken((b) => {
+      dropSnapshot(b, 0, "combined-fleet");
+      dropSnapshot(b, 1, "lee-van");
+    });
+    expect(result.ok).toBe(true);
+  });
+
+  it("7. a unit absent from a middle phase is two runs, and rejected", () => {
+    const result = validateBroken((b) => {
+      addPhase(b, "16:00");
+      dropSnapshot(b, 1, "combined-fleet");
+    });
+    expect(errorPaths(result)).toEqual(["/phases/2/units"]);
+    expect(errorMessage(result, "/phases/2/units")).toContain("combined-fleet");
+  });
+
+  it("7. a roster unit with no snapshot in any phase is rejected on the roster", () => {
+    const result = validateBroken((b) => {
+      dropSnapshot(b, 0, "combined-fleet");
+      dropSnapshot(b, 1, "combined-fleet");
+    });
+    expect(errorPaths(result)).toEqual(["/units/4/id"]);
   });
 
   it("8. every phase has a reference, each pointing at a source", () => {
@@ -612,7 +700,7 @@ describe("validateBattle: cross-field rules (schema.md 2.10)", () => {
   it("15. arm is required and on the allowlist", () => {
     expect(errorPaths(validateBroken((b) => delete b.units[1].arm))).toEqual(["/units/1/arm"]);
     expect(errorPaths(validateBroken((b) => (b.units[1].arm = "artillery")))).toEqual(["/units/1/arm"]);
-    for (const arm of ["infantry", "cavalry", "ship"]) {
+    for (const arm of ["infantry", "cavalry", "ship", "aircraft"]) {
       expect(validateBroken((b) => (b.units[1].arm = arm)).ok, arm).toBe(true);
     }
   });
@@ -655,8 +743,8 @@ describe("validateBattle: cross-field rules (schema.md 2.10)", () => {
   it("17. no level draws more than sixteen units, a childless root counted at every level", () => {
     // Level 1 draws the sixteen children and the childless root: seventeen.
     const seventeen = validateBroken((b) => withChildren(b, 16));
-    expect(errorPaths(seventeen)).toEqual(["/units"]);
-    expect(errorMessage(seventeen, "/units")).toContain("17");
+    expect(errorPaths(seventeen)).toEqual(["/phases/0/units", "/phases/1/units"]);
+    expect(errorMessage(seventeen, "/phases/0/units")).toContain("17");
     // Fifteen children plus the childless root is sixteen, which still reads,
     // on a roster of seventeen: the rule counts per level, never per roster.
     const sixteen = validateBroken((b) => withChildren(b, 15));
@@ -665,8 +753,45 @@ describe("validateBattle: cross-field rules (schema.md 2.10)", () => {
   });
 
   it("17. a flat roster of seventeen is rejected at its only level", () => {
-    expect(errorPaths(validateBroken((b) => flatRoster(b, 17)))).toEqual(["/units"]);
+    expect(errorPaths(validateBroken((b) => flatRoster(b, 17)))).toEqual(["/phases/0/units", "/phases/1/units"]);
     expect(validateBroken((b) => flatRoster(b, 16)).ok).toBe(true);
+  });
+
+  it("17. the ceiling is counted per level per phase, so seventeen on the roster passes if no phase draws them all", () => {
+    const spread = validateBroken((b) => {
+      withChildren(b, 16);
+      dropSnapshot(b, 0, "child-0");
+      dropSnapshot(b, 1, "child-1");
+    });
+    expect(spread.ok).toBe(true);
+  });
+
+  it("17. one phase over the ceiling is enough, and the phase is where it is reported", () => {
+    const over = validateBroken((b) => {
+      withChildren(b, 16);
+      dropSnapshot(b, 0, "child-0");
+    });
+    expect(errorPaths(over)).toEqual(["/phases/1/units"]);
+    expect(errorMessage(over, "/phases/1/units")).toContain("17");
+    expect(errorMessage(over, "/phases/1/units")).toContain("Squadrons");
+  });
+
+  it("18. still, when present, is true", () => {
+    const marked = validateBroken((b) => (b.phases[1].still = true));
+    expect(marked.ok).toBe(true);
+    if (marked.ok) expect(marked.battle.phases[1]?.still).toBe(true);
+    // A `false` is noise: a phase that is not the still simply omits the field.
+    expect(errorPaths(validateBroken((b) => (b.phases[0].still = false)))).toEqual(["/phases/0/still"]);
+    expect(errorPaths(validateBroken((b) => (b.phases[0].still = "yes")))).toEqual(["/phases/0/still"]);
+  });
+
+  it("18. at most one phase carries still", () => {
+    const two = validateBroken((b) => {
+      b.phases[0].still = true;
+      b.phases[1].still = true;
+    });
+    expect(errorPaths(two)).toEqual(["/phases/1/still"]);
+    expect(errorMessage(two, "/phases/1/still")).toContain("phase 0");
   });
 });
 

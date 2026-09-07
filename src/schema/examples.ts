@@ -84,6 +84,7 @@ export const MINIMAL_BATTLE: Battle = {
       playback_rate: 120,
       wind: { from: 292.5, force: "light" },
       caption: "The action is general; the Combined Fleet's line is cut in two places.",
+      notes: "Time: the dispatch gives no hour for the general action, so 13:30 is the author's reading of its sequence.",
       references: [{ source: "collingwood-dispatch", locator: "p. 1366" }],
       units: [
         { id: "weather-column", position: { lat: 36.27, lon: -6.24 }, heading: 90, formation: "column", state: "engaged" },

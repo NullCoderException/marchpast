@@ -11,9 +11,11 @@
  * in `src/schema/hierarchy.ts`, where the validator's sixteen-unit count reads
  * it too (ADR-0017). This file only applies it to a picture.
  *
- * What does **not** narrow is `picture.units`: it stays the whole roster, in
- * roster order, so the label priority and the numeral that keys a label in the
- * legend are the whole-roster index at every level.
+ * What does **not** narrow is `picture.units`: it stays every unit that exists
+ * on the plate at this instant, in roster order, so the label priority and the
+ * numeral that keys a label in the legend are the whole-roster index at every
+ * level. Absence is the timeline's doing and reaches this file already done
+ * (ADR-0024).
  */
 import { unitsAtLevel } from "../schema/hierarchy.ts";
 import type { Unit } from "../schema/types.ts";

@@ -28,13 +28,26 @@ export type DegreesTrue = number;
 /** Where a unit's force is directed, in degrees true: its course while it moves, the way its line faces while it fights (ADR-0019). */
 export type Heading = DegreesTrue;
 
-/** WGS84 decimal degrees, north and east positive, `-90 <= lat <= 90`, `-180 <= lon <= 180` (battle-file convention, ADR-0001). */
+/**
+ * WGS84 decimal degrees, north and east positive, `-90 <= lat <= 90`
+ * (battle-file convention, ADR-0001). Longitude is continuous rather than
+ * folded: it is bounded against the frame the `Extent` fixes, within 180
+ * degrees of that frame's centre, and not by a flat `-180..180`.
+ */
 export interface Position {
   lat: number;
   lon: number;
 }
 
-/** The lat/lon bounding box the battle plays inside, fixed for the whole playback. `south < north`, `west < east`. */
+/**
+ * The lat/lon bounding box the battle plays inside, fixed for the whole
+ * playback. `south < north`; `-180 <= west <= 180` and
+ * `west < east <= west + 360`.
+ *
+ * It also fixes the **frame** every longitude in the file is read in: `west`
+ * is spelled canonically and `east` runs east of it, so a battle crossing the
+ * antimeridian writes an `east` past 180 (Midway is `west: 173, east: 187.25`).
+ */
 export interface Extent {
   north: number;
   south: number;
@@ -136,11 +149,24 @@ export interface Phase {
   wind?: Wind;
   /** Narration shown verbatim, holding until the next phase. */
   caption: string;
-  /** The author's reasoning about the sources for this phase. Surfaced on demand; never animated. */
-  notes?: string;
+  /** The author's account of what this phase rests on. Surfaced on demand; never animated. Nothing else marks a reading as conjectural (ADR-0027). */
+  notes: string;
   /** Pointers into `sources` vouching for the phase as a whole. At least one. */
   references: Reference[];
-  /** Exactly one snapshot for every roster unit, no more, no fewer, no duplicates. */
+  /**
+   * Marks the phase whose picture stands for the battle: the build renders the
+   * library's thumbnail and the battle page's social card from it. At most one
+   * phase per battle carries it, and it is only ever `true` — a phase that is
+   * not the still omits the field (ADR-0025, ADR-0028).
+   */
+  still?: true;
+  /**
+   * One snapshot for every roster unit that exists on the plate at this
+   * instant, parents and children alike, no duplicates and no id off the
+   * roster. A roster unit missing from a phase is **absent**: it does not
+   * exist on the plate then, and the phase says nothing else about it
+   * (ADR-0024).
+   */
   units: UnitSnapshot[];
 }
 

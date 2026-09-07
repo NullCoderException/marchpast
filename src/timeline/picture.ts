@@ -55,7 +55,12 @@ export interface Picture {
   phase: Phase;
   /** The instant, in battle-clock seconds from midnight of the first day. The day it falls on is `phase.day`. */
   clock: ClockSeconds;
-  /** Every roster unit, in roster order. */
+  /**
+   * Every unit on the plate at the instant, in roster order: a unit is here
+   * only inside its run, which is the whole of what absence means downstream
+   * (ADR-0024, schema.md 2.11). Never narrowed by the viewer's level; that is
+   * the renderer's doing.
+   */
   units: UnitPicture[];
   /** Steps. Absent when the battle does not track wind. */
   wind?: Wind;
@@ -65,6 +70,6 @@ export interface Picture {
   label: string;
   /** Steps: the current phase's references. */
   references: Reference[];
-  /** Steps: the current phase's notes, when it has them. */
-  notes?: string;
+  /** Steps: the current phase's notes, which every phase has (schema.md 2.4). */
+  notes: string;
 }

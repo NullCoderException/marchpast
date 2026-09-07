@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { treeDepth, unitDepths, unitsAtLevel } from "./hierarchy.ts";
-import type { Unit } from "./types.ts";
+import { drawnAtLevel, treeDepth, unitDepths, unitsAtLevel } from "./hierarchy.ts";
+import type { Phase, Unit } from "./types.ts";
 
 /** A roster of `arm: "ship"` units from `[id, parent]` pairs, parents first as the schema requires. */
 function roster(...entries: [id: string, parent?: string][]): Unit[] {
@@ -14,6 +14,25 @@ function roster(...entries: [id: string, parent?: string][]): Unit[] {
 /** The ids `unitsAtLevel` draws, in roster order. */
 function drawn(units: Unit[], level: number): string[] {
   return unitsAtLevel(units, level).map((unit) => unit.id);
+}
+
+/** A phase holding a snapshot of each id named and of nothing else, in the order given. */
+function phaseOf(...ids: string[]): Phase {
+  return {
+    id: "a-phase",
+    label: "A phase",
+    t: "10:00",
+    playback_rate: 60,
+    caption: "A caption.",
+    notes: "A note.",
+    references: [{ source: "invented", locator: "p. 1" }],
+    units: ids.map((id) => ({ id, position: { lat: 0, lon: 0 }, heading: 0, formation: "line", state: "intact" })),
+  };
+}
+
+/** The ids `drawnAtLevel` draws, in roster order. */
+function present(units: Unit[], level: number, phase: Phase): string[] {
+  return drawnAtLevel(units, level, phase).map((unit) => unit.id);
 }
 
 describe("unitDepths", () => {
@@ -69,5 +88,35 @@ describe("unitsAtLevel", () => {
     const units = roster(["a"], ["a1", "a"], ["a1x", "a1"], ["b"]);
     expect(drawn(units, 2)).toEqual(["a1x", "b"]);
     expect(drawn(units, 5)).toEqual(["a1x", "b"]);
+  });
+});
+
+describe("drawnAtLevel", () => {
+  it("draws what the level draws when the phase holds every unit", () => {
+    const units = roster(["a"], ["a1", "a"], ["a2", "a"], ["b"]);
+    expect(present(units, 1, phaseOf("a", "a1", "a2", "b"))).toEqual(drawn(units, 1));
+  });
+
+  it("drops a unit the phase has no snapshot of", () => {
+    const units = roster(["a"], ["a1", "a"], ["a2", "a"], ["b"]);
+    expect(present(units, 1, phaseOf("a", "a1", "b"))).toEqual(["a1", "b"]);
+  });
+
+  it("keeps roster order, whatever order the phase lists its snapshots in", () => {
+    const units = roster(["a"], ["a1", "a"], ["b"], ["c"], ["c1", "c"]);
+    expect(present(units, 1, phaseOf("c1", "b", "a1"))).toEqual(["a1", "b", "c1"]);
+  });
+
+  it("leaves a parent off a finer level in the phases its children are away", () => {
+    // Which units a level *can* draw is a property of the roster; presence only
+    // filters that set, so `a` never pops onto level 1 (schema.md 2.9).
+    const units = roster(["a"], ["a1", "a"], ["a2", "a"], ["b"]);
+    expect(present(units, 0, phaseOf("a", "b"))).toEqual(["a", "b"]);
+    expect(present(units, 1, phaseOf("a", "b"))).toEqual(["b"]);
+  });
+
+  it("draws nothing at a level whose units are all absent", () => {
+    const units = roster(["a"], ["a1", "a"]);
+    expect(present(units, 1, phaseOf("a"))).toEqual([]);
   });
 });

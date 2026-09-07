@@ -10,6 +10,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { buildLibrary, type Library, type NamedBattle } from "../src/data/library.ts";
+import { reservedNameError } from "../src/schema/reservedNames.ts";
 import { validateBattle } from "../src/schema/validateBattle.ts";
 import { errorLine } from "../src/schema/validation.ts";
 
@@ -48,7 +49,17 @@ export function readLibrary(dataDir: string): Library {
       report(result.errors.map(errorLine));
       continue;
     }
-    battles.push({ name: path.basename(file, ".json"), battle: result.battle });
+    // Rule 19, the half the validator cannot see: the build emits a page per
+    // battle at `/<name>/`, and some of those paths are the build's own
+    // (ADR-0028). Checked here as well as in `npm run validate` so dev, the
+    // build and the command line agree.
+    const name = path.basename(file, ".json");
+    const reserved = reservedNameError(name);
+    if (reserved !== undefined) {
+      report([errorLine(reserved)]);
+      continue;
+    }
+    battles.push({ name, battle: result.battle });
   }
 
   if (errors.length > 0) throw new Error(["Marchpast: the library cannot be built.", ...errors].join("\n"));

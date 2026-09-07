@@ -1,6 +1,7 @@
 /**
- * The two synthetic battles the timeline tests run on: `TEST_BATTLE`, a
- * morning inside one day, and `NIGHT_BATTLE`, an action that crosses midnight.
+ * The three synthetic battles the timeline tests run on: `TEST_BATTLE`, a
+ * morning inside one day; `NIGHT_BATTLE`, an action that crosses midnight; and
+ * `ABSENCE_BATTLE`, whose strike is on the plate for three phases of six.
  * Deliberately neither Trafalgar nor the Nile: every rule under test wants
  * numbers chosen to make its arithmetic obvious, and a real battle's data
  * would drift under the historians.
@@ -50,7 +51,7 @@ export const TEST_BATTLE: Battle = {
       playback_rate: 600,
       wind: { from: 270, force: "fresh" },
       caption: "Caption one.",
-      notes: "A note only the first phase has.",
+      notes: "A note the first phase carries; every phase has one (schema.md 2.4).",
       references: [{ source: "invented", locator: "p. 1" }],
       units: [
         { id: "alpha", position: { lat: 10, lon: 20 }, heading: 350, formation: "column", state: "intact", strength: 1 },
@@ -64,6 +65,7 @@ export const TEST_BATTLE: Battle = {
       playback_rate: 60,
       wind: { from: 90, force: "light" },
       caption: "Caption two.",
+      notes: "A note the second phase carries.",
       references: [{ source: "invented", locator: "p. 2" }],
       units: [
         {
@@ -85,6 +87,7 @@ export const TEST_BATTLE: Battle = {
       playback_rate: 120,
       wind: { force: "calm" },
       caption: "Caption three.",
+      notes: "A note the third phase carries.",
       references: [{ source: "invented", locator: "p. 3" }],
       units: [
         { id: "alpha", position: { lat: 22, lon: 44 }, heading: 90, formation: "line", state: "broken", strength: 0.2 },
@@ -139,6 +142,7 @@ export const NIGHT_BATTLE: Battle = {
       t: "23:00",
       playback_rate: 600,
       caption: "Caption one, before midnight.",
+      notes: "A note the evening phase carries.",
       references: [{ source: "invented", locator: "p. 1" }],
       units: [
         { id: "alpha", position: { lat: 10, lon: 20 }, heading: 0, formation: "column", state: "intact" },
@@ -152,6 +156,7 @@ export const NIGHT_BATTLE: Battle = {
       t: "05:05",
       playback_rate: 600,
       caption: "Caption two, at first light.",
+      notes: "A note the daybreak phase carries.",
       references: [{ source: "invented", locator: "p. 2" }],
       units: [
         { id: "alpha", position: { lat: 20, lon: 40 }, heading: 90, formation: "line", state: "engaged" },
@@ -165,6 +170,7 @@ export const NIGHT_BATTLE: Battle = {
       t: "11:00",
       playback_rate: 600,
       caption: "Caption three, in the forenoon.",
+      notes: "A note the forenoon phase carries.",
       references: [{ source: "invented", locator: "p. 3" }],
       units: [
         { id: "alpha", position: { lat: 22, lon: 44 }, heading: 180, formation: "line", state: "broken" },
@@ -172,6 +178,72 @@ export const NIGHT_BATTLE: Battle = {
       ],
     },
   ],
+};
+
+/**
+ * The synthetic battle a unit is absent from (ADR-0024, schema.md 2.9): a
+ * carrier force whose aeroplanes are launched, attack and are recovered, and
+ * are on the plate for none of the hours either side.
+ *
+ * Six phases on the hour from `10:00`, ending at `16:00`, every one of them at
+ * 3,600 so an interval is one wall second. `strike` has a snapshot in phases
+ * two, three and four and in no other, which is one contiguous run:
+ *
+ * | phase | `t`     | `force` | `fleet` | `strike` |
+ * | ----- | ------- | ------- | ------- | -------- |
+ * | one   | `10:00` | yes     | yes     | —        |
+ * | two   | `11:00` | yes     | yes     | yes      |
+ * | three | `12:00` | yes     | yes     | yes      |
+ * | four  | `13:00` | yes     | yes     | yes      |
+ * | five  | `14:00` | yes     | yes     | —        |
+ * | six   | `15:00` | yes     | yes     | —        |
+ * | (end) | `16:00` |         |         |          |
+ *
+ * A unit is drawn across an interval only when it has a snapshot at both ends,
+ * so the strike is on the plate from `11:00` to `13:00` and nowhere else. It
+ * moves ten degrees of longitude an hour, so a midpoint reads at a glance.
+ *
+ * The roster is a tree — `force` over `fleet` and `strike` — because absence
+ * has to be watched at a level: level 0 draws the force, level 1 draws the two
+ * children, and `force` never pops onto level 1 in the hours the strike is
+ * away.
+ */
+export const ABSENCE_BATTLE: Battle = {
+  schema_version: 2,
+  title: "The Test Strike",
+  summary: "An invented carrier action, so that a unit that is not on the plate all day has somewhere to be tested.",
+  dates: ["1 January 1800"],
+  sort_date: { year: 1800, month: 1, day: 1 },
+  extent: { north: 30, south: -10, east: 50, west: 0 },
+  scale_unit: "nmi",
+  end: "16:00",
+  license: "CC-BY-4.0",
+  attribution: "Marchpast contributors, CC BY 4.0",
+  sources: {
+    invented: { label: "An invented source", work: "Nothing at all, made up for the tests", license: "public-domain" },
+  },
+  levels: ["Forces", "Groups"],
+  units: [
+    { id: "force", side: "Red", label: "The force", arm: "ship" },
+    { id: "fleet", side: "Red", label: "The fleet", arm: "ship", parent: "force" },
+    { id: "strike", side: "Red", label: "The strike", arm: "aircraft", parent: "force" },
+  ],
+  phases: [0, 1, 2, 3, 4, 5].map((index) => ({
+    id: `phase-${index}`,
+    label: `Phase ${index}`,
+    t: `${10 + index}:00`,
+    playback_rate: 3600,
+    caption: `Caption ${index}.`,
+    notes: `A note phase ${index} carries.`,
+    references: [{ source: "invented", locator: `p. ${index + 1}` }],
+    units: [
+      { id: "force", position: { lat: 0, lon: index }, heading: 90, formation: "column", state: "intact" as const },
+      { id: "fleet", position: { lat: -1, lon: index }, heading: 90, formation: "column", state: "intact" as const },
+      ...(index >= 1 && index <= 3
+        ? [{ id: "strike", position: { lat: 10, lon: index * 10 }, heading: 90, formation: "line" as const, state: "engaged" as const }]
+        : []),
+    ],
+  })),
 };
 
 /**

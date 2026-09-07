@@ -7,12 +7,17 @@
  * `data/maps/<map>.geojson` exists and is valid. Every error is printed with
  * its file and JSON-pointer path, and the exit code is 1 when there is any.
  *
+ * It is also one of the two places rule 19 is applied, because it is one of
+ * the two that walks a file name: the validator sees a document and never a
+ * name (`src/schema/reservedNames.ts`).
+ *
  * Runs on Node's built-in type stripping, which is why every import in
  * `src/schema/` spells out its `.ts` extension.
  */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { reservedNameError } from "../src/schema/reservedNames.ts";
 import { validateBattle } from "../src/schema/validateBattle.ts";
 import { validateMap } from "../src/schema/validateMap.ts";
 import { errorLine, type ValidationError } from "../src/schema/validation.ts";
@@ -66,8 +71,12 @@ function validateFile(file: string): FileReport & { mapName?: string } {
 
   switch (path.extname(file)) {
     case ".json": {
+      // Rule 19 first: a battle at a path the build owns is wrong whatever
+      // the document says, and it reads better than a clean bill of health.
+      const reserved = reservedNameError(path.basename(file, ".json"));
       const result = validateBattle(json.value);
-      if (!result.ok) return { file, errors: result.errors };
+      if (!result.ok) return { file, errors: reserved === undefined ? result.errors : [reserved, ...result.errors] };
+      if (reserved !== undefined) return { file, errors: [reserved], mapName: result.battle.map };
       return { file, errors: [], mapName: result.battle.map };
     }
     case ".geojson": {

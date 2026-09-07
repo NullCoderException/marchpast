@@ -402,6 +402,7 @@
           "quote": "breaking through, in all Parts, astern of their Leaders, and engaging the Enemy at the Muzzles of their Guns; the Conflict was severe"
         }
       ],
+      "still": true,
       "units": [
         { "id": "weather-column", "position": { "lat": 36.27, "lon": -6.255 }, "heading": 80, "formation": "column", "state": "engaged" },
         { "id": "weather-van", "position": { "lat": 36.274, "lon": -6.224 }, "heading": 80, "formation": "column", "state": "engaged" },

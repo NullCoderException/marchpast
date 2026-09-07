@@ -146,10 +146,10 @@ function sampleCanvas(view: View, row: KeyRow, place: Parameters<typeof drawKeyR
   return canvas;
 }
 
-/** The current phase: its label, its notes when it has them, and its references. */
+/** The current phase: its label, its notes, and its references. */
 function phaseChildren(battle: Battle, picture: Picture): Node[] {
   const children: Node[] = [element("h2", "st-details-heading", picture.label)];
-  if (picture.notes !== undefined) children.push(element("p", "st-details-notes", picture.notes));
+  children.push(element("p", "st-details-notes", picture.notes));
 
   const list = element("ul", "st-references");
   for (const reference of picture.references) list.append(referenceItem(battle, reference));

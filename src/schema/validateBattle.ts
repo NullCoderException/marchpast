@@ -2,8 +2,9 @@
  * Runtime validator for the battle file (schema.md section 2).
  *
  * Checks every shape rule (types, required fields, enums, ranges, unknown keys
- * rejected at every level) and the seventeen cross-field rules of schema.md
- * 2.10. Never throws on bad data; collects every error with a JSON-pointer path.
+ * rejected at every level) and the cross-field rules of schema.md 2.10, all
+ * but rule 19, which is about a file name and lives in `reservedNames.ts`.
+ * Never throws on bad data; collects every error with a JSON-pointer path.
  *
  * Each `read*` function checks one table of the spec and returns the typed
  * value only when every field read cleanly, recording errors otherwise. The
@@ -11,7 +12,7 @@
  * unit never hides an unrelated ordering error.
  */
 import { ARMS } from "./arms.ts";
-import { treeDepth, unitsAtLevel } from "./hierarchy.ts";
+import { drawnAtLevel, treeDepth } from "./hierarchy.ts";
 import { readAttribution, readLicense } from "./licenseFields.ts";
 import { classOf, ranksAbove, type LicenseId } from "./licenses.ts";
 import { instantMinutes, isBattleTime } from "./time.ts";
@@ -38,7 +39,6 @@ import {
   DAY_BOUNDS,
   Errors,
   LAT_BOUNDS,
-  LON_BOUNDS,
   ObjectReader,
   type RecordField,
   type ValidationError,
@@ -59,13 +59,17 @@ const ANGLE = { min: 0, max: 360, exclusiveMax: true };
 const NOT_A_BARE_NAME = /[\/\\.]/;
 /** Rule 17: the label placement proof's break point, made a rule (ADR-0017). */
 const MAX_UNITS_PER_LEVEL = 16;
+/** Rule 2: half the frame the extent fixes, the distance a longitude may lie from its centre. */
+const HALF_FRAME = 180;
 
-/** What a phase needs from the rest of the file to check its own cross-references (rules 7 and 8). */
+/** What a phase needs from the rest of the file to check its own cross-references (rules 2, 7 and 8). */
 interface PhaseContext {
   /** Every roster id, or `undefined` when the roster did not read cleanly and rule 7 cannot be judged. */
   rosterIds: Set<string> | undefined;
   /** Every key of `sources`, or `undefined` when they did not read cleanly. */
   sourceIds: Set<string> | undefined;
+  /** The extent's centre longitude, or `undefined` when the extent did not read and there is no frame to read a longitude in. */
+  frameCentre: number | undefined;
 }
 
 export function validateBattle(json: unknown): BattleValidation {
@@ -116,10 +120,6 @@ function readBattle(json: unknown, errors: Errors): Battle | undefined {
   if (units !== undefined) {
     checkUniqueIds(units, errors);
     checkParents(units, errors);
-    // Rule 17 counts units, so a roster with a unit missing would be counted
-    // short and could pass a level that really is over sixteen. It waits for a
-    // clean roster rather than reporting a number it cannot trust; the file is
-    // already failing on that unit, and the next run reaches this.
     if (allDefined(units.items)) {
       checkLevels(units.items, levels === undefined ? undefined : levels.items, obj, errors);
     }
@@ -128,6 +128,7 @@ function readBattle(json: unknown, errors: Errors): Battle | undefined {
     rosterIds: units !== undefined && allDefined(units.items) ? new Set(units.items.map((unit) => unit.id)) : undefined,
     // A key whose entry failed to read is still a key, so a reference to it is not dangling.
     sourceIds: sources === undefined ? undefined : new Set(Object.keys(sources.entries)),
+    frameCentre: extent === undefined ? undefined : frameCentre(extent),
   };
   const phases = obj.array("phases", (value, path) => readPhase(value, path, errors, context), { nonEmpty: true });
   if (phases !== undefined) {
@@ -135,6 +136,16 @@ function readBattle(json: unknown, errors: Errors): Battle | undefined {
     const lastDay = checkPhaseOrder(phases, end, endDay, obj, errors);
     checkWindAllOrNothing(phases, errors);
     if (dates !== undefined) checkDates(dates, lastDay, endDay, obj, errors);
+    checkOneStill(phases, errors);
+    // Rules 7 and 17 both count units, so a roster with a unit missing would
+    // be counted short and could pass a run or a level that really fails. They
+    // wait for a clean roster rather than reporting a number they cannot
+    // trust; the file is already failing on that unit, and the next run
+    // reaches these.
+    if (units !== undefined && allDefined(units.items)) {
+      checkUnitRuns(units, phases, errors);
+      checkLevelCounts(units.items, levels === undefined ? undefined : levels.items, phases, errors);
+    }
   }
 
   if (
@@ -242,24 +253,82 @@ function readMapName(obj: ObjectReader): string | undefined {
   return name;
 }
 
-/** Rule 2 lives here beside the range checks: `south < north`, `west < east`. */
+/**
+ * Rule 2, first half: `south < north`; `west` is spelled canonically in
+ * `-180..180`; and `east` runs east of it by no more than a full turn, which
+ * is the ambiguity bound — past `west + 360` a longitude would have two
+ * spellings inside one extent.
+ *
+ * An extent whose ordering fails returns nothing, because the rest of the file
+ * is read in the frame this box fixes and a box with no inside fixes no frame.
+ */
 function readExtent(obj: ObjectReader | undefined): Extent | undefined {
   if (obj === undefined) return undefined;
   const north = obj.number("north", LAT_BOUNDS);
   const south = obj.number("south", LAT_BOUNDS);
-  const east = obj.number("east", LON_BOUNDS);
-  const west = obj.number("west", LON_BOUNDS);
+  const east = obj.number("east");
+  const west = obj.number("west", { min: -180, max: 180 });
   if (north === undefined || south === undefined || east === undefined || west === undefined) return undefined;
-  if (south >= north) obj.errors.add(obj.path, `expected south < north, got south ${south} and north ${north}`);
-  if (west >= east) obj.errors.add(obj.path, `expected west < east, got west ${west} and east ${east}`);
-  return { north, south, east, west };
+  let ordered = true;
+  if (south >= north) {
+    obj.errors.add(obj.path, `expected south < north, got south ${south} and north ${north}`);
+    ordered = false;
+  }
+  if (west >= east) {
+    obj.errors.add(obj.path, `expected west < east, got west ${west} and east ${east}`);
+    ordered = false;
+  } else if (east > west + 360) {
+    obj.errors.add(obj.path, `expected east no further than 360 degrees east of west, got west ${west} and east ${east}`);
+    ordered = false;
+  }
+  return ordered ? { north, south, east, west } : undefined;
 }
 
-/** A `{ lat, lon }` object in WGS84 range. */
-function readPosition(obj: ObjectReader | undefined): Position | undefined {
+/** The middle of the frame the extent fixes: the longitude every longitude in the file is measured from (rule 2). */
+function frameCentre(extent: Extent): number {
+  return (extent.west + extent.east) / 2;
+}
+
+/**
+ * `lon` respelled into the frame centred on `centre`: the same place, in the
+ * one spelling the extent admits. Half-open at the upper end, so a place on
+ * the boundary has a single answer.
+ *
+ * Trimmed to twelve significant figures, because the arithmetic that shifts a
+ * longitude by whole turns leaves the odd trailing digit and this number goes
+ * into a message for a person to copy.
+ */
+function respell(lon: number, centre: number): number {
+  const turns = Math.floor((lon - centre + HALF_FRAME) / 360);
+  return Number((lon - turns * 360).toPrecision(12));
+}
+
+/**
+ * Rule 2, second half: every longitude in the file lies within 180 degrees of
+ * the extent's centre, half-open at the upper end. That is the only bound on
+ * longitude; there is no flat `-180..180`.
+ *
+ * It catches what continuous longitude would otherwise make silent: at
+ * Midway's frame the normalised spelling of Mikuma's grave, `-172.75`, is a
+ * legal WGS84 longitude that projects 353 degrees west of the plate and draws
+ * nowhere. So the message says which spelling was probably meant.
+ */
+function readLongitude(obj: ObjectReader, centre: number | undefined): number | undefined {
+  const lon = obj.number("lon");
+  if (lon === undefined || centre === undefined) return lon;
+  if (lon >= centre - HALF_FRAME && lon < centre + HALF_FRAME) return lon;
+  obj.errors.add(
+    obj.at("lon"),
+    `expected a longitude within ${HALF_FRAME} degrees of the extent's centre ${Number(centre.toPrecision(12))}, got ${lon}; did you mean ${respell(lon, centre)}?`,
+  );
+  return undefined;
+}
+
+/** A `{ lat, lon }` object: WGS84 latitude, and a longitude in the extent's frame. */
+function readPosition(obj: ObjectReader | undefined, centre: number | undefined): Position | undefined {
   if (obj === undefined) return undefined;
   const lat = obj.number("lat", LAT_BOUNDS);
-  const lon = obj.number("lon", LON_BOUNDS);
+  const lon = readLongitude(obj, centre);
   if (lat === undefined || lon === undefined) return undefined;
   return { lat, lon };
 }
@@ -331,7 +400,11 @@ function checkParents(units: ArrayField<Unit>, errors: Errors): void {
   });
 }
 
-/** Rule 17: `levels` present exactly when the roster is a tree, one name per level, and no level over sixteen units. */
+/**
+ * Rule 17's roster half: `levels` is present exactly when the roster is a
+ * tree, with one name per level. The sixteen-unit ceiling is the other half,
+ * and it is counted per phase, so it waits for the phases (`checkLevelCounts`).
+ */
 function checkLevels(units: Unit[], levels: (string | undefined)[] | undefined, root: ObjectReader, errors: Errors): void {
   const isTree = units.some((unit) => unit.parent !== undefined);
   if (isTree && levels === undefined) {
@@ -343,15 +416,6 @@ function checkLevels(units: Unit[], levels: (string | undefined)[] | undefined, 
   const depth = treeDepth(units);
   if (isTree && levels !== undefined && levels.length !== depth) {
     errors.add(root.at("levels"), `expected ${depth} names, one per level of the unit tree, got ${levels.length}`);
-  }
-
-  for (let level = 0; level < depth; level += 1) {
-    const drawn = unitsAtLevel(units, level).length;
-    if (drawn > MAX_UNITS_PER_LEVEL) {
-      const name = levels?.[level];
-      const which = name === undefined ? `level ${level}` : `level ${level} (${JSON.stringify(name)})`;
-      errors.add(root.at("units"), `${which} draws ${drawn} units; no level draws more than ${MAX_UNITS_PER_LEVEL}`);
-    }
   }
 }
 
@@ -365,7 +429,7 @@ function checkUniqueIds(field: ArrayField<{ id: string }>, errors: Errors): void
   });
 }
 
-/** One phase (schema.md 2.4), with rules 7 and 8 checked against `context`. */
+/** One phase (schema.md 2.4), with rules 7, 8 and 18 checked against `context`. */
 function readPhase(value: unknown, path: string, errors: Errors, context: PhaseContext): Phase | undefined {
   const obj = ObjectReader.of(value, path, errors, [
     "id",
@@ -377,6 +441,7 @@ function readPhase(value: unknown, path: string, errors: Errors, context: PhaseC
     "caption",
     "notes",
     "references",
+    "still",
     "units",
   ]);
   if (obj === undefined) return undefined;
@@ -389,13 +454,15 @@ function readPhase(value: unknown, path: string, errors: Errors, context: PhaseC
   const windPresent = obj.has("wind");
   const wind = readWind(obj.object("wind", ["from", "force"], { optional: true }));
   const caption = obj.string("caption");
-  const notes = obj.string("notes", { optional: true });
+  const notes = obj.string("notes");
   const references = obj.array("references", (item, itemPath) => readReference(item, itemPath, errors), {
     nonEmpty: true,
   });
   if (references !== undefined) checkReferencesResolve(references, context.sourceIds, errors);
-  const units = obj.array("units", (item, itemPath) => readSnapshot(item, itemPath, errors));
-  if (units !== undefined) checkRosterCovered(units, context.rosterIds, errors);
+  const stillPresent = obj.has("still");
+  const still = readStill(obj);
+  const units = obj.array("units", (item, itemPath) => readSnapshot(item, itemPath, errors, context.frameCentre));
+  if (units !== undefined) checkSnapshotIds(units, context.rosterIds, errors);
 
   if (
     id === undefined ||
@@ -405,8 +472,10 @@ function readPhase(value: unknown, path: string, errors: Errors, context: PhaseC
     playbackRate === undefined ||
     (windPresent && wind === undefined) ||
     caption === undefined ||
+    notes === undefined ||
     references === undefined ||
     !allDefined(references.items) ||
+    (stillPresent && still === undefined) ||
     units === undefined ||
     !allDefined(units.items)
   ) {
@@ -422,7 +491,33 @@ function readPhase(value: unknown, path: string, errors: Errors, context: PhaseC
     caption,
     notes,
     references: references.items,
+    still,
     units: units.items,
+  });
+}
+
+/**
+ * Rule 18, first half: `still`, when present, is `true`. A `false` is noise
+ * rather than a phase that opted out — a phase that is not the still simply
+ * omits the field, so nothing has two ways of saying the same thing.
+ */
+function readStill(obj: ObjectReader): true | undefined {
+  const raw = obj.raw("still", { optional: true });
+  if (raw === undefined) return undefined;
+  if (raw !== true) {
+    obj.errors.add(obj.at("still"), "expected true; a phase that is not the battle's still leaves the field out");
+    return undefined;
+  }
+  return true;
+}
+
+/** Rule 18, second half: at most one phase carries `still`, reported on each one after the first. */
+function checkOneStill(phases: ArrayField<Phase>, errors: Errors): void {
+  let first: number | undefined;
+  phases.items.forEach((phase, index) => {
+    if (phase?.still !== true) return;
+    if (first === undefined) first = index;
+    else errors.add(appendPointer(phases.path, index, "still"), `at most one phase carries still, and phase ${first} already does`);
   });
 }
 
@@ -548,7 +643,7 @@ function checkReferencesResolve(references: ArrayField<Reference>, sourceIds: Se
 }
 
 /** One unit's picture at the phase instant (schema.md 2.7). */
-function readSnapshot(value: unknown, path: string, errors: Errors): UnitSnapshot | undefined {
+function readSnapshot(value: unknown, path: string, errors: Errors, centre: number | undefined): UnitSnapshot | undefined {
   const obj = ObjectReader.of(value, path, errors, [
     "id",
     "position",
@@ -560,12 +655,12 @@ function readSnapshot(value: unknown, path: string, errors: Errors): UnitSnapsho
   ]);
   if (obj === undefined) return undefined;
   const id = obj.string("id");
-  const position = readPosition(obj.object("position", ["lat", "lon"]));
+  const position = readPosition(obj.object("position", ["lat", "lon"]), centre);
   const heading = obj.number("heading", ANGLE);
   const formation = obj.oneOf("formation", FORMATIONS);
   const state = obj.oneOf("state", STATES);
   const strength = obj.number("strength", { min: 0, max: 1 }, { optional: true });
-  const moves = obj.array("moves", (item, itemPath) => readMove(item, itemPath, errors), { optional: true });
+  const moves = obj.array("moves", (item, itemPath) => readMove(item, itemPath, errors, centre), { optional: true });
 
   if (id === undefined || position === undefined || heading === undefined || formation === undefined || state === undefined) {
     return undefined;
@@ -578,8 +673,13 @@ function readSnapshot(value: unknown, path: string, errors: Errors): UnitSnapsho
   return withoutUndefined({ id, position, heading, formation, state, strength, moves: moveList });
 }
 
-/** Rule 7: a phase lists every roster unit exactly once and no id off the roster. */
-function checkRosterCovered(snapshots: ArrayField<UnitSnapshot>, rosterIds: Set<string> | undefined, errors: Errors): void {
+/**
+ * Rule 7, the half one phase can answer on its own: every snapshot names a
+ * roster unit, and no phase names one twice. A phase need not list every unit
+ * — a unit it leaves out is absent, and whether that absence is legal is a
+ * question about the whole file, which `checkUnitRuns` asks.
+ */
+function checkSnapshotIds(snapshots: ArrayField<UnitSnapshot>, rosterIds: Set<string> | undefined, errors: Errors): void {
   if (rosterIds === undefined) return;
   const seen = new Set<string>();
   snapshots.items.forEach((snapshot, index) => {
@@ -591,19 +691,80 @@ function checkRosterCovered(snapshots: ArrayField<UnitSnapshot>, rosterIds: Set<
     }
     seen.add(snapshot.id);
   });
-  if (!allDefined(snapshots.items)) return;
-  const missing = [...rosterIds].filter((id) => !seen.has(id));
-  if (missing.length > 0) {
-    errors.add(snapshots.path, `missing roster units: ${missing.map((id) => JSON.stringify(id)).join(", ")}`);
-  }
 }
 
-/** One authored arrow (schema.md 2.8). */
-function readMove(value: unknown, path: string, errors: Errors): Move | undefined {
+/**
+ * Rule 7, the half that needs the whole file: every roster unit has a snapshot
+ * in at least one phase, and its phases form **one contiguous run** (ADR-0024).
+ *
+ * A unit that comes back after an absence is two sorties and therefore two
+ * units, not one that blinks: absence makes the second free, and each sortie's
+ * opening strength is then its own. A unit that never appears is reported on
+ * the roster, where the entry that nothing draws actually is; a unit that
+ * returns is reported on the phase it returns in.
+ */
+function checkUnitRuns(units: ArrayField<Unit>, phases: ArrayField<Phase>, errors: Errors): void {
+  const runs = new Map<string, { first: number; last: number; gap: number | undefined }>();
+  phases.items.forEach((phase, index) => {
+    if (phase === undefined) return;
+    for (const snapshot of phase.units) {
+      const run = runs.get(snapshot.id);
+      if (run === undefined) runs.set(snapshot.id, { first: index, last: index, gap: undefined });
+      else {
+        if (run.gap === undefined && index > run.last + 1) run.gap = index;
+        run.last = index;
+      }
+    }
+  });
+
+  units.items.forEach((unit, index) => {
+    if (unit === undefined) return;
+    const run = runs.get(unit.id);
+    if (run === undefined) {
+      errors.add(appendPointer(units.path, index, "id"), `${JSON.stringify(unit.id)} has no snapshot in any phase`);
+    } else if (run.gap !== undefined) {
+      errors.add(
+        appendPointer(phases.path, run.gap, "units"),
+        `${JSON.stringify(unit.id)} returns here after being absent, and a unit's phases form one contiguous run; a second sortie is a second unit`,
+      );
+    }
+  });
+}
+
+/**
+ * Rule 17's ceiling, counted per level **per phase** (ADR-0024): which units a
+ * level draws is a property of the roster, and the phase's snapshots filter
+ * it. Midway's strikes therefore count only in the phases they are airborne,
+ * so the question is how many at 07:55 rather than how many exist all day.
+ */
+function checkLevelCounts(
+  units: Unit[],
+  levels: (string | undefined)[] | undefined,
+  phases: ArrayField<Phase>,
+  errors: Errors,
+): void {
+  const depth = treeDepth(units);
+  phases.items.forEach((phase, index) => {
+    if (phase === undefined) return;
+    for (let level = 0; level < depth; level += 1) {
+      const drawn = drawnAtLevel(units, level, phase).length;
+      if (drawn <= MAX_UNITS_PER_LEVEL) continue;
+      const name = levels?.[level];
+      const which = name === undefined ? `level ${level}` : `level ${level} (${JSON.stringify(name)})`;
+      errors.add(
+        appendPointer(phases.path, index, "units"),
+        `${which} draws ${drawn} units in this phase; no level draws more than ${MAX_UNITS_PER_LEVEL}`,
+      );
+    }
+  });
+}
+
+/** One authored arrow (schema.md 2.8). Its head may lie outside the extent, but never outside the extent's frame. */
+function readMove(value: unknown, path: string, errors: Errors, centre: number | undefined): Move | undefined {
   const obj = ObjectReader.of(value, path, errors, ["kind", "to"]);
   if (obj === undefined) return undefined;
   const kind = obj.oneOf("kind", MOVE_KINDS);
-  const to = readPosition(obj.object("to", ["lat", "lon"]));
+  const to = readPosition(obj.object("to", ["lat", "lon"]), centre);
   if (kind === undefined || to === undefined) return undefined;
   return { kind, to };
 }

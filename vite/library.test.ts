@@ -65,6 +65,13 @@ describe("the library read from the battle files", () => {
     fs.writeFileSync(path.join(dataDir, "battles", "half-written.json"), "{");
     expect(() => readLibrary(dataDir)).toThrow(/half-written\.json[\s\S]*not valid JSON/);
   });
+
+  it("refuses to build a library over a battle named after a path the build emits at the root (rule 19)", () => {
+    // The build writes a page per battle at `/<name>/`, so dev and the build
+    // have to agree with `npm run validate` about which names are the site's.
+    writeBattle("index", { year: 1805, month: 10, day: 21 });
+    expect(() => readLibrary(dataDir)).toThrow(/index\.json[\s\S]*"index"/);
+  });
 });
 
 describe("the bytes written and served", () => {

@@ -87,6 +87,13 @@ const signs: Record<Arm, Sign> = {
     ctx.lineTo(half.x, -half.y);
     ctx.stroke();
   },
+  /**
+   * Stopgap: the ship's own chevron, so a strike is drawn as something rather
+   * than as nothing while the arm is in the allowlist and its sign is not yet
+   * drawn. It is the wrong sign — a viewer cannot tell an aeroplane from a
+   * ship — and it goes with TODO #171.
+   */
+  aircraft: (ctx, half, scale) => signs.ship(ctx, half, scale),
 };
 
 export const ticks: Glyph = {

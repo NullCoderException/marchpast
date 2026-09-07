@@ -18,7 +18,7 @@
  * roster entry leaves its unit a root; the validator reports that separately
  * (rule 16).
  */
-import type { Unit } from "./types.ts";
+import type { Phase, Unit } from "./types.ts";
 
 /** Each unit's depth by id: `0` for a root, the parent's plus one otherwise. */
 export function unitDepths(units: readonly Unit[]): Map<string, number> {
@@ -51,4 +51,22 @@ export function unitsAtLevel(units: readonly Unit[], level: number): Unit[] {
     if (depth === level) return true;
     return depth < level && !parents.has(unit.id);
   });
+}
+
+/**
+ * The units `level` draws in one phase, in roster order: `unitsAtLevel`
+ * intersected with the units the phase holds a snapshot of (ADR-0024,
+ * schema.md 2.9).
+ *
+ * Which units a level *can* draw stays a property of the roster — `unitsAtLevel`
+ * never reads a phase — and presence only filters that set. So a parent never
+ * pops onto a finer level in the phases its children are away, and a parent
+ * that must stay visible there is given a permanent childless child.
+ *
+ * This is what rule 17 counts against the sixteen-unit ceiling, and what the
+ * renderer's level filter comes to through the picture.
+ */
+export function drawnAtLevel(units: readonly Unit[], level: number, phase: Phase): Unit[] {
+  const present = new Set(phase.units.map((snapshot) => snapshot.id));
+  return unitsAtLevel(units, level).filter((unit) => present.has(unit.id));
 }

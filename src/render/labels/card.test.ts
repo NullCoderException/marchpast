@@ -80,6 +80,11 @@ describe("cardContent", () => {
   it("answers nothing for a unit the picture has no snapshot of", () => {
     expect(cardContent(ROSTER, [], "weather")).toBeUndefined();
   });
+
+  it("leaves an absent child off its parent's card, because it is not there to have a state", () => {
+    const withoutRear = PICTURE.filter((unit) => unit.id !== "weather-rear");
+    expect(cardContent(ROSTER, withoutRear, "weather")?.tree).toEqual(["Van of the weather column · engaged"]);
+  });
 });
 
 describe("layoutCard", () => {

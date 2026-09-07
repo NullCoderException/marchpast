@@ -259,6 +259,7 @@
           "quote": "snatching up the shields which lay scattered on all hands among the heaps of slain, they fell upon the rear of the Roman line, and striking their backs and wounding their hams, occasioned vast havoc, and still greater panic and confusion."
         }
       ],
+      "still": true,
       "units": [
         { "id": "roman-cavalry", "position": { "lat": 41.338, "lon": 16.2082 }, "heading": 250, "formation": "line", "state": "destroyed", "strength": 0.05 },
         { "id": "roman-infantry", "position": { "lat": 41.3014, "lon": 16.1946 }, "heading": 200, "formation": "mass", "state": "engaged" },

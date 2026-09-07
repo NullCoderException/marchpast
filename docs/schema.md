@@ -27,7 +27,7 @@ Everything else in v1 stands: positions, the extent's shape and fit, wind, sourc
 
 ### 0.1 What v0.3 adds to v2
 
-Locked on 2026-09-07 by the v0.3 handoff ([#141](https://github.com/NullCoderException/marchpast/issues/141)). Every change is additive: `schema_version` stays `2`, no field is removed, and every v2 file already written is valid unchanged (the four shipped battles gain a `still` flag by choice, not by need). Until [#166](https://github.com/NullCoderException/marchpast/issues/166) and [#167](https://github.com/NullCoderException/marchpast/issues/167) land, the validators read the v2 of 2026-09-06 and this table is ahead of them.
+Locked on 2026-09-07 by the v0.3 handoff ([#141](https://github.com/NullCoderException/marchpast/issues/141)). Every change is additive: `schema_version` stays `2`, no field is removed, and every v2 file already written is valid unchanged (the four shipped battles gain a `still` flag by choice, not by need). [#166](https://github.com/NullCoderException/marchpast/issues/166) brought the battle file's validator, timeline and player to every row below that touches them. The **map** validator still reads the v2 of 2026-09-06, so the `rampart` row and the map half of the longitude row (3.3 rule 6) are ahead of it until [#167](https://github.com/NullCoderException/marchpast/issues/167) lands.
 
 | Change | Where | Decided in |
 |---|---|---|

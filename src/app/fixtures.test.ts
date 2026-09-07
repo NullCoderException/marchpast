@@ -2,8 +2,9 @@
  * A fixture is held to one thing: the schema. It never passes the validator on
  * the way to the plate — the player takes it straight — so this is the only
  * place that stops one drifting out of the shape a battle file has. The
- * register is empty just now (#109), so that check has nothing to run on: it
- * stands for the next fixture rather than for one there is.
+ * register holds the absence fixture of #166, which is exactly what the check
+ * is for: a fixture is written to be looked at, and nothing else would notice
+ * it drifting out of the shape a battle file has.
  */
 import { describe, expect, it } from "vitest";
 import { validateBattle } from "../schema/validateBattle.ts";
@@ -38,8 +39,11 @@ describe("fixturesThereAre", () => {
     expect(fixturesThereAre({ "trafalgar-sketch": {}, "nile-sketch": {} })).toBe("The fixtures there are: trafalgar-sketch, nile-sketch.");
   });
 
-  it("says there are none rather than offering an empty list, which is what the register holds now", () => {
+  it("says there are none rather than offering an empty list, which is what an emptied register gets", () => {
     expect(fixturesThereAre({})).toBe("There are no fixtures just now: they live in src/app/fixtures.ts.");
-    expect(fixturesThereAre()).toBe("There are no fixtures just now: they live in src/app/fixtures.ts.");
+  });
+
+  it("names the register there is", () => {
+    expect(fixturesThereAre()).toBe("The fixtures there are: carrier-strike.");
   });
 });
