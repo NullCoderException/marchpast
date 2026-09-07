@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
   closeCard,
+  focusUnit,
   hoverUnit,
   initialState,
   isFinished,
   jumpNext,
   jumpPrevious,
   jumpToPhase,
+  leaveMuster,
   levelOptions,
   pinUnit,
   scrubTo,
@@ -276,6 +278,53 @@ describe("the unit card", () => {
       absent.phases[0]!.units = absent.phases[0]!.units.filter((snapshot) => snapshot.id !== "combined-fleet");
       const pinned = pinUnit(closed, "combined-fleet");
       expect(setLevel(absent, pinned, 1).card).toBeUndefined();
+    });
+  });
+
+  describe("focusUnit", () => {
+    it("opens the card on the unit focus has reached, unpinned", () => {
+      expect(focusUnit(closed, "weather-column").card).toEqual({ id: "weather-column", pinned: false });
+    });
+
+    it("moves the card off a pinned unit, because focus always moves the card", () => {
+      // The pointer's rule is the opposite (`hoverUnit` ignores a pinned card);
+      // obeying it here would strike the rest of the muster silent (#130).
+      expect(focusUnit(pinUnit(closed, "weather-column"), "lee-column").card).toEqual({ id: "lee-column", pinned: false });
+    });
+
+    it("changes nothing when focus is already on the card's unit, so a pinned card survives being walked back onto", () => {
+      const pinned = pinUnit(closed, "weather-column");
+      expect(focusUnit(pinned, "weather-column")).toBe(pinned);
+      const shown = focusUnit(closed, "lee-column");
+      expect(focusUnit(shown, "lee-column")).toBe(shown);
+    });
+
+    it("leaves the clock and the play state alone, so walking the muster never interrupts", () => {
+      const shown = focusUnit(closed, "weather-column");
+      expect(shown.clock).toBe(closed.clock);
+      expect(shown.playing).toBe(closed.playing);
+    });
+  });
+
+  describe("closeCard as Escape in the muster", () => {
+    it("unpins and closes, whether the card was pinned or not", () => {
+      expect(closeCard(pinUnit(closed, "weather-column"))).toEqual(closed);
+      expect(closeCard(focusUnit(closed, "weather-column"))).toEqual(closed);
+    });
+  });
+
+  describe("leaveMuster", () => {
+    it("closes an unpinned card, which is the keyboard's pointerleave", () => {
+      expect(leaveMuster(focusUnit(closed, "weather-column"))).toEqual(closed);
+    });
+
+    it("keeps a pinned card, which is what pinning is for", () => {
+      const pinned = pinUnit(closed, "weather-column");
+      expect(leaveMuster(pinned)).toBe(pinned);
+    });
+
+    it("changes nothing when no card is open", () => {
+      expect(leaveMuster(closed)).toBe(closed);
     });
   });
 

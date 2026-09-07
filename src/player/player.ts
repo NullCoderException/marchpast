@@ -10,22 +10,32 @@
  * a card opening — which is what the `dirty` flag tracks. Every rule about
  * what a control does lives in `state.ts`; this file only wires gestures to
  * transitions and state to pixels.
+ *
+ * The plate has words as well as pixels (#130). Two hidden nodes stand after
+ * the canvas: the **muster**, the keyboard's route to the same unit cards the
+ * pointer opens, and the **announcer**, the one sentence saying which phase of
+ * how many is on the plate. Both are kept in step at the end of a rendered
+ * frame and neither costs anything on a frame that changed nothing.
  */
 import type { Battle, MapFile } from "../schema/types.ts";
 import { createRenderer, type HitRegion, hoverAt, unitAt } from "../render/index.ts";
 import { layoutMode } from "../render/layout.ts";
 import { pictureAt } from "../timeline/pictureAt.ts";
+import { ANNOUNCER_ID, createAnnouncer } from "./announcer.ts";
 import { createControls, type PickerOptions } from "./controls.ts";
 import { createDetailsPanel } from "./details.ts";
 import { Listeners } from "./dom.ts";
+import { createMuster } from "./muster.ts";
 import "./player.css";
 import {
   closeCard,
+  focusUnit,
   hoverUnit,
   initialState,
   jumpNext,
   jumpPrevious,
   jumpToPhase,
+  leaveMuster,
   pinUnit,
   scrubTo,
   setLevel,
@@ -64,6 +74,15 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
   const renderer = createRenderer(canvas);
   const listeners = new Listeners();
   const details = createDetailsPanel(battle, map);
+  const announcer = createAnnouncer(battle);
+
+  // The plate is a picture, named by the battle it draws and described by the
+  // announcer, which says which phase of how many is on it (#130). Without
+  // this the plate is an anonymous `<canvas>`: nothing to land on and nothing
+  // said when you do.
+  canvas.setAttribute("role", "img");
+  canvas.setAttribute("aria-label", battle.title);
+  canvas.setAttribute("aria-describedby", ANNOUNCER_ID);
 
   let state: PlayerState = initialState(battle);
   let dirty = true;
@@ -98,6 +117,16 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
   }, picker);
   controlsRoot.append(details.root, controls.root);
 
+  // The keyboard's route to a unit card, immediately after the plate it stands
+  // for, and the sentence that says where in the battle the plate is (#130).
+  const muster = createMuster(battle, {
+    focus: (id) => apply(focusUnit(state, id)),
+    pin: (id) => apply(pinUnit(state, id)),
+    close: () => apply(closeCard(state)),
+    leave: () => apply(leaveMuster(state)),
+  });
+  canvas.after(muster.root, announcer.root);
+
   // Space plays and pauses, the arrows jump phases. A focused control that
   // already answers the key keeps it: space is how a button is pressed, and a
   // select owns both arrows, so the shortcut stands aside rather than firing
@@ -118,7 +147,8 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
   // and a click on bare plate closes it. A tap is a click, so one pair of rules
   // serves both inputs (#60). The two gestures read different regions: hover
   // answers to a glyph and its label, a click to those and the legend's numeral
-  // rows as well. Keyboard access to a card is out of scope for v0.2.
+  // rows as well. The keyboard reaches the same cards through the muster, and
+  // ends in the same card drawn on the same canvas (#130).
   const canvasPoint = (event: MouseEvent): { x: number; y: number } => {
     const rect = canvas.getBoundingClientRect();
     return { x: event.clientX - rect.left, y: event.clientY - rect.top };
@@ -149,6 +179,11 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
     // panel gains the legend's rows exactly when the plate loses them (#86).
     details.setPlate(state.view, layoutMode(canvas.clientWidth || canvas.width));
     controls.update(state, picture, details.isOpen());
+    announcer.update(picture);
+    // Last, because a rebuild moves focus and so opens a card: the state it
+    // reads is the one this frame was drawn from, and the change it makes is
+    // the next frame's.
+    muster.update(state, picture);
   });
 
   return {
@@ -156,6 +191,8 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
       cancelAnimationFrame(frame);
       listeners.removeAll();
       controls.destroy();
+      muster.destroy();
+      announcer.root.remove();
       details.root.remove();
     },
   };
@@ -165,11 +202,15 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
  * Whether the focused element answers `key` itself: a text field takes every
  * key, a select takes the arrows and space, and any button takes space, which
  * is how it is pressed.
+ *
+ * A focused muster entry stands with the select rather than the button: the
+ * arrows walk the units and space pins the card, so both belong to the widget
+ * the viewer tabbed to (#130). It is the same stand-aside, not a new rule.
  */
 function answersItself(target: EventTarget | null, key: string): boolean {
   if (!(target instanceof HTMLElement)) return false;
   if (target.isContentEditable || ["INPUT", "TEXTAREA"].includes(target.tagName)) return true;
-  if (target.tagName === "SELECT") return true;
+  if (target.tagName === "SELECT" || target.getAttribute("role") === "option") return true;
   return key === " " && ["BUTTON", "A"].includes(target.tagName);
 }
 

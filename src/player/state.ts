@@ -56,7 +56,8 @@ export interface PlayerState {
    */
   level: number;
   /**
-   * The unit whose card is open, and whether a click pinned it there. Player
+   * The unit whose card is open, and whether a click or an Enter pinned it
+   * there — a pointer at rest and a focused muster entry open one alike. Player
    * state like the view and the level — viewer-opened, never authored, never
    * on the URL and never remembered — and absent when no card is open (#60).
    */
@@ -149,12 +150,37 @@ export function hoverUnit(state: PlayerState, id: string | undefined): PlayerSta
   return { ...state, card: { id, pinned: false } };
 }
 
-/** A click or tap on a unit: the card is pinned to it, swapping from whatever it was on. One card at a time. */
+/**
+ * Focus has reached a unit in the muster. Focus **always** moves the card,
+ * which is where the keyboard parts company with the pointer above: the rule
+ * that makes a pinned card ignore hover exists to stop a unit sliding out from
+ * under a still pointer, a problem focus does not have, and if focus obeyed it
+ * then pinning a card would strike the rest of the muster silent (#130).
+ *
+ * Focus staying on the unit the card is already on changes nothing, so a
+ * pinned card survives being walked back onto.
+ */
+export function focusUnit(state: PlayerState, id: string): PlayerState {
+  if (state.card?.id === id) return state;
+  return { ...state, card: { id, pinned: false } };
+}
+
+/** A click or tap on a unit, or Enter or Space on its muster entry: the card is pinned to it, swapping from whatever it was on. One card at a time. */
 export function pinUnit(state: PlayerState, id: string): PlayerState {
   return { ...state, card: { id, pinned: true } };
 }
 
-/** Close the card, which is what a click or tap on bare plate does. Nothing at all when none is open. */
+/**
+ * Focus has left the muster: an unpinned card closes, which is the keyboard's
+ * `pointerleave`. A pinned card stays, and that is what pinning is for — it is
+ * how a card is still there once focus has gone on to the scrubber or the
+ * Level chooser (#130).
+ */
+export function leaveMuster(state: PlayerState): PlayerState {
+  return state.card?.pinned === true ? state : closeCard(state);
+}
+
+/** Close the card, which is what a click or tap on bare plate does, and what Escape in the muster does. Nothing at all when none is open. */
 export function closeCard(state: PlayerState): PlayerState {
   if (state.card === undefined) return state;
   const next = { ...state };

@@ -8,11 +8,16 @@
  * `state.ts` through the handlers it was given, and `update` is the only way
  * state reaches the DOM. That is the seam that keeps the rules testable
  * without a browser.
+ *
+ * The strip is **one tab stop per control and none per phase** (#130): the bar
+ * is focusable and the ticks are not, so a battle of twenty-one phases costs
+ * the tab order one stop rather than twenty-one.
  */
 import type { LibraryEntry } from "../data/library.ts";
 import { formatClock, VIEWS, viewById, type ViewId } from "../render/index.ts";
 import type { Battle } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
+import { phaseCount } from "./announcer.ts";
 import { Listeners, element } from "./dom.ts";
 import { barSegments, clockToFraction, type BarFraction } from "./scrub.ts";
 import { levelOptions, MULTIPLIERS, type PlayerState } from "./state.ts";
@@ -69,6 +74,11 @@ export function createControls(battle: Battle, handlers: ControlHandlers, picker
 
   const { bar, thumb } = scrubber(battle, listeners, handlers, button);
   const readout = element("output", "st-readout", "--:--");
+  // An `<output>` is a live region of its own, and this one is rewritten every
+  // time the shown second changes — which at 600x is several times a second.
+  // There is **one** announcer on this page (#130), and it speaks once a phase;
+  // the clock stays readable on demand and says nothing of its own accord.
+  readout.setAttribute("aria-live", "off");
   const multiplier = multiplierChooser(listeners, handlers);
   const view = viewChooser(listeners, handlers);
   const level = levelChooser(battle, listeners, handlers);
@@ -95,7 +105,9 @@ export function createControls(battle: Battle, handlers: ControlHandlers, picker
       const fraction = clockToFraction(battle, state.clock);
       thumb.style.left = `${fraction * 100}%`;
       bar.setAttribute("aria-valuenow", String(Math.round(fraction * 100)));
-      bar.setAttribute("aria-valuetext", `${time}, ${picture.label}`);
+      // The same count the announcer reads, so the bar and the announcer never
+      // state the position two different ways (#130).
+      bar.setAttribute("aria-valuetext", `${phaseCount(picture, battle.phases.length)}, ${time}, ${picture.label}`);
 
       for (const option of multiplier.options) option.selected = Number(option.value) === state.multiplier;
       for (const option of view.options) option.selected = option.value === state.view;
@@ -138,6 +150,20 @@ function scrubber(
   bar.setAttribute("aria-label", "Battle clock");
   bar.setAttribute("aria-valuemin", "0");
   bar.setAttribute("aria-valuemax", "100");
+  // A slider nothing could focus was an ARIA lie, and `player.css` has styled
+  // `.st-bar:focus-visible` all along for a focus it could never take (#130).
+  bar.tabIndex = 0;
+
+  // The bar's own two keys. The arrows need none: the player's own shortcut
+  // jumps phases from anywhere, which is what an arrow on a battle-clock
+  // slider should do. Home and End are the ends of the battle, which nothing
+  // else reaches in one press now the ticks have left the tab order.
+  listeners.on<KeyboardEvent>(bar, "keydown", (event) => {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    if (event.key !== "Home" && event.key !== "End") return;
+    event.preventDefault();
+    handlers.jumpToPhase(event.key === "Home" ? 0 : battle.phases.length - 1);
+  });
 
   for (const segment of barSegments(battle)) {
     const phase = battle.phases[segment.index]!;
@@ -147,6 +173,12 @@ function scrubber(
     bar.append(piece);
 
     const tick = button("st-tick", "", () => handlers.jumpToPhase(segment.index), `Jump to ${phase.label}, ${phase.t}`);
+    // A pointer target and nothing else. Midway's twenty-one phases are
+    // twenty-one tab stops between the plate and Details, and the arrows
+    // already reach every phase while `aria-valuetext` says where you are, so
+    // what is lost is direct jumping and what is bought back is the strip
+    // (#130).
+    tick.tabIndex = -1;
     tick.style.left = `${segment.start * 100}%`;
     tick.title = `${phase.t} ${phase.label}`;
     // The tick sits over the bar, so its own gestures must not also scrub.
