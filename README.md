@@ -1,6 +1,6 @@
 # Marchpast
 
-Marchpast plays back famous battles as animated 2D "grand strategy" sequences: a map, its units and their moves, a caption band and play/pause/scrub controls, driven by a reusable JSON timeline format whose timelines are extracted from public-domain primary and secondary sources. It is not a game and not 3D. It is a data-driven animation player where the interesting work is the data, and the bar is a documentary map with arrows, drawn here as an engraved chart plate. The concept in full is [`docs/CONCEPT.md`](docs/CONCEPT.md).
+Marchpast plays back famous battles as animated 2D "grand strategy" sequences: a map, its units and their moves, a caption band and play/pause/scrub controls. It is not a game and not 3D. The bar is a documentary map with arrows, drawn here as an engraved chart plate. It is driven by a reusable JSON timeline format whose timelines are extracted from public-domain primary and secondary sources: a data-driven animation player where the interesting work is the data. The concept in full is [`docs/CONCEPT.md`](docs/CONCEPT.md).
 
 It is live at **https://marchpast.com/**. The bare URL is the library: every battle it holds, oldest first, with its date and the sentence it describes itself by. A battle is addressed by name on the query string, [`?battle=trafalgar`](https://marchpast.com/?battle=trafalgar), and the player's picker switches to another one. There is no default battle and the site remembers nothing (ADR-0011).
 

@@ -76,7 +76,7 @@ async function showLibrary(page: Page, loading: Promise<LibraryResult>): Promise
     return;
   }
 
-  // The title is index.html's `Marchpast` already: only a battle changes it.
+  // The title is index.html's library title already: only a battle changes it.
   page.canvas.remove();
   page.controlsRoot.remove();
   document.documentElement.classList.add("st-library-page");

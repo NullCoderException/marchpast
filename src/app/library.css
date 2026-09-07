@@ -43,18 +43,50 @@
   border-bottom: 3px double var(--st-rule);
 }
 
+/*
+ * The lockup (#135): the mark's baseline — the line its ticks stand on, y 50
+ * of the 64 it is drawn in — sits on the wordmark's baseline, so the ticks and
+ * the letters stand on the same line. The two feet aligned, the mark rides
+ * high by 0.219 of its size against the face's 0.205 of the name's, which at
+ * 40 over 30 is the 3px it is dropped by here. The gap is 35% of the mark's
+ * height, at either size.
+ */
+.st-library-lockup {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.st-library-mark {
+  line-height: 0;
+  margin-bottom: -3px;
+}
+
+/* The mark is drawn at its size (MARK_SIZE in libraryPage.ts); only the phone below overrides it. */
+.st-library-mark svg {
+  display: block;
+}
+
 .st-library-name {
   margin: 0;
   font-size: 30px;
   font-weight: normal;
+  line-height: 1.15;
   letter-spacing: 0.02em;
 }
 
 .st-library-idea {
-  margin: 8px 0 0;
+  margin: 10px 0 0;
   font-size: 15px;
   font-style: italic;
   line-height: 1.45;
+}
+
+/* The way into the story, in ink: never a side ink, which belongs to the sides of a battle (#58). */
+.st-library-story {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-style: italic;
 }
 
 .st-library-list {
@@ -145,5 +177,24 @@
   .st-library-link {
     padding: 16px 8px;
     margin: 0 -8px;
+  }
+
+  /* The mark drops to 32 against a name that does not move, so the drop and the gap go with it. */
+  .st-library-lockup {
+    gap: 11px;
+  }
+
+  .st-library-mark {
+    margin-bottom: -1px;
+  }
+
+  .st-library-mark svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* The story line keeps its head and loses its tail: one line at 390. */
+  .st-library-story-more {
+    display: none;
   }
 }
