@@ -538,32 +538,54 @@ const boards = {
 
 for (const [name, html] of Object.entries(boards)) writeFileSync(new URL(name, import.meta.url), html);
 
+// The frame is the artboard's own size, read back off the drawing rather than guessed: w and h
+// neither scale nor crop, so a frame short of its root clips the sheet silently.
+const size = (name) => {
+  const m = /<svg width="([0-9]+)" height="([0-9]+)"/.exec(boards[name]);
+  return { w: Number(m[1]), h: Number(m[2]) + 8 };
+};
+const place = (rows, page) => {
+  const out = [];
+  let y = 0;
+  for (const row of rows) {
+    let x = 0;
+    let tallest = 0;
+    for (const file of row) {
+      const { w, h } = size(file);
+      out.push({ file, page, x, y, w, h });
+      x += w + 120;
+      tallest = Math.max(tallest, h);
+    }
+    y += tallest + 140;
+  }
+  return out;
+};
+
 const canvas = {
   pages: [
     { id: "page-1", name: "The sign" },
     { id: "page-2", name: "The frames" },
   ],
   artboards: [
-    { file: "Main.dc.html", page: "page-1", x: 0, y: 0, w: 1300, h: 1200 },
-    { file: "States.dc.html", page: "page-1", x: 1420, y: 0, w: 1300, h: 1000 },
-    { file: "Legend.dc.html", page: "page-1", x: 2840, y: 0, w: 1300, h: 860 },
-    { file: "Engaged.dc.html", page: "page-1", x: 0, y: 1340, w: 1300, h: 900 },
-    { file: "Atlas.dc.html", page: "page-1", x: 1420, y: 1340, w: 1300, h: 780 },
-    { file: "StaffMap.dc.html", page: "page-1", x: 2840, y: 1340, w: 1300, h: 800 },
-    { file: "FirstStrike.dc.html", page: "page-2", x: 0, y: 0, w: 1120, h: 650 },
-    { file: "Burning.dc.html", page: "page-2", x: 1240, y: 0, w: 1120, h: 650 },
-    { file: "NightBurning.dc.html", page: "page-2", x: 2480, y: 0, w: 1120, h: 650 },
-    { file: "MidwayStaff.dc.html", page: "page-2", x: 3720, y: 0, w: 1120, h: 650 },
-    { file: "Aboard.dc.html", page: "page-2", x: 0, y: 790, w: 1300, h: 780 },
+    ...place([
+      ["Main.dc.html", "States.dc.html", "Legend.dc.html"],
+      ["Engaged.dc.html", "Atlas.dc.html", "StaffMap.dc.html"],
+    ], "page-1"),
+    ...place([
+      ["FirstStrike.dc.html", "Burning.dc.html", "NightBurning.dc.html", "MidwayStaff.dc.html"],
+      ["Aboard.dc.html"],
+    ], "page-2"),
   ],
   annotations: [
     {
-      id: "brief", page: "page-1", x: 0, y: -150, w: 620,
-      text: "#140 · The aircraft sign.\nThree candidates in every hand. The legend board is the one that decides it: everything reads at nine times magnification, and the plate's legend samples at 0.75.",
+      id: "brief", page: "page-1", x: 0, y: -170, w: 660,
+      text: ["#140 - The aircraft sign, in the four hands ADR-0015 obliges.",
+        "The legend sheet is the one that decides it: every candidate reads at nine times magnification, and the plate's legend samples at 0.75."].join("\n"),
     },
     {
-      id: "frames", page: "page-2", x: 0, y: -150, w: 620,
-      text: "Both frames are drawn with candidate A. Nothing here is geo-registered — these are scenes, not map files.",
+      id: "frames", page: "page-2", x: 0, y: -170, w: 660,
+      text: ["Both plate frames are drawn with candidate A; the staff frame keeps #139's own greyed mark.",
+        "Nothing here is geo-registered - these are scenes, not map files."].join("\n"),
     },
   ],
   launch: { view: "canvas", page: "page-1" },
