@@ -8,14 +8,17 @@
  * held to is the schema, which `fixtures.test.ts` checks by running each one
  * through the validator. And a fixture goes once a real battle covers what it
  * stood in for: the Cannae fixture went when `data/battles/cannae.json`
- * landed, researched and over a map cut from the ground itself (#109), and the
- * register has been empty since. The route stays for the next slice that has
- * to be looked at before its battle file exists.
+ * landed, researched and over a map cut from the ground itself (#109).
+ *
+ * The register holds `carrier-strike`, which stands in for Midway while its
+ * battle file is being written: it is the only thing on the site that has a
+ * unit absent from a phase, or an extent running east past 180. It goes when
+ * Midway lands.
  */
 import type { Battle, Phase, UnitSnapshot } from "../schema/types.ts";
 
-/** One snapshot of the strike fixture below, spelled short because there are twenty of them. */
-function at(id: string, lat: number, lon: number, heading: number, over: Partial<UnitSnapshot> = {}): UnitSnapshot {
+/** One snapshot of the strike fixture below, spelled short because it is written twenty-one times. */
+function snapshot(id: string, lat: number, lon: number, heading: number, over: Partial<UnitSnapshot> = {}): UnitSnapshot {
   return { id, position: { lat, lon }, heading, formation: "column", state: "intact", ...over };
 }
 
@@ -75,37 +78,37 @@ const CARRIER_STRIKE: Battle = {
   ],
   phases: [
     hour(6, "Before dawn: the forces close", "Invented: the two forces close from east and west, and nothing is in the air.", "Nothing here is history. The positions are chosen so the strike has somewhere to fly from.", [
-      at("blue-force", 28.2, 183.4, 260),
-      at("blue-carriers", 28.35, 183.6, 260),
-      at("red-force", 27.9, 179.2, 80),
+      snapshot("blue-force", 28.2, 183.4, 260),
+      snapshot("blue-carriers", 28.35, 183.6, 260),
+      snapshot("red-force", 27.9, 179.2, 80),
     ]),
     hour(7, "The strike is launched", "Invented: the strike goes off the deck and appears on the plate for the first time.", "The strike's first snapshot. A unit appears at the instant of its first phase, with no fade (ADR-0024).", [
-      at("blue-force", 28.2, 183.0, 260),
-      at("blue-carriers", 28.35, 183.2, 260),
-      at("blue-strike", 28.3, 182.8, 260, { formation: "line" }),
-      at("red-force", 27.9, 179.6, 80),
+      snapshot("blue-force", 28.2, 183.0, 260),
+      snapshot("blue-carriers", 28.35, 183.2, 260),
+      snapshot("blue-strike", 28.3, 182.8, 260, { formation: "line" }),
+      snapshot("red-force", 27.9, 179.6, 80),
     ]),
     hour(8, "The strike attacks", "Invented: the strike is over the Red force, which is engaged.", "The middle of the run: the strike tweens across both of the intervals its snapshots bound.", [
-      at("blue-force", 28.2, 182.6, 260),
-      at("blue-carriers", 28.35, 182.8, 260),
-      at("blue-strike", 28.05, 180.4, 260, { formation: "line", state: "engaged" }),
-      at("red-force", 27.95, 180.1, 80, { state: "engaged", strength: 0.7 }),
+      snapshot("blue-force", 28.2, 182.6, 260),
+      snapshot("blue-carriers", 28.35, 182.8, 260),
+      snapshot("blue-strike", 28.05, 180.4, 260, { formation: "line", state: "engaged" }),
+      snapshot("red-force", 27.95, 180.1, 80, { state: "engaged", strength: 0.7 }),
     ]),
     hour(9, "The strike is recovered", "Invented: the strike is back on the deck, and is on the plate for the last time.", "The strike's last snapshot: it is over the carriers, and from this instant it is gone.", [
-      at("blue-force", 28.2, 182.2, 260),
-      at("blue-carriers", 28.3, 182.3, 260),
-      at("blue-strike", 28.3, 182.3, 260, { state: "engaged", strength: 0.6 }),
-      at("red-force", 28.0, 180.6, 80, { state: "engaged", strength: 0.7 }),
+      snapshot("blue-force", 28.2, 182.2, 260),
+      snapshot("blue-carriers", 28.3, 182.3, 260),
+      snapshot("blue-strike", 28.3, 182.3, 260, { state: "engaged", strength: 0.6 }),
+      snapshot("red-force", 28.0, 180.6, 80, { state: "engaged", strength: 0.7 }),
     ]),
     hour(10, "The forces are in contact", "Invented: with nothing in the air, the two forces fight it out.", "The strike is absent from here on. Nothing rolls its picture up into its parent.", [
-      at("blue-force", 28.2, 181.8, 260, { state: "engaged" }),
-      at("blue-carriers", 28.3, 181.9, 260, { state: "engaged" }),
-      at("red-force", 28.05, 181.1, 80, { state: "engaged", strength: 0.5 }),
+      snapshot("blue-force", 28.2, 181.8, 260, { state: "engaged" }),
+      snapshot("blue-carriers", 28.3, 181.9, 260, { state: "engaged" }),
+      snapshot("red-force", 28.05, 181.1, 80, { state: "engaged", strength: 0.5 }),
     ]),
     hour(11, "The Red force breaks off", "Invented: the Red force turns away and the action ends.", "The last phase, whose picture holds until end.", [
-      at("blue-force", 28.2, 181.4, 260, { state: "engaged" }),
-      at("blue-carriers", 28.3, 181.5, 260, { state: "engaged" }),
-      at("red-force", 28.2, 181.0, 30, { state: "broken", strength: 0.4 }),
+      snapshot("blue-force", 28.2, 181.4, 260, { state: "engaged" }),
+      snapshot("blue-carriers", 28.3, 181.5, 260, { state: "engaged" }),
+      snapshot("red-force", 28.2, 181.0, 30, { state: "broken", strength: 0.4 }),
     ]),
   ],
 };

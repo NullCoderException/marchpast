@@ -10,10 +10,18 @@
  *
  * A unit exists only inside its run (ADR-0024, schema.md 2.9, 2.11). The
  * picture holds a unit only when the interval's **both ends** have a snapshot
- * of it, so it appears at the instant of its first phase and is gone once its
- * last is reached, with no fade. Everything downstream — the plate, the
- * labels, the muster, the card — reads the picture, so absence needs no second
- * rule anywhere else.
+ * of it, with no fade. Everything downstream — the plate, the labels, the
+ * muster, the card — reads the picture, so absence needs no second rule
+ * anywhere else.
+ *
+ * That makes the run inclusive at its first instant and exclusive at its last,
+ * which is ADR-0024's own illustration and not an off-by-one: *"a launch phase
+ * puts the strike on its carrier and it tweens outward; a recovery phase brings
+ * it home and it is struck below."* The last snapshot is the tween's
+ * destination — the strike is drawn arriving at its carrier right up to that
+ * instant — and at the instant itself the aeroplanes are below. A run that
+ * reaches the battle's last phase has no far end to check, so it holds to
+ * `end` like any other.
  */
 import type { Battle, Phase, UnitSnapshot } from "../schema/types.ts";
 import { clampClock, intervalAt } from "./intervals.ts";

@@ -154,7 +154,18 @@ describe("pictureAt: a unit absent from a phase", () => {
     expect(unit(half, "strike").track).toEqual({ from: { lat: 10, lon: 10 }, to: { lat: 10, lon: 20 } });
   });
 
-  it("takes the strike off the plate once its run is over, with no fade", () => {
+  it("draws the strike arriving at its last snapshot, right up to the instant it is struck below", () => {
+    // The last snapshot is the tween's destination, which is how a recovery
+    // phase "brings it home" (ADR-0024): the strike is on the plate, at its
+    // authored position, until the instant of the phase that holds it.
+    const arriving = pictureAt(ABSENCE_BATTLE, clock("12:59:59"));
+    expect(arriving.units.map((u) => u.id)).toEqual(["force", "fleet", "strike"]);
+    // A second short of the hour is a second short of the destination, which
+    // is the whole of what "brings it home" means.
+    expect(unit(arriving, "strike").position.lon).toBeCloseTo(30, 2);
+  });
+
+  it("takes the strike off the plate at the instant its run ends, with no fade", () => {
     expect(drawn("13:00")).toEqual(["force", "fleet"]);
     expect(drawn("14:00")).toEqual(["force", "fleet"]);
     expect(drawn("15:30")).toEqual(["force", "fleet"]);

@@ -207,6 +207,11 @@ export const NIGHT_BATTLE: Battle = {
  * has to be watched at a level: level 0 draws the force, level 1 draws the two
  * children, and `force` never pops onto level 1 in the hours the strike is
  * away.
+ *
+ * `src/app/fixtures.ts` holds the same shape drawn to be *looked* at, over
+ * ground and a frame past 180. This one is arithmetic: if the two ever
+ * disagree about what absence means, the rule is `pictureAt`'s and both are
+ * wrong.
  */
 export const ABSENCE_BATTLE: Battle = {
   schema_version: 2,
@@ -231,7 +236,7 @@ export const ABSENCE_BATTLE: Battle = {
   phases: [0, 1, 2, 3, 4, 5].map((index) => ({
     id: `phase-${index}`,
     label: `Phase ${index}`,
-    t: `${10 + index}:00`,
+    t: `${String(10 + index).padStart(2, "0")}:00`,
     playback_rate: 3600,
     caption: `Caption ${index}.`,
     notes: `A note phase ${index} carries.`,

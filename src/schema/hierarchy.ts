@@ -63,8 +63,11 @@ export function unitsAtLevel(units: readonly Unit[], level: number): Unit[] {
  * pops onto a finer level in the phases its children are away, and a parent
  * that must stay visible there is given a permanent childless child.
  *
- * This is what rule 17 counts against the sixteen-unit ceiling, and what the
- * renderer's level filter comes to through the picture.
+ * This is what rule 17 counts against the sixteen-unit ceiling. The renderer
+ * reaches the same set from the other side, in `src/render/level.ts`: it holds
+ * a picture whose absent units the timeline has already dropped, so it filters
+ * that by `unitsAtLevel` instead. Two entry points, one rule — the rule being
+ * `unitsAtLevel`, which lives here alone.
  */
 export function drawnAtLevel(units: readonly Unit[], level: number, phase: Phase): Unit[] {
   const present = new Set(phase.units.map((snapshot) => snapshot.id));

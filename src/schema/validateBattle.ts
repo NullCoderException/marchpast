@@ -505,7 +505,10 @@ function readStill(obj: ObjectReader): true | undefined {
   const raw = obj.raw("still", { optional: true });
   if (raw === undefined) return undefined;
   if (raw !== true) {
-    obj.errors.add(obj.at("still"), "expected true; a phase that is not the battle's still leaves the field out");
+    obj.errors.add(
+      obj.at("still"),
+      `expected true, got ${JSON.stringify(raw)}; a phase that is not the battle's still leaves the field out`,
+    );
     return undefined;
   }
   return true;
@@ -513,11 +516,16 @@ function readStill(obj: ObjectReader): true | undefined {
 
 /** Rule 18, second half: at most one phase carries `still`, reported on each one after the first. */
 function checkOneStill(phases: ArrayField<Phase>, errors: Errors): void {
-  let first: number | undefined;
+  let first: { index: number; id: string } | undefined;
   phases.items.forEach((phase, index) => {
     if (phase?.still !== true) return;
-    if (first === undefined) first = index;
-    else errors.add(appendPointer(phases.path, index, "still"), `at most one phase carries still, and phase ${first} already does`);
+    if (first === undefined) first = { index, id: phase.id };
+    else {
+      errors.add(
+        appendPointer(phases.path, index, "still"),
+        `at most one phase carries still, and phase ${first.index} (${JSON.stringify(first.id)}) already does`,
+      );
+    }
   });
 }
 
