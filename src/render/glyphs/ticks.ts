@@ -298,8 +298,15 @@ function paintCloud(
   const paint = scratch.getContext("2d");
   if (paint === null) return;
 
+  // The whole scratch, and not merely the corner about to be painted: it is
+  // shared and only ever grows, so an earlier cloud's ink is still sitting in
+  // it, and the stamp below resamples across the corner's edge. Clearing the
+  // corner alone leaves a cloud's outline depending on the clouds drawn before
+  // it — unnoticeable in the player, and fatal to a still, which has to be a
+  // pure function of its arguments (ADR-0025).
+  paint.setTransform(1, 0, 0, 1, 0, 0);
+  paint.clearRect(0, 0, scratch.width, scratch.height);
   paint.setTransform(density, 0, 0, density, -left * density, -top * density);
-  paint.clearRect(left, top, cloudWidth, cloudHeight);
 
   tracePuffs(paint, puffs, 0);
   paint.fillStyle = ink;
