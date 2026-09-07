@@ -1,0 +1,1142 @@
+{
+  "schema_version": 2,
+  "title": "The Battle of the Nile",
+  "summary": "Nelson finds the French fleet moored across Aboukir Bay, doubles its van at sunset and fights all night; by the second morning only two ships of the line are left to escape.",
+  "dates": ["1 August 1798", "2 August 1798"],
+  "sort_date": { "year": 1798, "month": 8, "day": 1 },
+  "extent": { "north": 31.55, "south": 31.26, "east": 30.3, "west": 29.75 },
+  "scale_unit": "nmi",
+  "map": "aboukir",
+  "end": "14:00",
+  "end_day": 1,
+  "license": "CC-BY-4.0",
+  "attribution": "Sandtable contributors, CC BY 4.0. Positions and captions authored from public-domain sources listed in the file.",
+  "sources": {
+    "nelson-dispatch": {
+      "label": "Nelson's dispatch",
+      "work": "Nelson to Earl St Vincent, Vanguard off the Mouth of the Nile, 3 August 1798, London Gazette Extraordinary no. 15065, 2 October 1798, pp. 915-917; reprinted in N. H. Nicolas (ed.), The Dispatches and Letters of Vice Admiral Lord Viscount Nelson, vol. III (London: Henry Colburn, 1845), pp. 56-59",
+      "url": "https://www.thegazette.co.uk/London/issue/15065/page/915",
+      "license": "public-domain",
+      "license_note": "Crown copyright in a 1798 Gazette long expired. No Wikisource transcription of this issue exists and the Gazette's own scan and OCR are under OGL v3.0, so quotes are taken from Nicolas's reprint rather than from the scan."
+    },
+    "berry": {
+      "label": "Berry's narrative",
+      "work": "Sir Edward Berry, An Authentic Narrative of the Proceedings of His Majesty's Squadron under the Command of Rear-Admiral Sir Horatio Nelson (London: Cadell and Davies, 1798), reprinted entire as the head-note to the Nile dispatch in Nicolas, Dispatches and Letters, vol. III, pp. 48-55",
+      "url": "https://archive.org/details/dispatchesletter03nelsuoft",
+      "license": "public-domain",
+      "license_note": "Published 1798; author died 1831. The Internet Archive scan of Nicolas is marked NOT_IN_COPYRIGHT. Berry writes of himself in the third person."
+    },
+    "vanguard-log": {
+      "label": "Vanguard's journal",
+      "work": "Vanguard's journal for 1 to 3 August 1798, as printed by Nicolas, Dispatches and Letters, vol. III, pp. 53-54, with a short extract set into Berry's narrative at p. 49",
+      "url": "https://archive.org/details/dispatchesletter03nelsuoft",
+      "license": "public-domain",
+      "license_note": "An 1798 ship's journal printed in 1845; both long out of copyright. The p. 49 sentences are Nicolas's insertion into Berry's text, not Berry's own."
+    },
+    "blanquet": {
+      "label": "Blanquet's account",
+      "work": "Translation of the French Rear-Admiral Blanquet's Account of the Battle of the Nile, from a copy in the Nelson Papers, in Nicolas, Dispatches and Letters, vol. III, pp. 67-71",
+      "url": "https://archive.org/details/dispatchesletter03nelsuoft",
+      "license": "public-domain",
+      "license_note": "A 1798 account in an 1845 edition. Nicolas notes that the plans Blanquet refers to are not attached to the paper."
+    },
+    "hood": {
+      "label": "Hood to Bridport",
+      "work": "Captain Samuel Hood of the Zealous to Lord Bridport, written immediately after the battle, in Nicolas, Dispatches and Letters, vol. III, pp. 63-64",
+      "url": "https://archive.org/details/dispatchesletter03nelsuoft",
+      "license": "public-domain",
+      "license_note": "Printed by Nicolas in his Remarks on the Battle of the Nile; author died 1814."
+    },
+    "nelson-to-howe": {
+      "label": "Nelson to Howe",
+      "work": "Nelson to Earl Howe, Palermo, 8 January 1799, from the Letter-Book, in Nicolas, Dispatches and Letters, vol. III, pp. 230-231",
+      "url": "https://archive.org/details/dispatchesletter03nelsuoft",
+      "license": "public-domain",
+      "license_note": "Nelson's own fullest account of the action; author died 1805."
+    },
+    "southey": {
+      "label": "Southey",
+      "work": "Robert Southey, The Life of Horatio, Lord Nelson (1813), ch. V, Project Gutenberg ebook #947",
+      "url": "https://www.gutenberg.org/ebooks/947",
+      "license": "public-domain",
+      "license_note": "Project Gutenberg header: public domain in the USA; author died 1843."
+    },
+    "mahan": {
+      "label": "Mahan",
+      "work": "A. T. Mahan, The Life of Nelson: The Embodiment of the Sea Power of Great Britain (London: Sampson Low, Marston, 1897), vol. I, ch. X, Project Gutenberg ebook #16914",
+      "url": "https://www.gutenberg.org/ebooks/16914",
+      "license": "public-domain",
+      "license_note": "Project Gutenberg header: public domain in the USA; author died 1914."
+    },
+    "pocock-1798": {
+      "label": "Pocock's chart (1798)",
+      "work": "Nicholas Pocock, The Battle of the Nile, 1 August 1798; chart of Aboukir Bay and of the action, with key, 1798, Royal Museums Greenwich PY0143",
+      "url": "https://commons.wikimedia.org/wiki/File:The_Battle_of_the_Nile,_1_August_1798;_chart_of_Aboukir_Bay_and_of_the_action,_with_key_RMG_PY0143.tiff",
+      "license": "public-domain",
+      "license_note": "Wikimedia Commons: {{PD-Art|PD-old-100-1923}}"
+    },
+    "dodd-1800": {
+      "label": "Dodd's plan (1800)",
+      "work": "Robert Dodd, A True Position of the French Fleet as they were moored near the Mouth of the Nile and the manner in which Lord Nelson formed his attack on them, published before 1815, Royal Museums Greenwich PW4704",
+      "url": "https://commons.wikimedia.org/wiki/File:Battle_of_the_Nile_PW4704.jpg",
+      "license": "public-domain",
+      "license_note": "Wikimedia Commons: {{PD-old-100-1923}}"
+    }
+  },
+  "units": [
+    {
+      "id": "inshore-squadron",
+      "side": "British",
+      "label": "Inshore squadron",
+      "short_label": "Inshore",
+      "commander": "Foley",
+      "arm": "ship"
+    },
+    {
+      "id": "nelsons-division",
+      "side": "British",
+      "label": "Nelson's division",
+      "short_label": "Nelson",
+      "commander": "Nelson",
+      "arm": "ship"
+    },
+    {
+      "id": "reserve",
+      "side": "British",
+      "label": "Culloden and the stragglers",
+      "short_label": "Culloden",
+      "commander": "Troubridge",
+      "arm": "ship"
+    },
+    {
+      "id": "french-van",
+      "side": "French",
+      "label": "French van",
+      "short_label": "Van",
+      "commander": "Brueys",
+      "arm": "ship"
+    },
+    {
+      "id": "french-centre",
+      "side": "French",
+      "label": "French centre",
+      "short_label": "Centre",
+      "commander": "Brueys",
+      "arm": "ship"
+    },
+    {
+      "id": "french-rear",
+      "side": "French",
+      "label": "French rear",
+      "short_label": "Rear",
+      "commander": "Villeneuve",
+      "arm": "ship"
+    }
+  ],
+  "phases": [
+    {
+      "id": "sighting",
+      "label": "Zealous signals the French at anchor",
+      "t": "14:00",
+      "playback_rate": 600,
+      "wind": { "from": 337.5, "force": "fresh" },
+      "caption": "At two in the afternoon the Zealous signals the enemy's fleet at anchor in a bay upon the larboard bow, sixteen sail of the line by her count; Hood makes out thirteen of the line and four frigates, and so does the dispatch. They lie moored in a strong and compact line of battle close in with the shore, its form an obtuse angle, flanked by numerous gun-boats, four frigates, and a battery of guns and mortars on an island in their van. Culloden is seven miles to windward with a prize in tow, and Alexander and Swiftsure a dozen miles to leeward, sent ahead on frigates' duty to look into Alexandria.",
+      "notes": "Berry and Blanquet both give two o'clock; Mahan has 2.45 and Vanguard's journal four o'clock, with the only fix any source offers, the Pharos bearing SSW four or five leagues. Either the journal's clock runs two hours slow or its entry records when the signal was logged; 14:00 is used. The British are placed on that bearing about nine and a half miles WNW of Aboukir Island. The research note's extent is opened out to the north and west, from 31.48 and 29.85 to 31.55 and 29.75, so that Culloden seven miles to windward is inside the plate and clear of the compass rose; the bay itself keeps the note's southern and eastern edges. The French line is constructed from Blanquet's description, heads SE from the island in a line of 1300 fathoms lying NW and SE at 80 fathoms apart, with Guerrier about 2400 yards SE of the island and 1000 yards off the edge of the shoal; the three French markers keep those positions in every phase in which the fleet lies moored. The wind is NNW in every phase, 337.5, fresh through the afternoon and moderate from the moment the action opens at sunset: no source records a shift, and the two forces are an authoring choice inside the enum, not a reading. Zealous's count of sixteen against Hood's thirteen and four is caption matter.",
+      "references": [
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 50",
+          "quote": "The Enemy appeared to be moored in a strong and compact Line of Battle, close in with the shore, their line describing an obtuse angle in its form, flanked by numerous Gun-boats, four Frigates, and a battery of guns and mortars, on an Island in their Van."
+        },
+        {
+          "source": "nelson-dispatch",
+          "locator": "London Gazette 15065 p. 915; Nicolas vol. III p. 56",
+          "quote": "The Enemy were moored in a strong Line of Battle for defending the Entrance of the Bay (of Shoals), flanked by numerous Gun-Boats, Four Frigates, and a Battery of Guns and Mortars on an Island in their Van."
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 67",
+          "quote": "At two o'clock in the afternoon, the Heureux made the Signal for 12 Sail, W.N.W."
+        },
+        {
+          "source": "mahan",
+          "locator": "vol. I ch. X, paragraph beginning 'Aboukir Bay begins at a promontory'",
+          "quote": "Having the Ships' heads S.E. from the Island of Bequier, forming a Line about 1300 fathoms N.W. and S.E."
+        },
+        {
+          "source": "mahan",
+          "locator": "vol. I ch. X, paragraph beginning 'When the French fleet was sighted'",
+          "quote": "two ships, the \"Alexander\" and \"Swiftsure,\" were a dozen miles to leeward, having been sent ahead on frigates' duty to reconnoitre Alexandria"
+        },
+        {
+          "source": "vanguard-log",
+          "locator": "Nicolas vol. III p. 49, the journal extract set into Berry's narrative",
+          "quote": "At 4, Pharos Tower S.S.W. distant four or five leagues, the Zealous made the signal for the French Fleet, sixteen Sail of the Line.",
+          "note": "The outlying reading of the time of the signal, and the only position given for the squadron."
+        },
+        {
+          "source": "pocock-1798",
+          "locator": "whole chart: Aboukir Island and its battery, the shoal, the French line moored SE of the island and the track of the English fleet",
+          "note": "Consulted for the arrangement of the bay and of the anchored line."
+        }
+      ],
+      "units": [
+        {
+          "id": "inshore-squadron",
+          "position": { "lat": 31.424, "lon": 29.93 },
+          "heading": 90,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "nelsons-division",
+          "position": { "lat": 31.416, "lon": 29.895 },
+          "heading": 90,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "reserve",
+          "position": { "lat": 31.5, "lon": 29.8 },
+          "heading": 130,
+          "formation": "column",
+          "state": "intact",
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.266, "lon": 29.862 } }]
+        },
+        {
+          "id": "french-van",
+          "position": { "lat": 31.342, "lon": 30.126 },
+          "heading": 45,
+          "formation": "line",
+          "state": "intact"
+        },
+        {
+          "id": "french-centre",
+          "position": { "lat": 31.338, "lon": 30.131 },
+          "heading": 45,
+          "formation": "line",
+          "state": "intact"
+        },
+        {
+          "id": "french-rear",
+          "position": { "lat": 31.334, "lon": 30.134 },
+          "heading": 45,
+          "formation": "line",
+          "state": "intact"
+        }
+      ]
+    },
+    {
+      "id": "haul-the-wind",
+      "label": "The squadron hauls its wind; cables out of the stern ports",
+      "t": "15:00",
+      "playback_rate": 600,
+      "wind": { "from": 337.5, "force": "fresh" },
+      "caption": "The Admiral hauls his wind that instant, recalls Alexander and Swiftsure, and signals his intention to attack the enemy's van and centre as they lie at anchor: first to secure the victory, then to make the most of it. A bower cable of every ship is got out abaft and bent forward, so that each may anchor by the stern where she finds her berth. Where there is room for an enemy's ship to swing, Nelson tells his captains, there is room for one of ours to anchor. Brueys gets his top-gallant yards across, then makes the signal that he means to fight where he lies.",
+      "notes": "Vanguard's journal puts the recall and the cable work at half past two, Blanquet the French preparations at three, and the modern consensus Nelson's shortening of sail at four; 15:00 is the middle reading and the one Berry's sequence supports. The squadron is drawn close-hauled on the starboard tack with the royals in, heading NE, which is the board it stood before bearing up. The track between this phase and the next therefore runs ESE: it is the resultant of the board to the north-east and the bearing-up about five o'clock, which two snapshots cannot separate. The inshore squadron carries an intent arrow to the head of the French line, the attack Nelson signalled. The reserve's marker is on Culloden, closing from the north-west, with a detachment arrow to Alexander and Swiftsure standing back up from off Alexandria; the arrow head is nudged a few cables inside the extent's southern edge.",
+      "references": [
+        {
+          "source": "vanguard-log",
+          "locator": "Nicolas vol. III p. 49, the journal extract set into Berry's narrative",
+          "quote": "At 1/2 past 2, recalled the Alexander and Swiftsure. At 1/2 past 2, hauled our wind, unbent the best bower cable, took it out of the stern port and bent it again."
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 50",
+          "quote": "His idea, in this disposition of his force was, first to secure the victory, and then to make the most of it according to future circumstances. A bower cable of each Ship was immediately got out abaft, and bent forward."
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 50, the same paragraph",
+          "quote": "the Admiral viewed these with the eye of a seaman determined on attack, and it instantly struck his eager and penetrating mind, that where there was room for an Enemy's Ship to swing, there was room for one of ours to anchor."
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 67",
+          "quote": "At 3 o'clock, the Admiral not having any doubt but the Ships in sight were the Enemy, he ordered the hammocks to be stowed for Action, and directed the Alert and Railleur Brig, Sloops of War, to reconnoitre the Enemy."
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 67, the following paragraph",
+          "quote": "the Admiral got the top-gallant-yards across, but soon after made the signal that he intended engaging the Enemy at anchor"
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 50, on the royals",
+          "quote": "It was necessary to take in the royals when we hauled upon a wind"
+        }
+      ],
+      "units": [
+        {
+          "id": "inshore-squadron",
+          "position": { "lat": 31.44, "lon": 30.01 },
+          "heading": 45,
+          "formation": "column",
+          "state": "intact",
+          "moves": [{ "kind": "intent", "to": { "lat": 31.343, "lon": 30.123 } }]
+        },
+        {
+          "id": "nelsons-division",
+          "position": { "lat": 31.43, "lon": 29.98 },
+          "heading": 45,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "reserve",
+          "position": { "lat": 31.47, "lon": 29.87 },
+          "heading": 125,
+          "formation": "column",
+          "state": "intact",
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.28, "lon": 29.92 } }]
+        },
+        {
+          "id": "french-van",
+          "position": { "lat": 31.342, "lon": 30.126 },
+          "heading": 45,
+          "formation": "line",
+          "state": "intact"
+        },
+        {
+          "id": "french-centre",
+          "position": { "lat": 31.338, "lon": 30.131 },
+          "heading": 45,
+          "formation": "line",
+          "state": "intact"
+        },
+        {
+          "id": "french-rear",
+          "position": { "lat": 31.334, "lon": 30.134 },
+          "heading": 45,
+          "formation": "line",
+          "state": "intact"
+        }
+      ]
+    },
+    {
+      "id": "round-the-shoal",
+      "label": "Line of battle; Hood sounds round the shoal",
+      "t": "17:30",
+      "playback_rate": 300,
+      "wind": { "from": 337.5, "force": "fresh" },
+      "caption": "The signal is made to form line of battle. Nelson hails the Zealous to ask whether they are far enough to the eastward to bear up clear of the shoal; Hood, in eleven fathoms and with no chart of the bay, offers to bear away and sound with the lead and carry the Admiral as close as he safely can. He rounds the shoal with the Goliath on his lee bow, and the long column sweeps round to head for the French van. The battery on the island opens, and its shells fall ahead of the second ship in the line; the French brig Alert tries to draw the leaders on to the outer shoal, and is ignored.",
+      "notes": "Mahan puts the signal for line of battle at about half past five and the modern consensus the hail to Hood at 17:30, both of which this phase takes. Blanquet's fifteen minutes past five for a ship running on the reef ENE of the island can only be Culloden, whom every British account puts aground after dark; his clock runs half an hour to three quarters of an hour ahead of Berry's all night, and the British first-hand timing is preferred. The inshore squadron is placed a mile east of the shoal's north-eastern tail so that the run down to the van clears the tail as Hood's sounding did; the research note's estimate of 30.13 E would carry the tween across it. Both British markers keep the easterly heading of the approach; the quarter-circle turn on to the south-westerly run down the line is carried by the tween into the next phase.",
+      "references": [
+        {
+          "source": "hood",
+          "locator": "Nicolas vol. III p. 64",
+          "quote": "he asked me if I thought we were far enough to the eastward to bear up clear of this Shoal: I told him I was in eleven fathoms; that I had no chart of the Bay; but if he would allow me, I would bear up and sound with the lead, to which I would be very attentive, and carry him as close as I could with safety: he said he would be obliged to me. I immediately bore away and rounded the Shoal, the Goliath keeping upon my lee-bow."
+        },
+        {
+          "source": "mahan",
+          "locator": "vol. I ch. X, paragraph beginning 'At about half-past five'",
+          "quote": "as the long column swept round to head for the French van, the ships turned their port broadsides to the enemy, and were steering southwesterly when they finally ran down"
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 67",
+          "quote": "At five o'clock, the Enemy came to the wind in succession. This manoeuvre convinced us that they intended attacking us that evening."
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 67, on the island battery",
+          "quote": "The Battery on the Island opened a fire on the Enemy, and the shells fell ahead of the second Ship in the Line."
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 67, on the Alert",
+          "quote": "the English Admiral, without doubt, had experienced Pilots on board, as he did not pay any attention to the Brig's track"
+        },
+        {
+          "source": "mahan",
+          "locator": "vol. I ch. X, paragraph beginning 'The \"Alexander\" and \"Swiftsure\"'",
+          "quote": "the wind being so scant that they could barely pass to windward of the reef, along whose northwestern edge they were standing"
+        }
+      ],
+      "units": [
+        {
+          "id": "inshore-squadron",
+          "position": { "lat": 31.4, "lon": 30.14 },
+          "heading": 90,
+          "formation": "column",
+          "state": "intact",
+          "moves": [{ "kind": "intent", "to": { "lat": 31.343, "lon": 30.123 } }]
+        },
+        {
+          "id": "nelsons-division",
+          "position": { "lat": 31.42, "lon": 30.11 },
+          "heading": 90,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "reserve",
+          "position": { "lat": 31.4, "lon": 30.09 },
+          "heading": 120,
+          "formation": "column",
+          "state": "intact",
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.33, "lon": 30.02 } }]
+        },
+        {
+          "id": "french-van",
+          "position": { "lat": 31.342, "lon": 30.126 },
+          "heading": 45,
+          "formation": "line",
+          "state": "intact"
+        },
+        {
+          "id": "french-centre",
+          "position": { "lat": 31.338, "lon": 30.131 },
+          "heading": 45,
+          "formation": "line",
+          "state": "intact"
+        },
+        {
+          "id": "french-rear",
+          "position": { "lat": 31.334, "lon": 30.134 },
+          "heading": 45,
+          "formation": "line",
+          "state": "intact"
+        }
+      ]
+    },
+    {
+      "id": "goliath-rounds-the-van",
+      "label": "Sunset: Goliath rounds Guerrier and anchors inside",
+      "t": "18:30",
+      "playback_rate": 60,
+      "wind": { "from": 337.5, "force": "moderate" },
+      "caption": "The action commences at sunset. Foley takes the Goliath across the Guerrier's bows and, his sheet anchor not dropping the moment he wished it, brings up abreast of the second ship; Hood cuts away the Zealous's sheet anchor and comes to in the exact berth Foley meant to take. Orion, Theseus and Audacious follow inside, and the whole van is attacked on both sides by ships that range close along the line. Nelson's division is still running down outside, obliged to take into their bows the whole fire of the French broadsides until they can reach their stations; away to the north-east Culloden strikes on the tail of the shoal and sticks fast.",
+      "notes": "Berry gives sunset at thirty-one minutes past six and the opening of the action with it; Nelson to Howe has twenty-eight minutes past six, Mahan a little after half past, Southey half after six, and the modern consensus 18:20 for the first French gun. All fall within a quarter of an hour and 18:30 carries them; Blanquet's half past five is the signal to engage, obeyed only when the British were within pistol-shot, and is not a reading of the first shot. Culloden's grounding is put here, at about dark, on the British accounts rather than on Blanquet's quarter past five. Under ADR-0018 she is a detachment that rejoins within the battle at two in the morning, so she costs the reserve nothing: the reserve holds at strength 1 and the research note's 0.75, written before that decision, is not used. From this phase the reserve's marker follows Alexander and Swiftsure, the two ships still able to fight, and Culloden is the arrow; the marker's move to the south-west between five and half past six is that change of body, not a ship sailing backwards. The inshore squadron and Nelson's division are drawn about a quarter of a mile either side of the French line where the true distance was nearer three hundred yards, so that inside and outside read at this extent.",
+      "references": [
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 50",
+          "quote": "The action commenced at sun-set, which was at thirty-one minutes past six P.M."
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 50, on the leading ships",
+          "quote": "The Goliath and Zealous had the honour to lead inside, and to receive the first fire from the Van ships of the Enemy, as well as from the Batteries and Gun-boats with which their van was strengthened."
+        },
+        {
+          "source": "hood",
+          "locator": "Nicolas vol. III p. 64",
+          "quote": "Captain Foley intended anchoring abreast of the Van ship, but his sheet-anchor, the cable being out of the stern-port, not dropping the moment he wished it, he brought up abreast of the second Ship, having given the Van one his fire. I saw immediately he had failed of his intention, cut away the Zealous's sheet-anchor, and came to, in the exact situation Captain Foley meant to have taken."
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 68",
+          "quote": "All the Van were attacked on both sides by the Enemy, who ranged close along our Line."
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 50, on the ships running down",
+          "quote": "our leading Ships were unavoidably obliged to receive into their bows the whole fire of the broadsides of the French line, until they could take their respective stations"
+        },
+        {
+          "source": "mahan",
+          "locator": "vol. I ch. X, paragraph beginning 'The \"Culloden\"'",
+          "quote": "Troubridge had the mishap to strike on the tail of the shoal, and there the ship stuck fast, pounding heavily until the next morning."
+        },
+        {
+          "source": "nelson-to-howe",
+          "locator": "Nicolas vol. III p. 230",
+          "quote": "At twenty-eight minutes past six, the sun in the horizon, the firing commenced."
+        },
+        {
+          "source": "dodd-1800",
+          "locator": "whole plate: the French fleet as moored and the manner of Nelson's attack",
+          "note": "Consulted for the way the British ships are shown taking station on either side of the anchored line."
+        }
+      ],
+      "units": [
+        {
+          "id": "inshore-squadron",
+          "position": { "lat": 31.3412, "lon": 30.1205 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        },
+        {
+          "id": "nelsons-division",
+          "position": { "lat": 31.358, "lon": 30.128 },
+          "heading": 225,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "reserve",
+          "position": { "lat": 31.356, "lon": 30.08 },
+          "heading": 60,
+          "formation": "column",
+          "state": "intact",
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.3695, "lon": 30.126 } }]
+        },
+        {
+          "id": "french-van",
+          "position": { "lat": 31.342, "lon": 30.126 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        },
+        {
+          "id": "french-centre",
+          "position": { "lat": 31.338, "lon": 30.131 },
+          "heading": 45,
+          "formation": "line",
+          "state": "intact"
+        },
+        {
+          "id": "french-rear",
+          "position": { "lat": 31.334, "lon": 30.134 },
+          "heading": 45,
+          "formation": "line",
+          "state": "intact"
+        }
+      ]
+    },
+    {
+      "id": "vanguard-anchors-outside",
+      "label": "Vanguard anchors outside Spartiate; darkness",
+      "t": "18:45",
+      "playback_rate": 180,
+      "wind": { "from": 337.5, "force": "moderate" },
+      "caption": "The Vanguard anchors first on the outer side of the enemy, within half pistol-shot of Le Spartiate, the third in the line; Minotaur, Defence, Bellerophon and Majestic come up in succession, pass within hail, and take their stations opposite the French. Every British ship anchors by the stern, so that the line becomes inverted from van to rear. Guerrier is dismasted in less than twelve minutes and Conquerant and Spartiate almost so within ten minutes more; the Franklin and the Orient open on the outer ships and the Tonnant follows at seven o'clock. The rear, to leeward and unengaged, looks helplessly on.",
+      "notes": "Berry gives total darkness at about seven and the dismasting of the first three French ships in the first half hour; the modern consensus puts Vanguard, Minotaur and Defence at anchor by 18:40, and Blanquet has Franklin firing to starboard at a quarter past six and engaged on both sides at three quarters past. 18:45 is Berry's sequence read against Blanquet's. Nelson's division's marker is placed outside the seam between the van and the centre, where Vanguard lay on Spartiate with Majestic five ships further down; under ADR-0019 its heading is the way its guns bear, 225, shoreward at the line, while the inshore squadron inside the line bears 45, seaward at the same ships. The French keep their moored heading of 45, the broadside they present to the sea. Alexander and Swiftsure are drawn passing to windward of the reef's north-western edge, the only way round it Mahan allows them.",
+      "references": [
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III pp. 50-51",
+          "quote": "The Vanguard anchored the first on the outer side of the Enemy, and was opposed within half pistol-shot to Le Spartiate, the third in the Enemy's Line."
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 51, the following sentence",
+          "quote": "The Minotaur, Defence, Bellerophon, Majestic, Swiftsure, and Alexander, came up in succession, and passing within hail of the Vanguard, took their respective stations opposed to the Enemy's line. All our Ships anchored by the stern, by which means the British line became inverted from van to rear."
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 51, on the darkness and the dismasting",
+          "quote": "At about seven o'clock total darkness had come on"
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 51, on the van",
+          "quote": "The Van ship of the Enemy, Le Guerrier, was dismasted in less than twelve minutes, and, in ten minutes after, the second ship, Le Conquerant, and the third, Le Spartiate, very nearly at the same moment were almost dismasted."
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 68",
+          "quote": "At a quarter past 6, the Franklin opened her fire upon the Enemy from the starboard side: at three-quarters past 6, she was engaged on both sides. The L'Orient at the same time began firing her starboard guns, and at 7 o'clock, the Tonnant opened her fire."
+        },
+        {
+          "source": "mahan",
+          "locator": "vol. I ch. X, paragraph beginning 'Thus, of the thirteen French ships'",
+          "quote": "their consorts to leeward looked helplessly on"
+        },
+        {
+          "source": "nelson-to-howe",
+          "locator": "Nicolas vol. III p. 230",
+          "quote": "By attacking the Enemy's van and centre, the wind blowing directly along their Line, I was enabled to throw what force I pleased on a few Ships."
+        }
+      ],
+      "units": [
+        {
+          "id": "inshore-squadron",
+          "position": { "lat": 31.3412, "lon": 30.1205 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        },
+        {
+          "id": "nelsons-division",
+          "position": { "lat": 31.3428, "lon": 30.132 },
+          "heading": 225,
+          "formation": "line",
+          "state": "engaged"
+        },
+        {
+          "id": "reserve",
+          "position": { "lat": 31.362, "lon": 30.098 },
+          "heading": 70,
+          "formation": "column",
+          "state": "intact",
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.3695, "lon": 30.126 } }]
+        },
+        {
+          "id": "french-van",
+          "position": { "lat": 31.342, "lon": 30.126 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        },
+        {
+          "id": "french-centre",
+          "position": { "lat": 31.338, "lon": 30.131 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        },
+        {
+          "id": "french-rear",
+          "position": { "lat": 31.334, "lon": 30.134 },
+          "heading": 45,
+          "formation": "line",
+          "state": "intact"
+        }
+      ]
+    },
+    {
+      "id": "reserve-arrives",
+      "label": "Bellerophon drifts out; the stragglers close on L'Orient",
+      "t": "20:15",
+      "playback_rate": 150,
+      "wind": { "from": 337.5, "force": "moderate" },
+      "caption": "The ship engaging L'Orient on the starboard quarter is dismasted and so roughly handled that she cuts her cables and drives out of the line: the Bellerophon, her lights gone overboard, near two hundred of her people killed or wounded, drifting to the lee side of the bay. At that moment the two fresh ships astern steer right for the centre, Swiftsure anchoring on L'Orient's starboard bow and Alexander cutting the line astern of her to bring up on her larboard quarter, with Leander dropped athwart the Franklin's hawse and raking her. Three of the six van ships are taken possession of at half past eight. Nelson is struck on the head and carried below; Brueys, thrice wounded and refusing to leave the deck, is cut almost in two by a fourth shot.",
+      "notes": "Blanquet puts the drift and the arrival of the fresh ships at eight, Berry the taking possession of Aquilon and Souverain Peuple at half past, Mahan the new-comers soon after eight, and the modern consensus Bellerophon cutting at 20:20; 20:15 holds them together. The French van goes broken here at 0.5: three of its six ships are in British hands and the first two are silenced, while Franklin fights on. Bellerophon never rejoins the squadron, so under ADR-0018 she leaves Nelson's division and it drops to 0.8, four ships of five, with a detachment arrow to the lee side of the bay that is carried to the end of the file. The reserve, by contrast, holds at 1: Culloden is afloat again at two in the morning, within the battle. Its marker moves to the Orient-Franklin seam, a little inside the line where two of its three ships lay, and takes the heading of a ship firing outward, 45.",
+      "references": [
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 69",
+          "quote": "At 8 o'clock at night, the Ship which was engaging L'Orient, on the starboard quarter, notwithstanding her advantageous position, was dismasted and so roughly treated, that she cut her cables, and drove rather far from the Line"
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 69, the following sentence",
+          "quote": "One of them anchored on L'Orient's starboard bow, and the other cut the Line, astern of the L'Orient, and anchored on her larboard quarter."
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 51, on the Leander",
+          "quote": "most judiciously dropped his anchor athwart hause of Le Franklin, raking her with great success, the shot from the Leander's broadside which passed that Ship all striking L'Orient"
+        },
+        {
+          "source": "southey",
+          "locator": "ch. V, paragraph beginning 'The BELLEROPHON'",
+          "quote": "her lights had gone overboard, nearly 200 of her crew were killed or wounded, all her masts and cables had been shot away; and she was drifting out of the line toward the leeside of the bay"
+        },
+        {
+          "source": "southey",
+          "locator": "ch. V, on Brueys",
+          "quote": "he had received three wounds, yet would not leave his post: a fourth cut him almost in two"
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 51, on the prizes",
+          "quote": "were taken possession of by the British at half-past eight in the evening"
+        }
+      ],
+      "units": [
+        {
+          "id": "inshore-squadron",
+          "position": { "lat": 31.3412, "lon": 30.1205 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        },
+        {
+          "id": "nelsons-division",
+          "position": { "lat": 31.3428, "lon": 30.132 },
+          "heading": 225,
+          "formation": "line",
+          "state": "engaged",
+          "strength": 0.8,
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.32, "lon": 30.16 } }]
+        },
+        {
+          "id": "reserve",
+          "position": { "lat": 31.3355, "lon": 30.1278 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.3695, "lon": 30.126 } }]
+        },
+        {
+          "id": "french-van",
+          "position": { "lat": 31.342, "lon": 30.126 },
+          "heading": 45,
+          "formation": "line",
+          "state": "broken",
+          "strength": 0.5
+        },
+        {
+          "id": "french-centre",
+          "position": { "lat": 31.338, "lon": 30.131 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        },
+        {
+          "id": "french-rear",
+          "position": { "lat": 31.334, "lon": 30.134 },
+          "heading": 45,
+          "formation": "line",
+          "state": "intact"
+        }
+      ]
+    },
+    {
+      "id": "orient-burns",
+      "label": "Fire seen in L'Orient",
+      "t": "21:10",
+      "playback_rate": 150,
+      "wind": { "from": 337.5, "force": "moderate" },
+      "caption": "At ten minutes after nine a fire is seen on board L'Orient, seeming to come from the after part of the cabin; it soon breaks out upon the poop, where her sides have just been painted and the oil jars and paint buckets are still lying. Berry tells the Admiral, who comes up on deck though suffering severely from his wound, and whose first thought is for the lives in her: he orders every practicable exertion, and the Vanguard's one boat that will still swim is sent away. By the prodigious light of the conflagration the situation of the two fleets can be seen and the colours of both distinguished. The ships to windward hold on; those to leeward for the most part veer or slip their cables, and in the van the fire slackens and soon wholly ceases.",
+      "notes": "The readings of the fire span forty minutes: Mahan 20:50, Vanguard's journal 20:55, the modern consensus 21:00, Berry 21:10, Blanquet 21:15, Britannica 21:30. Berry's is taken, as it is throughout for the times he gives to the minute. The French van drops to 0.25 on Blanquet's nine o'clock: only the Franklin is still firing, and she is struck at half past eleven. The state stays broken; the fall is a step in strength, not a change of condition.",
+      "references": [
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 51",
+          "quote": "At ten minutes after nine, a fire was observed on board L'Orient, the French Admiral's Ship, which seemed to proceed from the after part of the cabin."
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 51, the following sentence",
+          "quote": "This circumstance Captain Berry immediately communicated to the Admiral, who, though suffering severely from his wound, came up upon deck, where the first consideration that struck his mind was concern for the danger of so many lives, to save as many as possible of whom he ordered Captain Berry to make every practicable exertion. A boat, the only one that could swim, was instantly dispatched from the Vanguard."
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 69",
+          "quote": "At a quarter past 9 o'clock, L'Orient caught fire in the cabin; it soon afterwards broke out upon the poop."
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 69, on the van",
+          "quote": "At 9 o'clock the Ships in the Van slackened their fire, and soon after totally ceased."
+        },
+        {
+          "source": "southey",
+          "locator": "ch. V, paragraph beginning 'The fire'",
+          "quote": "Her sides had just been painted; and the oil-jars and paint buckets were lying on the poop. By the prodigious light of this conflagration, the situation of the two fleets could now be perceived, the colours of both being clearly distinguishable."
+        },
+        {
+          "source": "mahan",
+          "locator": "vol. I ch. X, paragraph beginning 'The flames spread'",
+          "quote": "The ships to windward held on; those to leeward for the most part veered or slipped their cables."
+        }
+      ],
+      "units": [
+        {
+          "id": "inshore-squadron",
+          "position": { "lat": 31.3412, "lon": 30.1205 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        },
+        {
+          "id": "nelsons-division",
+          "position": { "lat": 31.3428, "lon": 30.132 },
+          "heading": 225,
+          "formation": "line",
+          "state": "engaged",
+          "strength": 0.8,
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.32, "lon": 30.16 } }]
+        },
+        {
+          "id": "reserve",
+          "position": { "lat": 31.3355, "lon": 30.1278 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.3695, "lon": 30.126 } }]
+        },
+        {
+          "id": "french-van",
+          "position": { "lat": 31.342, "lon": 30.126 },
+          "heading": 45,
+          "formation": "line",
+          "state": "broken",
+          "strength": 0.25
+        },
+        {
+          "id": "french-centre",
+          "position": { "lat": 31.338, "lon": 30.131 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        },
+        {
+          "id": "french-rear",
+          "position": { "lat": 31.334, "lon": 30.134 },
+          "heading": 45,
+          "formation": "line",
+          "state": "intact"
+        }
+      ]
+    },
+    {
+      "id": "orient-explodes",
+      "label": "L'Orient blows up; the pause",
+      "t": "22:00",
+      "playback_rate": 60,
+      "wind": { "from": 337.5, "force": "moderate" },
+      "caption": "About ten o'clock L'Orient blows up with a most tremendous explosion, and an awful pause and death-like silence of about three minutes follows: the firing ceases on both sides, and the first sound that breaks the silence is the wreck of her masts and yards, carried to a vast height, falling into the water and on board the surrounding ships. By then the six van ships have surrendered. A port-fire from her falls into the Alexander's main royal and is out in two minutes. At a quarter past ten the Tonnant cuts her cable to get clear of the fire and the Heureux and Mercure cut theirs after her, creating such confusion among the ships astern that they fire into each other; the two drive ashore, and Guillaume Tell, Genereux and Timoleon shift their berth and anchor further down, out of gunshot.",
+      "notes": "The explosion is the widest disagreement in the battle after the sighting: Mahan 21:45, Berry, the journal, Southey, Britannica and the modern consensus 22:00, Nelson to Howe 22:05 having burnt seventy minutes, Blanquet 22:45. The majority reading and the British witnesses carry 22:00. This phase runs at sixty battle-clock seconds to the second, the slowest in the file, so that Berry's three minutes of silence lasts three seconds of playback; the pause is the reason the phase exists. The French van is destroyed on Nelson's own count to Howe, the six van ships having surrendered, and carries strength 0. The centre goes broken at 0.25: the Tonnant alone is still fighting, and the marker follows her about a mile to the south-east, ahead of the rear, with the Heureux and Mercure aground said in the caption rather than in the position. The rear is still intact but has moved down the bay out of gunshot.",
+      "references": [
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 51",
+          "quote": "The cannonading was partially kept up to leeward of the Centre till about ten o'clock, when L'Orient blew up with a most tremendous explosion. An awful pause and death-like silence for about three minutes ensued."
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III pp. 51-52, the following sentence",
+          "quote": "when the wreck of the masts, yards, &c. which had been carried to a vast height, fell down into the water, and on board the surrounding Ships."
+        },
+        {
+          "source": "nelson-to-howe",
+          "locator": "Nicolas vol. III p. 230",
+          "quote": "At five minutes past ten, when L'Orient blew up, having burnt seventy minutes, the six Van ships had surrendered."
+        },
+        {
+          "source": "southey",
+          "locator": "ch. V, paragraph beginning 'The ORIENT blew up'",
+          "quote": "This tremendous explosion was followed by a silence not less awful: the firing immediately ceased on both sides; and the first sound which broke the silence, was the dash of her shattered masts and yards, falling into the water from the vast height to which they had been exploded."
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 70",
+          "quote": "At a quarter past 10, the Tonnant cut her cable, to avoid the fire from L'Orient"
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 70, the following sentences",
+          "quote": "The Heureux and Mercure conceived that they ought likewise to cut their cables. This manoeuvre created so much confusion among the Rear Ships, that they fired into each other"
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 70, on the rear",
+          "quote": "The Guillaume Tell, Le Genereux, and Le Timoleon, shifted their berth, and anchored further down, out of gun-shot."
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 52, on the Alexander",
+          "quote": "A port fire from L'Orient fell into the main royal of the Alexander, the fire occasioned by which was, however, extinguished in about two minutes."
+        }
+      ],
+      "units": [
+        {
+          "id": "inshore-squadron",
+          "position": { "lat": 31.3412, "lon": 30.1205 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        },
+        {
+          "id": "nelsons-division",
+          "position": { "lat": 31.3428, "lon": 30.132 },
+          "heading": 225,
+          "formation": "line",
+          "state": "engaged",
+          "strength": 0.8,
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.32, "lon": 30.16 } }]
+        },
+        {
+          "id": "reserve",
+          "position": { "lat": 31.3355, "lon": 30.1278 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.3695, "lon": 30.126 } }]
+        },
+        {
+          "id": "french-van",
+          "position": { "lat": 31.342, "lon": 30.126 },
+          "heading": 45,
+          "formation": "line",
+          "state": "destroyed",
+          "strength": 0
+        },
+        {
+          "id": "french-centre",
+          "position": { "lat": 31.3265, "lon": 30.1445 },
+          "heading": 45,
+          "formation": "line",
+          "state": "broken",
+          "strength": 0.25
+        },
+        {
+          "id": "french-rear",
+          "position": { "lat": 31.325, "lon": 30.15 },
+          "heading": 45,
+          "formation": "line",
+          "state": "intact"
+        }
+      ]
+    },
+    {
+      "id": "night-action",
+      "label": "The fight moves down to the rear",
+      "t": "23:00",
+      "playback_rate": 900,
+      "wind": { "from": 337.5, "force": "moderate" },
+      "caption": "After the pause the firing is renewed with the ships to leeward of the centre; it ceases again about twenty minutes past ten for ten minutes, and is then revived and kept up until about three in the morning. Such British ships as are in a condition to move go down upon the fresh ships of the enemy, and it is this that occasions the renewals of the fight; messages pass from ship to ship, captains consult and propose to move together, and move separately. Towards eleven the Franklin recommences the action with a few of her lower-deck guns, and at half past she strikes. The action in the rear is trifling until three quarters past eleven, when it becomes very warm and three British ships engage the ships that had shifted their berth; at three in the morning the Tonnant, dismasted, cuts her cable a second time, and at half past three the firing ceases throughout the line.",
+      "notes": "This phase begins at eleven at night on 1 August and holds until five past five the next morning, so it is the phase that carries the file across midnight: it stays on day 0 and the two that follow it carry day 1. Berry's three in the morning for the end of the firing is taken over Vanguard's journal at 02:55 and Blanquet's half past three, and Britannica's claim that the battle was over by midnight is contradicted by every witness on both sides. The French rear goes engaged from three quarters past eleven on Blanquet's account and the British markers move a few cables down the line to the ships they went down upon; the moves are small and the tween carries them over six hours, which is what the sources describe, ships warping and towing themselves into new berths through the night.",
+      "references": [
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 52",
+          "quote": "After this awful scene, the firing was recommenced with the Ships to leeward of the Centre, till twenty minutes past ten, when there was a total cessation of firing for about ten minutes; after which it was revived till about three in the morning, when it again ceased."
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 52, the following sentence",
+          "quote": "such British ships as were in a condition to move, had gone down upon the fresh Ships of the Enemy, which occasioned these renewals of the fight"
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 70",
+          "quote": "Towards 11 o'clock, the Franklin, desirous of preventing the Enemy from riding the wreck of the L'Orient, recommenced the Action with a few of her lower-deck guns"
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 70, the following sentences",
+          "quote": "The Action in the Rear of the Fleet was very trifling, until three-quarters past 11 o'clock, when it became very warm. Three of the Enemy's Ships were engaging them"
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 70, on the Tonnant",
+          "quote": "At half-past 3 o'clock the Action ceased throughout the Line."
+        },
+        {
+          "source": "mahan",
+          "locator": "vol. I ch. X, paragraph beginning 'The battle was not over'",
+          "quote": "Messages went from ship to ship, captains consulted together and proposed to move together, and did move separately."
+        }
+      ],
+      "units": [
+        {
+          "id": "inshore-squadron",
+          "position": { "lat": 31.339, "lon": 30.1245 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        },
+        {
+          "id": "nelsons-division",
+          "position": { "lat": 31.341, "lon": 30.135 },
+          "heading": 225,
+          "formation": "line",
+          "state": "engaged",
+          "strength": 0.8,
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.32, "lon": 30.16 } }]
+        },
+        {
+          "id": "reserve",
+          "position": { "lat": 31.3335, "lon": 30.132 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.3695, "lon": 30.126 } }]
+        },
+        {
+          "id": "french-van",
+          "position": { "lat": 31.342, "lon": 30.126 },
+          "heading": 45,
+          "formation": "line",
+          "state": "destroyed",
+          "strength": 0
+        },
+        {
+          "id": "french-centre",
+          "position": { "lat": 31.3265, "lon": 30.1445 },
+          "heading": 45,
+          "formation": "line",
+          "state": "broken",
+          "strength": 0.25
+        },
+        {
+          "id": "french-rear",
+          "position": { "lat": 31.325, "lon": 30.15 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        }
+      ]
+    },
+    {
+      "id": "daybreak",
+      "label": "Daybreak: only two of the enemy have colours flying",
+      "day": 1,
+      "t": "05:05",
+      "playback_rate": 900,
+      "wind": { "from": 337.5, "force": "moderate" },
+      "caption": "At five minutes past five in the morning Le Guillaume Tell and Le Genereux are the only French ships of the line that have their colours flying. At fifty-four minutes past five the frigate L'Artemise fires a broadside and strikes, and her captain then sets her on fire and quits her; at six two British ships join those engaging the rear and open on the Heureux and the Mercure, aground, which strike one after the other. Culloden has been got off the shoal since two in the morning, her rudder beaten away, and the Audacious is detached to the Bellerophon's assistance. The enemy, says Blanquet, must have received great damage in their masts and yards, for they did not get under way to attack what was left of the French fleet.",
+      "notes": "Berry's five past five is preferred to the modern consensus's sunrise at four, which is an hour before civil sunrise at this latitude and date. This is the first phase on the second day: it carries day 1, and the caption band's date advances to 2 August with it. The French centre is destroyed here, the Heureux and Mercure taken aground and the Tonnant a dismasted hulk that does not strike until the third; the rear is still engaged though out of gunshot, with its colours flying. Culloden is afloat again, so the reserve carries no detachment arrow from this phase on and stays at strength 1, having lost nothing that did not come back. The frigates, the gun-boats, the bombs and the brigs are caption matter throughout the file: the roster is six squadrons and carries no frigate unit.",
+      "references": [
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 52",
+          "quote": "At five minutes past five in the morning, the two Rear ships of the Enemy, Le Guillaume Tell and Le Genereux, were the only French ships of the Line that had their colours flying."
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 52, the following sentence",
+          "quote": "At fifty-four minutes past five, a French frigate, L'Artemise, fired a broadside and struck her colours"
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 70",
+          "quote": "At 6 o'clock, two English Ships joined those which had been engaging the Rear, and began firing on the Heureux and Mercure, which were aground. The former soon struck, and the latter followed"
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 70, the following passage",
+          "quote": "The Enemy, without doubt, had received great damage in their masts and yards, as they did not get under weigh to attack the remains of the French Fleet."
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 52, on the Culloden",
+          "quote": "It was not till the morning of the second, that the Culloden could be got off"
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 52, on the Audacious",
+          "quote": "The Audacious was in the morning detached to her assistance"
+        }
+      ],
+      "units": [
+        {
+          "id": "inshore-squadron",
+          "position": { "lat": 31.339, "lon": 30.1245 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        },
+        {
+          "id": "nelsons-division",
+          "position": { "lat": 31.341, "lon": 30.135 },
+          "heading": 225,
+          "formation": "line",
+          "state": "engaged",
+          "strength": 0.8,
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.32, "lon": 30.16 } }]
+        },
+        {
+          "id": "reserve",
+          "position": { "lat": 31.3335, "lon": 30.132 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        },
+        {
+          "id": "french-van",
+          "position": { "lat": 31.342, "lon": 30.126 },
+          "heading": 45,
+          "formation": "line",
+          "state": "destroyed",
+          "strength": 0
+        },
+        {
+          "id": "french-centre",
+          "position": { "lat": 31.3265, "lon": 30.1445 },
+          "heading": 45,
+          "formation": "line",
+          "state": "destroyed",
+          "strength": 0
+        },
+        {
+          "id": "french-rear",
+          "position": { "lat": 31.325, "lon": 30.15 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        }
+      ]
+    },
+    {
+      "id": "villeneuve-escapes",
+      "label": "Villeneuve cuts and stands out to sea",
+      "day": 1,
+      "t": "11:00",
+      "playback_rate": 600,
+      "wind": { "from": 337.5, "force": "moderate" },
+      "caption": "At eleven o'clock Le Genereux and Le Guillaume Tell, with the two frigates La Justice and La Diane, cut their cables and stand out to sea. Hood most handsomely endeavours to prevent them, but there is no other ship in a condition to support the Zealous and she is called in. The French division ranges along the British line on opposite tacks within pistol-shot, takes their broadsides, and is still in sight at sunset. At noon the Timoleon, not in a state to put to sea, steers right for the shore under her foresail, and her foremast falls as she strikes the ground. Victory, says Nelson, is not a name strong enough for such a scene: he calls it a conquest.",
+      "notes": "Berry and the modern consensus give eleven o'clock, Vanguard's journal half past eleven under way with the Zealous firing at 12:45, Blanquet three quarters past eleven, Mahan about noon; Berry's is taken. The rear breaks at 0.67: two of its three ships of the line get away and the Timoleon runs ashore, and the detachment arrow to the north-east carries the ships that escaped out of the extent while the marker stays where the division formed its line. Zealous's chase and recall is a detachment from the inshore squadron that returns within the battle and so costs it nothing. The file ends at two o'clock on the second day, when public service was performed on the Vanguard's quarter-deck and the picture stops changing; the coda of the third of August, the Timoleon burnt and the Tonnant struck and drifted ashore, is caption matter and would need a third day.",
+      "references": [
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 52",
+          "quote": "At eleven o'clock, Le Genereux and Guillaume Tell, with the two Frigates, La Justice and La Diane, cut their cables and stood out to sea, pursued by the Zealous, Captain Hood"
+        },
+        {
+          "source": "nelson-dispatch",
+          "locator": "London Gazette 15065 pp. 915-916; Nicolas vol. III p. 57",
+          "quote": "The Ships of the Enemy, all but their Two Rear Ships, are nearly dismasted; and those Two, with Two Frigates, I am sorry to say, made their Escape; nor was it, I assure you, in my Power to prevent them. Captain Hood most handsomely endeavoured to do it, but I had no Ship in a Condition to support the Zealous, and I was obliged to call her in."
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 71",
+          "quote": "at three-quarters past 11, Le Guillaume Tell, Le Genereux, La Diane, and La Justice, were under weigh, and formed in Line of Battle"
+        },
+        {
+          "source": "blanquet",
+          "locator": "Nicolas vol. III p. 71, the following sentences",
+          "quote": "At noon, the Timoleon, which probably was not in a state to put to sea, steered right for the shore, under her foresail, and as soon as she struck the ground, her foremast fell."
+        },
+        {
+          "source": "southey",
+          "locator": "ch. V, paragraph beginning 'The victory'",
+          "quote": "Victory, said Nelson, is not a name strong enough for such a scene"
+        },
+        {
+          "source": "berry",
+          "locator": "Nicolas vol. III p. 53, on the thanksgiving",
+          "quote": "At two o'clock accordingly on that day, public service was performed on the quarter-deck of the Vanguard"
+        }
+      ],
+      "units": [
+        {
+          "id": "inshore-squadron",
+          "position": { "lat": 31.339, "lon": 30.1245 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.4, "lon": 30.19 } }]
+        },
+        {
+          "id": "nelsons-division",
+          "position": { "lat": 31.341, "lon": 30.135 },
+          "heading": 225,
+          "formation": "line",
+          "state": "engaged",
+          "strength": 0.8,
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.32, "lon": 30.16 } }]
+        },
+        {
+          "id": "reserve",
+          "position": { "lat": 31.3335, "lon": 30.132 },
+          "heading": 45,
+          "formation": "line",
+          "state": "engaged"
+        },
+        {
+          "id": "french-van",
+          "position": { "lat": 31.342, "lon": 30.126 },
+          "heading": 45,
+          "formation": "line",
+          "state": "destroyed",
+          "strength": 0
+        },
+        {
+          "id": "french-centre",
+          "position": { "lat": 31.3265, "lon": 30.1445 },
+          "heading": 45,
+          "formation": "line",
+          "state": "destroyed",
+          "strength": 0
+        },
+        {
+          "id": "french-rear",
+          "position": { "lat": 31.338, "lon": 30.158 },
+          "heading": 45,
+          "formation": "column",
+          "state": "broken",
+          "strength": 0.67,
+          "moves": [{ "kind": "detachment", "to": { "lat": 31.48, "lon": 30.29 } }]
+        }
+      ]
+    }
+  ]
+}
