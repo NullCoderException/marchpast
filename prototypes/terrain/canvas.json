@@ -1,0 +1,123 @@
+{
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "The ground, four views"
+    },
+    {
+      "id": "page-2",
+      "name": "Shore, works and cost"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1120,
+      "h": 650,
+      "title": "Chart plate · Cannae (ground chip)",
+      "page": "page-1"
+    },
+    {
+      "file": "NightPlate.dc.html",
+      "x": 1220,
+      "y": 0,
+      "w": 1120,
+      "h": 650,
+      "title": "Night plate · Cannae (ground chip)",
+      "page": "page-1"
+    },
+    {
+      "file": "Atlas.dc.html",
+      "x": 0,
+      "y": 800,
+      "w": 1120,
+      "h": 650,
+      "title": "Atlas · Cannae (ground chip)",
+      "page": "page-1"
+    },
+    {
+      "file": "StaffMap.dc.html",
+      "x": 1220,
+      "y": 800,
+      "w": 1120,
+      "h": 650,
+      "title": "Staff map · Cannae (sheet chip)",
+      "page": "page-1"
+    },
+    {
+      "file": "Shore.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1140,
+      "h": 798,
+      "title": "Shore, sea and a work at a point",
+      "page": "page-2"
+    },
+    {
+      "file": "LineWorks.dc.html",
+      "x": 1240,
+      "y": 0,
+      "w": 1140,
+      "h": 798,
+      "title": "A work that is a line",
+      "page": "page-2"
+    },
+    {
+      "file": "Cost.dc.html",
+      "x": 2480,
+      "y": 0,
+      "w": 1140,
+      "h": 700,
+      "title": "What each treatment costs",
+      "page": "page-2"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "ground-intro",
+      "x": 0,
+      "y": -230,
+      "w": 1120,
+      "page": "page-1",
+      "text": "TERRAIN TREATMENTS PER VIEW (#138). ADR-0021 made `ground` a module the view supplies, so the question #62 answered once for one shared pass is open again per view. Each board is Cannae phase 6 — seven units, eight labels, 64 contour lines at 10 m — with a chip that switches that view's ground. The crowding is the point: a treatment that drowns the units is out however well it draws. Units are the tick and block glyphs already decided; what a legion looks like, and the staff map's own glyph, type and furniture, are #139's."
+    },
+    {
+      "id": "ground-claim",
+      "x": 1220,
+      "y": -230,
+      "w": 1120,
+      "page": "page-1",
+      "text": "THE CLAIM TO TEST FIRST. #62 rejected hachures because \"they need slope and aspect, which means the raster foreign member\", and so amended ADR-0007 and ADR-0012. That is not true of the hachures on the plate board: a contour ring carries its own uphill direction in its winding, and the distance to the next ring up is the steepness. Every treatment here is cut from the contour polylines and their levels and NOTHING else — no slope field, no aspect, no raster. If the hachures are still rejected it is now on the drawing, not on the data."
+    },
+    {
+      "id": "ground-night",
+      "x": 2440,
+      "y": 0,
+      "w": 520,
+      "page": "page-1",
+      "text": "THE NIGHT PLATE'S OWN READING. Under ADR-0021 the night plate may do more than invert the plate's alphas. `illuminated` is Tanaka's method: one light low in the north-west, each contour segment lit or shaded by the angle its uphill normal makes with it, so the hill is modelled by the lines themselves and nothing is washed over the paper. The cost is measurement — on the shaded side the line all but goes out, and a height cannot be read there. Whether that is the night plate's bargain to make is the decision."
+    },
+    {
+      "id": "ground-staff",
+      "x": 1220,
+      "y": 1480,
+      "w": 1120,
+      "page": "page-1",
+      "text": "THE STAFF MAP'S GROUND, in two idioms: `ops` a printed operations sheet, `modern` a clean one. Both draw the same anatomy in a different hand — flat steps of colour instead of stacked ink, a kilometre graticule (which ADR-0021 makes GROUND, not furniture, so it is drawn here beside the land and under the units), and the height set INTO the contour, turned to lie along it, where the plate gathers its numerals in a column at the foot. The face is IBM Plex Sans Condensed as a stand-in; the view's type, glyph and furniture are #139's."
+    },
+    {
+      "id": "cost-note",
+      "x": 2480,
+      "y": -230,
+      "w": 1140,
+      "page": "page-2",
+      "text": "TO DECIDE: (1) the chart plate's ground — contours as they are, or hachures now that they cost no schema change. (2) Whether the night plate keeps the plate's ground or takes the illuminated one. (3) Whether the atlas's bands stay stacked ink or become a ramp the view carries. (4) The staff map's sheet, ops or modern. (5) The sea per view. (6) A line work's three idioms, which is also the drawing #132 decides its schema against."
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-1"
+  }
+}
