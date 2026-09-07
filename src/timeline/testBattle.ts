@@ -34,7 +34,7 @@ export const TEST_BATTLE: Battle = {
   scale_unit: "nmi",
   end: "10:30",
   license: "CC-BY-4.0",
-  attribution: "Sandtable contributors, CC BY 4.0",
+  attribution: "Marchpast contributors, CC BY 4.0",
   sources: {
     invented: { label: "An invented source", work: "Nothing at all, made up for the tests", license: "public-domain" },
   },
@@ -124,7 +124,7 @@ export const NIGHT_BATTLE: Battle = {
   end: "14:00",
   end_day: 1,
   license: "CC-BY-4.0",
-  attribution: "Sandtable contributors, CC BY 4.0",
+  attribution: "Marchpast contributors, CC BY 4.0",
   sources: {
     invented: { label: "An invented source", work: "Nothing at all, made up for the tests", license: "public-domain" },
   },

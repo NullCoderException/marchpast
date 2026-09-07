@@ -20,7 +20,7 @@ const IDEA =
   "A web app that plays back famous battles as animated 2D “grand strategy” sequences, driven by a reusable JSON timeline format, with the timelines extracted from public-domain primary and secondary sources.";
 
 /** Where the source lives, for the credit line. */
-const REPOSITORY = "https://github.com/NullCoderException/sandtable";
+const REPOSITORY = "https://github.com/NullCoderException/marchpast";
 
 /** What the page says about the data it plays. */
 const DATA_LICENCE = "Battle files CC BY 4.0; each map file carries its own licence.";
@@ -39,7 +39,7 @@ export function createLibraryPage(library: Library): HTMLElement {
   const root = element("main", "st-library");
 
   const head = element("header", "st-library-head");
-  head.append(element("h1", "st-library-name", "Sandtable"), element("p", "st-library-idea", IDEA));
+  head.append(element("h1", "st-library-name", "Marchpast"), element("p", "st-library-idea", IDEA));
   root.append(head);
 
   const battles = libraryOrder(library);
@@ -79,7 +79,7 @@ function entryFor(battle: Library[number]): HTMLLIElement {
 /** The credit line: where the source is, and what the data may be reused under. */
 function credit(): HTMLElement {
   const footer = element("footer", "st-library-credit");
-  const repository = element("a", undefined, "Sandtable on GitHub");
+  const repository = element("a", undefined, "Marchpast on GitHub");
   repository.href = REPOSITORY;
   footer.append(repository, document.createTextNode(`. ${DATA_LICENCE}`));
   return footer;

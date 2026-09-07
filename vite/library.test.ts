@@ -14,7 +14,7 @@ import { libraryJson, readLibrary } from "./library.ts";
 let dataDir: string;
 
 beforeEach(() => {
-  dataDir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "sandtable-library-")), "data");
+  dataDir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "marchpast-library-")), "data");
 });
 
 afterEach(() => {

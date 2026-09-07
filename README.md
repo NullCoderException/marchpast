@@ -1,6 +1,6 @@
-# Sandtable
+# Marchpast
 
-Sandtable plays back famous battles as animated 2D "grand strategy" sequences: a map, its units and their moves, a caption band and play/pause/scrub controls, driven by a reusable JSON timeline format whose timelines are extracted from public-domain primary and secondary sources. It is not a game and not 3D. It is a data-driven animation player where the interesting work is the data, and the bar is a documentary map with arrows, drawn here as an engraved chart plate. The concept in full is [`docs/CONCEPT.md`](docs/CONCEPT.md).
+Marchpast plays back famous battles as animated 2D "grand strategy" sequences: a map, its units and their moves, a caption band and play/pause/scrub controls, driven by a reusable JSON timeline format whose timelines are extracted from public-domain primary and secondary sources. It is not a game and not 3D. It is a data-driven animation player where the interesting work is the data, and the bar is a documentary map with arrows, drawn here as an engraved chart plate. The concept in full is [`docs/CONCEPT.md`](docs/CONCEPT.md).
 
 It is live at **https://marchpast.com/**. The bare URL is the library: every battle it holds, oldest first, with its date and the sentence it describes itself by. A battle is addressed by name on the query string, [`?battle=trafalgar`](https://marchpast.com/?battle=trafalgar), and the player's picker switches to another one. There is no default battle and the site remembers nothing (ADR-0011).
 
@@ -39,7 +39,7 @@ The design decisions behind the format and the renderer are recorded as ADRs in 
 
 - **Code** is MIT ([`LICENSE`](LICENSE)).
 - **Battle files** under `data/battles/` are CC BY 4.0; each file's `license` and `attribution` fields are authoritative, and battle files draw only on public-domain or attribution-only sources, never share-alike ones (ADR-0007).
-- **Map files** under `data/maps/` each declare their own licence in the file's `license` member, with the credit line in `attribution`. The Cadiz coast is cut from Natural Earth, public domain, and the Cannae map adds contours from SRTM 1 arc-second, also public domain. The Aboukir and Copenhagen maps put Natural Earth's coast under shoals and shorelines traced by Sandtable contributors from period plans, and are CC BY 4.0.
+- **Map files** under `data/maps/` each declare their own licence in the file's `license` member, with the credit line in `attribution`. The Cadiz coast is cut from Natural Earth, public domain, and the Cannae map adds contours from SRTM 1 arc-second, also public domain. The Aboukir and Copenhagen maps put Natural Earth's coast under shoals and shorelines traced by Marchpast contributors from period plans, and are CC BY 4.0.
 
 The full statement is [`data/LICENSE`](data/LICENSE). The plate typeface, IM Fell English, is under the SIL Open Font License 1.1 (`src/fonts/OFL.txt`).
 

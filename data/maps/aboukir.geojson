@@ -1,7 +1,7 @@
 {
   "type": "FeatureCollection",
   "license": "CC-BY-4.0",
-  "attribution": "Coastline from Natural Earth (public domain); Aboukir shoal and Nelson's Island traced from Brydon's 1798 plan by Sandtable contributors, CC BY 4.0",
+  "attribution": "Coastline from Natural Earth (public domain); Aboukir shoal and Nelson's Island traced from Brydon's 1798 plan by Marchpast contributors, CC BY 4.0",
   "features": [
     {
       "type": "Feature",

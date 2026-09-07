@@ -1,6 +1,8 @@
-# Licences for Sandtable data
+# Licences for Marchpast data
 
 The code in this repository is MIT licensed (see the root `LICENSE`). The data is licensed separately, per ADR-0007.
+
+This project was called **Sandtable** until 2026-09-07, so copies of these files made before that date carry `Sandtable contributors` as their credit line (ADR-0020). The licensor is the same people before and after, and CC BY 4.0 asks for attribution in the manner the licensor requests: the request is now to credit **Marchpast contributors**. Nothing already reused under the old string is invalidated.
 
 - **Battle files** under `data/battles/` are licensed under the Creative Commons Attribution 4.0 International licence (CC BY 4.0), https://creativecommons.org/licenses/by/4.0/. Each file's `license` and `attribution` fields are authoritative; battle files draw only on public-domain or attribution-only sources, never on share-alike ones.
 - **Map files** under `data/maps/` each declare their own licence in the `license` member of the GeoJSON FeatureCollection, with the credit line the licence requires in `attribution`. A map file may carry a share-alike licence (for example ODbL for OpenStreetMap extracts); it is an independent database that a battle file only points at.

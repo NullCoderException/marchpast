@@ -13,7 +13,7 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
 
-> **Prerequisite:** the remote is `https://github.com/NullCoderException/sandtable`. If `gh` reports it is not
+> **Prerequisite:** the remote is `https://github.com/NullCoderException/marchpast`. If `gh` reports it is not
 > authenticated, run `gh auth login` once; every operation above depends on it.
 
 ## Pull requests as a triage surface

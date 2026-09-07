@@ -17,7 +17,7 @@ export const MINIMAL_BATTLE: Battle = {
   map: "cadiz",
   end: "17:30",
   license: "CC-BY-4.0",
-  attribution: "Sandtable contributors, CC BY 4.0",
+  attribution: "Marchpast contributors, CC BY 4.0",
   sources: {
     "collingwood-dispatch": {
       label: "Collingwood's dispatch",
