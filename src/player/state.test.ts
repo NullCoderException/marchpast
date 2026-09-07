@@ -268,6 +268,15 @@ describe("the unit card", () => {
       const pinned = pinUnit(closed, "combined-fleet");
       expect(setLevel(battle, pinned, 1).card).toEqual({ id: "combined-fleet", pinned: true });
     });
+
+    it("closes a card on a unit that is absent at this instant, which has no glyph to hang on either", () => {
+      // The Combined Fleet is not on the plate until the melee, so at 10:15
+      // there is nothing for its card to be anchored at (ADR-0024).
+      const absent = structuredClone(MINIMAL_BATTLE);
+      absent.phases[0]!.units = absent.phases[0]!.units.filter((snapshot) => snapshot.id !== "combined-fleet");
+      const pinned = pinUnit(closed, "combined-fleet");
+      expect(setLevel(absent, pinned, 1).card).toBeUndefined();
+    });
   });
 
   describe("setView with a card open", () => {

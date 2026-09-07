@@ -25,8 +25,8 @@ export interface Plate {
   /**
    * The picture's units the viewer's level draws, in roster order: what every
    * pass that puts a unit on the plate reads, so no two passes disagree about
-   * what is there. `picture.units` stays the whole roster, which is what the
-   * labels' numerals are indexed by (schema.md 2.9, 2.11).
+   * what is there. `picture.units` stays every unit present at the instant,
+   * which is what the labels' numerals are indexed by (schema.md 2.9, 2.11).
    */
   unitsDrawn: readonly UnitPicture[];
   /**

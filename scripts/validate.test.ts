@@ -107,6 +107,25 @@ describe("validateDataDir", () => {
     const stray = writeFile("notes.txt", "hello");
     expect(errorLocations(validateDataDir(dataDir, [stray]))).toEqual([["notes.txt", ""]]);
   });
+
+  it("rejects a battle whose name is a path the build emits at the site's root (rule 19)", () => {
+    for (const name of ["data", "assets", "404", "index"]) {
+      fs.rmSync(path.join(dataDir, "battles"), { recursive: true, force: true });
+      const battle = structuredClone(MINIMAL_BATTLE) as any;
+      delete battle.map;
+      writeBattle(name, battle);
+      const reports = validateDataDir(dataDir);
+      expect(errorLocations(reports), name).toEqual([[`battles/${name}.json`, ""]]);
+      expect(reports[0]?.errors[0]?.message, name).toContain(JSON.stringify(name));
+    }
+  });
+
+  it("accepts an ordinary battle name", () => {
+    const battle = structuredClone(MINIMAL_BATTLE) as any;
+    delete battle.map;
+    writeBattle("midway", battle);
+    expect(errorLocations(validateDataDir(dataDir))).toEqual([]);
+  });
 });
 
 describe("formatReports", () => {

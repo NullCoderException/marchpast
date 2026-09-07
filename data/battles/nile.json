@@ -585,6 +585,7 @@
           "quote": "A port fire from L'Orient fell into the main royal of the Alexander, the fire occasioned by which was, however, extinguished in about two minutes."
         }
       ],
+      "still": true,
       "units": [
         { "id": "inshore-squadron", "position": { "lat": 31.3412, "lon": 30.1205 }, "heading": 45, "formation": "line", "state": "engaged" },
         {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Battle } from "../schema/types.ts";
-import { pictureAt } from "./pictureAt.ts";
-import { NIGHT_BATTLE, TEST_BATTLE, clock, cloneTestBattle } from "./testBattle.ts";
+import { pictureAt, presentAt } from "./pictureAt.ts";
+import { ABSENCE_BATTLE, NIGHT_BATTLE, TEST_BATTLE, clock, cloneTestBattle } from "./testBattle.ts";
 
 /** The unit of that id in the picture; fails loudly rather than returning undefined. */
 function unit(picture: ReturnType<typeof pictureAt>, id: string) {
@@ -65,10 +65,10 @@ describe("pictureAt: everything else steps", () => {
     expect(unit(on, "alpha").state).toBe("engaged");
   });
 
-  it("carries the phase's references, and its notes only when it has them", () => {
+  it("carries the phase's references and its notes, which every phase has", () => {
     expect(pictureAt(TEST_BATTLE, clock("10:05")).references).toEqual([{ source: "invented", locator: "p. 1" }]);
-    expect(pictureAt(TEST_BATTLE, clock("10:05")).notes).toBe("A note only the first phase has.");
-    expect(pictureAt(TEST_BATTLE, clock("10:15")).notes).toBeUndefined();
+    expect(pictureAt(TEST_BATTLE, clock("10:05")).notes).toBe(TEST_BATTLE.phases[0]!.notes);
+    expect(pictureAt(TEST_BATTLE, clock("10:15")).notes).toBe(TEST_BATTLE.phases[1]!.notes);
   });
 
   it("has no wind at all when the battle does not track wind", () => {
@@ -100,7 +100,7 @@ describe("pictureAt: the last phase holds", () => {
     expect(picture.label).toBe(last.label);
     expect(picture.references).toEqual(last.references);
     expect(picture.wind).toEqual(last.wind);
-    expect(picture.notes).toBeUndefined();
+    expect(picture.notes).toBe(last.notes);
   });
 
   it("still shows it at end itself", () => {
@@ -130,6 +130,76 @@ describe("pictureAt: the clock", () => {
 
   it("lists every roster unit in roster order", () => {
     expect(pictureAt(TEST_BATTLE, clock("10:05")).units.map((u) => u.id)).toEqual(["alpha", "beta"]);
+  });
+});
+
+/** The ids in the picture at `time`, in the order the picture lists them. */
+function drawn(time: string): string[] {
+  return pictureAt(ABSENCE_BATTLE, clock(time)).units.map((u) => u.id);
+}
+
+describe("pictureAt: a unit absent from a phase", () => {
+  it("leaves the strike out of the interval before its run, where only the far end holds it", () => {
+    expect(drawn("10:00")).toEqual(["force", "fleet"]);
+    expect(drawn("10:30")).toEqual(["force", "fleet"]);
+    expect(drawn("10:59:59")).toEqual(["force", "fleet"]);
+  });
+
+  it("puts the strike on the plate at the instant of its first phase, and tweens it through its run", () => {
+    expect(drawn("11:00")).toEqual(["force", "fleet", "strike"]);
+    expect(drawn("12:00")).toEqual(["force", "fleet", "strike"]);
+    // Ten degrees an hour: halfway from 11:00 to 12:00 is longitude 15.
+    const half = pictureAt(ABSENCE_BATTLE, clock("11:30"));
+    expect(unit(half, "strike").position.lon).toBeCloseTo(15, 12);
+    expect(unit(half, "strike").track).toEqual({ from: { lat: 10, lon: 10 }, to: { lat: 10, lon: 20 } });
+  });
+
+  it("draws the strike arriving at its last snapshot, right up to the instant it is struck below", () => {
+    // The last snapshot is the tween's destination, which is how a recovery
+    // phase "brings it home" (ADR-0024): the strike is on the plate, at its
+    // authored position, until the instant of the phase that holds it.
+    const arriving = pictureAt(ABSENCE_BATTLE, clock("12:59:59"));
+    expect(arriving.units.map((u) => u.id)).toEqual(["force", "fleet", "strike"]);
+    // A second short of the hour is a second short of the destination, which
+    // is the whole of what "brings it home" means.
+    expect(unit(arriving, "strike").position.lon).toBeCloseTo(30, 2);
+  });
+
+  it("takes the strike off the plate at the instant its run ends, with no fade", () => {
+    expect(drawn("13:00")).toEqual(["force", "fleet"]);
+    expect(drawn("14:00")).toEqual(["force", "fleet"]);
+    expect(drawn("15:30")).toEqual(["force", "fleet"]);
+    expect(drawn("16:00")).toEqual(["force", "fleet"]);
+  });
+
+  it("keeps the units it does draw in roster order", () => {
+    expect(drawn("11:30")).toEqual(["force", "fleet", "strike"]);
+  });
+
+  it("holds a unit whose run reaches the last phase, which has no far end to check", () => {
+    const battle: Battle = structuredClone(ABSENCE_BATTLE);
+    // The strike flies from phase 4 to the end of the battle instead.
+    for (const [index, phase] of battle.phases.entries()) {
+      phase.units = phase.units.filter((snapshot) => snapshot.id !== "strike");
+      if (index >= 3) phase.units.push({ id: "strike", position: { lat: 10, lon: index }, heading: 90, formation: "line", state: "engaged" });
+    }
+    expect(pictureAt(battle, clock("12:59:59")).units.map((u) => u.id)).toEqual(["force", "fleet"]);
+    expect(pictureAt(battle, clock("13:00")).units.map((u) => u.id)).toEqual(["force", "fleet", "strike"]);
+    expect(pictureAt(battle, clock("15:30")).units.map((u) => u.id)).toEqual(["force", "fleet", "strike"]);
+    expect(pictureAt(battle, clock("16:00")).units.map((u) => u.id)).toEqual(["force", "fleet", "strike"]);
+  });
+});
+
+describe("presentAt", () => {
+  it("answers with the ids the interval holding the clock draws", () => {
+    expect([...presentAt(ABSENCE_BATTLE, clock("10:30"))]).toEqual(["force", "fleet"]);
+    expect([...presentAt(ABSENCE_BATTLE, clock("11:30"))]).toEqual(["force", "fleet", "strike"]);
+    expect([...presentAt(ABSENCE_BATTLE, clock("13:30"))]).toEqual(["force", "fleet"]);
+  });
+
+  it("clamps like the picture does, so an instant outside the battle answers for its nearest end", () => {
+    expect([...presentAt(ABSENCE_BATTLE, clock("03:00"))]).toEqual(["force", "fleet"]);
+    expect([...presentAt(ABSENCE_BATTLE, clock("23:00"))]).toEqual(["force", "fleet"]);
   });
 });
 

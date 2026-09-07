@@ -18,9 +18,9 @@
  * the commander, the arm and formation as words, and the tree.
  *
  * The children's state words come from the **picture**, not from the level's
- * slice of it: every roster unit has a snapshot in every phase, drawn or not
- * (schema.md 2.9), which is the whole reason a column's card can name the
- * state of squadrons this level never puts on the plate.
+ * slice of it: every unit on the plate at this instant is in the picture,
+ * drawn or not (schema.md 2.9), which is the whole reason a column's card can
+ * name the state of squadrons this level never puts on the plate.
  *
  * The panel is measured from the very point the label hangs from — its first
  * line sits exactly where the label's name would — so opening a card is the
@@ -109,6 +109,12 @@ export function cardContent(roster: readonly Unit[], units: readonly UnitPicture
  * child with its state word. A unit in the middle of a deeper tree says both,
  * which is the only reading of "its parent or children" that does not lose a
  * fact the card was asked for.
+ *
+ * A child the picture does not hold is left out: outside its run a unit is not
+ * drawn, not labelled, not in the muster and not on a card, and a line naming
+ * one would put a unit that does not exist on a card about this instant
+ * (ADR-0024, schema.md 2.11). The parent line is roster matter and stands
+ * whether or not the parent is drawn at this level.
  */
 function treeLines(roster: readonly Unit[], units: readonly UnitPicture[], entry: Unit): string[] {
   const lines: string[] = [];
@@ -117,7 +123,7 @@ function treeLines(roster: readonly Unit[], units: readonly UnitPicture[], entry
 
   for (const child of roster.filter((unit) => unit.parent === entry.id)) {
     const state = units.find((unit) => unit.id === child.id)?.state;
-    lines.push(state === undefined ? child.label : `${child.label} · ${state}`);
+    if (state !== undefined) lines.push(`${child.label} · ${state}`);
   }
   return lines;
 }

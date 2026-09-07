@@ -41,12 +41,12 @@ type GeometryType = Geometry["type"];
  * coordinates are written in the frame of the battle it serves (ADR-0001 as
  * amended, schema.md 3.2), so Midway's atoll is `182.63` and not `-177.37`.
  *
- * Wider than the bound the battle file is getting, too, and deliberately: a
- * position there is read against its own extent's centre longitude (schema.md
- * 2.10 rule 2, landing with #166). This validator sees a file and never a
- * pairing, so it cannot narrow the same way — and it need not, because a
- * mis-spelled map coordinate is clipped and costs a piece of the picture,
- * where a mis-spelled position lies about where a force was.
+ * Wider than the bound the battle file has, too, and deliberately: a position
+ * there is read against its own extent's centre longitude (schema.md 2.10
+ * rule 2, landed with #166). This validator sees a file and never a pairing,
+ * so it cannot narrow the same way — and it need not, because a mis-spelled
+ * map coordinate is clipped and costs a piece of the picture, where a
+ * mis-spelled position lies about where a force was.
  */
 const MAP_LON_BOUNDS: NumberBounds = { min: -180, max: 360 };
 
