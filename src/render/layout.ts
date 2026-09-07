@@ -18,6 +18,9 @@
 /** The two widths the app is drawn at. */
 export type LayoutMode = "desktop" | "phone";
 
+/** The phone floor's step in the collapse order (`content.ts`'s ladder). */
+const PHONE_FLOOR = 3;
+
 /**
  * The widest plate that still collapses, in CSS pixels. Chosen to sit above
  * every phone in portrait — 390 is the Phone board's own width, 430 the widest
@@ -42,8 +45,8 @@ export interface FurnitureSet {
   legend: "full" | "sides";
   /** The map's credit line on the plate. A phone gives it to Details. */
   credit: boolean;
-  /** Always drawn: the one piece that answers how big the ground is, which nothing else says. */
-  scaleBar: true;
+  /** True in both modes: the one piece that answers how big the ground is, which nothing else says. */
+  scaleBar: boolean;
 }
 
 const SETS: Readonly<Record<LayoutMode, FurnitureSet>> = {
@@ -65,6 +68,3 @@ export function furnitureFor(mode: LayoutMode): FurnitureSet {
 export function labelFloor(mode: LayoutMode): number {
   return mode === "phone" ? PHONE_FLOOR : 0;
 }
-
-/** The phone floor's step in the collapse order. */
-const PHONE_FLOOR = 3;

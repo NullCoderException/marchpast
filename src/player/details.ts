@@ -94,11 +94,13 @@ export function createDetailsPanel(battle: Battle, map?: MapFile): DetailsPanel 
       phaseSection.replaceChildren(...phaseChildren(battle, picture));
     },
     setPlate(view, mode) {
+      keySection.hidden = mode !== "phone";
+      // The rows say nothing the view does not, so they are built when the
+      // view changes and on no other frame — this runs once per rendered
+      // frame, and an open panel is meant to cost nothing.
+      if (keySection.hidden || view === shownView) return;
       const key = plateKey(battle, map, mode);
-      keySection.hidden = key === undefined;
-      // The rows say nothing the view does not, so they are redrawn when the
-      // view changes and on no other frame.
-      if (key === undefined || view === shownView) return;
+      if (key === undefined) return;
       shownView = view;
       keySection.replaceChildren(...keyChildren(battle, key, viewById(view)));
     },
