@@ -53,7 +53,7 @@ function hour(hour24: number, label: string, caption: string, notes: string, uni
  * - **The frame.** The extent runs from 178 to 184.5, so every longitude here
  *   is spelled east of 180 rather than folded (ADR-0001 as amended on #143).
  *
- * The strike is `aircraft`, which until #171 draws with the ship's own sign.
+ * The strike is `aircraft`, and draws with that arm's own sign (#171).
  */
 const CARRIER_STRIKE: Battle = {
   schema_version: 2,
