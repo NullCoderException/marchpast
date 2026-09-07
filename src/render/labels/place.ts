@@ -165,10 +165,16 @@ export function placeLabels({ units, plate, obstacles, measure, memory, card, mo
     const soft = others.flatMap((other) => smoke.get(other.id) ?? []);
     const ownCard = open !== undefined && open.content.id === unit.id ? open : undefined;
     // A slot a closed card left behind is not a step of the collapse order, so
-    // the label taking its unit back keeps the angle and starts the order again.
+    // the label taking its unit back keeps the angle and starts the order again
+    // — at the floor and undisplaced, because the ring the card rode out on to
+    // find room is the card's. A label left on it would stay there for good:
+    // the slot is free every frame, so **stay** keeps it, and **recover** only
+    // ever gives back a step, never a displacement (#115).
     const remembered = memory.get(unit.id);
     const previous =
-      ownCard === undefined && remembered?.step === CARD_STEP ? { ...remembered, step: labelFloor(mode), clean: 0 } : remembered;
+      ownCard === undefined && remembered?.step === CARD_STEP
+        ? { ...remembered, extra: 0, step: labelFloor(mode), clean: 0 }
+        : remembered;
 
     const free = (box: Rect, avoidSmoke: boolean): boolean => {
       if (!insidePlate(box, plate)) return false;
