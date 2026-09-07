@@ -43,6 +43,22 @@ const PHASES: ReadonlyArray<readonly [id: string, t: string]> = [
 /** Wikipedia is a fact-check, never a source: the issue forbids it and the CC BY-SA order of battle with it. */
 const SHARE_ALIKE_WORKS = /wikipedia\.org|wikidata\.org/;
 
+/** The move heads the issue names, each of which must appear in a run of phases and nowhere else. */
+const AGAMEMNON = { lat: 55.652, lon: 12.668 };
+const BELLONA_AND_RUSSELL = { lat: 55.674, lon: 12.645 };
+const BOMBS = { lat: 55.688, lon: 12.644 };
+
+/**
+ * How near two positions must be to count as the same authored point: a tenth
+ * of a minute of arc, which is finer than any two heads in this file are apart
+ * and coarser than the rounding the positions are written to.
+ */
+const SAME_POINT = { lat: 0.002, lon: 0.003 };
+
+/** Metres per degree of latitude, and of longitude at this battle's latitude, for turning an extent into a shape. */
+const METRES_PER_DEGREE_LAT = 111_320;
+const METRES_PER_DEGREE_LON = METRES_PER_DEGREE_LAT * Math.cos((55.67 * Math.PI) / 180);
+
 /** Index of the phase with this id; throws so a typo fails loudly rather than reading phase 0. */
 function phaseIndex(id: string): number {
   const index = battle.phases.findIndex((phase) => phase.id === id);
@@ -62,19 +78,25 @@ function snapshots(unitId: string): UnitSnapshot[] {
   return battle.phases.map((phase) => snapshot(phase.id, unitId));
 }
 
+/** One phase's notes; `notes` is optional in the schema but this brief asks for it on every phase. */
+function phaseNotes(phaseId: string): string {
+  return battle.phases[phaseIndex(phaseId)]?.notes ?? "";
+}
+
 /** Every move a unit carries in a phase, in the order authored. */
 function moves(phaseId: string, unitId: string): Move[] {
   return snapshot(phaseId, unitId).moves ?? [];
 }
 
-/** The ids of the phases in which this unit carries a move whose head is at `to`, to a tenth of a minute of arc. */
+/** Whether two authored positions are the same point, within `SAME_POINT`. */
+function samePoint(a: Position, b: Position): boolean {
+  return Math.abs(a.lat - b.lat) < SAME_POINT.lat && Math.abs(a.lon - b.lon) < SAME_POINT.lon;
+}
+
+/** The ids of the phases in which this unit carries a move whose head is at `to`. */
 function phasesWithMoveTo(unitId: string, to: Position): string[] {
   return battle.phases
-    .filter((phase) =>
-      (snapshot(phase.id, unitId).moves ?? []).some(
-        (move) => Math.abs(move.to.lat - to.lat) < 0.002 && Math.abs(move.to.lon - to.lon) < 0.003,
-      ),
-    )
+    .filter((phase) => moves(phase.id, unitId).some((move) => samePoint(move.to, to)))
     .map((phase) => phase.id);
 }
 
@@ -130,7 +152,8 @@ describe("data/battles/copenhagen.json", () => {
 
   it("frames Parker's anchorage and Draco inside a landscape extent", () => {
     const { north, south, east, west } = battle.extent;
-    expect(east - west).toBeGreaterThan(north - south);
+    // Landscape is a shape on the ground, not a difference in degrees: a degree of longitude is 56% of one of latitude here.
+    expect((east - west) * METRES_PER_DEGREE_LON).toBeGreaterThan((north - south) * METRES_PER_DEGREE_LAT);
     for (const phase of battle.phases) {
       for (const unit of phase.units) {
         const where = `${phase.id}/${unit.id}`;
@@ -165,6 +188,18 @@ describe("data/battles/copenhagen.json", () => {
     for (const phase of battle.phases) expect(phase.day ?? 0, phase.id).toBe(0);
   });
 
+  it("never turns a unit through more than a quarter circle between phases", () => {
+    // schema.md 2.7: a bigger turn wants an intermediate phase, so the direction is authored not guessed.
+    // Nelson's two turns sit exactly on the limit, which is why this is worth pinning.
+    for (const unit of battle.units) {
+      const headings = snapshots(unit.id).map((snapshot) => snapshot.heading);
+      for (let index = 1; index < headings.length; index++) {
+        const turn = Math.abs(((headings[index]! - headings[index - 1]! + 540) % 360) - 180);
+        expect(turn, `${unit.id} phase ${index}`).toBeLessThanOrEqual(90);
+      }
+    }
+  });
+
   it("carries a light south-south-easterly wind on every phase, never shifting", () => {
     for (const phase of battle.phases) expect(phase.wind, phase.id).toEqual({ from: 157.5, force: "light" });
   });
@@ -177,7 +212,7 @@ describe("data/battles/copenhagen.json", () => {
   });
 
   it("records the recall-signal dispute in the notes of the phase that carries it", () => {
-    expect(snapshotNotes("signal-39")).toMatch(/13:?30|half-past one/i);
+    expect(phaseNotes("signal-39")).toMatch(/13:?30|half-past one/i);
   });
 
   it("lists only public-domain sources, and never a share-alike work", () => {
@@ -245,35 +280,42 @@ describe("data/battles/copenhagen.json", () => {
     expect(nelson.map((unit) => unit.strength ?? 1)).toEqual([1, 0.92, 0.75, 0.75, 0.75, 0.75, 0.75, 0.58]);
   });
 
-  it("leaves each grounded detachment on the shoal for every phase after it grounds", () => {
-    const agamemnon = { lat: 55.652, lon: 12.668 };
-    const bellonaAndRussell = { lat: 55.674, lon: 12.645 };
-    expect(phasesWithMoveTo("nelsons-division", agamemnon)).toEqual(PHASES.slice(1).map(([id]) => id));
-    expect(phasesWithMoveTo("nelsons-division", bellonaAndRussell)).toEqual(PHASES.slice(2).map(([id]) => id));
-    for (const move of moves("withdrawal", "nelsons-division")) expect(move.kind).toBe("detachment");
+  it("leaves each detached ship where it stopped for every phase after it stopped there", () => {
+    expect(phasesWithMoveTo("nelsons-division", AGAMEMNON)).toEqual(PHASES.slice(1).map(([id]) => id));
+    expect(phasesWithMoveTo("nelsons-division", BELLONA_AND_RUSSELL)).toEqual(PHASES.slice(2).map(([id]) => id));
+  });
+
+  it("grounds the Bellona and the Russell on the shoal, and anchors the Agamemnon short of it", () => {
+    // Stewart has the two "ran aground" on the starboard shoal; Nelson has the Agamemnon unable to
+    // weather the shoal's end and "obliged to anchor", so hers is the one arrow that is not on it.
+    expect(inside("shoal", BELLONA_AND_RUSSELL)).toBe(true);
+    expect(inside("shoal", AGAMEMNON)).toBe(false);
+    expect(AGAMEMNON.lat).toBeLessThan(BELLONA_AND_RUSSELL.lat);
   });
 
   it("sends Riou to the Trekroner and hauls him off, and stations the bombs abreast the Elephant", () => {
     const riou = moves("battle-general", "nelsons-division").find((move) => move.to.lat > 55.7);
     expect(riou?.kind).toBe("detachment");
     expect(riou!.to.lat).toBeGreaterThan(named("work").get("Trekroner")!.lat);
-    // In phase 5 the frigates have obeyed No. 39 and the arrow points back down the channel.
+    // In phase 5 the frigates have obeyed No. 39: the head has come back south from the Trekroner
+    // toward the line, so it is still north of the division but nearer to it than it was.
     const hauledOff = moves("signal-39", "nelsons-division").filter((move) => move.to.lat > 55.69);
     expect(hauledOff).toHaveLength(1);
     expect(hauledOff[0]!.to.lat).toBeLessThan(riou!.to.lat);
+    expect(hauledOff[0]!.to.lat).toBeGreaterThan(snapshot("signal-39", "nelsons-division").position.lat);
     // The bombs: on the shoal side of the line, from the battle becoming general until the truce.
     const bombPhases = ["battle-general", "signal-39", "southern-wing-silenced", "truce"];
+    expect(phasesWithMoveTo("nelsons-division", BOMBS)).toEqual(bombPhases);
     for (const phaseId of bombPhases) {
-      const bombs = moves(phaseId, "nelsons-division").find((move) => Math.abs(move.to.lat - 55.688) < 0.002);
-      expect(bombs?.kind, phaseId).toBe("detachment");
-      expect(bombs!.to.lon, phaseId).toBeGreaterThan(snapshot(phaseId, "nelsons-division").position.lon);
+      const bombs = moves(phaseId, "nelsons-division").find((move) => samePoint(move.to, BOMBS))!;
+      expect(bombs.kind, phaseId).toBe("detachment");
+      expect(bombs.to.lon, phaseId).toBeGreaterThan(snapshot(phaseId, "nelsons-division").position.lon);
     }
-    expect(moves("withdrawal", "nelsons-division").some((move) => Math.abs(move.to.lat - 55.688) < 0.002)).toBe(false);
   });
 
   it("sends the flag of truce ashore, once, as an intent", () => {
     const ashore = battle.phases.filter((phase) =>
-      (snapshot(phase.id, "nelsons-division").moves ?? []).some((move) => move.kind === "intent" && move.to.lon < 12.61),
+      moves(phase.id, "nelsons-division").some((move) => move.kind === "intent" && move.to.lon < 12.61),
     );
     expect(ashore.map((phase) => phase.id)).toEqual(["southern-wing-silenced"]);
     const truce = moves("southern-wing-silenced", "nelsons-division").find((move) => move.kind === "intent")!;
@@ -372,15 +414,10 @@ describe("data/maps/copenhagen.geojson", () => {
     expect(inside("shoal", { lat: british.lat, lon: british.lon + 0.012 })).toBe(true);
   });
 
-  it("puts the groundings on the Middle Ground", () => {
-    for (const move of moves("withdrawal", "nelsons-division")) {
-      expect(move.kind).toBe("detachment");
+  it("keeps every place label off the plate's crowded middle, one per named thing", () => {
+    const places = [...named("place").values(), ...named("work").values()];
+    for (const [index, one] of places.entries()) {
+      for (const other of places.slice(index + 1)) expect(samePoint(one, other)).toBe(false);
     }
-    expect(inside("shoal", { lat: 55.674, lon: 12.645 })).toBe(true);
   });
 });
-
-/** The notes of one phase, or the empty string; `notes` is optional in the schema but required by this brief. */
-function snapshotNotes(phaseId: string): string {
-  return battle.phases[phaseIndex(phaseId)]?.notes ?? "";
-}

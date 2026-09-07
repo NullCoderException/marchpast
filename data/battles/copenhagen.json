@@ -116,7 +116,7 @@
         },
         {
           "source": "parker-dispatch",
-          "locator": "London Gazette no. 15354 p. 401; Nicolas vol. IV p. 320",
+          "locator": "Nicolas vol. IV p. 320, reprinting London Gazette no. 15354 p. 401",
           "quote": "It was agreed between us that the remaining Ships with me, should weigh at the same moment his Lordship did, and menace the Crown Batteries, and the four Ships of the Line that lay at the entrance of the Arsenal, as also to cover our disabled Ships as they came out of Action."
         },
         {
@@ -142,13 +142,7 @@
           "state": "intact",
           "moves": [{ "kind": "intent", "to": { "lat": 55.7031, "lon": 12.6144 } }]
         },
-        {
-          "id": "danish-line",
-          "position": { "lat": 55.686, "lon": 12.627 },
-          "heading": 70,
-          "formation": "line",
-          "state": "intact"
-        }
+        { "id": "danish-line", "position": { "lat": 55.686, "lon": 12.627 }, "heading": 70, "formation": "line", "state": "intact" }
       ]
     },
     {
@@ -158,7 +152,7 @@
       "playback_rate": 150,
       "wind": { "from": 157.5, "force": "light" },
       "caption": "The pilots hesitate over the bearing of the east end of the Middle Ground until Brierley, master of the Bellona, offers to lead. At half-past nine the signal is given to weigh in succession and the Edgar stands into the King's Deep. The Agamemnon takes a course direct for the end of the shoal, cannot weather it and has to anchor; the Polyphemus is ordered up in her place. Parker weighs as agreed and beats up from the north-east against Nelson's fair wind.",
-      "notes": "Strength steps to eleven twelfths, 0.92. The Agamemnon is detached by the shoal and never rejoins within the battle the file holds, so she costs strength and takes a detachment arrow, laid at the southern tip of the Middle Ground where the sketch draws her (ADR-0018, ADR-0019). The division's position is a reading of the column forming in the channel between this instant and the first gun, not a sourced fix; its heading is the course up the King's Deep, which is also where its force is directed.",
+      "notes": "Strength steps to eleven twelfths, 0.92. The Agamemnon is detached by the shoal and never rejoins within the battle the file holds, so she costs strength and takes a detachment arrow (ADR-0018, ADR-0019). Her arrow head lies south-east of the Middle Ground's tail and not on it, because she did not ground: she took a course direct for the end of the shoal, could not weather it and anchored short of it, which is the difference Stewart draws between her and the two ships that ran aground in the next phase. The division's position is a reading of the column forming in the channel between this instant and the first gun, not a sourced fix; its heading is the course up the King's Deep, which is also where its force is directed. Parker's position from here to the withdrawal is likewise a reading, not a fix: the sources give only 'some four miles off' and the direction he beat up from, so his division is stepped south-west along that bearing, and the sketch's placing of his ships at the north end of the channel at the close is what it is stepped toward.",
       "references": [
         {
           "source": "stewart-narrative",
@@ -167,7 +161,7 @@
         },
         {
           "source": "nelson-report",
-          "locator": "London Gazette no. 15354 p. 403; Nicolas vol. IV p. 314",
+          "locator": "Nicolas vol. IV p. 314, reprinting London Gazette no. 15354 p. 403",
           "quote": "The Agamemnon could not weather the shoal of the middle, and was obliged to anchor, but not the smallest blame can be attached to Captain Fancourt: it was an event to which all the Ships were liable."
         },
         {
@@ -194,13 +188,7 @@
           "state": "intact",
           "moves": [{ "kind": "intent", "to": { "lat": 55.7031, "lon": 12.6144 } }]
         },
-        {
-          "id": "danish-line",
-          "position": { "lat": 55.686, "lon": 12.627 },
-          "heading": 70,
-          "formation": "line",
-          "state": "intact"
-        }
+        { "id": "danish-line", "position": { "lat": 55.686, "lon": 12.627 }, "heading": 70, "formation": "line", "state": "intact" }
       ]
     },
     {
@@ -210,11 +198,11 @@
       "playback_rate": 145,
       "wind": { "from": 157.5, "force": "light" },
       "caption": "The Bellona and the Russell keep too close on the starboard shoal and run aground, within range and firing where they lie. The Elephant puts her helm to starboard, goes inside them, and the ships astern follow her. At five minutes past ten the action begins, the van led by the Edgar; nine of the twelve reach their stations and anchor by the stern opposite their numbers in the Danish line.",
-      "notes": "Strength steps to nine twelfths, 0.75: Mahan's reduction by one-fourth. The two grounded ships share one arrow, laid on the western edge of the Middle Ground abreast the southern Danes, which is where Mahan's 'east side of the Middle Ground' and Stewart's 'starboard shoal' are the same place. From here to the truce the division is drawn as a line and not a column: the ships lie moored and fight to port, so the heading is the broadside they present to the Danes, not where their bows point (ADR-0019), and the anchoring by the stern is caption matter. This instant is the one exact clock reading in the battle, Nelson's own.",
+      "notes": "Strength steps to nine twelfths, 0.75: Mahan's reduction by one-fourth. The two grounded ships share one arrow, laid on the western edge of the Middle Ground abreast the southern Danes, which is where Mahan's 'east side of the Middle Ground' and Stewart's 'starboard shoal' are the same place. From here to the truce the division is drawn as a line and not a column: the ships lie moored and fight to port, so the heading is the broadside they present to the Danes, not where their bows point (ADR-0019), and the anchoring by the stern is caption matter. This instant is the one exact clock reading in the battle, Nelson's own. The line's own fix is the Elephant's station opposite the Dannebrog, put a cable and a half east of the Danish centre: Stewart's 'nearly a cable's length' is flagship to flagship and the sketch shows rather more, and the position is the whole division's centre, not one ship's.",
       "references": [
         {
           "source": "nelson-report",
-          "locator": "London Gazette no. 15354 p. 403; Nicolas vol. IV pp. 314-315",
+          "locator": "Nicolas vol. IV pp. 314-315, reprinting London Gazette no. 15354 p. 403",
           "quote": "The Action began at five minutes past ten — the Van led by Captain George Murray of the Edgar, who set a noble example of intrepidity"
         },
         {
@@ -249,13 +237,7 @@
           "state": "intact",
           "moves": [{ "kind": "intent", "to": { "lat": 55.7031, "lon": 12.6144 } }]
         },
-        {
-          "id": "danish-line",
-          "position": { "lat": 55.686, "lon": 12.627 },
-          "heading": 70,
-          "formation": "line",
-          "state": "engaged"
-        }
+        { "id": "danish-line", "position": { "lat": 55.686, "lon": 12.627 }, "heading": 70, "formation": "line", "state": "engaged" }
       ]
     },
     {
@@ -265,7 +247,7 @@
       "playback_rate": 145,
       "wind": { "from": 157.5, "force": "light" },
       "caption": "Before half past eleven the battle is general, the two lines nearly a cable's length apart, the Elephant in the centre opposite the Dannebrog. Riou, seeing the blank the three grounded ships have left, takes his frigates down to the Crown Battery in their place. Two bomb vessels reach their station abreast the Elephant and throw shells over both fleets into the Arsenal; the Dannebrog is on fire and the Rendsborg adrift.",
-      "notes": "The line holds the station it anchored in, so its position repeats until the withdrawal; the tween shows no motion because there was none. The Danish strength steps to about 0.9 for the Dannebrog burning and the Rendsborg's cable shot away, an author's reading of Fischer's own order of misfortunes and not a count. Riou's frigates and the bomb vessels are detachments of Nelson's division that cost it nothing, because both return within the battle: the frigates haul off in the next phase and the bombs stay to the truce (ADR-0018). The Trekroner is a work on the map and not a unit, so its fire against the frigates is the Danish line's caption (ADR-0012, ADR-0015).",
+      "notes": "The line holds the station it anchored in, so its position repeats until the withdrawal; the tween shows no motion because there was none. The Danish strength steps to about 0.9 for the Dannebrog burning and the Rendsborg's cable shot away, an author's reading of Fischer's own order of misfortunes and not a count. Riou's frigates and the bomb vessels are detachments of Nelson's division that cost it nothing, because both return within the battle: the frigates haul off in the next phase and the bombs stay to the truce (ADR-0018). The Trekroner is a work on the map and not a unit, so its fire against the frigates is the Danish line's caption (ADR-0012, ADR-0015). Riou's arrow head is put just north-east of the Trekroner, where the sketch draws the Amazon and her consorts; the bombs' head is on the shoal edge abreast the Elephant, which is the station Stewart says only two of them reached.",
       "references": [
         {
           "source": "stewart-narrative",
@@ -279,7 +261,7 @@
         },
         {
           "source": "nelson-report",
-          "locator": "London Gazette no. 15354 p. 403; Nicolas vol. IV p. 314",
+          "locator": "Nicolas vol. IV p. 314, reprinting London Gazette no. 15354 p. 403",
           "quote": "The Bombs were directed and took their stations abreast of the Elephant, and threw some shells into the Arsenal."
         },
         {
@@ -311,14 +293,7 @@
           "state": "intact",
           "moves": [{ "kind": "intent", "to": { "lat": 55.7031, "lon": 12.6144 } }]
         },
-        {
-          "id": "danish-line",
-          "position": { "lat": 55.686, "lon": 12.627 },
-          "heading": 70,
-          "formation": "line",
-          "state": "engaged",
-          "strength": 0.9
-        }
+        { "id": "danish-line", "position": { "lat": 55.686, "lon": 12.627 }, "heading": 70, "formation": "line", "state": "engaged", "strength": 0.9 }
       ]
     },
     {
@@ -328,7 +303,7 @@
       "playback_rate": 145,
       "wind": { "from": 157.5, "force": "light" },
       "caption": "Four miles off and unable to close, Parker throws out No. 39, the general signal to leave off action. Nelson acknowledges it, orders No. 16 for close action kept flying, and puts the glass to his blind eye. Not a ship of the line moves; Riou's frigates obey and haul off down the channel, and Riou is killed as the Amazon shows her stern to the Trekroner. The Danish fire is slackening but the heavy ships and praams have not ceased.",
-      "notes": "The clock of the recall is the one real dispute in the battle. Southey puts it at one o'clock and Mahan at 'two o'clock, an hour after the signal was made', so 13:00; Stewart says only that it was made about mid-action, and the modern consensus is 13:30, a fact taken from Wikipedia, which is not cited as a source. 13:00 is used because two of the three works cited here agree on it, and the half hour is inside this phase either way. The Danish strength steps to about 0.6 for the relaxed state of the enemy's fire Stewart reports at one p.m. The frigates' arrow now points back down the King's Deep, where they hauled off to.",
+      "notes": "The clock of the recall is the one real dispute in the battle. Southey puts it at one o'clock and Mahan at 'two o'clock, an hour after the signal was made', so 13:00; Stewart says only that it was made about mid-action, and the modern consensus is 13:30, a fact taken from Wikipedia, which is not cited as a source. 13:00 is used because two of the three works cited here agree on it, and the half hour is inside this phase either way. The Danish strength steps to about 0.6 for the relaxed state of the enemy's fire Stewart reports at one p.m. The frigates' arrow head has come back south from the Trekroner toward the line, so it is shorter than in the previous phase and still north of the division: a detachment arrow says where the detached part is, not which way it is going.",
       "references": [
         {
           "source": "stewart-narrative",
@@ -374,14 +349,7 @@
           "state": "intact",
           "moves": [{ "kind": "intent", "to": { "lat": 55.7031, "lon": 12.6144 } }]
         },
-        {
-          "id": "danish-line",
-          "position": { "lat": 55.686, "lon": 12.627 },
-          "heading": 70,
-          "formation": "line",
-          "state": "engaged",
-          "strength": 0.6
-        }
+        { "id": "danish-line", "position": { "lat": 55.686, "lon": 12.627 }, "heading": 70, "formation": "line", "state": "engaged", "strength": 0.6 }
       ]
     },
     {
@@ -437,14 +405,7 @@
           "state": "intact",
           "moves": [{ "kind": "detachment", "to": { "lat": 55.725, "lon": 12.645 } }]
         },
-        {
-          "id": "danish-line",
-          "position": { "lat": 55.686, "lon": 12.627 },
-          "heading": 70,
-          "formation": "line",
-          "state": "broken",
-          "strength": 0.2
-        }
+        { "id": "danish-line", "position": { "lat": 55.686, "lon": 12.627 }, "heading": 70, "formation": "line", "state": "broken", "strength": 0.2 }
       ]
     },
     {
@@ -463,7 +424,7 @@
         },
         {
           "source": "nelson-report",
-          "locator": "London Gazette no. 15354 p. 403; Nicolas vol. IV p. 314",
+          "locator": "Nicolas vol. IV p. 314, reprinting London Gazette no. 15354 p. 403",
           "quote": "The other seventeen Sail are sunk, burnt, or taken, being the whole of the Danish Line to the southward of the Crown Islands, after a battle of four hours."
         }
       ],
@@ -481,21 +442,8 @@
             { "kind": "detachment", "to": { "lat": 55.688, "lon": 12.644 } }
           ]
         },
-        {
-          "id": "parkers-division",
-          "position": { "lat": 55.727, "lon": 12.658 },
-          "heading": 225,
-          "formation": "line",
-          "state": "intact"
-        },
-        {
-          "id": "danish-line",
-          "position": { "lat": 55.686, "lon": 12.627 },
-          "heading": 70,
-          "formation": "line",
-          "state": "destroyed",
-          "strength": 0
-        }
+        { "id": "parkers-division", "position": { "lat": 55.727, "lon": 12.658 }, "heading": 225, "formation": "line", "state": "intact" },
+        { "id": "danish-line", "position": { "lat": 55.686, "lon": 12.627 }, "heading": 70, "formation": "line", "state": "destroyed", "strength": 0 }
       ]
     },
     {
@@ -536,21 +484,8 @@
             { "kind": "detachment", "to": { "lat": 55.674, "lon": 12.645 } }
           ]
         },
-        {
-          "id": "parkers-division",
-          "position": { "lat": 55.726, "lon": 12.656 },
-          "heading": 225,
-          "formation": "line",
-          "state": "intact"
-        },
-        {
-          "id": "danish-line",
-          "position": { "lat": 55.686, "lon": 12.627 },
-          "heading": 70,
-          "formation": "line",
-          "state": "destroyed",
-          "strength": 0
-        }
+        { "id": "parkers-division", "position": { "lat": 55.726, "lon": 12.656 }, "heading": 225, "formation": "line", "state": "intact" },
+        { "id": "danish-line", "position": { "lat": 55.686, "lon": 12.627 }, "heading": 70, "formation": "line", "state": "destroyed", "strength": 0 }
       ]
     }
   ]
