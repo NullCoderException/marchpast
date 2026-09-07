@@ -1,0 +1,124 @@
+{
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "The sign"
+    },
+    {
+      "id": "page-2",
+      "name": "The frames"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "page": "page-1",
+      "x": 0,
+      "y": 0,
+      "w": 1300,
+      "h": 1200
+    },
+    {
+      "file": "States.dc.html",
+      "page": "page-1",
+      "x": 1420,
+      "y": 0,
+      "w": 1300,
+      "h": 1000
+    },
+    {
+      "file": "Legend.dc.html",
+      "page": "page-1",
+      "x": 2840,
+      "y": 0,
+      "w": 1300,
+      "h": 860
+    },
+    {
+      "file": "Engaged.dc.html",
+      "page": "page-1",
+      "x": 0,
+      "y": 1340,
+      "w": 1300,
+      "h": 900
+    },
+    {
+      "file": "Atlas.dc.html",
+      "page": "page-1",
+      "x": 1420,
+      "y": 1340,
+      "w": 1300,
+      "h": 780
+    },
+    {
+      "file": "StaffMap.dc.html",
+      "page": "page-1",
+      "x": 2840,
+      "y": 1340,
+      "w": 1300,
+      "h": 800
+    },
+    {
+      "file": "FirstStrike.dc.html",
+      "page": "page-2",
+      "x": 0,
+      "y": 0,
+      "w": 1120,
+      "h": 650
+    },
+    {
+      "file": "Burning.dc.html",
+      "page": "page-2",
+      "x": 1240,
+      "y": 0,
+      "w": 1120,
+      "h": 650
+    },
+    {
+      "file": "NightBurning.dc.html",
+      "page": "page-2",
+      "x": 2480,
+      "y": 0,
+      "w": 1120,
+      "h": 650
+    },
+    {
+      "file": "MidwayStaff.dc.html",
+      "page": "page-2",
+      "x": 3720,
+      "y": 0,
+      "w": 1120,
+      "h": 650
+    },
+    {
+      "file": "Aboard.dc.html",
+      "page": "page-2",
+      "x": 0,
+      "y": 790,
+      "w": 1300,
+      "h": 780
+    }
+  ],
+  "annotations": [
+    {
+      "id": "brief",
+      "page": "page-1",
+      "x": 0,
+      "y": -150,
+      "w": 620,
+      "text": "#140 · The aircraft sign.\nThree candidates in every hand. The legend board is the one that decides it: everything reads at nine times magnification, and the plate's legend samples at 0.75."
+    },
+    {
+      "id": "frames",
+      "page": "page-2",
+      "x": 0,
+      "y": -150,
+      "w": 620,
+      "text": "Both frames are drawn with candidate A. Nothing here is geo-registered — these are scenes, not map files."
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-1"
+  }
+}
