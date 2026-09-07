@@ -7,10 +7,10 @@
  * anywhere.
  *
  * Three tables are what a kind is: the geometries it allows, the properties it
- * carries beyond `kind`, and how each of those properties is read. `rampart`
- * cost exactly what that promised (ADR-0026): one row in the first two tables
- * and nothing else. An eighth kind is the same again; a property no kind
- * carries yet is one more reader.
+ * carries beyond `kind`, and how each of those properties is read. A seventh
+ * kind is one row in the first two; a property no kind carries yet is one
+ * more reader. `rampart` was that seventh kind and cost exactly that, which is
+ * the promise ADR-0026 weighed the alternatives against (#167).
  *
  * Never throws on bad data; collects every error with a JSON-pointer path.
  * Ring winding and polygon validity are not checked (schema.md 3.3).
@@ -41,10 +41,11 @@ type GeometryType = Geometry["type"];
  * coordinates are written in the frame of the battle it serves (ADR-0001 as
  * amended, schema.md 3.2), so Midway's atoll is `182.63` and not `-177.37`.
  *
- * Wider than the battle file's bound too, and deliberately. That one is read
- * against its own extent's centre longitude; this validator sees a file and
- * never a pairing, so it cannot narrow the same way — and it need not, because
- * a mis-spelled map coordinate is clipped and costs a piece of the picture,
+ * Wider than the bound the battle file is getting, too, and deliberately: a
+ * position there is read against its own extent's centre longitude (schema.md
+ * 2.10 rule 2, landing with #166). This validator sees a file and never a
+ * pairing, so it cannot narrow the same way — and it need not, because a
+ * mis-spelled map coordinate is clipped and costs a piece of the picture,
  * where a mis-spelled position lies about where a force was.
  */
 const MAP_LON_BOUNDS: NumberBounds = { min: -180, max: 360 };

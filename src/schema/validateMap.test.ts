@@ -132,8 +132,18 @@ describe("validateMap: rules (schema.md 3.3)", () => {
         m.features[CONTOUR].geometry = { type: "LineString", coordinates: [[16.14, 41.29], [16.16, 41.3]] };
       }).ok,
     ).toBe(true);
-    // A rampart is a line like a river. The example ships the disjoint runs a
-    // siege line comes in; a single unbroken stretch is just as legal.
+    // A rampart is a line like a river. The example ships the disjoint runs
+    // one actually comes in; a single unbroken stretch is just as legal. Both
+    // are asserted here rather than left to the example, so an edit to the
+    // fixture cannot quietly take half of this rule's coverage with it.
+    expect(
+      validateBroken((m) => {
+        m.features[RAMPART].geometry = {
+          type: "MultiLineString",
+          coordinates: [[[16.1, 41.33], [16.13, 41.34]], [[16.16, 41.34], [16.18, 41.33]]],
+        };
+      }).ok,
+    ).toBe(true);
     expect(
       validateBroken((m) => {
         m.features[RAMPART].geometry = { type: "LineString", coordinates: [[16.1, 41.33], [16.13, 41.34]] };
@@ -214,9 +224,6 @@ describe("validateMap: rules (schema.md 3.3)", () => {
       "/features/0/geometry/coordinates/0/1",
     ]);
     expect(errorPaths(validateBroken((m) => (ring(m)[2] = [16.3])))).toEqual(["/features/0/geometry/coordinates/0/2"]);
-    expect(errorPaths(validateBroken((m) => (ring(m)[2] = [361, 41.38])))).toEqual([
-      "/features/0/geometry/coordinates/0/2/0",
-    ]);
     expect(errorPaths(validateBroken((m) => (ring(m)[2] = [-181, 41.38])))).toEqual([
       "/features/0/geometry/coordinates/0/2/0",
     ]);

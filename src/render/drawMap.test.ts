@@ -28,10 +28,13 @@ import type { Picture } from "../timeline/picture.ts";
  * every drawing call. A stand-in for a real face, not a model of one — the
  * promise being tested holds for any measure, and these widths are the same
  * order as the plate's own.
+ *
+ * Pass `calls` and it writes down each call it swallowed, name and arguments,
+ * in order: a fingerprint of the marks a pass laid, for the one test that has
+ * to say a feature was drawn nowhere rather than merely drawn without error.
  */
-function fakeContext(): CanvasRenderingContext2D {
+function fakeContext(calls: string[] = []): CanvasRenderingContext2D {
   const state: Record<string, string> = { font: "15px serif", letterSpacing: "0px" };
-  const noop = (): void => {};
   return new Proxy(
     {
       measureText: (text: string) => {
@@ -41,7 +44,11 @@ function fakeContext(): CanvasRenderingContext2D {
       },
     } as Record<string, unknown>,
     {
-      get: (target, key) => (key in target ? target[key as string] : (state[key as string] ?? noop)),
+      get: (target, key) => {
+        if (key in target) return target[key as string];
+        if (key in state) return state[key as string];
+        return (...args: unknown[]): void => void calls.push(`${String(key)}(${args.join(" ")})`);
+      },
       set: (_target, key, value) => {
         state[key as string] = String(value);
         return true;
@@ -133,16 +140,38 @@ describe("mapPoints", () => {
   it("reports nothing at all for a battle with no map", () => {
     expect(mapPoints({ ...plate(), map: undefined })).toEqual([]);
   });
+});
 
-  /**
-   * The fixture carries a rampart, and neither the pass nor the placer knows
-   * what one looks like yet (#170). A map with ramparts on it has to load and
-   * play all the same, with the lines simply not there: the kind arrived in
-   * the format ahead of the ink (#167), so this is the thing that would break.
-   */
-  it("passes over a rampart: nameless, so it reaches no label, and drawn nowhere yet", () => {
-    expect(mapPoints(plate()).map(({ text }) => text)).toEqual(["Aboukir Island", "ISLAND BATTERY"]);
-    expect(() => drawMap(plate(), [])).not.toThrow();
+/**
+ * The seventh kind reached the format on #167 ahead of its ink, and neither
+ * this pass nor the placer knows what one looks like until #170 and #175. A
+ * map carrying ramparts has to load and play all the same, with the lines
+ * simply not there — so what is tested is that they change nothing: no name
+ * reaches the placer, and the pass lays down exactly the marks it would if the
+ * features were not in the file at all.
+ */
+describe("a rampart, read but not drawn yet", () => {
+  const WITHOUT: MapFile = {
+    ...FIXTURE,
+    features: FIXTURE.features.filter(({ properties }) => properties.kind !== "rampart"),
+  };
+
+  /** Every mark the pass laid, in order, drawing `map` on the Nile's plate. */
+  const marks = (map: MapFile): string[] => {
+    const calls: string[] = [];
+    drawMap({ ...shippedPlate("nile.json", VIEWS[0]!), ctx: fakeContext(calls), map }, []);
+    return calls;
+  };
+
+  it("is nameless, so it reaches no label", () => {
+    const named = mapPoints({ ...shippedPlate("nile.json", VIEWS[0]!), map: FIXTURE });
+    expect(named.map(({ text }) => text)).toEqual(["Aboukir Island", "ISLAND BATTERY"]);
+  });
+
+  it("leaves the plate exactly as it stands without it", () => {
+    // The guard first: two empty logs would satisfy the comparison and say nothing.
+    expect(marks(WITHOUT).length).toBeGreaterThan(0);
+    expect(marks(FIXTURE)).toEqual(marks(WITHOUT));
   });
 });
 
