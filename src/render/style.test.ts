@@ -1,10 +1,12 @@
 /**
- * The lee-flank clamp: where Billow's cloud goes, given the wind the units pass
- * handed the glyph. Pure geometry, so it is worth testing; the cloud whose
- * direction it decides is checked by eye (#58, ADR-0014).
+ * The engraved system's geometry: a unit's own axes, and the lee-flank clamp
+ * that decides which side the smoke goes and therefore which side the label
+ * does not. Pure geometry, so it is worth testing; what is drawn with it is
+ * checked by eye (#58, ADR-0014).
  */
 import { describe, expect, it } from "vitest";
-import { leeDrift } from "./ticks.ts";
+import { leeDrift, MARK_REACH } from "./style.ts";
+import { billowReach } from "./glyphs/ticks.ts";
 
 /** Heading is up the negative y axis, so `-y` is ahead, `+y` astern, `+x` to starboard. */
 const AHEAD = 0;
@@ -58,5 +60,20 @@ describe("leeDrift", () => {
     // cloud takes the other flank rather than sitting under the words.
     expect(leeDrift(undefined, "column")).toEqual({ x: -1, y: 0 });
     expect(leeDrift(undefined, "line")).toEqual({ x: 0, y: -1 });
+  });
+});
+
+describe("MARK_REACH", () => {
+  it("covers the plate's own cloud, which is what the shared label pass clears", () => {
+    // The label pass may not read a view's glyph (ADR-0014), so it clears a
+    // number kept here instead. Re-tuning Billow past it fails here rather
+    // than silently leaving labels sitting in smoke.
+    for (const state of ["engaged", "broken"] as const) {
+      expect(billowReach(state, 1)).toBeLessThanOrEqual(MARK_REACH[state]);
+      expect(billowReach(state, 1)).toBeGreaterThan(MARK_REACH[state] - 6);
+    }
+    expect(billowReach("intact", 1)).toBe(0);
+    expect(MARK_REACH.intact).toBe(0);
+    expect(MARK_REACH.destroyed).toBe(0);
   });
 });

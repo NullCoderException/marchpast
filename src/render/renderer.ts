@@ -21,9 +21,10 @@
 import type { Battle, MapFile } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
 import { drawCaption, layoutCaption } from "./drawCaption.ts";
-import { drawFurniture } from "./drawFurniture.ts";
+import { drawFurniture, furnitureBoxes } from "./drawFurniture.ts";
 import { drawMap } from "./drawMap.ts";
 import { drawUnits } from "./drawUnits.ts";
+import { canvasMeasure, drawLabels, type LabelMemory, type LabelUnit, type Measure, NO_LABEL_MEMORY, type NumeralRow, numeralKey, type Placed, placeLabels } from "./labels/index.ts";
 import { unitsDrawn } from "./level.ts";
 import { seeded } from "./primitives.ts";
 import { fitProjection, type Rect } from "./projection.ts";
@@ -41,9 +42,21 @@ export interface Renderer {
 export function createRenderer(canvas: HTMLCanvasElement): Renderer {
   const ctx = canvas.getContext("2d");
   if (ctx === null) throw new Error("Canvas 2D is not available in this browser");
+  const measure = canvasMeasure(ctx);
+
+  // The one piece of frame-to-frame state the renderer holds: where each
+  // label stood last frame, so it does not move when it need not (#39). It is
+  // per battle — the slots are keyed by roster id — so a new battle starts
+  // over.
+  let labels: LabelMemory = NO_LABEL_MEMORY;
+  let drawing: Battle | undefined;
 
   return {
     render(battle, map, picture, viewer) {
+      if (battle !== drawing) {
+        labels = NO_LABEL_MEMORY;
+        drawing = battle;
+      }
       const view = viewById(viewer.view);
       const { palette } = view;
       const { width, height } = fitBackingStore(canvas, ctx);
@@ -94,13 +107,48 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
       ctx.rect(extentRect.x, extentRect.y, extentRect.width, extentRect.height);
       ctx.clip();
       drawMap(plate);
-      drawUnits(plate);
+      const units = drawUnits(plate);
       ctx.restore();
 
-      drawFurniture(plate);
+      // The labels go last, over the whole plate, because they must clear the
+      // furniture as well as the glyphs (#39). The furniture is measured
+      // first, drawn after: its legend carries a key for any numeral the
+      // labels end up showing, and a bigger legend is a bigger obstacle.
+      const { placed, key } = layoutLabels(plate, units, extentRect, labels, measure);
+      drawFurniture(plate, key);
+      drawLabels(ctx, placed, palette);
       drawCaption(ctx, battle, picture, caption, plateHeight, width, palette);
     },
   };
+
+  /**
+   * Places the frame's labels against the furniture, and the furniture against
+   * the frame's labels. The two depend on each other in one direction only —
+   * the numeral is the last resort of the collapse order, and every numeral
+   * shown adds a row to the legend — so a second pass settles it, and the key
+   * the legend draws is always the key the placed labels imply.
+   */
+  function layoutLabels(
+    plate: Plate,
+    units: readonly LabelUnit[],
+    extentRect: Rect,
+    memory: LabelMemory,
+    measureText: Measure,
+  ): { placed: Placed[]; key: NumeralRow[] } {
+    const place = (against: readonly NumeralRow[]) =>
+      placeLabels({ units, plate: extentRect, obstacles: furnitureBoxes(plate, against), measure: measureText, memory });
+
+    let placement = place([]);
+    let key = numeralKey(placement.placed);
+
+    if (key.length > 0) {
+      placement = place(key);
+      key = numeralKey(placement.placed);
+    }
+
+    labels = placement.memory;
+    return { placed: placement.placed, key };
+  }
 }
 
 /** Sizes the backing store to the canvas's CSS size at the current devicePixelRatio. Returns the CSS size. */
