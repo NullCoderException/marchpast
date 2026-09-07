@@ -4,12 +4,10 @@
  * marks the named things stand on. Everything is drawn in map space through
  * the projection; the shared half keeps the order and the clipping.
  *
- * The seventh kind, `rampart`, is **read and not drawn**. It reached the
- * format on #167 ahead of its ink, and every selector here picks its kind out
- * by name, so a map with ramparts on it loads and plays with the lines simply
- * not there. #170 puts them among the ground — after the water and before the
- * named things, which is where schema.md section 4 has them — here and in
- * Atlas's; #175 in the staff map's.
+ * The seventh kind, `rampart`, is drawn by `rampart.ts` in the idiom this
+ * ground was built with, among the ground: after the water and before the
+ * named things, which is where schema.md section 4 has it (#170). #175 gives
+ * the staff map its third idiom.
  *
  * How each kind is inked was decided on #62 against the design canvas: relief
  * as contour lines weighted by level and nothing else (no hachures, no
@@ -19,12 +17,14 @@
  * plan sign with its name in small capitals; a place, unchanged from v1, as a
  * dot with its name in italic.
  *
- * **Three grounds, one hand.** The chart plate and the night plate name the
- * same relief treatment under their own palettes — an inverted plate still
- * costs no drawing code, which was the seam's first claim (ADR-0014) — and
- * Atlas names the tinted one, which lays its bands under the same lines. #138
- * splits the night plate's off to illuminated contours and Atlas's off to a
- * hypsometric ramp; that is #170's, and this file is the shape it lands in.
+ * **Three grounds, one frame.** #138 found that no relief treatment survives
+ * the move from one view to the next: the chart plate keeps its contours
+ * weighted by level (below), the night plate lights them from the north-west
+ * (`groundNight.ts`) and Atlas lays a hypsometric ramp under them
+ * (`groundAtlas.ts`). What is still shared is everything round the treatment —
+ * the sea, the land and its shore, the water, the ramparts and the named
+ * things' marks — which `engravedGround` hands out to all three by value and
+ * never by inheritance (ADR-0021).
  *
  * The marks are this hand's own; **where the names go is not**. The shared
  * half measures every named point in the face `naming` gives it and finds each
@@ -33,11 +33,12 @@
  */
 import type { LonLat, MapFile, MapFeature } from "../../../schema/types.ts";
 import type { MapLabelKind } from "../../labels/index.ts";
-import { seeded } from "../../primitives.ts";
+import { type Point, seeded } from "../../primitives.ts";
 import type { Projection } from "../../projection.ts";
-import { indexLevels, tintBandLevels } from "../../relief.ts";
+import { indexLevels } from "../../relief.ts";
 import type { Ground, GroundRequest, Naming, Palette } from "../../view.ts";
 import { atAlpha } from "./ink.ts";
+import { drawRamparts, type RampartPen } from "./rampart.ts";
 import { font } from "./type.ts";
 
 /** Engraved shading inside the shoreline: wide faint strokes under a fine dark one. */
@@ -48,9 +49,14 @@ const COASTLINE_STROKES: ReadonlyArray<readonly [width: number, alpha: number]> 
   [1.6, 0.6],
 ];
 
-/** The two contour weights. Fixed across the engraved views; only their alphas are the view's (#62). */
-const CONTOUR_WIDTH = 0.5;
-const INDEX_CONTOUR_WIDTH = 0.9;
+/**
+ * The two contour weights, the chart plate's own (#62). The night plate draws
+ * on both and scales them by the light; Atlas cuts its index line thinner
+ * still and lays no fine one at all, so they are exported rather than copied
+ * into each hand.
+ */
+export const CONTOUR_WIDTH = 0.5;
+export const INDEX_CONTOUR_WIDTH = 0.9;
 
 /** An index contour's numeral, on a knock-out of the paper wide enough to open the lines under it. */
 const NUMERAL_SIZE = 10;
@@ -95,43 +101,43 @@ const MOTTLE_BLOTS = 900;
 const MOTTLE_SEED = 7;
 const MOTTLE_MAX_RADIUS = 6;
 
-/** How a view shows height: the one part of the engraved ground the three views do not share. */
+/** How a view shows height: the one part of the engraved ground the three views do not share (#138). */
 export type ReliefHand = (request: GroundRequest) => void;
 
 /**
  * Contours weighted by level: every line at 0.5 px and every fifth at 0.9 px
  * and numbered, in the palette's own ink at the palette's own alphas. The
- * chart plate's answer on #62, and the night plate's until #170 lights it.
+ * chart plate's answer on #62, kept on #138 on new grounds — hachures come off
+ * the same rings and cost no schema change, but they gather into a dark band
+ * exactly where the units are, and the plate is the view the other two are
+ * compared against.
+ *
+ * On a plate the ground under a numeral *is* the paper, so that is what it
+ * knocks out to. It looked like anatomy until Atlas tinted its ground, and it
+ * was the plate's own drawing all along (#138's closing note).
  */
 export const weightedContours: ReliefHand = (request) => {
   const lines = contourLinesOf(request);
   if (lines === undefined) return;
-  drawContours(request, lines);
+  const { palette } = request;
+  const { fine, index } = byWeight(lines, request.contourLevels);
+  strokeContours(request, fine, CONTOUR_WIDTH, palette.relief.contour);
+  strokeContours(request, index, INDEX_CONTOUR_WIDTH, palette.relief.index);
+  drawContourNumerals(request, lines, () => palette.paper);
 };
 
 /**
- * The same lines over tint bands: each band the region above its level, filled
- * in ink at `palette.relief.band`, stacking so the high ground is the darkest.
- * Atlas's, and the one view whose palette carries a band alpha at all (#62).
+ * An engraved ground with one relief treatment and one rampart idiom in it. A
+ * view names those two and gets the sea, the land, the water and the named
+ * things' marks with them — value reuse, never inheritance (ADR-0021).
  */
-export const tintedContours: ReliefHand = (request) => {
-  const lines = contourLinesOf(request);
-  if (lines === undefined) return;
-  drawTintBands(request, lines);
-  drawContours(request, lines);
-};
-
-/**
- * An engraved ground with one relief treatment in it. A view names this with
- * its own treatment and gets the sea, the land, the water and the named
- * things' marks with it — value reuse, never inheritance (ADR-0021).
- */
-export function engravedGround(relief: ReliefHand): Ground {
+export function engravedGround(relief: ReliefHand, rampart: RampartPen): Ground {
   return {
     sea,
     land,
     relief,
     water,
+    rampart: (request) => drawRamparts(request, rampart),
     mark,
     naming,
   };
@@ -225,64 +231,55 @@ function naming(kind: MapLabelKind): Naming {
 }
 
 /** The map's contour polylines gathered by level, or nothing when the map carries no relief. */
-function contourLinesOf({ map, contourLevels }: GroundRequest): Map<number, LonLat[][]> | undefined {
+export function contourLinesOf({ map, contourLevels }: GroundRequest): Map<number, LonLat[][]> | undefined {
   if (map === undefined || contourLevels.length === 0) return undefined;
   return contourLines(map);
 }
 
 /**
- * Each band is the region above its level: the closed rings at that level,
- * filled together. An open line encloses nothing, so it is left out rather
- * than closed across the plate, and a plate whose lines run off the extent is
- * banded by whichever levels do close. Even-odd, so a hollow inside a hill is
- * a hole however the ring was wound. The bands stack, which is what makes the
- * high ground the darkest.
+ * The contours split by the weight they are drawn at: the levels indexed every
+ * fifth, and all the rest. Nothing here is derived from the ground but the
+ * lines themselves — the map file carries no slope and no raster, and by
+ * ADR-0012 it never will (#138).
  */
-function drawTintBands({ ctx, projection, palette, contourLevels }: GroundRequest, lines: Map<number, LonLat[][]>): void {
-  if (palette.relief.band === undefined) return;
-  ctx.fillStyle = atAlpha(palette.ink, palette.relief.band);
-  for (const level of tintBandLevels(contourLevels)) {
-    const closed = (lines.get(level) ?? []).filter(isClosed);
-    if (closed.length === 0) continue;
-    tracePolygons(ctx, projection, closed);
-    ctx.fill("evenodd");
-  }
+export function byWeight(lines: Map<number, LonLat[][]>, contourLevels: readonly number[]): { fine: LonLat[][]; index: LonLat[][] } {
+  const heavy = new Set(indexLevels(contourLevels));
+  const fine: LonLat[][] = [];
+  const index: LonLat[][] = [];
+  for (const [level, polylines] of lines) (heavy.has(level) ? index : fine).push(...polylines);
+  return { fine, index };
+}
+
+/** One set of contour polylines at a weight, in the palette's own ink at one of its own alphas. */
+export function strokeContours({ ctx, projection, palette }: GroundRequest, lines: readonly LonLat[][], width: number, alpha: number): void {
+  if (lines.length === 0) return;
+  ctx.save();
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  for (const line of lines) tracePolyline(ctx, projection, line);
+  ctx.lineWidth = width;
+  ctx.strokeStyle = atAlpha(palette.ink, alpha);
+  ctx.stroke();
+  ctx.restore();
 }
 
 /**
- * The contours themselves: every one of them 0.5 px and every fifth level
- * 0.9 px and numbered. Nothing is derived from the ground but the lines
- * themselves — the map file carries no slope and no raster, and by ADR-0012 it
- * never will.
+ * Each index level's number, once, where its line comes nearest the numeral
+ * column: a band across the foot of the plate, so the numbers stay below the
+ * field and out of the unit labels (#62). The night plate keeps them in the
+ * same column, which is what still names the levels where the shaded side of a
+ * hill has all but gone out (#138).
+ *
+ * `knockout` is the ground the numeral stands on — what the figure is stroked
+ * in under its own fill, so the lines beneath it are opened up: the paper on a
+ * plate, the band it stands in under Atlas's ramp.
  */
-function drawContours(request: GroundRequest, lines: Map<number, LonLat[][]>): void {
-  const { ctx, projection, palette, contourLevels } = request;
-  const index = new Set(indexLevels(contourLevels));
-
-  ctx.lineJoin = "round";
-  for (const [width, alpha, wanted] of [
-    [CONTOUR_WIDTH, palette.relief.contour, false],
-    [INDEX_CONTOUR_WIDTH, palette.relief.index, true],
-  ] as const) {
-    ctx.beginPath();
-    for (const [level, polylines] of lines) {
-      if (index.has(level) !== wanted) continue;
-      for (const line of polylines) tracePolyline(ctx, projection, line);
-    }
-    ctx.lineWidth = width;
-    ctx.strokeStyle = atAlpha(palette.ink, alpha);
-    ctx.stroke();
-  }
-
-  drawContourNumerals(request, lines, index);
-}
-
-/** Each index level's number, once, where its line comes nearest the numeral column. */
-function drawContourNumerals(
-  { ctx, projection, palette }: GroundRequest,
+export function drawContourNumerals(
+  { ctx, projection, palette, contourLevels }: GroundRequest,
   lines: Map<number, LonLat[][]>,
-  index: ReadonlySet<number>,
+  knockout: (level: number) => string,
 ): void {
+  const index = new Set(indexLevels(contourLevels));
   const frame = projection.extentRect;
   const column = frame.x + frame.width / 2;
   const top = frame.y + frame.height * NUMERAL_BAND_TOP;
@@ -295,7 +292,6 @@ function drawContourNumerals(
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillStyle = atAlpha(palette.ink, palette.relief.numeral);
-  ctx.strokeStyle = palette.paper;
   ctx.lineWidth = NUMERAL_KNOCKOUT;
   ctx.lineJoin = "round";
   for (const level of index) {
@@ -316,6 +312,7 @@ function drawContourNumerals(
     // being labelled up among the units.
     if (best === undefined) continue;
     const text = String(level);
+    ctx.strokeStyle = knockout(level);
     ctx.strokeText(text, best.x, best.y);
     ctx.fillText(text, best.x, best.y);
   }
@@ -496,14 +493,14 @@ function contourLines(map: MapFile): Map<number, LonLat[][]> {
 }
 
 /** A ring: a polyline that comes back to where it started, so filling it encloses ground. */
-function isClosed(line: LonLat[]): boolean {
+export function isClosed(line: readonly LonLat[]): boolean {
   const first = line[0];
   const last = line[line.length - 1];
   if (first === undefined || last === undefined || line.length < 4) return false;
   return first[0] === last[0] && first[1] === last[1];
 }
 
-function tracePolygons(ctx: CanvasRenderingContext2D, projection: Projection, rings: LonLat[][]): void {
+export function tracePolygons(ctx: CanvasRenderingContext2D, projection: Projection, rings: readonly LonLat[][]): void {
   ctx.beginPath();
   for (const ring of rings) {
     tracePolyline(ctx, projection, ring);
@@ -511,8 +508,13 @@ function tracePolygons(ctx: CanvasRenderingContext2D, projection: Projection, ri
   }
 }
 
+/** One polyline's points on the canvas. Projected once by a hand that walks the same line twice, as the lit contours and the ramparts both do. */
+export function projectLine(projection: Projection, line: readonly LonLat[]): Point[] {
+  return line.map(([lon, lat]) => projection.project(lat, lon));
+}
+
 /** Adds one polyline to the path already open; the caller begins and strokes it. */
-function tracePolyline(ctx: CanvasRenderingContext2D, projection: Projection, line: LonLat[]): void {
+function tracePolyline(ctx: CanvasRenderingContext2D, projection: Projection, line: readonly LonLat[]): void {
   line.forEach(([lon, lat], i) => {
     const { x, y } = projection.project(lat, lon);
     if (i === 0) ctx.moveTo(x, y);
