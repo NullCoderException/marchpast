@@ -4,7 +4,7 @@
 
 ADR-0009 decided that the renderer draws an engraved chart plate, and the v0.1 renderer took it literally: the parchment, the ink, the letterbox and the side palette were module constants that every drawing pass imported by name. The design-language decision (issue #58) settled that there is one engraved system and that a **view** is a named treatment built from it, never a second aesthetic, and named three for v0.2: the **Chart plate** (default), the **Night plate** (the plate inverted, for the Nile) and **Atlas** (units as blocks, strength as the filled fraction, engaged as a hatched zone, thicker arrows). So the renderer draws views, and the chart plate is one of them.
 
-A view is a **palette**, a set of **pens** and a **glyph**, and nothing else. Every other drawing pass is shared and takes its colours off the palette. The seam was cut in the real renderer over the real Trafalgar data on [prototype/second-view](https://github.com/NullCoderException/sandtable/tree/prototype/second-view), which is what settled the two shapes prose could not: that the Night plate needs no code at all, and that the glyph has to be two passes rather than one.
+A view is a **palette**, a set of **pens** and a **glyph**, and nothing else. Every other drawing pass is shared and takes its colours off the palette. The seam was cut in the real renderer over the real Trafalgar data on [prototype/second-view](https://github.com/NullCoderException/marchpast/tree/prototype/second-view), which is what settled the two shapes prose could not: that the Night plate needs no code at all, and that the glyph has to be two passes rather than one.
 
 ## Considered options
 
