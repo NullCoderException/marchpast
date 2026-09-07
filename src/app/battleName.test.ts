@@ -42,7 +42,7 @@ describe("where the Library is", () => {
   });
 
   it("follows the app's base URL", () => {
-    vi.stubEnv("BASE_URL", "/sandtable/");
-    expect(libraryHref()).toBe("/sandtable/");
+    vi.stubEnv("BASE_URL", "/under-a-path/");
+    expect(libraryHref()).toBe("/under-a-path/");
   });
 });

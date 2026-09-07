@@ -17,7 +17,7 @@ describe("data served by name", () => {
 
 describe("data under a base path", () => {
   beforeEach(() => {
-    vi.stubEnv("BASE_URL", "/sandtable/");
+    vi.stubEnv("BASE_URL", "/under-a-path/");
   });
 
   afterEach(() => {
@@ -25,14 +25,14 @@ describe("data under a base path", () => {
   });
 
   it("puts a battle beneath the app's base URL", () => {
-    expect(battleUrl("trafalgar")).toBe("/sandtable/data/battles/trafalgar.json");
+    expect(battleUrl("trafalgar")).toBe("/under-a-path/data/battles/trafalgar.json");
   });
 
   it("puts a map beneath the app's base URL", () => {
-    expect(mapUrl("cadiz")).toBe("/sandtable/data/maps/cadiz.geojson");
+    expect(mapUrl("cadiz")).toBe("/under-a-path/data/maps/cadiz.geojson");
   });
 
   it("puts the index beneath the app's base URL", () => {
-    expect(indexUrl()).toBe("/sandtable/data/index.json");
+    expect(indexUrl()).toBe("/under-a-path/data/index.json");
   });
 });
