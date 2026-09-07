@@ -33,7 +33,7 @@
 import { type LayoutMode, labelFloor } from "../layout.ts";
 import { cardBox, type CardContent, type CardLayout, cardSetback, layoutCard } from "./card.ts";
 import type { Align, Measure } from "./content.ts";
-import { contentAt, contentWidth, labelBox, LAST_STEP, nearEdgeSetback, rungAbove } from "./content.ts";
+import { contentAt, contentWidth, labelBox, labelLadder, LAST_STEP, nearEdgeSetback, rungAbove } from "./content.ts";
 import {
   areaOutside,
   clearance,
@@ -219,11 +219,20 @@ function choose(
 ): Omit<Slot, "clean"> {
   const flanks = preferredAngles(unit);
   const ring = ringAngles(unit, previous?.angle);
-  // The mode's floor is the top of the ladder here: a label carried across a
-  // resize may hold a step the new mode does not spend, and it climbs no
-  // higher than the floor however long it has been clean.
+  // The mode's floor is the top of the ladder here: a label climbs no higher
+  // than it, however long it has been clean.
+  //
+  // A label carried across a resize may hold a rung the new mode does not
+  // spend — a phone rests on 3, which a desktop has no words for. That is not
+  // a rung this ladder can search down from, so the label is a stranger and
+  // starts again at the floor with everything this mode can say. Clamping it
+  // upward instead would open a widened window on bare short names, and would
+  // strand a unit with no `short_label` on its numeral for good: the desktop
+  // has no rung between 3 and the numeral for it, and `rungAbove` would then
+  // keep offering it one it skips.
   const floor = labelFloor(mode);
-  const from = Math.max(previous?.step ?? floor, floor);
+  const held = previous?.step;
+  const from = held !== undefined && labelLadder(mode).includes(held) ? held : floor;
 
   /** The first free slot between two steps of the collapse order, or nothing. */
   const search = (from: number, to: number): Omit<Slot, "clean"> | undefined => {

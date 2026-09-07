@@ -94,7 +94,7 @@ export function drawFurniture(plate: Plate, key: readonly NumeralRow[]): HitRegi
   if (set.compass === "rose") drawCompassRose(plate, frame, plate.picture.wind);
   else drawNorthArrow(plate, frame, plate.picture.wind);
   if (set.title) drawTitle(plate, frame);
-  drawScaleBar(plate, scale);
+  if (set.scaleBar) drawScaleBar(plate, scale);
   // Both forms of the legend key the frame's numerals, and both report those
   // rows as hit regions: a phone's strip is where a collapsed label is
   // rescued from, exactly as the desktop legend is (#60).
@@ -130,13 +130,14 @@ function legendBottom(scale: ScaleBarLayout): number {
 
 /** Every box the mode's furniture stands in, which is both the paper it is laid on and the obstacle a label clears. */
 function furniturePanels(plate: Plate, scale: ScaleBarLayout, key: readonly NumeralRow[]): Rect[] {
-  const set = furnitureFor(plate.mode);
   const frame = furnitureFrame(plate);
   if (plate.mode === "phone") return [arrowPanel(plate, frame), scalePanelOnly(plate, scale), stripPanel(plate, frame, key)];
 
+  // Only a desktop reaches here, and a desktop always draws its credit — when
+  // the map has one to draw.
   const credit = creditPanel(plate, frame);
   const boxes = [rosePanel(plate, frame), titlePanel(plate, frame), scalePanel(plate, frame, scale, legendBottom(scale), key)];
-  return set.credit && credit !== undefined ? [...boxes, credit] : boxes;
+  return credit === undefined ? boxes : [...boxes, credit];
 }
 
 /** Paper under every piece the mode draws. Filled and never ruled (#62). */
@@ -441,11 +442,11 @@ const LEGEND_WIDTH = 168;
 const LEGEND_SAMPLE = 40;
 /** The legend's samples are drawn small, so a glyph knows to leave off its finest detail. */
 const LEGEND_SCALE = 0.75;
-/** The three motion styles, which the legend always keys: track, intent, detachment. */
-const LEGEND_LINE_ROWS = 3;
-
-/** The three motion styles, in the order the legend keys them. */
+/** The motion styles, in the order the legend keys them. */
 const LINES: readonly (keyof Pens)[] = ["track", "intent", "detachment"];
+
+/** How many rows those take, counted from the list itself so a fourth pen cannot outgrow the legend's panel. */
+const LEGEND_LINE_ROWS = LINES.length;
 
 /**
  * One row of the plate's key: a sample of the view's own drawing and the word

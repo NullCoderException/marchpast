@@ -184,6 +184,34 @@ describe("the collapse order", () => {
     expect(byId(placed, "a").step).toBe(3);
   });
 
+  it("gives a label carried in from the other mode every word this one can spend, on the first frame", () => {
+    // A phone label rests on rung 3, which a desktop does not spend. It is a
+    // stranger to the desktop's ladder, so the desktop starts it again at the
+    // top rather than at the first rung beneath the one it held — otherwise a
+    // widened window shows the bare short name and needs three recoveries,
+    // ninety clean frames apart, to say the unit's name again.
+    const only = [unit({ id: "a", name: "Weather column", shortLabel: "Weather" })];
+    const onThePhone = place(only, { mode: "phone" });
+    expect(byId(onThePhone.placed, "a").step).toBe(3);
+
+    const widened = place(only, { memory: onThePhone.memory });
+    expect(byId(widened.placed, "a").step).toBe(0);
+    expect(byId(widened.placed, "a").name).toBe("Weather column");
+  });
+
+  it("does not strand a unit with no short_label on its numeral when the window widens", () => {
+    // With no short_label the desktop has no rung at all between 3 and the
+    // numeral, so a search that starts at 3 falls to the numeral — and
+    // `rungAbove` then offers it rung 5, which this unit skips, so it never
+    // recovers. It must never get there in the first place.
+    const only = [unit({ id: "a", name: "Weather column" })];
+    const onThePhone = place(only, { mode: "phone" });
+    const widened = place(only, { memory: onThePhone.memory });
+
+    expect(byId(widened.placed, "a").step).toBe(0);
+    expect(byId(widened.placed, "a").name).toBe("Weather column");
+  });
+
   it("takes a label carried across a resize down to the new mode's floor, never above it", () => {
     // A desktop frame settles the label at the top of the ladder; the next
     // frame is a phone, and the same memory may not hold a step it cannot spend.
