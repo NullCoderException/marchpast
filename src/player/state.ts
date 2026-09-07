@@ -14,7 +14,7 @@ import { DEFAULT_VIEW, type CardTarget, type ViewId } from "../render/index.ts";
 import { unitsAtLevel } from "../schema/hierarchy.ts";
 import type { Battle } from "../schema/types.ts";
 import { checkMultiplier, clockIntervals, endClock, intervalAt, startClock } from "../timeline/intervals.ts";
-import type { ClockSeconds } from "../timeline/picture.ts";
+import type { ClockSeconds, Picture } from "../timeline/picture.ts";
 import { presentAt } from "../timeline/pictureAt.ts";
 import { advance, nextPhaseStart, previousPhaseStart } from "../timeline/playback.ts";
 import { fractionToClock, type BarFraction } from "./scrub.ts";
@@ -56,7 +56,8 @@ export interface PlayerState {
    */
   level: number;
   /**
-   * The unit whose card is open, and whether a click pinned it there. Player
+   * The unit whose card is open, and whether a click or an Enter pinned it
+   * there — a pointer at rest and a focused muster entry open one alike. Player
    * state like the view and the level — viewer-opened, never authored, never
    * on the URL and never remembered — and absent when no card is open (#60).
    */
@@ -149,12 +150,58 @@ export function hoverUnit(state: PlayerState, id: string | undefined): PlayerSta
   return { ...state, card: { id, pinned: false } };
 }
 
-/** A click or tap on a unit: the card is pinned to it, swapping from whatever it was on. One card at a time. */
+/**
+ * Focus has reached a unit in the muster. Focus **always** moves the card,
+ * which is where the keyboard parts company with the pointer above: the rule
+ * that makes a pinned card ignore hover exists to stop a unit sliding out from
+ * under a still pointer, a problem focus does not have, and if focus obeyed it
+ * then pinning a card would strike the rest of the muster silent (#130).
+ *
+ * Focus staying on the unit the card is already on changes nothing, so a
+ * pinned card survives being walked back onto.
+ */
+export function focusUnit(state: PlayerState, id: string): PlayerState {
+  if (state.card?.id === id) return state;
+  return { ...state, card: { id, pinned: false } };
+}
+
+/** A click or tap on a unit, or Enter or Space on its muster entry: the card is pinned to it, swapping from whatever it was on. One card at a time. */
 export function pinUnit(state: PlayerState, id: string): PlayerState {
   return { ...state, card: { id, pinned: true } };
 }
 
-/** Close the card, which is what a click or tap on bare plate does. Nothing at all when none is open. */
+/**
+ * The clock has reached an instant the card's unit is not on the plate at, so
+ * the card closes — pinned or not.
+ *
+ * It is `setLevel`'s rule read the other way round. That one closes a card the
+ * new *level* stops drawing; this one closes a card the new *phase* stops
+ * drawing, and for the same reason: a card is anchored at its unit's glyph, so
+ * a card on a unit with no glyph has nowhere to be (#60, ADR-0024). Without
+ * it a pin outlives the unit it was on — invisible, because the renderer will
+ * not draw a card for a unit the plate has not got, and unreachable, because
+ * the muster no longer lists it.
+ *
+ * The picture is the whole of what presence means downstream, so this takes
+ * one rather than the battle: a unit is in it only inside its run.
+ */
+export function closeAbsentCard(state: PlayerState, picture: Picture): PlayerState {
+  const id = state.card?.id;
+  if (id === undefined || picture.units.some((unit) => unit.id === id)) return state;
+  return closeCard(state);
+}
+
+/**
+ * Focus has left the muster: an unpinned card closes, which is the keyboard's
+ * `pointerleave`. A pinned card stays, and that is what pinning is for — it is
+ * how a card is still there once focus has gone on to the scrubber or the
+ * Level chooser (#130).
+ */
+export function leaveMuster(state: PlayerState): PlayerState {
+  return state.card?.pinned === true ? state : closeCard(state);
+}
+
+/** Close the card, which is what a click or tap on bare plate does, and what Escape in the muster does. Nothing at all when none is open. */
 export function closeCard(state: PlayerState): PlayerState {
   if (state.card === undefined) return state;
   const next = { ...state };
