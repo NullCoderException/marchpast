@@ -140,6 +140,12 @@ function body(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
   const { w, h } = blockSize(formation, length, scale);
 
   ctx.save();
+  // A block has square corners, which is what the design canvas drew and what
+  // tells it from the plate's rounded destroyed outline. Said here rather than
+  // left to the context, because until #168 buffered the ground the relief
+  // pass's own `lineJoin` leaked this far and rounded them on any plate that
+  // carried contours — and on no other.
+  ctx.lineJoin = "miter";
   if (state === "broken") ctx.globalAlpha = BROKEN_ALPHA;
 
   const filled = state === "destroyed" ? 0 : strength;
