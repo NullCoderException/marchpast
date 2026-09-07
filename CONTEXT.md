@@ -15,8 +15,8 @@ The direction a unit's front faces, in degrees true (0 is north, clockwise, 0 to
 _Avoid_: Course, bearing, direction, orientation
 
 **Extent**:
-The latitude/longitude bounding box a battle plays inside, fixed for the whole playback.
-_Avoid_: Viewport, bounds, camera, map box
+The latitude/longitude bounding box a battle plays inside, fixed for the whole playback. Longitude runs continuously east from its western edge, so a battle crossing the antimeridian has an east past 180. The antimeridian is the 180th meridian; the date line is a political line that zigzags around it, and the two part company at Midway.
+_Avoid_: Viewport, bounds, camera, map box, date line
 
 **Map**:
 The static geography a battle plays over, drawn behind the units: land, rivers, shoals, contours, ramparts, named places and works, in a file the battle points at. One map file is one moment in time, so a modern and a historical coastline are two files; a battle names at most one.
