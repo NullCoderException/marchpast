@@ -1,12 +1,19 @@
 /**
  * The app entry: the library, or the battle the URL names.
  *
- * With `?battle=<name>` on the URL that battle is fetched through the path
- * module and validated, along with the map it names, and the player takes
- * over. With no battle named the page is the library instead, the site's front
- * door; there is no default battle (ADR-0011). Either way the page shows every
- * error where the plate would be, as words rather than as a painting (#130),
- * and in the console.
+ * With `/<name>/` on the URL that battle is fetched through the path module
+ * and validated, along with the map it names, and the player takes over. With
+ * no battle named the page is the library instead, the site's front door;
+ * there is no default battle (ADR-0011, ADR-0028). Either way the page shows
+ * every error where the plate would be, as words rather than as a painting
+ * (#130), and in the console.
+ *
+ * The legacy `?battle=<name>` is still read, and a visit that arrives by it is
+ * rewritten to the path in place, so the shape v0.2 shipped stops propagating
+ * rather than merely being tolerated (ADR-0028). Reading the path is also what
+ * makes dev and the build agree: Vite's fallback serves the untransformed
+ * `index.html` for `/trafalgar/`, so nothing in the document can name the
+ * battle and only the URL can.
  *
  * `?fixture=<name>` plays a renderer fixture from `app/fixtures.ts` instead:
  * no fetch, no library and no Picker. It is a way to look at a slice before
@@ -20,7 +27,7 @@
  * takes the landmark down whole when the page is the library, which has no
  * plate to draw and nothing to control.
  */
-import { battleNameFrom, battleQuery } from "./app/battleName.ts";
+import { battleNameFrom, battleNameFromPath, battlePath } from "./app/battleName.ts";
 import { fixtureNameFrom, FIXTURES, fixturesThereAre } from "./app/fixtures.ts";
 import { createLibraryPage } from "./app/libraryPage.ts";
 import { formatLoadErrors, type LoadError } from "./app/load.ts";
@@ -60,7 +67,7 @@ async function start(): Promise<void> {
     return;
   }
 
-  const name = battleNameFrom(window.location.search);
+  const name = battleOnTheUrl();
   // Both pages want the library: it is the front door's list, and it fills the
   // player's Picker. Every fetch is started before the face is awaited.
   const library = loadLibrary();
@@ -74,6 +81,22 @@ async function start(): Promise<void> {
   const battle = loadBattle(name);
   await loadOpeningFace();
   await playBattle(page, name, battle, library);
+}
+
+/**
+ * The battle this visit is for: the path first, the legacy query second
+ * (ADR-0028). A visit that arrived by the query is put on the path with
+ * `replaceState`, so the address bar, a copied link and the back button all
+ * carry the shape the site emits — and nothing is navigated to, because the
+ * document the browser already has is the one the path names.
+ */
+function battleOnTheUrl(): string | null {
+  const onThePath = battleNameFromPath(window.location.pathname);
+  if (onThePath !== null) return onThePath;
+
+  const onTheQuery = battleNameFrom(window.location.search);
+  if (onTheQuery !== null) window.history.replaceState(null, "", battlePath(onTheQuery));
+  return onTheQuery;
 }
 
 /** The front door: every battle, oldest first, as a page rather than a plate. */
@@ -126,7 +149,7 @@ async function playBattle(page: Page, name: string, loading: Promise<LoadResult>
     map: result.map,
     // A library that would not load costs the Picker, not the battle.
     picker: library.ok
-      ? { battles: library.library, current: name, choose: (chosen) => window.location.assign(battleQuery(chosen)) }
+      ? { battles: library.library, current: name, choose: (chosen) => window.location.assign(battlePath(chosen)) }
       : undefined,
     view: OPENING_VIEW.id,
   });

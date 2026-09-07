@@ -1,7 +1,7 @@
 {
   "name": "Marchpast",
   "short_name": "Marchpast",
-  "description": "Famous battles played back on the map, phase by phase — the positions, the moves and the clock, drawn from public-domain primary sources. Cannae, the Nile, Copenhagen, Trafalgar.",
+  "description": "Famous battles played back on the map, phase by phase — the positions, the moves and the clock, drawn from public-domain primary sources. Cannae, the Nile, Copenhagen, Trafalgar, the Little Bighorn.",
   "display": "standalone",
   "start_url": "/",
   "scope": "/",

@@ -8,13 +8,16 @@
  * that make the data URLs real are `vite/serve-data.ts` and `vite/stills.ts`.
  */
 import { defineConfig } from "vitest/config";
+import { pages } from "./vite/pages.ts";
 import { serveData } from "./vite/serve-data.ts";
 import { stills } from "./vite/stills.ts";
 
 export default defineConfig({
   // `stills()` first: the pictures it draws sit under the data route and no
   // file on disk answers for them, so `serveData()` would 404 them first.
-  plugins: [stills(), serveData()],
+  // `pages()` is build-only and answers for nothing in dev, so its place in
+  // the list is free.
+  plugins: [stills(), serveData(), pages()],
 
   test: {
     include: ["src/**/*.test.ts", "vite/**/*.test.ts", "scripts/**/*.test.ts"],

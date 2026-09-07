@@ -1,7 +1,7 @@
 /**
  * The library page: the site's front door (ADR-0011). The bare URL lists every
  * battle oldest first — title, date and summary — each entry linking to
- * `?battle=<name>`, beneath the masthead and above a credit line naming the
+ * `/<name>/`, beneath the masthead and above a credit line naming the
  * repository and the data licence.
  *
  * The masthead is the mark beside the name, the one line that says what the
@@ -18,7 +18,7 @@
  */
 import { compareBattles, type Library } from "../data/library.ts";
 import { element } from "../player/dom.ts";
-import { battleQuery } from "./battleName.ts";
+import { battlePath } from "./battleName.ts";
 import { markSvg } from "./mark.ts";
 import "./library.css";
 
@@ -102,7 +102,7 @@ export function createLibraryPage(library: Library): HTMLElement {
 function entryFor(battle: Library[number]): HTMLLIElement {
   const item = element("li", "st-library-entry");
   const link = element("a", "st-library-link");
-  link.href = battleQuery(battle.name);
+  link.href = battlePath(battle.name);
   link.append(
     element("span", "st-library-title", battle.title),
     element("span", "st-library-date", battle.date),

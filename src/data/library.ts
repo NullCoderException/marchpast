@@ -11,9 +11,23 @@
  */
 import type { Battle, SortDate } from "../schema/types.ts";
 
+/**
+ * Where a battle's page sits under the site's root: `<name>/` (ADR-0028).
+ *
+ * The one place that shape lives, and it lives *here* because the two callers
+ * cannot reach each other. `src/app/battleName.ts` hangs `battlePath` off the
+ * app's `BASE_URL`, which only a bundled module has; `vite/pages.ts` hangs the
+ * emitted file and the canonical URL off the site's origin, which only the
+ * build knows. This module is already the thing both of them share, so the
+ * segment they agree about is one function rather than two spellings.
+ */
+export function battleSegment(name: string): string {
+  return `${encodeURIComponent(name)}/`;
+}
+
 /** One battle as the library and the Picker know it: enough to list it, sort it and link to it, and nothing more. */
 export interface LibraryEntry {
-  /** Bare file name of `data/battles/<name>.json`, and what `?battle=` carries. */
+  /** Bare file name of `data/battles/<name>.json`, and the page it is played at, `/<name>/`. */
   name: string;
   /** Display title, as the battle file writes it. */
   title: string;
