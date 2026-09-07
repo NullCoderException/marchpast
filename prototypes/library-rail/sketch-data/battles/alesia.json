@@ -1,0 +1,363 @@
+{
+  "schema_version": 2,
+  "title": "The Siege of Alesia",
+  "summary": "Caesar shuts Vercingetorix inside two rings of ditch and rampart, twenty-one miles of them, and holds both faces at once when a Gallic army four times his size comes down on his back.",
+  "dates": [
+    "September 52 BC",
+    "September 52 BC, the next day"
+  ],
+  "sort_date": {
+    "year": -51,
+    "month": 9,
+    "day": 20
+  },
+  "extent": {
+    "north": 47.591,
+    "south": 47.483,
+    "east": 4.56,
+    "west": 4.442
+  },
+  "scale_unit": "km",
+  "map": "alesia",
+  "end": "17:00",
+  "license": "CC-BY-4.0",
+  "attribution": "Sketch file for #151's drawing. Not data.",
+  "sources": {
+    "caesar": {
+      "label": "Caesar, Gallic War VII",
+      "work": "C. Iulius Caesar, Commentarii de Bello Gallico VII.68-90",
+      "url": "https://en.wikisource.org/wiki/Commentaries_on_the_Gallic_War",
+      "license": "public-domain",
+      "license_note": "Sketch file: the source is named for shape only and nothing here is quoted from it."
+    }
+  },
+  "units": [
+    {
+      "id": "vercingetorix",
+      "side": "Gaul",
+      "label": "Vercingetorix in the oppidum",
+      "short_label": "Vercingetorix",
+      "commander": "Vercingetorix",
+      "arm": "infantry"
+    },
+    {
+      "id": "gallic-sortie",
+      "side": "Gaul",
+      "label": "The sortie from the town",
+      "short_label": "The sortie",
+      "arm": "infantry"
+    },
+    {
+      "id": "relief-army",
+      "side": "Gaul",
+      "label": "The relief army",
+      "short_label": "Relief army",
+      "commander": "Commius",
+      "arm": "infantry"
+    },
+    {
+      "id": "vercassivellaunus",
+      "side": "Gaul",
+      "label": "Vercassivellaunus's sixty thousand",
+      "short_label": "Vercassivellaunus",
+      "commander": "Vercassivellaunus",
+      "arm": "infantry"
+    },
+    {
+      "id": "gallic-horse",
+      "side": "Gaul",
+      "label": "The Gallic horse",
+      "short_label": "Gallic horse",
+      "arm": "cavalry"
+    },
+    {
+      "id": "rea-sector",
+      "side": "Rome",
+      "label": "The Réa sector",
+      "short_label": "Réa sector",
+      "commander": "Antistius Reginus",
+      "arm": "infantry"
+    },
+    {
+      "id": "north-camps",
+      "side": "Rome",
+      "label": "The northern camps",
+      "short_label": "North camps",
+      "commander": "Caesar",
+      "arm": "infantry"
+    },
+    {
+      "id": "plain-sector",
+      "side": "Rome",
+      "label": "The lines on the plain",
+      "short_label": "The plain",
+      "arm": "infantry"
+    },
+    {
+      "id": "german-horse",
+      "side": "Rome",
+      "label": "The German horse",
+      "short_label": "German horse",
+      "arm": "cavalry"
+    }
+  ],
+  "phases": [
+    {
+      "id": "relief-arrives",
+      "label": "The relief army comes down into the plain",
+      "t": "12:00",
+      "playback_rate": 900,
+      "caption": "The relief army occupies the hill outside the lines, and the town sees its own people for the first time in six weeks.",
+      "notes": "Sketch positions, eyeballed at map scale from the research note. Not authored against Caesar.",
+      "references": [
+        {
+          "source": "caesar",
+          "locator": "VII.79"
+        }
+      ],
+      "units": [
+        {
+          "id": "vercingetorix",
+          "position": {
+            "lat": 47.537,
+            "lon": 4.5
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "gallic-sortie",
+          "position": {
+            "lat": 47.545,
+            "lon": 4.489
+          },
+          "heading": 315,
+          "formation": "line",
+          "state": "intact"
+        },
+        {
+          "id": "relief-army",
+          "position": {
+            "lat": 47.579,
+            "lon": 4.487
+          },
+          "heading": 180,
+          "formation": "mass",
+          "state": "intact",
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 47.562,
+                "lon": 4.492
+              }
+            }
+          ]
+        },
+        {
+          "id": "vercassivellaunus",
+          "position": {
+            "lat": 47.575,
+            "lon": 4.452
+          },
+          "heading": 150,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "gallic-horse",
+          "position": {
+            "lat": 47.572,
+            "lon": 4.514
+          },
+          "heading": 200,
+          "formation": "line",
+          "state": "intact"
+        },
+        {
+          "id": "rea-sector",
+          "position": {
+            "lat": 47.566,
+            "lon": 4.469
+          },
+          "heading": 330,
+          "formation": "line",
+          "state": "intact"
+        },
+        {
+          "id": "north-camps",
+          "position": {
+            "lat": 47.573,
+            "lon": 4.5
+          },
+          "heading": 0,
+          "formation": "line",
+          "state": "intact"
+        },
+        {
+          "id": "plain-sector",
+          "position": {
+            "lat": 47.556,
+            "lon": 4.499
+          },
+          "heading": 0,
+          "formation": "line",
+          "state": "intact"
+        },
+        {
+          "id": "german-horse",
+          "position": {
+            "lat": 47.561,
+            "lon": 4.522
+          },
+          "heading": 20,
+          "formation": "line",
+          "state": "intact"
+        }
+      ]
+    },
+    {
+      "id": "rea-assault",
+      "label": "Vercassivellaunus comes down on the Réa sector",
+      "day": 1,
+      "t": "12:30",
+      "playback_rate": 240,
+      "caption": "The sixty thousand come down out of the wood on the one stretch of line the ground would not let Caesar hold, and the town comes out against the inner face at the same hour.",
+      "notes": "Sketch positions, eyeballed at map scale from the research note. Not authored against Caesar.",
+      "references": [
+        {
+          "source": "caesar",
+          "locator": "VII.83-88"
+        }
+      ],
+      "units": [
+        {
+          "id": "vercingetorix",
+          "position": {
+            "lat": 47.535,
+            "lon": 4.494
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.9
+        },
+        {
+          "id": "gallic-sortie",
+          "position": {
+            "lat": 47.549,
+            "lon": 4.481
+          },
+          "heading": 320,
+          "formation": "line",
+          "state": "engaged",
+          "strength": 0.8,
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 47.556,
+                "lon": 4.474
+              }
+            }
+          ]
+        },
+        {
+          "id": "relief-army",
+          "position": {
+            "lat": 47.566,
+            "lon": 4.495
+          },
+          "heading": 190,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.85
+        },
+        {
+          "id": "vercassivellaunus",
+          "position": {
+            "lat": 47.567,
+            "lon": 4.462
+          },
+          "heading": 140,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.75,
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 47.556,
+                "lon": 4.476
+              }
+            }
+          ]
+        },
+        {
+          "id": "gallic-horse",
+          "position": {
+            "lat": 47.569,
+            "lon": 4.523
+          },
+          "heading": 210,
+          "formation": "line",
+          "state": "broken",
+          "strength": 0.5
+        },
+        {
+          "id": "rea-sector",
+          "position": {
+            "lat": 47.561,
+            "lon": 4.472
+          },
+          "heading": 320,
+          "formation": "line",
+          "state": "engaged",
+          "strength": 0.6
+        },
+        {
+          "id": "north-camps",
+          "position": {
+            "lat": 47.572,
+            "lon": 4.499
+          },
+          "heading": 0,
+          "formation": "line",
+          "state": "engaged",
+          "strength": 0.9
+        },
+        {
+          "id": "plain-sector",
+          "position": {
+            "lat": 47.552,
+            "lon": 4.494
+          },
+          "heading": 340,
+          "formation": "line",
+          "state": "engaged",
+          "strength": 0.8
+        },
+        {
+          "id": "german-horse",
+          "position": {
+            "lat": 47.564,
+            "lon": 4.456
+          },
+          "heading": 280,
+          "formation": "line",
+          "state": "intact",
+          "moves": [
+            {
+              "kind": "detachment",
+              "to": {
+                "lat": 47.572,
+                "lon": 4.45
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

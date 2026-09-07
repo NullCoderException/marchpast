@@ -1,0 +1,107 @@
+{
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "The library"
+    },
+    {
+      "id": "page-2",
+      "name": "Directions"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1024,
+      "h": 2140,
+      "title": "The library · desktop, 52rem",
+      "page": "page-1"
+    },
+    {
+      "file": "Phone.dc.html",
+      "x": 1140,
+      "y": 0,
+      "w": 390,
+      "h": 4260,
+      "title": "The library · phone, 390",
+      "page": "page-1"
+    },
+    {
+      "file": "Anatomy.dc.html",
+      "x": 1650,
+      "y": 0,
+      "w": 1000,
+      "h": 1180,
+      "title": "The rail, drawn out",
+      "page": "page-1"
+    },
+    {
+      "file": "Intervals.dc.html",
+      "x": 1650,
+      "y": 1320,
+      "w": 1000,
+      "h": 1240,
+      "title": "The interval line",
+      "page": "page-1"
+    },
+    {
+      "file": "Nodes.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1080,
+      "h": 1200,
+      "title": "Four nodes",
+      "page": "page-2"
+    },
+    {
+      "file": "StillBox.dc.html",
+      "x": 1200,
+      "y": 0,
+      "w": 1010,
+      "h": 1980,
+      "title": "The still box · 630, 760, 900",
+      "page": "page-2"
+    },
+    {
+      "file": "Layouts.dc.html",
+      "x": 2330,
+      "y": 0,
+      "w": 900,
+      "h": 2100,
+      "title": "Three columns, and the ways out",
+      "page": "page-2"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "brief",
+      "x": 0,
+      "y": -330,
+      "w": 1024,
+      "page": "page-1",
+      "text": "THE LIBRARY'S CHRONOLOGY RAIL · issue #151 on the v0.3 map (#121).\nADR-0022 settled what the rail is and what it says: flat list, oldest first, no grouping; a line in a gutter left of the cards, a bare node per battle, and the elapsed interval written in the run between two of them, ordinal and never to scale. This canvas is the drawing it deferred — gutter, weight, node, the interval line's setting, the measure, and the card beside it.\nEvery still is a real render of the marked phase through the app's own renderer (ADR-0025, the recipe #126 measured). The four battles the library holds are their real files; Alesia, the Little Bighorn and Midway are throwaway sketch files written for this drawing, so their positions are eyeballed, not authored."
+    },
+    {
+      "id": "decisions",
+      "x": 1650,
+      "y": 2700,
+      "w": 1000,
+      "page": "page-1",
+      "text": "WHAT THE DRAWING PROPOSES\nMeasure 52rem (832px), up from 46rem: 48 gutter, 288 still, 24 gap, 424 text.\nRail: one 1px line at x 22, ink at 30%, hanging from the masthead's doubled rule and stopping dead at the last node.\nNode: a 13 × 3 bar in full ink, level with the top edge of the still — the mark's own tick against the mark's own rule.\nInterval: 13px italic at 72% ink, starting on the rail, the rail broken for it.\nThe 1px hairline between entries goes; the hover ground stays.\nThe still box stays at ADR-0025's 630.\nThe sides are set in their own inks, in roster order."
+    },
+    {
+      "id": "phone-note",
+      "x": 1140,
+      "y": 4330,
+      "w": 390,
+      "page": "page-1",
+      "text": "The phone at 390. Gutter 26, rail at 12, node 9 × 2.5, interval at 12px. The still goes above the text, so the title stays the first thing read after it — and the node is level with the still's top edge at both widths, which is why that is where it sits rather than beside the title."
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-1"
+  }
+}

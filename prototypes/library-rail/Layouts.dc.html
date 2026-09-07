@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: "IM Fell English", Georgia, "Times New Roman", serif; color: #2b2418; background: #efe3c6; }
+    a { color: #8f2f24; } a:hover { color: #2b2418; }
+    svg text { font-family: "IM Fell English", Georgia, "Times New Roman", serif; }
+    code { font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.88em; }
+  </style>
+</helmet>
+<div style="width: 900px; padding: 36px 40px; box-sizing: border-box; background: #efe3c6;">
+  <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 26px;">
+    <div style="font-size: 30px;">Three columns, and the two ways out of them</div>
+    <div style="font-size: 15px; font-style: italic; line-height: 1.45; max-width: 60ch;">ADR-0022 allowed the measure to widen and named the fallback: <i>“If three columns cannot be made to work at any sane measure, the still moves to the right of the text and the rail keeps the gutter.”</i> They can, at 52rem. Both alternatives are drawn against it.</div>
+  </div>
+<div style="font-size: 20px; margin: 30px 0 12px;">A · Rail, still, text at 52rem — the drawing's choice</div>
+<div style="width: 784px;"><ol style="margin: 0; padding: 0; list-style: none;">
+    <li style="padding-left: 48px;">
+      <div style="margin: 18px 0 18px -26px; font-size: 13px; font-style: italic; color: rgba(43,36,24,0.72); line-height: 1.2;">1,849 years later</div>
+      <div style="position: relative; padding: 20px 12px; margin: 0 -12px;">
+        <span style="position: absolute; left: -14px; top: 0; bottom: 0; width: 1px; background: rgba(43,36,24,0.3);"></span>
+        <span style="position: absolute; left: -20px; top: 18.5px; width: 13px; height: 3px; background: #2b2418;"></span>
+        <div style="display: flex; gap: 24px; align-items: flex-start;"><img src="nile.jpg" alt="" style="display: block; width: 288px; height: 182px; object-fit: cover;"><div style="min-width: 0;">
+          <span style="display: block; font-size: 22px; line-height: 1.2;">The Battle of the Nile</span>
+          <span style="display: block; margin-top: 2px; font-size: 13px; font-style: italic;">1 August 1798</span>
+          <span style="display: block; margin-top: 3px; font-size: 13px;"><span style="color: #8f2f24;">British</span><span style="color: rgba(43,36,24,0.2);"> · </span><span style="color: #24406b;">French</span></span>
+          <span style="display: block; margin-top: 8px; font-size: 15px; line-height: 1.45;">Nelson finds the French fleet moored across Aboukir Bay, doubles its van at sunset and fights all night; by the second morning only two ships of the line are left to escape.</span>
+        </div></div>
+      </div>
+    </li>
+    <li style="padding-left: 48px;">
+      <div style="margin: 18px 0 18px -26px; font-size: 13px; font-style: italic; color: rgba(43,36,24,0.72); line-height: 1.2;">2 years later</div>
+      <div style="position: relative; padding: 20px 12px; margin: 0 -12px;">
+        <span style="position: absolute; left: -14px; top: 0; bottom: 0; width: 1px; background: rgba(43,36,24,0.3);"></span>
+        <span style="position: absolute; left: -20px; top: 18.5px; width: 13px; height: 3px; background: #2b2418;"></span>
+        <div style="display: flex; gap: 24px; align-items: flex-start;"><img src="copenhagen.jpg" alt="" style="display: block; width: 288px; height: 182px; object-fit: cover;"><div style="min-width: 0;">
+          <span style="display: block; font-size: 22px; line-height: 1.2;">The Battle of Copenhagen</span>
+          <span style="display: block; margin-top: 2px; font-size: 13px; font-style: italic;">2 April 1801</span>
+          <span style="display: block; margin-top: 3px; font-size: 13px;"><span style="color: #8f2f24;">British</span><span style="color: rgba(43,36,24,0.2);"> · </span><span style="color: #24406b;">Danish</span></span>
+          <span style="display: block; margin-top: 8px; font-size: 15px; line-height: 1.45;">Nelson takes twelve of the line up the King's Deep, destroys the Danish line of blockships at anchor, and ends the day under a flag of truce.</span>
+        </div></div>
+      </div>
+    </li>
+  </ol></div>
+<div style="font-size: 11px; font-style: italic; color: rgba(43,36,24,0.72); line-height: 1.45; text-align: left; max-width: 760px;">The title is the first thing on the line after the rail's node, and the picture is what the eye lands on. 424px of text is 58 characters, inside the measure the summary already had.</div>
+<div style="font-size: 20px; margin: 30px 0 12px;">B · Rail, text, still — the fallback, at today's 46rem</div>
+<div style="width: 688px;"><ol style="margin: 0; padding: 0; list-style: none;">
+    <li style="padding-left: 48px;">
+      <div style="margin: 18px 0 18px -26px; font-size: 13px; font-style: italic; color: rgba(43,36,24,0.72); line-height: 1.2;">1,849 years later</div>
+      <div style="position: relative; padding: 20px 12px; margin: 0 -12px;">
+        <span style="position: absolute; left: -14px; top: 0; bottom: 0; width: 1px; background: rgba(43,36,24,0.3);"></span>
+        <span style="position: absolute; left: -20px; top: 18.5px; width: 13px; height: 3px; background: #2b2418;"></span>
+        <div style="display: flex; gap: 24px; align-items: flex-start;"><div style="min-width: 0;">
+          <span style="display: block; font-size: 22px; line-height: 1.2;">The Battle of the Nile</span>
+          <span style="display: block; margin-top: 2px; font-size: 13px; font-style: italic;">1 August 1798</span>
+          <span style="display: block; margin-top: 3px; font-size: 13px;"><span style="color: #8f2f24;">British</span><span style="color: rgba(43,36,24,0.2);"> · </span><span style="color: #24406b;">French</span></span>
+          <span style="display: block; margin-top: 8px; font-size: 15px; line-height: 1.45;">Nelson finds the French fleet moored across Aboukir Bay, doubles its van at sunset and fights all night; by the second morning only two ships of the line are left to escape.</span>
+        </div><img src="nile.jpg" alt="" style="display: block; width: 240px; height: 152px; object-fit: cover;"></div>
+      </div>
+    </li>
+    <li style="padding-left: 48px;">
+      <div style="margin: 18px 0 18px -26px; font-size: 13px; font-style: italic; color: rgba(43,36,24,0.72); line-height: 1.2;">2 years later</div>
+      <div style="position: relative; padding: 20px 12px; margin: 0 -12px;">
+        <span style="position: absolute; left: -14px; top: 0; bottom: 0; width: 1px; background: rgba(43,36,24,0.3);"></span>
+        <span style="position: absolute; left: -20px; top: 18.5px; width: 13px; height: 3px; background: #2b2418;"></span>
+        <div style="display: flex; gap: 24px; align-items: flex-start;"><div style="min-width: 0;">
+          <span style="display: block; font-size: 22px; line-height: 1.2;">The Battle of Copenhagen</span>
+          <span style="display: block; margin-top: 2px; font-size: 13px; font-style: italic;">2 April 1801</span>
+          <span style="display: block; margin-top: 3px; font-size: 13px;"><span style="color: #8f2f24;">British</span><span style="color: rgba(43,36,24,0.2);"> · </span><span style="color: #24406b;">Danish</span></span>
+          <span style="display: block; margin-top: 8px; font-size: 15px; line-height: 1.45;">Nelson takes twelve of the line up the King's Deep, destroys the Danish line of blockships at anchor, and ends the day under a flag of truce.</span>
+        </div><img src="copenhagen.jpg" alt="" style="display: block; width: 240px; height: 152px; object-fit: cover;"></div>
+      </div>
+    </li>
+  </ol></div>
+<div style="font-size: 11px; font-style: italic; color: rgba(43,36,24,0.72); line-height: 1.45; text-align: left; max-width: 760px;">Keeps the page narrow. Against it: the reading order becomes title, date, sides, summary, <i>then</i> a picture, so the picture is a footnote to the entry rather than the entry's face; and the ragged right edge of seven summaries puts seven differently-placed stills down the right of the page, which the rail's regular left edge then has to fight. Only if three columns had failed.</div>
+<div style="font-size: 20px; margin: 30px 0 12px;">C · Rail and text, no still — today's page with the rail alone</div>
+<div style="width: 688px;"><ol style="margin: 0; padding: 0; list-style: none;">
+    <li style="padding-left: 48px;">
+      <div style="margin: 18px 0 18px -26px; font-size: 13px; font-style: italic; color: rgba(43,36,24,0.72); line-height: 1.2;">1,849 years later</div>
+      <div style="position: relative; padding: 20px 12px; margin: 0 -12px;">
+        <span style="position: absolute; left: -14px; top: 0; bottom: 0; width: 1px; background: rgba(43,36,24,0.3);"></span>
+        <span style="position: absolute; left: -20px; top: 18.5px; width: 13px; height: 3px; background: #2b2418;"></span>
+        <div style="min-width: 0;">
+          <span style="display: block; font-size: 22px; line-height: 1.2;">The Battle of the Nile</span>
+          <span style="display: block; margin-top: 2px; font-size: 13px; font-style: italic;">1 August 1798</span>
+          <span style="display: block; margin-top: 3px; font-size: 13px;"><span style="color: #8f2f24;">British</span><span style="color: rgba(43,36,24,0.2);"> · </span><span style="color: #24406b;">French</span></span>
+          <span style="display: block; margin-top: 8px; font-size: 15px; line-height: 1.45;">Nelson finds the French fleet moored across Aboukir Bay, doubles its van at sunset and fights all night; by the second morning only two ships of the line are left to escape.</span>
+        </div>
+      </div>
+    </li>
+    <li style="padding-left: 48px;">
+      <div style="margin: 18px 0 18px -26px; font-size: 13px; font-style: italic; color: rgba(43,36,24,0.72); line-height: 1.2;">2 years later</div>
+      <div style="position: relative; padding: 20px 12px; margin: 0 -12px;">
+        <span style="position: absolute; left: -14px; top: 0; bottom: 0; width: 1px; background: rgba(43,36,24,0.3);"></span>
+        <span style="position: absolute; left: -20px; top: 18.5px; width: 13px; height: 3px; background: #2b2418;"></span>
+        <div style="min-width: 0;">
+          <span style="display: block; font-size: 22px; line-height: 1.2;">The Battle of Copenhagen</span>
+          <span style="display: block; margin-top: 2px; font-size: 13px; font-style: italic;">2 April 1801</span>
+          <span style="display: block; margin-top: 3px; font-size: 13px;"><span style="color: #8f2f24;">British</span><span style="color: rgba(43,36,24,0.2);"> · </span><span style="color: #24406b;">Danish</span></span>
+          <span style="display: block; margin-top: 8px; font-size: 15px; line-height: 1.45;">Nelson takes twelve of the line up the King's Deep, destroys the Danish line of blockships at anchor, and ends the day under a flag of truce.</span>
+        </div>
+      </div>
+    </li>
+  </ol></div>
+<div style="font-size: 11px; font-style: italic; color: rgba(43,36,24,0.72); line-height: 1.45; text-align: left; max-width: 760px;">Worth drawing because it is what ships if the still machinery slips: the rail is independent of ADR-0025 and costs nothing but the page's own arithmetic. It reads perfectly well. It is also the version that makes the front door a list of essays, which is the argument ADR-0025 already had.</div>
+<div style="font-size: 20px; margin: 30px 0 12px;">The sides, inked or not</div>
+<div style="display: flex; gap: 40px; align-items: flex-start;">
+  <div style="width: 320px;">
+    <div style="font-size: 22px; line-height: 1.2;">The Battle of Trafalgar</div>
+    <div style="margin-top: 2px; font-size: 13px; font-style: italic;">21 October 1805</div>
+    <span style="display: block; margin-top: 3px; font-size: 13px;"><span style="color: #8f2f24;">British</span><span style="color: rgba(43,36,24,0.2);"> · </span><span style="color: #24406b;">Combined Fleet</span></span>
+    <div style="margin-top: 10px;"><div style="font-size: 11px; font-style: italic; color: rgba(43,36,24,0.72); line-height: 1.45; text-align: left; max-width: 320px;">Inked, in roster order — the same two inks the still beside it is drawn in, so the card teaches the ink before the battle is opened. A side ink on the sides of a battle is exactly what #58 reserved it for.</div></div>
+  </div>
+  <div style="width: 320px;">
+    <div style="font-size: 22px; line-height: 1.2;">The Battle of Trafalgar</div>
+    <div style="margin-top: 2px; font-size: 13px; font-style: italic;">21 October 1805</div>
+    <span style="display: block; margin-top: 3px; font-size: 13px;"><span style="color: #2b2418;">British</span><span style="color: rgba(43,36,24,0.2);"> · </span><span style="color: #2b2418;">Combined Fleet</span></span>
+    <div style="margin-top: 10px;"><div style="font-size: 11px; font-style: italic; color: rgba(43,36,24,0.72); line-height: 1.45; text-align: left; max-width: 320px;">In ink. Quieter, and it keeps colour on the front door to the stills alone. Against it: two side names in one ink read as a single phrase rather than as two sides, and the one fact the line exists to give is who fought whom.</div></div>
+  </div>
+</div>
+</div>
+</x-dc>
+</body>
+</html>

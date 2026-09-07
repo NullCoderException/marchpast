@@ -1,0 +1,328 @@
+{
+  "schema_version": 2,
+  "title": "The Battle of the Little Bighorn",
+  "summary": "Custer divides the 7th Cavalry and attacks the largest village on the plains from two directions; within an hour his own five companies are surrounded on a ridge above the ford and killed to the last man.",
+  "dates": [
+    "25 June 1876",
+    "26 June 1876"
+  ],
+  "sort_date": {
+    "year": 1876,
+    "month": 6,
+    "day": 25
+  },
+  "extent": {
+    "north": 45.615,
+    "south": 45.495,
+    "east": -107.375,
+    "west": -107.51
+  },
+  "scale_unit": "km",
+  "map": "little-bighorn",
+  "end": "10:00",
+  "end_day": 1,
+  "license": "CC-BY-4.0",
+  "attribution": "Sketch file for #151's drawing. Not data.",
+  "sources": {
+    "reno": {
+      "label": "Reno's report",
+      "work": "Marcus A. Reno to the Adjutant General, Camp on Yellowstone, 5 July 1876, Report of the Secretary of War (1876)",
+      "url": "https://www.google.com/books/edition/_/0_pCAQAAMAAJ",
+      "license": "public-domain",
+      "license_note": "Sketch file: the source is named for shape only and nothing here is quoted from it."
+    }
+  },
+  "units": [
+    {
+      "id": "custer",
+      "side": "7th Cavalry",
+      "label": "Custer's battalion",
+      "short_label": "Custer",
+      "commander": "Custer",
+      "arm": "cavalry"
+    },
+    {
+      "id": "reno",
+      "side": "7th Cavalry",
+      "label": "Reno's battalion",
+      "short_label": "Reno",
+      "commander": "Reno",
+      "arm": "cavalry"
+    },
+    {
+      "id": "benteen",
+      "side": "7th Cavalry",
+      "label": "Benteen's battalion",
+      "short_label": "Benteen",
+      "commander": "Benteen",
+      "arm": "cavalry"
+    },
+    {
+      "id": "pack-train",
+      "side": "7th Cavalry",
+      "label": "The pack train",
+      "short_label": "Packs",
+      "arm": "cavalry"
+    },
+    {
+      "id": "hunkpapa",
+      "side": "The village",
+      "label": "The Hunkpapa circle",
+      "short_label": "Hunkpapa",
+      "commander": "Gall",
+      "arm": "cavalry"
+    },
+    {
+      "id": "cheyenne",
+      "side": "The village",
+      "label": "The Cheyenne circle",
+      "short_label": "Cheyenne",
+      "arm": "cavalry"
+    },
+    {
+      "id": "crazy-horse",
+      "side": "The village",
+      "label": "Crazy Horse's warriors",
+      "short_label": "Crazy Horse",
+      "commander": "Crazy Horse",
+      "arm": "cavalry"
+    },
+    {
+      "id": "oglala",
+      "side": "The village",
+      "label": "The Oglala circle",
+      "short_label": "Oglala",
+      "arm": "cavalry"
+    }
+  ],
+  "phases": [
+    {
+      "id": "reno-charges",
+      "label": "Reno charges the upper end of the village",
+      "t": "15:03",
+      "playback_rate": 60,
+      "caption": "Reno's three companies cross the ford and come down the valley at a gallop with the village in front of them.",
+      "notes": "Sketch positions, eyeballed at map scale from the research note. Not authored against the sources.",
+      "references": [
+        {
+          "source": "reno",
+          "locator": "the valley fight"
+        }
+      ],
+      "units": [
+        {
+          "id": "custer",
+          "position": {
+            "lat": 45.545,
+            "lon": -107.383
+          },
+          "heading": 315,
+          "formation": "column",
+          "state": "intact",
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 45.564,
+                "lon": -107.4
+              }
+            }
+          ]
+        },
+        {
+          "id": "reno",
+          "position": {
+            "lat": 45.523,
+            "lon": -107.446
+          },
+          "heading": 340,
+          "formation": "line",
+          "state": "engaged",
+          "strength": 0.95
+        },
+        {
+          "id": "benteen",
+          "position": {
+            "lat": 45.505,
+            "lon": -107.4
+          },
+          "heading": 320,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "pack-train",
+          "position": {
+            "lat": 45.499,
+            "lon": -107.388
+          },
+          "heading": 320,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "hunkpapa",
+          "position": {
+            "lat": 45.534,
+            "lon": -107.468
+          },
+          "heading": 160,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.95
+        },
+        {
+          "id": "cheyenne",
+          "position": {
+            "lat": 45.566,
+            "lon": -107.487
+          },
+          "heading": 120,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "crazy-horse",
+          "position": {
+            "lat": 45.552,
+            "lon": -107.483
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "oglala",
+          "position": {
+            "lat": 45.545,
+            "lon": -107.478
+          },
+          "heading": 130,
+          "formation": "mass",
+          "state": "intact"
+        }
+      ]
+    },
+    {
+      "id": "last-stand",
+      "label": "The Keogh wing goes; the rest close on the ridge",
+      "t": "16:40",
+      "playback_rate": 30,
+      "caption": "Custer's five companies are pushed off the ridge above the ford and the fight closes on the knoll at its north end.",
+      "notes": "Sketch positions, eyeballed at map scale from the research note. Not authored against the archaeology.",
+      "references": [
+        {
+          "source": "reno",
+          "locator": "the hilltop fight"
+        }
+      ],
+      "units": [
+        {
+          "id": "custer",
+          "position": {
+            "lat": 45.572,
+            "lon": -107.399
+          },
+          "heading": 250,
+          "formation": "line",
+          "state": "broken",
+          "strength": 0.35
+        },
+        {
+          "id": "reno",
+          "position": {
+            "lat": 45.526,
+            "lon": -107.414
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.6
+        },
+        {
+          "id": "benteen",
+          "position": {
+            "lat": 45.524,
+            "lon": -107.409
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.85
+        },
+        {
+          "id": "pack-train",
+          "position": {
+            "lat": 45.519,
+            "lon": -107.404
+          },
+          "heading": 320,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "hunkpapa",
+          "position": {
+            "lat": 45.566,
+            "lon": -107.409
+          },
+          "heading": 30,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.95,
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 45.571,
+                "lon": -107.403
+              }
+            }
+          ]
+        },
+        {
+          "id": "cheyenne",
+          "position": {
+            "lat": 45.581,
+            "lon": -107.408
+          },
+          "heading": 160,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.95,
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 45.575,
+                "lon": -107.401
+              }
+            }
+          ]
+        },
+        {
+          "id": "crazy-horse",
+          "position": {
+            "lat": 45.579,
+            "lon": -107.42
+          },
+          "heading": 120,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.95
+        },
+        {
+          "id": "oglala",
+          "position": {
+            "lat": 45.535,
+            "lon": -107.428
+          },
+          "heading": 60,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.9
+        }
+      ]
+    }
+  ]
+}

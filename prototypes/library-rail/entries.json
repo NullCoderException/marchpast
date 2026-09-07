@@ -1,0 +1,107 @@
+[
+  {
+    "name": "cannae",
+    "title": "The Battle of Cannae",
+    "date": "2 August 216 BC",
+    "sort_date": {
+      "year": -216,
+      "month": 8,
+      "day": 2
+    },
+    "summary": "Hannibal lets his centre give ground until the Roman army has walked into a bag, then closes his Libyans and his cavalry round it and annihilates the largest army Rome ever put in the field.",
+    "sides": [
+      "Roman",
+      "Carthaginian"
+    ]
+  },
+  {
+    "name": "alesia",
+    "title": "The Siege of Alesia",
+    "date": "September 52 BC",
+    "sort_date": {
+      "year": -51,
+      "month": 9,
+      "day": 20
+    },
+    "summary": "Caesar shuts Vercingetorix inside two rings of ditch and rampart, twenty-one miles of them, and holds both faces at once when a Gallic army four times his size comes down on his back.",
+    "sides": [
+      "Gaul",
+      "Rome"
+    ]
+  },
+  {
+    "name": "nile",
+    "title": "The Battle of the Nile",
+    "date": "1 August 1798",
+    "sort_date": {
+      "year": 1798,
+      "month": 8,
+      "day": 1
+    },
+    "summary": "Nelson finds the French fleet moored across Aboukir Bay, doubles its van at sunset and fights all night; by the second morning only two ships of the line are left to escape.",
+    "sides": [
+      "British",
+      "French"
+    ]
+  },
+  {
+    "name": "copenhagen",
+    "title": "The Battle of Copenhagen",
+    "date": "2 April 1801",
+    "sort_date": {
+      "year": 1801,
+      "month": 4,
+      "day": 2
+    },
+    "summary": "Nelson takes twelve of the line up the King's Deep, destroys the Danish line of blockships at anchor, and ends the day under a flag of truce.",
+    "sides": [
+      "British",
+      "Danish"
+    ]
+  },
+  {
+    "name": "trafalgar",
+    "title": "The Battle of Trafalgar",
+    "date": "21 October 1805",
+    "sort_date": {
+      "year": 1805,
+      "month": 10,
+      "day": 21
+    },
+    "summary": "Nelson's two columns cut Villeneuve's line off Cape Trafalgar and destroy the Combined Fleet in an afternoon.",
+    "sides": [
+      "British",
+      "Combined Fleet"
+    ]
+  },
+  {
+    "name": "little-bighorn",
+    "title": "The Battle of the Little Bighorn",
+    "date": "25 June 1876",
+    "sort_date": {
+      "year": 1876,
+      "month": 6,
+      "day": 25
+    },
+    "summary": "Custer divides the 7th Cavalry and attacks the largest village on the plains from two directions; within an hour his own five companies are surrounded on a ridge above the ford and killed to the last man.",
+    "sides": [
+      "7th Cavalry",
+      "The village"
+    ]
+  },
+  {
+    "name": "midway",
+    "title": "The Battle of Midway",
+    "date": "4 June 1942",
+    "sort_date": {
+      "year": 1942,
+      "month": 6,
+      "day": 4
+    },
+    "summary": "Four Japanese carriers steam on an atoll two hundred miles away, are caught with their decks full, and burn within six minutes of each other; the fourth is found and burned that afternoon.",
+    "sides": [
+      "Japan",
+      "United States"
+    ]
+  }
+]

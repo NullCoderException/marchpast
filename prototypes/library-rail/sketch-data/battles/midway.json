@@ -1,0 +1,341 @@
+{
+  "schema_version": 2,
+  "title": "The Battle of Midway",
+  "summary": "Four Japanese carriers steam on an atoll two hundred miles away, are caught with their decks full, and burn within six minutes of each other; the fourth is found and burned that afternoon.",
+  "dates": [
+    "4 June 1942",
+    "5 June 1942"
+  ],
+  "sort_date": {
+    "year": 1942,
+    "month": 6,
+    "day": 4
+  },
+  "extent": {
+    "north": 30.6,
+    "south": 26.6,
+    "east": -175.2,
+    "west": -179.6
+  },
+  "scale_unit": "nmi",
+  "map": "midway",
+  "end": "18:00",
+  "end_day": 1,
+  "license": "CC-BY-4.0",
+  "attribution": "Sketch file for #151's drawing. Not data.",
+  "sources": {
+    "cincpac": {
+      "label": "CINCPAC report",
+      "work": "Commander in Chief, Pacific Fleet, serial 01849, Battle of Midway, 28 June 1942",
+      "url": "https://www.history.navy.mil/research/library/online-reading-room.html",
+      "license": "public-domain",
+      "license_note": "Sketch file: the source is named for shape only and nothing here is quoted from it."
+    }
+  },
+  "levels": [
+    "Forces",
+    "Ships and strikes"
+  ],
+  "units": [
+    {
+      "id": "kido-butai",
+      "side": "Japan",
+      "label": "The First Carrier Striking Force",
+      "short_label": "Kidō Butai",
+      "commander": "Nagumo",
+      "arm": "ship"
+    },
+    {
+      "id": "hiryu",
+      "side": "Japan",
+      "label": "Hiryū",
+      "short_label": "Hiryū",
+      "commander": "Yamaguchi",
+      "arm": "ship",
+      "parent": "kido-butai"
+    },
+    {
+      "id": "japanese-strike",
+      "side": "Japan",
+      "label": "The Midway strike",
+      "short_label": "Midway strike",
+      "arm": "ship",
+      "parent": "kido-butai"
+    },
+    {
+      "id": "invasion-force",
+      "side": "Japan",
+      "label": "The invasion force",
+      "short_label": "Invasion force",
+      "commander": "Kondō",
+      "arm": "ship"
+    },
+    {
+      "id": "tf16",
+      "side": "United States",
+      "label": "Task Force 16",
+      "short_label": "TF16",
+      "commander": "Spruance",
+      "arm": "ship"
+    },
+    {
+      "id": "tf17",
+      "side": "United States",
+      "label": "Task Force 17",
+      "short_label": "TF17",
+      "commander": "Fletcher",
+      "arm": "ship"
+    },
+    {
+      "id": "enterprise-strike",
+      "side": "United States",
+      "label": "Enterprise's dive bombers",
+      "short_label": "Enterprise SBDs",
+      "commander": "McClusky",
+      "arm": "ship",
+      "parent": "tf16"
+    },
+    {
+      "id": "midway-air",
+      "side": "United States",
+      "label": "The Midway air group",
+      "short_label": "Midway air",
+      "arm": "ship"
+    }
+  ],
+  "phases": [
+    {
+      "id": "first-strike",
+      "label": "The Midway strike goes in",
+      "t": "06:30",
+      "playback_rate": 240,
+      "caption": "A hundred and eight aircraft bomb the atoll while the carriers that sent them steam north-west of it, unfound.",
+      "notes": "Sketch positions, eyeballed at map scale from the research note. Not authored against the action reports.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "the morning attack"
+        }
+      ],
+      "units": [
+        {
+          "id": "kido-butai",
+          "position": {
+            "lat": 30.1,
+            "lon": -178.8
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 30.18,
+            "lon": -178.72
+          },
+          "heading": 135,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "japanese-strike",
+          "position": {
+            "lat": 28.9,
+            "lon": -178
+          },
+          "heading": 130,
+          "formation": "line",
+          "state": "engaged",
+          "strength": 0.95,
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 28.3,
+                "lon": -177.45
+              }
+            }
+          ]
+        },
+        {
+          "id": "invasion-force",
+          "position": {
+            "lat": 27.2,
+            "lon": -179.4
+          },
+          "heading": 70,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 30.05,
+            "lon": -176.3
+          },
+          "heading": 240,
+          "formation": "mass",
+          "state": "intact",
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 29.2,
+                "lon": -177.6
+              }
+            }
+          ]
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 30.35,
+            "lon": -176.05
+          },
+          "heading": 240,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise-strike",
+          "position": {
+            "lat": 30,
+            "lon": -176.35
+          },
+          "heading": 240,
+          "formation": "line",
+          "state": "intact"
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.35,
+            "lon": -177.3
+          },
+          "heading": 300,
+          "formation": "line",
+          "state": "engaged",
+          "strength": 0.8
+        }
+      ]
+    },
+    {
+      "id": "six-minutes",
+      "label": "Three carriers burn in six minutes",
+      "t": "10:25",
+      "playback_rate": 60,
+      "caption": "Two squadrons of dive bombers arrive over the Japanese force unopposed, and by 10:30 Akagi, Kaga and Sōryū are on fire.",
+      "notes": "Sketch positions, eyeballed at map scale from the research note. Not authored against the action reports.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "the dive-bombing attack"
+        }
+      ],
+      "units": [
+        {
+          "id": "kido-butai",
+          "position": {
+            "lat": 29.65,
+            "lon": -178.05
+          },
+          "heading": 20,
+          "formation": "mass",
+          "state": "destroyed"
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 29.86,
+            "lon": -178.16
+          },
+          "heading": 20,
+          "formation": "column",
+          "state": "intact",
+          "moves": [
+            {
+              "kind": "detachment",
+              "to": {
+                "lat": 29.4,
+                "lon": -177.4
+              }
+            }
+          ]
+        },
+        {
+          "id": "japanese-strike",
+          "position": {
+            "lat": 29.72,
+            "lon": -178
+          },
+          "heading": 200,
+          "formation": "line",
+          "state": "broken",
+          "strength": 0.4
+        },
+        {
+          "id": "invasion-force",
+          "position": {
+            "lat": 27.5,
+            "lon": -179.15
+          },
+          "heading": 60,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 29.2,
+            "lon": -177.05
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 29.55,
+            "lon": -176.85
+          },
+          "heading": 300,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise-strike",
+          "position": {
+            "lat": 29.62,
+            "lon": -177.95
+          },
+          "heading": 290,
+          "formation": "line",
+          "state": "engaged",
+          "strength": 0.9,
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 29.2,
+                "lon": -177.1
+              }
+            }
+          ]
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.3,
+            "lon": -177.36
+          },
+          "heading": 320,
+          "formation": "line",
+          "state": "broken",
+          "strength": 0.45
+        }
+      ]
+    }
+  ]
+}
