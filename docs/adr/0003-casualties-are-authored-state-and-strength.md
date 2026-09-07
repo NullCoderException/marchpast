@@ -1,5 +1,7 @@
 # Casualties are an authored state and strength fraction, not a simulation
 
+*Amended 2026-09-07: the deferral below of "units appearing or disappearing mid-battle" was closed by [ADR-0024](0024-aircraft-are-an-arm-and-a-unit-may-be-absent-from-a-phase.md), which lets a unit be absent from a phase when it does not exist on the plate at that instant; `broken` was widened by ADR-0018 to cover fighting on in fragments as well as flight. Everything else here stands.*
+
 A battle file needs to show a fleet or army wearing down without the player computing anything. We considered dropping strength and relying on state alone, an absolute count (ships or men) with an opening denominator, a coarse full/reduced/shattered band, and a 0-to-1 fraction. We chose two fields per unit per phase: a fixed four-value **state** enum (`intact`, `engaged`, `broken`, `destroyed`) and an optional **strength** fraction, 0 to 1, defaulting to 1. Both are authored facts the sources support and both step at the phase instant like every other non-geometric field; nothing is derived, and the detail that neither field can carry lives in the phase caption.
 
 ## Considered options

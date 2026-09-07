@@ -1,5 +1,7 @@
 # The library is a chronology, not a grouping
 
+*Amended 2026-09-07: the restatement below of ADR-0011's `?battle=<name>` and "no memory" is overtaken — a battle is a page at `/<name>/` ([ADR-0028](0028-a-battle-is-a-page-at-its-own-path-and-its-card-is-its-own-still.md)) and the viewer's view is remembered ([ADR-0023](0023-a-view-reaches-the-player-surface-and-is-remembered.md)); #151 set the look — a 52rem measure, a 48px gutter for the rail and the thumbnail at 288 × 182, recorded in ADR-0025 (#164). The chronology, the rail, the intervals and the twelve-battle trigger stand.*
+
 ADR-0011 put the library's grouping off "until the list is long enough to need one". v0.3 makes the list seven — Cannae (216 BC), Alesia (52 BC), the Nile (1798), Copenhagen (1801), Trafalgar (1805), the Little Bighorn (1876) and Midway (1942) — which is the moment that clause named, so [#129](https://github.com/NullCoderException/marchpast/issues/129) came back to it and answered in the negative.
 
 **The library does not group. It stays one flat list, oldest first, and gains a chronology rail: a line down a gutter to the left of the cards, a bare node per battle, and the run between two battles carrying its elapsed interval in words.** Decided on [#129](https://github.com/NullCoderException/marchpast/issues/129).

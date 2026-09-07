@@ -1,5 +1,7 @@
 # The renderer draws views, and the chart plate is the default
 
+*Superseded in two clauses 2026-09-07 by [ADR-0023](0023-a-view-reaches-the-player-surface-and-is-remembered.md): the view no longer stops at the canvas edge — the palette is published to the player's surface as derived tokens and the controls follow the picture — and the view is remembered from one visit to the next rather than "gone on reload"; the no-battle notice is DOM text on the surface's tokens (#130), so the clause that it is "the only place outside the drawing passes" to reach for a palette is retired. What ADR-0021 left standing still stands (#127).*
+
 *Amended 2026-09-06: the control that switches views is a `<select>` beside the speed multiplier, decided on #47 with no ADR; the Level chooser sits beside it (ADR-0017); the hovered or pinned unit of the unit card joins the view and the level as per-frame viewer state passed to `render` (#60).*
 
 *Superseded in part 2026-09-07 by **ADR-0021**, which admits a second aesthetic: a view is no longer a palette, pens and a glyph and nothing else, the map, furniture, caption and label passes no longer never change, the label is a view's to draw, and a fourth view is no longer only a value in the views file. What still stands is where the view lives — a per-frame argument to `render`, never on the `Picture` and never `createRenderer` configuration — the glyph's two halves and the mark-before-body order, the scratch canvas, and a glyph never learning a compass bearing.*

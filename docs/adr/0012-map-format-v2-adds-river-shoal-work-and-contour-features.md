@@ -1,6 +1,8 @@
 # Map format v2 adds river, shoal, work and contour features, and elevation ships as contour lines
 
-*Amended 2026-09-06: whether a work is also a unit was closed by ADR-0015 (Trekroner stays a work, not a unit); how each kind is drawn was decided on #62 (contours weighted by level, hachures rejected, so the raster escape hatch stays closed and this ADR stands unamended in substance).*
+*Amended 2026-09-07 on #138, which drew the ground each view owns: relief is inked per view — the chart plate keeps #62's contours weighted by level, the night plate lights them from one side, Atlas lays a hypsometric ramp, the staff map a printed sheet's flat tints under a graticule — and every treatment, hachures included, is derived from the contour polylines and their levels alone, so the raster escape hatch below stays closed because nothing needs it, not because hachures are impossible. Under [ADR-0021](0021-the-anatomy-is-fixed-and-a-view-owns-how-it-is-drawn.md) all of it is a view's `ground` hand. Everything else here stands.*
+
+*Amended 2026-09-06: whether a work is also a unit was closed by ADR-0015 (Trekroner stays a work, not a unit); how each kind is drawn was decided on #62 (contours weighted by level, hachures declined for the plate on legibility, and #138 later drew them from the contours alone, so the raster escape hatch stays closed because nothing needs it and this ADR stands unamended in substance).*
 
 *Amended 2026-09-07: [ADR-0026](0026-a-rampart-is-the-seventh-map-feature-and-alesia-needs-nothing-else.md) adds a seventh kind, `rampart`, for a built line — Alesia's contravallation and circumvallation — exactly as the "no `road` kind" clause below anticipated. `work` stays a `Point`, `place` stays the one naming mechanism, nothing marks a stretch as conjectural, and `ground` stays withdrawn: Alesia is the genuinely inland battle this ADR contemplated, and one covering `land` polygon serves it. Nothing here becomes false (#132).*
 
