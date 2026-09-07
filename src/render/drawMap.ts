@@ -63,6 +63,11 @@ const SHOAL_SEED = 17;
 const RIVER_WIDTH = 3.4;
 const RIVER_WATER_WIDTH = 2;
 
+/** A place, exactly as v1 drew it: the mark, the gap before the name, and the name's size. */
+const PLACE_DOT_RADIUS = 2.2;
+const PLACE_LABEL_GAP = 7;
+const PLACE_LABEL_SIZE = 15;
+
 /** The work's plan sign: an 8 px square with four bastions, 13 px across in all. */
 const WORK_HALF = 4;
 const WORK_BASTION_INNER = 1.5;
@@ -72,8 +77,7 @@ const WORK_LABEL_SIZE = 11;
 const WORK_LABEL_TRACKING = "0.5px";
 
 export function drawMap(plate: Plate): void {
-  const { ctx, map } = plate;
-  const { palette } = plate.view;
+  const { map } = plate;
   if (map === undefined) return;
 
   const land = landRings(map);
@@ -81,10 +85,6 @@ export function drawMap(plate: Plate): void {
   drawShoals(plate, map);
   drawRelief(plate, map);
   drawRivers(plate, map, land);
-
-  ctx.fillStyle = palette.ink;
-  ctx.textBaseline = "middle";
-  ctx.textAlign = "left";
   drawPlaces(plate, map);
   drawWorks(plate, map);
 }
@@ -123,7 +123,8 @@ function drawShoals(plate: Plate, map: MapFile): void {
     if (feature.properties.kind !== "shoal") continue;
     const rings = areaRings(feature);
     if (rings.length === 0) continue;
-    const points = rings.flat().map(([lon, lat]) => projection.project(lat, lon));
+    const box = boundingBox(projection, rings);
+    if (box === undefined) continue;
 
     ctx.save();
     tracePolygons(ctx, projection, rings);
@@ -131,13 +132,11 @@ function drawShoals(plate: Plate, map: MapFile): void {
     ctx.fillStyle = atAlpha(palette.ink, SHOAL_DOT_ALPHA);
     // The grid is anchored to the plate, not to the shoal's own corner, so two
     // shoals on one plate carry the same sand rather than two offset ones.
-    const anchor = plate.projection.extentRect;
-    const left = gridStart(Math.min(...points.map((p) => p.x)), anchor.x);
-    const top = gridStart(Math.min(...points.map((p) => p.y)), anchor.y);
-    const right = Math.max(...points.map((p) => p.x));
-    const bottom = Math.max(...points.map((p) => p.y));
-    for (let y = top; y <= bottom; y += SHOAL_DOT_GRID) {
-      for (let x = left; x <= right; x += SHOAL_DOT_GRID) {
+    const anchor = projection.extentRect;
+    const left = gridStart(box.left, anchor.x);
+    const top = gridStart(box.top, anchor.y);
+    for (let y = top; y <= box.bottom; y += SHOAL_DOT_GRID) {
+      for (let x = left; x <= box.right; x += SHOAL_DOT_GRID) {
         ctx.beginPath();
         ctx.arc(x + (random() - 0.5) * SHOAL_DOT_JITTER, y + (random() - 0.5) * SHOAL_DOT_JITTER, SHOAL_DOT_RADIUS, 0, Math.PI * 2);
         ctx.fill();
@@ -159,6 +158,27 @@ function drawShoals(plate: Plate, map: MapFile): void {
 /** The first grid line at or before `value`, counted from `anchor`. */
 function gridStart(value: number, anchor: number): number {
   return anchor + Math.floor((value - anchor) / SHOAL_DOT_GRID) * SHOAL_DOT_GRID;
+}
+
+/** The rings' box on the canvas, or `undefined` when they hold no point. Walked rather than spread: a traced shoal can run to many thousands of vertices. */
+function boundingBox(
+  projection: Projection,
+  rings: LonLat[][],
+): { left: number; top: number; right: number; bottom: number } | undefined {
+  let left = Infinity;
+  let top = Infinity;
+  let right = -Infinity;
+  let bottom = -Infinity;
+  for (const ring of rings) {
+    for (const [lon, lat] of ring) {
+      const { x, y } = projection.project(lat, lon);
+      left = Math.min(left, x);
+      top = Math.min(top, y);
+      right = Math.max(right, x);
+      bottom = Math.max(bottom, y);
+    }
+  }
+  return left === Infinity ? undefined : { left, top, right, bottom };
 }
 
 /**
@@ -287,18 +307,23 @@ function drawRivers(plate: Plate, map: MapFile, land: LonLat[][]): void {
 }
 
 /** A place: a small mark with the name in the plate face. Unchanged from v1. */
-function drawPlaces({ ctx, projection }: Plate, map: MapFile): void {
-  ctx.font = font(15, true);
-  for (const feature of map.features) {
-    const { geometry, properties } = feature;
-    if (properties.kind !== "place" || geometry.type !== "Point") continue;
-    const [lon, lat] = geometry.coordinates;
+function drawPlaces({ ctx, projection, view: { palette } }: Plate, map: MapFile): void {
+  const places = namedPoints(map, "place");
+  if (places.length === 0) return;
+
+  ctx.save();
+  ctx.fillStyle = palette.ink;
+  ctx.font = font(PLACE_LABEL_SIZE, true);
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "left";
+  for (const { name, lon, lat } of places) {
     const { x, y } = projection.project(lat, lon);
     ctx.beginPath();
-    ctx.arc(x, y, 2.2, 0, Math.PI * 2);
+    ctx.arc(x, y, PLACE_DOT_RADIUS, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillText(properties.name, x + 7, y);
+    ctx.fillText(name, x + PLACE_LABEL_GAP, y);
   }
+  ctx.restore();
 }
 
 /**
@@ -309,20 +334,26 @@ function drawPlaces({ ctx, projection }: Plate, map: MapFile): void {
 function drawWorks(plate: Plate, map: MapFile): void {
   const { ctx, projection } = plate;
   const { palette } = plate.view;
-  const works = map.features.filter((feature) => feature.properties.kind === "work");
+  const works = namedPoints(map, "work");
   if (works.length === 0) return;
 
+  ctx.save();
+  ctx.fillStyle = palette.ink;
   ctx.font = font(WORK_LABEL_SIZE);
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "left";
   ctx.letterSpacing = WORK_LABEL_TRACKING;
-  for (const { geometry, properties } of works) {
-    if (properties.kind !== "work" || geometry.type !== "Point") continue;
-    const [lon, lat] = geometry.coordinates;
+  for (const { name, lon, lat } of works) {
     const { x, y } = projection.project(lat, lon);
     drawWorkSign(ctx, x, y, palette);
     ctx.fillStyle = palette.ink;
-    ctx.fillText(properties.name.toUpperCase(), x + WORK_LABEL_GAP, y);
+    ctx.fillText(name.toUpperCase(), x + WORK_LABEL_GAP, y);
   }
+  // Tracking is part of the drawing state, so `restore` puts it back; it is
+  // cleared here as well because a browser that has not implemented it would
+  // otherwise leave every later label tracked.
   ctx.letterSpacing = "0px";
+  ctx.restore();
 }
 
 /** The sign itself: a square with a bastion at each corner, filled paper and outlined in ink, so it reads over relief. */
@@ -372,6 +403,21 @@ function areaRings(feature: MapFeature): LonLat[][] {
   if (geometry.type === "Polygon") return geometry.coordinates;
   if (geometry.type === "MultiPolygon") return geometry.coordinates.flat();
   return [];
+}
+
+/**
+ * The named points of one kind, with the name and the position pulled off the
+ * feature. The two named kinds are drawn differently but read the same way, and
+ * this is where the geometry narrowing happens for both.
+ */
+function namedPoints(map: MapFile, kind: "place" | "work"): { name: string; lon: number; lat: number }[] {
+  const points: { name: string; lon: number; lat: number }[] = [];
+  for (const { geometry, properties } of map.features) {
+    if (properties.kind !== kind || geometry.type !== "Point") continue;
+    const [lon, lat] = geometry.coordinates;
+    points.push({ name: properties.name, lon, lat });
+  }
+  return points;
 }
 
 /** Every polyline of one line feature, whether it is a linestring or a multilinestring. */

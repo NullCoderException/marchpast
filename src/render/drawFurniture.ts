@@ -40,6 +40,15 @@ const LEGEND_GAP = 14;
 
 /** The paper a piece of furniture is given to sit on where relief runs under it: how far the panel stands off the ink. */
 const PANEL_PAD = 12;
+/** Inset of the rose's panel from the extent's corner, and how deep it stands: the wind arrow's tail reaches past the rose. */
+const ROSE_PANEL_INSET = 14;
+const ROSE_PANEL_HEIGHT = 128;
+/** The rose's panel is never narrower than this, so a calm plate's panel is the same shape as a windy one's. */
+const ROSE_PANEL_MIN_WIDTH = 236;
+/** Inset of the title's and the credit's panels from the extent's edge: less than the ink's own, so the paper reads as a panel. */
+const CORNER_PANEL_INSET = 10;
+/** How far a panel stands above and below the line of type it carries. */
+const PANEL_LEAD = 6;
 
 export function drawFurniture(plate: Plate): void {
   drawPlateBorder(plate);
@@ -47,11 +56,12 @@ export function drawFurniture(plate: Plate): void {
   const legendBottom = scale.labelTop - LEGEND_GAP;
   // Relief runs under every corner, so on a land plate the furniture is given
   // paper first. Unruled: the legend's own rule is the only one there is.
-  if (plate.contourLevels.length > 0) drawPanels(plate, scale, legendBottom);
+  const onPanels = plate.contourLevels.length > 0;
+  if (onPanels) drawPanels(plate, scale, legendBottom);
   drawCompassRose(plate, plate.picture.wind);
   drawTitle(plate);
   drawScaleBar(plate, scale);
-  drawLegend(plate, legendBottom);
+  drawLegend(plate, legendBottom, onPanels);
   drawCredit(plate);
 }
 
@@ -66,12 +76,22 @@ function drawPanels(plate: Plate, scale: ScaleBarLayout, legendBottom: number): 
   ctx.restore();
 }
 
+/** How wide a line of type runs in a font, without disturbing what the caller had set. */
+function textWidth(ctx: CanvasRenderingContext2D, text: string, face: string): number {
+  ctx.save();
+  ctx.font = face;
+  const { width } = ctx.measureText(text);
+  ctx.restore();
+  return width;
+}
+
 /** A double rule at the extent's edge, where the letterbox begins. */
 function drawPlateBorder({ ctx, view, projection: { extentRect } }: Plate): void {
   drawPlateRule(ctx, extentRect, view.palette.ink);
 }
 
 /** Where the rose stands, and where the wind sentence starts beside it: the panel and the drawing have to agree. */
+const WIND_TEXT_SIZE = 13;
 const roseCentre = (frame: Rect): Point => ({ x: frame.x + 74, y: frame.y + 78 });
 const windTextLeft = (frame: Rect): number => roseCentre(frame).x + ROSE_RADIUS + 34;
 const windTextTop = (frame: Rect): number => roseCentre(frame).y - 8;
@@ -87,19 +107,13 @@ function windText(wind: Wind | undefined): string | undefined {
  * arrow's tail, which reaches further than the rose itself, and wide enough
  * for whatever the sentence says.
  */
-function rosePanel(plate: Plate): Rect {
-  const frame = plate.projection.extentRect;
-  const x = frame.x + 14;
-  const y = frame.y + 14;
-  const text = windText(plate.picture.wind);
-  let right = x + 236;
-  if (text !== undefined) {
-    plate.ctx.save();
-    plate.ctx.font = font(13, true);
-    right = Math.max(right, windTextLeft(frame) + plate.ctx.measureText(text).width + PANEL_PAD);
-    plate.ctx.restore();
-  }
-  return { x, y, width: right - x, height: 128 };
+function rosePanel({ ctx, picture, projection: { extentRect: frame } }: Plate): Rect {
+  const x = frame.x + ROSE_PANEL_INSET;
+  const y = frame.y + ROSE_PANEL_INSET;
+  const text = windText(picture.wind);
+  const sentenceRight = text === undefined ? 0 : windTextLeft(frame) + textWidth(ctx, text, font(WIND_TEXT_SIZE, true)) + PANEL_PAD;
+  const right = Math.max(x + ROSE_PANEL_MIN_WIDTH, sentenceRight);
+  return { x, y, width: right - x, height: ROSE_PANEL_HEIGHT };
 }
 
 function drawCompassRose(plate: Plate, wind: Wind | undefined): void {
@@ -171,7 +185,7 @@ function drawCompassRose(plate: Plate, wind: Wind | undefined): void {
   if (text !== undefined) {
     ctx.save();
     ctx.fillStyle = ink;
-    ctx.font = font(13, true);
+    ctx.font = font(WIND_TEXT_SIZE, true);
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
     ctx.fillText(text, windTextLeft(frame), windTextTop(frame));
@@ -180,8 +194,9 @@ function drawCompassRose(plate: Plate, wind: Wind | undefined): void {
 }
 
 const TITLE_SIZE = 22;
-const TITLE_RIGHT_INSET = 22;
-const TITLE_TOP = 18;
+/** Where the title's right edge sits and where its cap-line starts: the panel and the drawing have to agree. */
+const titleRight = (frame: Rect): number => frame.x + frame.width - 22;
+const titleTop = (frame: Rect): number => frame.y + 18;
 
 /** The battle's title, top right, as the plate's cartouche. */
 function drawTitle({ ctx, battle, view, projection: { extentRect: frame } }: Plate): void {
@@ -190,18 +205,15 @@ function drawTitle({ ctx, battle, view, projection: { extentRect: frame } }: Pla
   ctx.textAlign = "right";
   ctx.textBaseline = "top";
   ctx.font = font(TITLE_SIZE);
-  ctx.fillText(battle.title, frame.x + frame.width - TITLE_RIGHT_INSET, frame.y + TITLE_TOP);
+  ctx.fillText(battle.title, titleRight(frame), titleTop(frame));
   ctx.restore();
 }
 
 /** Paper behind the title, cut to the title's own width. */
 function titlePanel({ ctx, battle, projection: { extentRect: frame } }: Plate): Rect {
-  ctx.save();
-  ctx.font = font(TITLE_SIZE);
-  const width = ctx.measureText(battle.title).width + PANEL_PAD * 2;
-  ctx.restore();
-  const right = frame.x + frame.width - 10;
-  return { x: right - width, y: frame.y + TITLE_TOP - 6, width, height: TITLE_SIZE + 12 };
+  const width = textWidth(ctx, battle.title, font(TITLE_SIZE)) + PANEL_PAD * 2;
+  const right = frame.x + frame.width - CORNER_PANEL_INSET;
+  return { x: right - width, y: titleTop(frame) - PANEL_LEAD, width, height: TITLE_SIZE + PANEL_LEAD * 2 };
 }
 
 /** Where the scale bar goes and what it says, worked out before anything is drawn so its panel can be laid first. */
@@ -269,15 +281,14 @@ const SCALE_BAR_LABEL_SIZE = 12;
  * same corner, and two panels there would show their own seam.
  */
 function scalePanel(plate: Plate, scale: ScaleBarLayout, legendBottom: number): Rect {
-  const { ctx } = plate;
-  ctx.save();
-  ctx.font = font(SCALE_BAR_LABEL_SIZE, true);
-  const captionWidth = ctx.measureText(scale.caption).width;
-  ctx.restore();
+  const captionWidth = textWidth(plate.ctx, scale.caption, font(SCALE_BAR_LABEL_SIZE, true));
+  const widest = Math.max(LEGEND_WIDTH, scale.bar.pixels, captionWidth);
+  const frame = plate.projection.extentRect;
   const x = scale.x - PANEL_PAD;
-  const right = Math.max(scale.x + LEGEND_WIDTH, scale.x + scale.bar.pixels, scale.x + captionWidth) + PANEL_PAD;
-  const top = legendBottom - legendHeight(plate) - 8;
-  return { x, y: top, width: right - x, height: scale.y + 16 - top };
+  const top = legendBottom - legendHeight(plate) - PANEL_LEAD;
+  // Down to the same corner inset the title's and the credit's panels take, which clears the bar's end ticks.
+  const bottom = frame.y + frame.height - CORNER_PANEL_INSET;
+  return { x, y: top, width: scale.x + widest + PANEL_PAD - x, height: bottom - top };
 }
 
 const LEGEND_ROW = 18;
@@ -307,8 +318,12 @@ function legendHeight(plate: Plate): number {
  * The always-on legend: each side's colour and name, the four state glyphs, one
  * row per arm when the roster has two or more (ADR-0015), and the three line
  * styles. Its bottom sits at `bottom`.
+ *
+ * `onPanel` says a land plate has already laid paper under this corner, so the
+ * legend draws its rule and not a second ground: the panel is the paper at .92
+ * once, not twice over (#62).
  */
-function drawLegend(plate: Plate, bottom: number): void {
+function drawLegend(plate: Plate, bottom: number, onPanel: boolean): void {
   const { ctx, colours, view } = plate;
   const { palette, pens, glyph } = view;
   const frame = plate.projection.extentRect;
@@ -322,8 +337,10 @@ function drawLegend(plate: Plate, bottom: number): void {
   const y = bottom - height;
 
   ctx.save();
-  ctx.fillStyle = palette.panel;
-  ctx.fillRect(x, y, LEGEND_WIDTH, height);
+  if (!onPanel) {
+    ctx.fillStyle = palette.panel;
+    ctx.fillRect(x, y, LEGEND_WIDTH, height);
+  }
   ctx.strokeStyle = palette.ink;
   ctx.lineWidth = 1;
   ctx.strokeRect(x + 0.5, y + 0.5, LEGEND_WIDTH - 1, height - 1);
@@ -417,11 +434,9 @@ function drawCredit({ ctx, map, view, projection: { extentRect: frame } }: Plate
 function creditPanel({ ctx, map, projection: { extentRect: frame } }: Plate): Rect | undefined {
   const credit = map?.attribution;
   if (credit === undefined || credit === "") return undefined;
-  ctx.save();
-  ctx.font = font(CREDIT_SIZE, true);
-  const width = ctx.measureText(credit).width + PANEL_PAD;
-  ctx.restore();
-  const right = creditRight(frame) + 6;
+  const width = textWidth(ctx, credit, font(CREDIT_SIZE, true)) + PANEL_PAD;
+  const right = frame.x + frame.width - CORNER_PANEL_INSET;
   const baseline = creditBaseline(frame);
-  return { x: right - width, y: baseline - CREDIT_SIZE - 2, width, height: CREDIT_SIZE + 6 };
+  // The credit sits on its baseline, so its panel hangs from the cap-line above it.
+  return { x: right - width, y: baseline - CREDIT_SIZE - 2, width, height: CREDIT_SIZE + PANEL_LEAD };
 }

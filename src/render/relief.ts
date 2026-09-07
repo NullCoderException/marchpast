@@ -22,8 +22,12 @@ const INDEX_EVERY = 5;
 const EPSILON = 1e-9;
 
 /**
- * The five levels the atlas tints a band above, in metres (#62). A map bands
- * by the ones it actually carries a closed line for; the rest go untinted.
+ * The five levels the atlas tints a band above, in metres. Unlike the index
+ * contours these are **fixed heights, not derived from the interval**: #62
+ * chose them as the tones a battlefield reads in, and a map bands by whichever
+ * of the five it carries a line for. A map cut far above or below them goes
+ * untinted rather than banded on some other ladder, which is a decision to
+ * reopen on #62 when a battle needs it, not a rule to invent here.
  */
 export const TINT_BAND_LEVELS: readonly number[] = [30, 50, 100, 150, 200];
 
