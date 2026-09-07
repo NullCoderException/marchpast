@@ -209,7 +209,7 @@ The player's page around the plate — the control strip, the details panel and 
 _Avoid_: Chrome, UI, shell, skin, theme, frame
 
 **Controls**:
-What the viewer operates to drive playback: play and pause, the scrubber, the phase-jump buttons, the speed multiplier, the view chooser, the level chooser, the picker, and the toggle for the details panel. Drawn in the current view's language, on the surface. Never authored in a battle file. A phase jump **cuts** where playback tweens, so the jump buttons and the caption band are a way through a battle that never moves.
+What the viewer operates to drive playback: play and pause, the scrubber, the phase-jump buttons, the speed multiplier, the view chooser, the level chooser, the picker, and the toggle for the details panel — and, at the strip's head, the one link that leaves: **← All battles**, which is the only way back to the library from a battle reached by its own URL. Drawn in the current view's language, on the surface. The three choosers are native `<select>`s whose popup the operating system draws, with only the caret drawn in the view's ink. Never authored in a battle file. A phase jump **cuts** where playback tweens, so the jump buttons and the caption band are a way through a battle that never moves.
 _Avoid_: Furniture, UI, transport, toolbar
 
 **Scrubber**:
