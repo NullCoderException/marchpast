@@ -31,8 +31,8 @@ import type { Battle, MapFile } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
 import { drawCaption, layoutCaption } from "./drawCaption.ts";
 import { drawFurniture, furnitureBoxes } from "./drawFurniture.ts";
-import { drawMap } from "./drawMap.ts";
-import { drawUnits } from "./drawUnits.ts";
+import { drawMap, mapPoints } from "./drawMap.ts";
+import { drawUnits, layoutUnits } from "./drawUnits.ts";
 import type { HitRegion } from "./hit.ts";
 import {
   canvasMeasure,
@@ -42,12 +42,14 @@ import {
   glyphBox,
   type LabelMemory,
   type LabelUnit,
+  type MapLabel,
   type Measure,
   NO_LABEL_MEMORY,
   type NumeralRow,
   numeralKey,
   type Placed,
   placeLabels,
+  placeMapLabels,
 } from "./labels/index.ts";
 import { unitsDrawn } from "./level.ts";
 import { seeded } from "./primitives.ts";
@@ -129,56 +131,90 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
         pixelsPerMetre,
       };
 
+      // Everything is laid out before anything is inked. The map's names, the
+      // units' labels and the legend's numeral key each depend on the others,
+      // and the map is drawn first of the three, so no pass can settle its own
+      // question while it draws (#107).
+      const laid = layoutUnits(plate);
+      const layout = layoutPlate({ plate, units: laid.map(({ label }) => label), memory: labels, measure, card: openCard(plate, viewer) });
+      const { names, placed, key } = layout;
+      labels = layout.memory;
+
       // The picture is clipped to the extent; furniture is not.
       ctx.save();
       ctx.beginPath();
       ctx.rect(extentRect.x, extentRect.y, extentRect.width, extentRect.height);
       ctx.clip();
-      drawMap(plate);
-      const units = drawUnits(plate);
+      drawMap(plate, names);
+      drawUnits(plate, laid);
       ctx.restore();
 
-      // The labels go last, over the whole plate, because they must clear the
-      // furniture as well as the glyphs (#39). The furniture is measured
-      // first, drawn after: its legend carries a key for any numeral the
-      // labels end up showing, and a bigger legend is a bigger obstacle.
-      const { placed, key } = layoutLabels(plate, units, extentRect, labels, measure, openCard(plate, viewer));
+      // The unit labels go last, over the whole plate, because they must clear
+      // the furniture as well as the glyphs (#39), and the furniture goes
+      // before them because its legend carries a key for any numeral they end
+      // up showing.
       const rows = drawFurniture(plate, key);
       drawLabels(ctx, placed, palette);
       drawCaption(ctx, battle, picture, caption, plateHeight, width, palette);
       return hitRegions(placed, rows);
     },
   };
+}
 
-  /**
-   * Places the frame's labels against the furniture, and the furniture against
-   * the frame's labels. The two depend on each other in one direction only —
-   * the numeral is the last resort of the collapse order, and every numeral
-   * shown adds a row to the legend — so a second pass settles it, and the key
-   * the legend draws is always the key the placed labels imply.
-   */
-  function layoutLabels(
-    plate: Plate,
-    units: readonly LabelUnit[],
-    extentRect: Rect,
-    memory: LabelMemory,
-    measureText: Measure,
-    card: CardContent | undefined,
-  ): { placed: Placed[]; key: NumeralRow[] } {
-    const place = (against: readonly NumeralRow[]) =>
-      placeLabels({ units, plate: extentRect, obstacles: furnitureBoxes(plate, against), measure: measureText, memory, card });
+export interface PlateLayout {
+  /** The map's names, only those the placer found room for. */
+  names: MapLabel[];
+  /** The unit labels, in roster order. */
+  placed: Placed[];
+  /** The legend's numeral key, which the placed labels imply. */
+  key: NumeralRow[];
+  /** Where the unit labels stood, for the next frame's sticky search. */
+  memory: LabelMemory;
+}
 
-    let placement = place([]);
-    let key = numeralKey(placement.placed);
+export interface PlateLayoutOptions {
+  plate: Plate;
+  /** The units this level draws, as `layoutUnits` reported them. */
+  units: readonly LabelUnit[];
+  memory: LabelMemory;
+  measure: Measure;
+  /** The card the viewer has open, when its unit is one this level draws (#60). */
+  card?: CardContent;
+}
 
-    if (key.length > 0) {
-      placement = place(key);
-      key = numeralKey(placement.placed);
-    }
+/**
+ * Where every word on the plate goes. Three things depend on each other in one
+ * direction only: the map's names clear the furniture, the units' labels clear
+ * both, and the numeral a unit label collapses to adds a row to the legend —
+ * which is a bigger obstacle for all of them. So a second pass settles it, and
+ * the key the legend draws is always the key the placed labels imply.
+ *
+ * Out of `render` and exported because it is the whole of the ordering #107
+ * decided, and the only part of a frame's layout that can be tested without a
+ * canvas to draw on.
+ */
+export function layoutPlate({ plate, units, memory, measure, card }: PlateLayoutOptions): PlateLayout {
+  const extentRect = plate.projection.extentRect;
+  const points = mapPoints(plate);
 
-    labels = placement.memory;
-    return { placed: placement.placed, key };
+  const place = (against: readonly NumeralRow[]) => {
+    const furniture = furnitureBoxes(plate, against);
+    // The names first: a place is where it is, so it takes precedence over a
+    // unit label, which may be displaced or collapsed instead (#107).
+    const names = placeMapLabels({ points, plate: extentRect, obstacles: furniture });
+    const obstacles = [...furniture, ...names.map(({ box }) => box)];
+    return { names, ...placeLabels({ units, plate: extentRect, obstacles, measure, memory, card }) };
+  };
+
+  let placement = place([]);
+  let key = numeralKey(placement.placed);
+
+  if (key.length > 0) {
+    placement = place(key);
+    key = numeralKey(placement.placed);
   }
+
+  return { names: placement.names, placed: placement.placed, key, memory: placement.memory };
 }
 
 /**

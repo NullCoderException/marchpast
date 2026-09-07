@@ -1,7 +1,7 @@
 /**
- * The two passes that report what they drew, so the label pass can clear it
- * (#39, ticket #81 items 2 and 3). `drawUnits` says where every glyph landed
- * and how far it reaches; `layoutFurniture` says which boxes the rose, title,
+ * The two passes that report what they will draw, so the label pass can clear
+ * it (#39, ticket #81 items 2 and 3). `layoutUnits` says where every glyph
+ * lands and how far it reaches; `layoutFurniture` says which boxes the rose, title,
  * legend, scale bar and credit will occupy, and grows the legend for the
  * numeral key.
  *
@@ -11,9 +11,9 @@
  * roster's, not the level's slice of it (schema.md 2.11).
  */
 import { describe, expect, it } from "vitest";
-import { drawUnits } from "./drawUnits.ts";
+import { layoutUnits } from "./drawUnits.ts";
 import { furnitureBoxes } from "./drawFurniture.ts";
-import { glyphBox } from "./labels/index.ts";
+import { glyphBox, type LabelUnit } from "./labels/index.ts";
 import { unitsDrawn } from "./level.ts";
 import type { Plate } from "./plate.ts";
 import { fitProjection, type Rect } from "./projection.ts";
@@ -89,14 +89,17 @@ function plate(over: { level?: number; map?: MapFile; view?: typeof DEFAULT_VIEW
   };
 }
 
-describe("drawUnits", () => {
+/** What the pass reports to the placer, which is all these tests are about. */
+const reported = (of: Plate): LabelUnit[] => layoutUnits(of).map(({ label }) => label);
+
+describe("layoutUnits", () => {
   it("reports one label unit per drawn glyph, in the order it drew them", () => {
-    const reported = drawUnits(plate());
-    expect(reported.map((unit) => unit.id)).toEqual(["weather", "lee", "combined"]);
+    const units = reported(plate());
+    expect(units.map((unit) => unit.id)).toEqual(["weather", "lee", "combined"]);
   });
 
   it("puts each glyph where the projection put it, and the box round it", () => {
-    const weather = drawUnits(plate())[0];
+    const weather = reported(plate())[0];
     if (weather === undefined) throw new Error("nothing was drawn");
     expect(weather.anchor).toEqual(plate().projection.project(36.3, -6.4));
     // The box the label must clear: heading east, the glyph's length runs in x
@@ -107,37 +110,37 @@ describe("drawUnits", () => {
   });
 
   it("takes the reach across the axis from the view, so Atlas's blocks clear more than the plate's ticks", () => {
-    const [onThePlate] = drawUnits(plate());
-    const [onAtlas] = drawUnits(plate({ view: ATLAS }));
+    const [onThePlate] = reported(plate());
+    const [onAtlas] = reported(plate({ view: ATLAS }));
     expect(onAtlas?.halfWidth).toBeGreaterThan(onThePlate?.halfWidth ?? 0);
     expect(onAtlas?.halfWidth).toBe(ATLAS.glyph.halfWidth(1, "column"));
   });
 
   it("carries the roster's words: the label, the short_label where there is one, and nothing where there is not", () => {
-    const reported = drawUnits(plate());
-    expect(reported[0]?.name).toBe("Weather column");
-    expect(reported[0]?.shortLabel).toBe("Weather");
-    expect(reported[1]?.shortLabel).toBeUndefined();
+    const units = reported(plate());
+    expect(units[0]?.name).toBe("Weather column");
+    expect(units[0]?.shortLabel).toBe("Weather");
+    expect(units[1]?.shortLabel).toBeUndefined();
   });
 
   it("numbers a unit by the whole roster, so a numeral means the same at every level", () => {
     // At level 1 the weather column is drawn as its van, the third roster
     // entry drawn but the *second* roster entry: the numeral follows the
     // roster, never the slice (schema.md 2.11).
-    const coarse = drawUnits(plate({ level: 0 }));
-    const fine = drawUnits(plate({ level: 1 }));
+    const coarse = reported(plate({ level: 0 }));
+    const fine = reported(plate({ level: 1 }));
     expect(coarse.map((unit) => unit.rosterIndex)).toEqual([0, 2, 3]);
     expect(fine.map((unit) => unit.id)).toEqual(["weather-van", "lee", "combined"]);
     expect(fine.map((unit) => unit.rosterIndex)).toEqual([1, 2, 3]);
   });
 
   it("says which units have a move, since they take the flank before the rest", () => {
-    const reported = drawUnits(plate());
-    expect(reported.map((unit) => unit.hasMove)).toEqual([false, true, false]);
+    const units = reported(plate());
+    expect(units.map((unit) => unit.hasMove)).toEqual([false, true, false]);
   });
 
   it("hands on the wind the glyph was given, so the label and the billow agree which flank is the lee one", () => {
-    const [weather] = drawUnits(plate());
+    const [weather] = reported(plate());
     // A WNW wind on a unit heading east: the same one turn the glyph is handed.
     expect(weather?.windTo).toBeCloseTo((((292.5 + 180 - 90) % 360) * Math.PI) / 180);
   });
