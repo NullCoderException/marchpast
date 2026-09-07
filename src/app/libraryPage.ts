@@ -1,8 +1,14 @@
 /**
  * The library page: the site's front door (ADR-0011). The bare URL lists every
  * battle oldest first — title, date and summary — each entry linking to
- * `?battle=<name>`, beneath the site's name and its one-line idea and above a
- * credit line naming the repository and the data licence.
+ * `?battle=<name>`, beneath the masthead and above a credit line naming the
+ * repository and the data licence.
+ *
+ * The masthead is the mark beside the name, the one line that says what the
+ * site is, and the way into the story (#135). The name is arbitrary by design
+ * (ADR-0020), so the idea line is the only thing on the page that explains the
+ * app to someone who has just arrived, and it is set before the list rather
+ * than in the footer below it.
  *
  * It is a DOM page, not a canvas: there is nothing here to animate. It wears
  * the plate's materials and type ramp all the same (`library.css`), so the
@@ -13,14 +19,32 @@
 import { compareBattles, type Library } from "../data/library.ts";
 import { element } from "../player/dom.ts";
 import { battleQuery, libraryHref } from "./battleName.ts";
+import { markSvg } from "./mark.ts";
 import "./library.css";
 
-/** The site's one-line idea, from `docs/CONCEPT.md`. */
-const IDEA =
-  "A web app that plays back famous battles as animated 2D “grand strategy” sequences, driven by a reusable JSON timeline format, with the timelines extracted from public-domain primary and secondary sources.";
+/** The site's name, set beside the mark. Never in another face, never bold, never all caps. */
+const NAME = "Marchpast";
+
+/** The site's one-line idea (#135): what a visitor is told before they are shown anything. */
+export const IDEA = "Famous battles, played back on the map — phase by phase, from the sources up.";
 
 /** Where the source lives, for the credit line. */
 const REPOSITORY = "https://github.com/NullCoderException/marchpast";
+
+/**
+ * The head's third line: how the site is made, and where the battles come
+ * from. It stays in the head rather than moving to the credit footer, which
+ * sits below every card — a visitor who does not know what this is has decided
+ * before they reach it. `detail` is the tail a phone drops (`library.css`).
+ */
+export const STORY = {
+  text: "How it is made",
+  detail: ", and where the battles come from",
+  href: `${REPOSITORY}/blob/main/docs/CONCEPT.md`,
+} as const;
+
+/** The mark's size on the masthead; a phone drops it to 32, in `library.css`. */
+const MARK_SIZE = 40;
 
 /** What the page says about the data it plays. */
 const DATA_LICENCE = "Battle files CC BY 4.0; each map file carries its own licence.";
@@ -34,12 +58,31 @@ export function libraryOrder(library: Library): Library {
   return [...library].sort(compareBattles);
 }
 
+/**
+ * The masthead, as the HTML the head is set with: the mark, the name on the
+ * mark's own baseline, the idea line, and the way into the story, in the order
+ * they read. It is markup rather than elements because the mark is a drawing,
+ * and every character of it is a constant of this module — nothing here comes
+ * from a battle file, so there is nothing to escape.
+ */
+export function mastheadHtml(): string {
+  return [
+    '<div class="st-library-lockup">',
+    `<span class="st-library-mark" aria-hidden="true">${markSvg(MARK_SIZE)}</span>`,
+    `<h1 class="st-library-name">${NAME}</h1>`,
+    "</div>",
+    `<p class="st-library-idea">${IDEA}</p>`,
+    `<p class="st-library-story"><a href="${STORY.href}">${STORY.text}`,
+    `<span class="st-library-story-more">${STORY.detail}</span> →</a></p>`,
+  ].join("");
+}
+
 /** Builds the page for a library. The caller places it and owns the document. */
 export function createLibraryPage(library: Library): HTMLElement {
   const root = element("main", "st-library");
 
   const head = element("header", "st-library-head");
-  head.append(element("h1", "st-library-name", "Marchpast"), element("p", "st-library-idea", IDEA));
+  head.innerHTML = mastheadHtml();
   root.append(head);
 
   const battles = libraryOrder(library);
