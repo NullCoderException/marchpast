@@ -79,7 +79,7 @@ Which day of the battle a phase falls on, counted from its first at zero. A batt
 _Avoid_: Date, offset, session, part
 
 **Sort date**:
-The battle's first day written as numbers so the library can order battles by it, its year negative before Christ. It is only ever compared, never counted from.
+The battle's first day written as numbers so the library can order battles by it, its year negative before Christ. It is compared freely, and counted from only for the interval between two battles, never for any duration within one.
 _Avoid_: Timestamp, epoch, start date, key
 
 **Playback rate**:
@@ -219,8 +219,12 @@ _Avoid_: Tooltip, popup, popover, info box, unit panel
 ### Site
 
 **Library**:
-The collection of every battle the site holds, and the front-door page that lists them oldest first, each by title, date and summary, drawn from the battle files themselves.
+The collection of every battle the site holds, and the front-door page that lists them oldest first, each by title, date, sides and summary, drawn from the battle files themselves. It is never grouped.
 _Avoid_: Catalogue, index, list, home page, menu, gallery
+
+**Chronology rail**:
+The line down the library's left gutter that gives the list its spine: a bare node beside each battle, and between two battles the years that passed, in words. Its spacing is even and means nothing; the interval is written rather than drawn, because the library spans two millennia and no scale holds both a gap of eighteen centuries and a gap of two years.
+_Avoid_: Timeline, axis, scrubber, spine
 
 **Picker**:
 The control in the player's controls that switches to another battle in the library, starting a fresh visit to it.

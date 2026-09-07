@@ -1,5 +1,7 @@
 # The library is built from the battle files and the URL names a battle by query parameter
 
+*Amended 2026-09-07: the grouping clause below — "grouping the library is out of scope until the list is long enough to need it" — is superseded by ADR-0022, which answered it in the negative at seven battles and gave the library a chronology rail instead. Everything else this ADR decided stands (#129).*
+
 *Amended 2026-09-06: the sortable date this ADR required is `sort_date` (ADR-0013); the `sides` block it deferred was closed in the negative by ADR-0015 and ADR-0017, so sides stay derived from the roster.*
 
 *Amended 2026-09-06: "a battle joins the library by existing" reads the other way too, so only a battle belongs in `data/battles/` and there is no second kind of file there to mark (#99). `two-level-example.json`, which arrived to exercise the Level chooser (ADR-0017), is retired now that Trafalgar itself has levels.*
