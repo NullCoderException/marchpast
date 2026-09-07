@@ -14,7 +14,7 @@ import { DEFAULT_VIEW, type CardTarget, type ViewId } from "../render/index.ts";
 import { unitsAtLevel } from "../schema/hierarchy.ts";
 import type { Battle } from "../schema/types.ts";
 import { checkMultiplier, clockIntervals, endClock, intervalAt, startClock } from "../timeline/intervals.ts";
-import type { ClockSeconds } from "../timeline/picture.ts";
+import type { ClockSeconds, Picture } from "../timeline/picture.ts";
 import { presentAt } from "../timeline/pictureAt.ts";
 import { advance, nextPhaseStart, previousPhaseStart } from "../timeline/playback.ts";
 import { fractionToClock, type BarFraction } from "./scrub.ts";
@@ -168,6 +168,27 @@ export function focusUnit(state: PlayerState, id: string): PlayerState {
 /** A click or tap on a unit, or Enter or Space on its muster entry: the card is pinned to it, swapping from whatever it was on. One card at a time. */
 export function pinUnit(state: PlayerState, id: string): PlayerState {
   return { ...state, card: { id, pinned: true } };
+}
+
+/**
+ * The clock has reached an instant the card's unit is not on the plate at, so
+ * the card closes — pinned or not.
+ *
+ * It is `setLevel`'s rule read the other way round. That one closes a card the
+ * new *level* stops drawing; this one closes a card the new *phase* stops
+ * drawing, and for the same reason: a card is anchored at its unit's glyph, so
+ * a card on a unit with no glyph has nowhere to be (#60, ADR-0024). Without
+ * it a pin outlives the unit it was on — invisible, because the renderer will
+ * not draw a card for a unit the plate has not got, and unreachable, because
+ * the muster no longer lists it.
+ *
+ * The picture is the whole of what presence means downstream, so this takes
+ * one rather than the battle: a unit is in it only inside its run.
+ */
+export function closeAbsentCard(state: PlayerState, picture: Picture): PlayerState {
+  const id = state.card?.id;
+  if (id === undefined || picture.units.some((unit) => unit.id === id)) return state;
+  return closeCard(state);
 }
 
 /**

@@ -1,21 +1,22 @@
 /**
- * The plate with no battle on it: what the page shows while a battle loads and
- * what it shows when the battle cannot be played.
+ * What stands where the plate would be: while a battle loads, and when the
+ * battle cannot be played at all.
  *
- * It is **DOM text, and it replaces the canvas** (#130, ADR-0023). A heading
- * drawn with `fillText` is silent to a screen reader, and a battle that fails
- * to load is the worst place on the page for that; the canvas has nothing to
- * draw before a battle loads, so there is nothing to sit over. It is one
- * surface and no duplicate text to drift.
+ * It is **DOM text, and it takes the canvas's place** rather than covering it
+ * (#130, ADR-0023). A heading drawn with `fillText` is silent to a screen
+ * reader, and a battle that fails to load is the worst place on the page for
+ * that; the canvas has nothing to draw before a battle loads, so there is
+ * nothing worth sitting over. One surface, and no second copy of the words to
+ * drift.
  *
- * It reaches for no palette. The heading and the lines take the surface's own
- * tokens — the ink, the ground and the face `player.css` sets on the control
- * strip beside it — so the notice is themed by whatever view the surface is
- * in, and takes the opening view for free once the surface follows one.
+ * It reaches for no palette. The heading and the lines take the ink, the
+ * ground and the face `player.css` already sets on the control strip beside
+ * it, so the notice is themed by whatever view the surface is in — and takes
+ * the opening view for free once #172 makes the surface follow one.
  *
  * It is a `status`, so the error a viewer never asked for is spoken when it
- * arrives. There is no player on this path and so no announcer: the two live
- * regions never share a page.
+ * arrives. There is no player on this path and so no announcer: the page's two
+ * live regions never share a page.
  */
 import { element } from "../player/dom.ts";
 // The strip's own stylesheet carries the notice's rules, because the notice is
@@ -29,8 +30,8 @@ export interface Notice {
   lines: readonly string[];
 }
 
-/** The notice as an element, for the caller to place. */
-export function createNotice(notice: Notice): HTMLElement {
+/** The notice as an element. */
+function noticeElement(notice: Notice): HTMLElement {
   const root = element("section", "st-notice");
   root.setAttribute("role", "status");
   root.append(element("h2", "st-notice-heading", notice.heading));
@@ -44,7 +45,7 @@ export function createNotice(notice: Notice): HTMLElement {
  * down again and gives the plate back, before something else owns the canvas.
  */
 export function showNotice(canvas: HTMLCanvasElement, notice: Notice): () => void {
-  const root = createNotice(notice);
+  const root = noticeElement(notice);
   canvas.hidden = true;
   canvas.after(root);
   return () => {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  closeAbsentCard,
   closeCard,
   focusUnit,
   hoverUnit,
@@ -18,7 +19,8 @@ import {
   tick,
   togglePlay,
 } from "./state.ts";
-import { TEST_BATTLE, clock } from "../timeline/testBattle.ts";
+import { ABSENCE_BATTLE, TEST_BATTLE, clock } from "../timeline/testBattle.ts";
+import { pictureAt } from "../timeline/pictureAt.ts";
 import trafalgarRaw from "../../data/battles/trafalgar.json?raw";
 import { MINIMAL_BATTLE } from "../schema/examples.ts";
 import type { Battle } from "../schema/types.ts";
@@ -310,6 +312,32 @@ describe("the unit card", () => {
     it("unpins and closes, whether the card was pinned or not", () => {
       expect(closeCard(pinUnit(closed, "weather-column"))).toEqual(closed);
       expect(closeCard(focusUnit(closed, "weather-column"))).toEqual(closed);
+    });
+  });
+
+  describe("closeAbsentCard", () => {
+    /** The strike is on the plate for phases one to three of six (ADR-0024). */
+    const airborne = { clock: clock("11:00"), playing: true, multiplier: 1, view: "plate" as const, level: 1 };
+    const picture = (time: string) => pictureAt(ABSENCE_BATTLE, clock(time));
+
+    it("leaves a card on a unit the instant still holds", () => {
+      const pinned = pinUnit(airborne, "strike");
+      expect(closeAbsentCard(pinned, picture("11:00"))).toBe(pinned);
+    });
+
+    it("closes a pinned card when the clock has carried the battle past its unit's last phase", () => {
+      // The pin would otherwise outlive the strike: invisible, because the
+      // renderer draws no card for a unit the plate has not got, and
+      // unreachable, because the muster no longer lists it.
+      expect(closeAbsentCard(pinUnit(airborne, "strike"), picture("15:00")).card).toBeUndefined();
+    });
+
+    it("closes an unpinned card on the same rule", () => {
+      expect(closeAbsentCard(focusUnit(airborne, "strike"), picture("15:00")).card).toBeUndefined();
+    });
+
+    it("changes nothing when no card is open", () => {
+      expect(closeAbsentCard(airborne, picture("15:00"))).toBe(airborne);
     });
   });
 

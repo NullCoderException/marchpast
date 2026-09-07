@@ -232,6 +232,10 @@ _Avoid_: Tooltip, popup, popover, info box, unit panel
 The units the plate is drawing at the current level and in the current phase, as a list a keyboard or screen reader can walk: one tab stop after the canvas, the arrows moving through it, focus opening a unit's card. Against the roster, which is every unit the battle file authors, the muster is what is drawn now.
 _Avoid_: Unit list, roll, roster (the authored one), index
 
+**Announcer**:
+The one sentence that says where in the battle the plate is — which phase of how many, its instant and its label — read when a viewer reaches the plate and again each time the phase changes, and never as the clock runs. It is the page's only spoken-of-itself text: the details panel is not one, and the clock readout is silenced so that it cannot become one. What it says is what the scrubber's ticks say to a viewer who can see them.
+_Avoid_: Live region, status bar, narrator, subtitle, caption (the authored one)
+
 ### Site
 
 **Library**:

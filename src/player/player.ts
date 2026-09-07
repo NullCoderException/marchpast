@@ -24,10 +24,11 @@ import { pictureAt } from "../timeline/pictureAt.ts";
 import { ANNOUNCER_ID, createAnnouncer } from "./announcer.ts";
 import { createControls, type PickerOptions } from "./controls.ts";
 import { createDetailsPanel } from "./details.ts";
-import { Listeners } from "./dom.ts";
+import { Listeners, plainKey } from "./dom.ts";
 import { createMuster } from "./muster.ts";
 import "./player.css";
 import {
+  closeAbsentCard,
   closeCard,
   focusUnit,
   hoverUnit,
@@ -132,7 +133,7 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
   // select owns both arrows, so the shortcut stands aside rather than firing
   // twice or fighting the control the viewer tabbed to.
   listeners.on<KeyboardEvent>(window, "keydown", (event) => {
-    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+    if (event.defaultPrevented || !plainKey(event)) return;
     const transition = KEYS[event.key];
     if (transition === undefined || answersItself(event.target, event.key)) return;
     event.preventDefault();
@@ -173,6 +174,10 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
     dirty = false;
 
     const picture = pictureAt(battle, state.clock);
+    // The one transition a frame makes for itself: the clock may have carried
+    // the battle past the last phase the open card's unit is on the plate for,
+    // and a card with no glyph under it has nowhere to be (ADR-0024).
+    state = closeAbsentCard(state, picture);
     hits = renderer.render(battle, map, picture, { view: state.view, level: state.level, card: state.card });
     details.update(picture);
     // The same rule the plate was just drawn to, off the same width: the
@@ -192,7 +197,7 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
       listeners.removeAll();
       controls.destroy();
       muster.destroy();
-      announcer.root.remove();
+      announcer.destroy();
       details.root.remove();
     },
   };
@@ -204,7 +209,7 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
  * is how it is pressed.
  *
  * A focused muster entry stands with the select rather than the button: the
- * arrows walk the units and space pins the card, so both belong to the widget
+ * arrows walk the units and space pins the card, so both belong to the control
  * the viewer tabbed to (#130). It is the same stand-aside, not a new rule.
  */
 function answersItself(target: EventTarget | null, key: string): boolean {

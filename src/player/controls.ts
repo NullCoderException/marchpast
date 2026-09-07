@@ -17,8 +17,8 @@ import type { LibraryEntry } from "../data/library.ts";
 import { formatClock, VIEWS, viewById, type ViewId } from "../render/index.ts";
 import type { Battle } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
-import { phaseCount } from "./announcer.ts";
-import { Listeners, element } from "./dom.ts";
+import { phasePosition } from "./announcer.ts";
+import { Listeners, element, plainKey } from "./dom.ts";
 import { barSegments, clockToFraction, type BarFraction } from "./scrub.ts";
 import { levelOptions, MULTIPLIERS, type PlayerState } from "./state.ts";
 
@@ -105,9 +105,9 @@ export function createControls(battle: Battle, handlers: ControlHandlers, picker
       const fraction = clockToFraction(battle, state.clock);
       thumb.style.left = `${fraction * 100}%`;
       bar.setAttribute("aria-valuenow", String(Math.round(fraction * 100)));
-      // The same count the announcer reads, so the bar and the announcer never
-      // state the position two different ways (#130).
-      bar.setAttribute("aria-valuetext", `${phaseCount(picture, battle.phases.length)}, ${time}, ${picture.label}`);
+      // The same phrase the announcer reads, so the bar and the announcer
+      // never state the position two different ways (#130).
+      bar.setAttribute("aria-valuetext", `${phasePosition(picture, battle.phases.length)}, ${time}, ${picture.label}`);
 
       for (const option of multiplier.options) option.selected = Number(option.value) === state.multiplier;
       for (const option of view.options) option.selected = option.value === state.view;
@@ -159,7 +159,7 @@ function scrubber(
   // slider should do. Home and End are the ends of the battle, which nothing
   // else reaches in one press now the ticks have left the tab order.
   listeners.on<KeyboardEvent>(bar, "keydown", (event) => {
-    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    if (!plainKey(event)) return;
     if (event.key !== "Home" && event.key !== "End") return;
     event.preventDefault();
     handlers.jumpToPhase(event.key === "Home" ? 0 : battle.phases.length - 1);
