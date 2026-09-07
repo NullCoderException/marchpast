@@ -19,7 +19,7 @@ The latitude/longitude bounding box a battle plays inside, fixed for the whole p
 _Avoid_: Viewport, bounds, camera, map box
 
 **Map**:
-The static geography a battle plays over, drawn behind the units: land, rivers, shoals, contours, named places and works, in a file the battle points at. One map file is one moment in time, so a modern and a historical coastline are two files; a battle names at most one.
+The static geography a battle plays over, drawn behind the units: land, rivers, shoals, contours, ramparts, named places and works, in a file the battle points at. One map file is one moment in time, so a modern and a historical coastline are two files; a battle names at most one.
 _Avoid_: Basemap, background, terrain, layer, chart
 
 **Place**:
@@ -35,8 +35,12 @@ Water too shallow to fight over, drawn as an outline: the Aboukir shoal, Copenha
 _Avoid_: Bank, reef, shallows, bathymetry
 
 **Work**:
-A named built thing on the ground that takes no part as a unit unless the battle file says otherwise: a fort, a battery, a camp. Trekroner, Abu Qir castle, the Roman camps on the Aufidus.
+A named built thing at a place on the map, drawn as a sign with its name beside it, that takes no part as a unit unless the battle file says otherwise: a fort, a battery, a camp. Trekroner, Abu Qir castle, the Roman camps on the Aufidus, Alesia's castella. A built thing that runs along a line rather than standing at a point is a Rampart.
 _Avoid_: Fort, fortification, camp, structure, installation
+
+**Rampart**:
+A built line on the ground, drawn as a line with its ditch and the teeth on the side it faces: Alesia's contravallation and circumvallation, a trench line, a wall, a berm. It names the drawn line rather than what the thing was made of, so what it was is caption matter. It carries no name, so a rampart a caption must name gets a Place on it, and the direction it is drawn in is the side it faces.
+_Avoid_: Entrenchment, lines, wall, trench, siege line, earthwork, work (for a line)
 
 **Contour**:
 A line on the map joining ground at one height above sea level, carrying that height in metres. The set of them is how a map holds elevation; the interval between them is an authoring choice, not a fixed one.

@@ -21,6 +21,7 @@ v2 is the land-battle generalisation forced by Cannae, plus what the Nile, Copen
 | `formation` gains `mass` | 2.7 | ADR-0016 |
 | `heading` is where the unit's force is directed; `broken` and `strength` sharpened | 2.7 | ADR-0018, ADR-0019 |
 | Map features gain `river`, `shoal`, `work` and `contour`; `LineString` and `MultiLineString` become legal for the two line kinds | 3.2 | ADR-0012 |
+| Map features gain `rampart`, a built line drawn with its ditch, the teeth on the side it faces | 3.2 | ADR-0026 |
 | More than sixteen units drawn at one level is a validation error | 2.10 rule 17 | ADR-0017 |
 
 Everything else in v1 stands: positions, the extent, wind, sources and references, licences, moves, the track, the tween rules. A v1 **map** file is a valid v2 map file unchanged. A v1 **battle** file needs `schema_version: 2`, `summary`, `dates` in place of `date`, `sort_date`, and `arm` on every unit.
@@ -63,7 +64,7 @@ Classes rank `public-domain` < `attribution` < `share-alike`. Adding an identifi
 | `schema_version` | literal `2` | yes | Rejected if anything else. A v1 file is rejected with a message saying what v2 needs (section 0). |
 | `title` | string | yes | Display title, e.g. `"The Battle of Trafalgar"`. |
 | `summary` | string | yes | One plain sentence the battle carries to describe itself wherever it is named but not played: the Library's list, the Picker. Display only. |
-| `dates` | string[] | yes, at least one | Human-readable date of each day the battle spans, in order, one entry per day: `["21 October 1805"]`, `["1 August 1798", "2 August 1798"]`. Display only; never parsed. The caption band shows `dates[day]` for the current phase; the Library shows `dates[0]`. |
+| `dates` | string[] | yes, at least one | Human-readable date of each day the battle spans, in order, one entry per day: `["21 October 1805"]`, `["1 August 1798", "2 August 1798"]`. Display only; never parsed, so an entry need not be a calendar date: where no source dates the battle, the strings say what they can (`"September 52 BC (the relief army's first day)"`). The caption band shows `dates[day]` for the current phase; the Library shows `dates[0]`. |
 | `sort_date` | `{ year, month, day }` | yes | The first day as integers, for the Library to sort on: `month` `1` to `12`, `day` `1` to `31`, `year` in ordinary historical numbering with BC negative and no year zero (Cannae is `-216`, not `-215`). Compared freely; counted from only for the interval between two battles that the Library's chronology rail writes, never for any duration within one battle (ADR-0013, ADR-0022). Restates `dates[0]` in machine form; nothing checks the two agree. |
 | `extent` | `{ north, south, east, west }` | yes | The lat/lon bounding box the battle plays inside, fixed for the whole playback. Numbers in degrees; `south < north`, `west < east`, each within range. The renderer fits it to the canvas preserving aspect ratio and letterboxes the rest. Authoring guideline, not a rule: make it landscape. |
 | `scale_unit` | `"nmi"` or `"km"` | yes | The unit the renderer's scale bar is drawn in. |
@@ -191,7 +192,7 @@ Shape rules follow from the tables above (types, required fields, enums, ranges,
 2. `extent.south < extent.north` and `extent.west < extent.east`, all four in range.
 3. `units[].id` unique; `phases[].id` unique.
 4. Phases strictly increase on (`day`, `t`); the first phase's `day` is `0`; (`end_day`, `end`) is later than the last phase, and `end_day` is not less than the last phase's `day`.
-5. `dates` has exactly `max(last phase's day, end_day) + 1` entries: no `day` points past it and no trailing entry goes unused.
+5. `dates` has exactly `max(last phase's day, end_day) + 1` entries: no `day` points past it and no trailing entry goes unused. A day **in the middle** with no phase is legal and its entry is authored and never shown, because a battle may have a quiet day: Alesia's day 2 is one of hurdle-making that the next phase's caption carries. Nothing requires every day to have a phase (ADR-0026).
 6. `sort_date.month` is `1` to `12`, `sort_date.day` is `1` to `31`, all three integers; `year` is not `0`.
 7. Every phase lists every roster unit exactly once, by id, and no id that is not on the roster.
 8. Every phase has at least one reference, and every `references[].source` is a key of `sources`.
@@ -307,7 +308,7 @@ Unchanged from v1.
 | Member | Type | Required | Meaning |
 |---|---|---|---|
 | `type` | literal `"FeatureCollection"` | yes | |
-| `features` | Feature[] | yes | Only the six feature kinds below. |
+| `features` | Feature[] | yes | Only the seven feature kinds below. |
 | `license` | licence identifier | yes | The map file's own licence, e.g. `public-domain` for a Natural Earth cut with SRTM contours, `CC-BY-4.0` for a file with the project's own tracings, `ODbL-1.0` for an OpenStreetMap cut. A file inherits the strictest class of its inputs; where a public-domain source still reads at the extent, it wins. |
 | `attribution` | string | if the licence class demands it | The credit line, one string however many sources it names. The renderer always draws it as a small credit line in the frame, because attribution licences oblige a visible credit wherever the work is displayed. |
 
@@ -315,7 +316,7 @@ No other foreign member (`bbox`, `name`, `crs`, `sources`, a raster, a contour i
 
 ### 3.2 Features
 
-Every feature is `{ "type": "Feature", "geometry": ..., "properties": { "kind": ... } }`. Coordinates are `[lon, lat]` in WGS84, exactly two elements. A feature's `properties` may carry only the keys listed for its kind. Natural features carry no name; a contour carries its level; named things carry a name.
+Every feature is `{ "type": "Feature", "geometry": ..., "properties": { "kind": ... } }`. Coordinates are `[lon, lat]` in WGS84, exactly two elements. A feature's `properties` may carry only the keys listed for its kind. Natural features and a rampart carry no name; a contour carries its level; named things carry a name. The two built kinds are a point and a line: a `work` is a thing at a place, a `rampart` a thing along a line.
 
 | `properties.kind` | Geometry | Properties | Meaning |
 |---|---|---|---|
@@ -325,22 +326,25 @@ Every feature is `{ "type": "Feature", "geometry": ..., "properties": { "kind": 
 | `"contour"` | `LineString` or `MultiLineString` | `kind`, `elevation` (number, required, metres, `-500 <= x <= 9000`) | A line joining ground at one height. The set of them is how a map holds elevation; nothing else does. `MultiLineString` because `gdal_contour` emits many segments per level. No index flag: the renderer weights every fifth level from the levels it is given. |
 | `"place"` | `Point` | `kind`, `name` (string, required, non-empty) | A named point drawn as a label so captions can refer to it: Cadiz, Cape Trafalgar, the Aufidus, the Middle Ground. The one naming mechanism: a river or a shoal that must be labelled gets a place on it. |
 | `"work"` | `Point` | `kind`, `name` (string, required, non-empty) | A named built thing on the ground, drawn as a plan sign with its name in small capitals: a fort, a battery, a camp. Trekroner, Abu Qir castle, the Roman camps. A point, never a polygon; independent of any `land` under it. A work takes no part as a unit unless the battle file rosters one at the same coordinates, which none of the v0.2 battles does. |
+| `"rampart"` | `LineString` or `MultiLineString` | `kind` only | A built line on the ground, drawn as a line **with its ditch**, the teeth on the side it faces: Alesia's contravallation and circumvallation, a trench line, a wall, a berm. The kind names the drawn line, not what it was made of; the caption says which. No name and no width; a rampart a caption must name gets a `place` on it. **The direction the line is drawn in is the side it faces**: the teeth fall on the right of its direction of travel, so an author draws a rampart keeping the side it faces on their right. A closed ring is neither required nor expected — Alesia's contravallation stops at the escarpments — and `MultiLineString` holds the disjoint runs. |
 
-Any other kind, any other geometry type for a kind (`LineString` for `land`, `Polygon` for `work`, `GeometryCollection` anywhere, a bare geometry without a Feature wrapper), a `null` geometry, or an extra property (a `name` on a `river`, a `depth` on a `shoal`, a `conjectural` flag on anything) is a validation error. No `road` kind; it arrives additively when a battle needs one.
+Any other kind, any other geometry type for a kind (`LineString` for `land`, `Polygon` for `work`, `GeometryCollection` anywhere, a bare geometry without a Feature wrapper), a `null` geometry, or an extra property (a `name` on a `river` or a `rampart`, a `depth` on a `shoal`, a `conjectural` flag on anything) is a validation error. No `road` kind; it arrives additively when a battle needs one, the way `rampart` did (ADR-0026).
 
 ### 3.3 Validator rules for the map file
 
 1. Top level is a `FeatureCollection` with `type`, `features`, `license`, and optionally `attribution`, and nothing else.
 2. `license` is in the allowlist; `attribution` present when the class demands it.
-3. Every feature has `type: "Feature"`, a non-null geometry, and `properties.kind` of `land`, `river`, `shoal`, `contour`, `place` or `work`.
-4. `land` and `shoal` geometry is `Polygon` or `MultiPolygon`; `river` and `contour` geometry is `LineString` or `MultiLineString`; `place` and `work` geometry is `Point`.
+3. Every feature has `type: "Feature"`, a non-null geometry, and `properties.kind` of `land`, `river`, `shoal`, `contour`, `place`, `work` or `rampart`.
+4. `land` and `shoal` geometry is `Polygon` or `MultiPolygon`; `river`, `contour` and `rampart` geometry is `LineString` or `MultiLineString`; `place` and `work` geometry is `Point`.
 5. `contour` carries a finite `properties.elevation` with `-500 <= x <= 9000`; `place` and `work` carry a non-empty `properties.name`.
 6. Every coordinate is `[lon, lat]` with `-180 <= lon <= 180`, `-90 <= lat <= 90` (a third element is rejected).
 7. No property beyond those listed for the kind.
 
-Not checked: ring winding, polygon validity, whether contours are closed or nested, whether a shoal overlaps land, or whether the map covers the battle's extent. A map may extend beyond the extent and the renderer clips.
+Not checked: ring winding, polygon validity, whether contours are closed or nested, whether a shoal overlaps land, or whether the map covers the battle's extent. A map may extend beyond the extent and the renderer clips. Winding is unchecked **including a rampart's, where it carries meaning**: a rampart drawn the wrong way round gets its teeth on the wrong side, and only the plate will say so. This sits beside `sort_date` not being checkable against `dates[0]` as something the format knows it cannot verify (ADR-0026).
 
 ### 3.4 Minimal example
+
+A test parses this block and runs it through `validateMap`, so it shows only the kinds the validator ships today: `rampart` joins it when the code does.
 
 ```json
 {
@@ -371,6 +375,8 @@ Not checked: ring winding, polygon validity, whether contours are closed or nest
 - **Period plans for the historical shoal and shoreline.** No open bathymetry resolves the Aboukir shoal or the Middle Ground; both are traced from the public-domain Brydon plans (1798 and 1802), and Copenhagen's inner shoreline with them, with the two forts built after 1801 cut out of any modern polygon set. Tracings are the project's own work and set the file's licence with the modern layer they sit beside.
 - **Nothing marks geometry as conjectural.** The Aufidus of 216 BC is unknowable, so the modern Ofanto is drawn and the Cannae captions say so.
 - **Nelson's Island is `land` plus a `place`**; a fort is a `work`; a camp is a `work`; a shoal that captions name gets a `place` on it.
+- **An inland battle opens its map with one covering `land` polygon, and that polygon overhangs the extent.** Land is the base and everything else is sea, so a map with no land at all draws as all sea. The overhang matters because the land pass shades its coastline inward: a polygon stopping exactly at the extent draws a hairline coastline round the inside of the frame, and an inland plate grows a phantom shore. Alesia's is five vertices. (ADR-0026)
+- **A rampart is drawn in the direction that puts the side it faces on the right.** Alesia's contravallation faces inward at the town and its circumvallation outward at the relief, so two lines round the same hill are drawn the opposite way round. Nothing checks it (3.3).
 
 ## 4. What the renderer and player draw that is not in either file
 
@@ -382,7 +388,7 @@ For the reader wondering where a field went: these are renderer or player behavi
 - **Level**: which depth of the roster tree is drawn, chosen with the Level chooser, present only when the battle has `levels`, opening on the coarsest every visit. (ADR-0017)
 - **Unit label**: the unit's `label` in the side ink and beneath it the state word and, when strength is below 1, the percentage; placed on the glyph's flank clear of its signs by a sticky search with a five-step collapse (full, displaced, no state, `short_label`, numeral keyed in the legend), a leader when the label's own glyph is not the nearest one, and the furniture as an obstacle. (ADR-0009, [#39](https://github.com/NullCoderException/marchpast/issues/39))
 - **Unit card**: the label unfolded, a canvas panel beside the glyph carrying the full label and commander, the arm, formation, state and strength as words, and the unit's parent or children; hover shows, click or tap pins, one at a time, never pausing. ([#60](https://github.com/NullCoderException/marchpast/issues/60))
-- **Map drawing**: land in a darker paper with an ink coastline; relief as contours weighted by level, every fifth numbered; a shoal as a dotted edge with a fine stipple; a river as two banks clipped to the land; a work as a bastioned-square sign with its name in small capitals; a place as a dot with its name in italic. Drawn in that order, land first and the named things last. The index contours are every fifth level, found from the levels the file carries and never flagged in it; a view re-tunes the two contour alphas and nothing else about the pass, except that **Atlas alone lays tint bands** above 30, 50, 100, 150 and 200 m under its contours — a palette value like the alphas, so the map pass stays shared and no pass tests a view id. On a plate with contours the furniture sits on paper panels and the scale bar carries the interval. (ADR-0012, ADR-0014, [#62](https://github.com/NullCoderException/marchpast/issues/62))
+- **Map drawing**: land in a darker paper with an ink coastline; relief as contours weighted by level, every fifth numbered; a shoal as a dotted edge with a fine stipple; a river as two banks clipped to the land; a rampart as a line with its ditch teeth on the side it faces (engraved, a fine line with 4.5px teeth as a siege plan cuts it; atlas, one heavier line; the staff map, an obstacle with cross ticks both sides); a work as a bastioned-square sign with its name in small capitals; a place as a dot with its name in italic. Drawn in that order, land first, the ramparts among the ground, and the named things last. The index contours are every fifth level, found from the levels the file carries and never flagged in it; a view re-tunes the two contour alphas and nothing else about the pass, except that **Atlas alone lays tint bands** above 30, 50, 100, 150 and 200 m under its contours — a palette value like the alphas, so the map pass stays shared and no pass tests a view id. On a plate with contours the furniture sits on paper panels and the scale bar carries the interval. (ADR-0012, ADR-0014, [#62](https://github.com/NullCoderException/marchpast/issues/62))
 - **Furniture**: compass rose with the wind arrow and text (top-left), plate title (top-right), scale bar in `scale_unit` and the always-on legend (bottom-left), the map file's `attribution` credit line (bottom-right). North is always up. (ADR-0005, ADR-0009, #58)
 - **Legend**: each side's colour and `side` name, the four state glyphs, the three line styles (track, intent, detachment), one row per arm when the roster has two or more, and a numeral key for any unit showing one this frame. No row for formation or level. (ADR-0015, ADR-0016, ADR-0017, #39)
 - **Caption band**: battle clock and `dates[day]` left, phase `label` and `caption` right, the phase's reference source `label`s beneath. (ADR-0009, ADR-0013)
@@ -414,6 +420,7 @@ For the reader wondering where a field went: these are renderer or player behavi
 | `parent`, `levels`; the Level chooser; the sixteen-unit rule | [ADR-0017](adr/0017-hierarchy-is-authored-at-every-level-and-the-viewer-picks-the-level.md) |
 | `broken` widened; a returning detachment costs nothing; no third move kind | [ADR-0018](adr/0018-state-strength-and-moves-carry-cannae-with-broken-widened.md) |
 | Anchoring and the truce as caption matter; heading as the fighting front; groundings | [ADR-0019](adr/0019-anchoring-and-the-truce-are-caption-matter-and-heading-is-the-fighting-front.md) |
+| `rampart`; the teeth's side from the line's direction; a quiet day; `ground` stays withdrawn | [ADR-0026](adr/0026-a-rampart-is-the-seventh-map-feature-and-alesia-needs-nothing-else.md) |
 | Label placement, collapse order, leader rule, `short_label` (no ADR) | [Label prototype #39](https://github.com/NullCoderException/marchpast/issues/39) |
 | The View chooser (no ADR) | [Views ticket #47](https://github.com/NullCoderException/marchpast/issues/47) |
 | The design language, Billow, the three views, the phone (no ADR) | [Design language #58](https://github.com/NullCoderException/marchpast/issues/58) |
