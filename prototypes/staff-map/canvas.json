@@ -1,0 +1,124 @@
+{
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "The view, whole"
+    },
+    {
+      "id": "page-2",
+      "name": "The hand"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1120,
+      "h": 650,
+      "title": "Trafalgar 13:30 · the overlap test",
+      "page": "page-1"
+    },
+    {
+      "file": "Cannae.dc.html",
+      "x": 1240,
+      "y": 0,
+      "w": 1120,
+      "h": 650,
+      "title": "Cannae phase 6 · an ancient battle",
+      "page": "page-1"
+    },
+    {
+      "file": "Midway.dc.html",
+      "x": 0,
+      "y": 810,
+      "w": 1120,
+      "h": 650,
+      "title": "Midway 10:25 · a fleet battle in its own century",
+      "page": "page-1"
+    },
+    {
+      "file": "Phone.dc.html",
+      "x": 1240,
+      "y": 810,
+      "w": 390,
+      "h": 844,
+      "title": "Phone · 390 wide",
+      "page": "page-1"
+    },
+    {
+      "file": "Glyph.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1160,
+      "h": 1126,
+      "title": "The staff glyph: two candidates",
+      "page": "page-2"
+    },
+    {
+      "file": "Moves.dc.html",
+      "x": 1280,
+      "y": 0,
+      "w": 1160,
+      "h": 854,
+      "title": "The moves, and the fifth slot",
+      "page": "page-2"
+    },
+    {
+      "file": "Furniture.dc.html",
+      "x": 0,
+      "y": 1326,
+      "w": 1160,
+      "h": 1599,
+      "title": "Furniture, type and the label",
+      "page": "page-2"
+    },
+    {
+      "file": "Name.dc.html",
+      "x": 1280,
+      "y": 994,
+      "w": 552,
+      "h": 620,
+      "title": "The name in the chooser",
+      "page": "page-2"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "view-intro",
+      "x": 0,
+      "y": -260,
+      "w": 1120,
+      "page": "page-1",
+      "text": "THE STAFF-MAP VIEW (#139) — the first view built outside the engraved system. ADR-0021 fixed the rule it works to: what the picture shows, where each thing sits and what it means is the same in every view; HOW any of it is drawn is the view's. So every board here is one hand redrawing an unchanged anatomy — same extent and north up, same furniture in the same corners, same caption band with the clock at the left, same label on the flank, same four states, same 72 px glyph, same side ink by roster order.\nTwo glyph candidates and two ways of drawing a move run through the frames on the chips. The GROUND is not reopened: #138 chose the `ops` sheet and it is imported unchanged."
+    },
+    {
+      "id": "view-test",
+      "x": 1240,
+      "y": -260,
+      "w": 1120,
+      "page": "page-1",
+      "text": "WHAT EACH FRAME IS FOR. TRAFALGAR 13:30 is the overlap test every view passes — eight units, four of them locked together in the same 200 px, which is where a glyph that looked handsome alone stops reading. CANNAE asks whether a twentieth-century idiom on a 216 BC battle is absurd or clarifying; the marks are the ones a reader already brings (crossed diagonals for foot, one for horse), and the ground is #138's. MIDWAY is the case the engraved plate serves worst: open ocean, where a graticule is the only thing that says where anything is.\nNothing is geo-registered — as on the terrain canvas, these are scenes, not map files."
+    },
+    {
+      "id": "view-sea",
+      "x": 0,
+      "y": 1490,
+      "w": 1120,
+      "page": "page-1",
+      "text": "ONE THING #138 COULD NOT HAVE SEEN. Its water tone was chosen against a sliver of sea on a land battle; Midway is the first frame that is water edge to edge, and at full frame `#93a9b6` reads as a blue sheet rather than a buff one with sea on it. The chip carries both tones. Whether this is a correction to the chosen `ops` palette or the price of a fleet battle is a decision, not a bug."
+    },
+    {
+      "id": "hand-decide",
+      "x": 0,
+      "y": -330,
+      "w": 1160,
+      "page": "page-2",
+      "text": "TO DECIDE.\n1 · THE GLYPH: candidate A (the frame is the unit's footprint) or B (a symbol box astride a unit trace). Judge it on Trafalgar, not here.\n2 · THE MOVES: whether the staff map takes the tapered operations arrow — which cannot come out of a `Pen`, and therefore cuts ADR-0021's fifth slot, a `moves` hand — or accepts the pen column, which is legible and free.\n3 · THE FACE: IBM Plex Sans Condensed, Archivo at wdth 75, or Barlow Condensed.\n4 · THE LEADER: the plate's hairline-and-dot, or the sheet's elbow-and-tick — and if the elbow, whether `type` owns it or a slot is cut.\n5 · THE NAME the chooser shows.\n6 · THE SEA at full frame (see the note under Midway).\nNOT this ticket: the aircraft sign (#140, blocked on #131) is a candidate only; the player's controls and chooser are #137's; the ground is #138's, closed."
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-1"
+  }
+}

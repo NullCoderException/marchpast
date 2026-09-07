@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@400;500;600&amp;family=Archivo:wdth,wght@75,400;75,500;75,600&amp;family=Barlow+Condensed:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: "IBM Plex Sans Condensed", "Arial Narrow", "Helvetica Neue", sans-serif; color: #2f3134; background: #c8c1ab; }
+    a { color: #9c3327; } a:hover { color: #2f3134; }
+    svg text { font-family: inherit; }
+    
+  </style>
+</helmet>
+<div style="width: 552px; padding: 24px; box-sizing: border-box; background: #c8c1ab; display: flex; flex-direction: column; gap: 14px; font-family: "IBM Plex Sans Condensed", "Arial Narrow", "Helvetica Neue", sans-serif; color: #2f3134;">
+  <div style="font-size: 17px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;">The name of the view</div>
+  <div style="font-size: 13px; line-height: 1.45;">The three names it stands beside are all <b>the physical object</b> — a plate, a plate, a bound atlas — never what the picture is about. The fourth should be an object too, and one word or two.</div>
+  <div style="display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid rgba(47,49,52,0.35); background: #ded7c2;">
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; opacity: 0.7;">View</div>
+      <select style="font: inherit; font-size: 14px; padding: 6px 8px; border: 1px solid rgba(47,49,52,0.55); background: #ded7c2; color: #2f3134;"><option>Chart plate</option><option>Night plate</option><option>Atlas</option><option selected>Staff map</option></select>
+    </div>
+    <div style="font-size: 13px; line-height: 1.45;"><b>The object.</b> The map a staff works on, and the ticket's own working name. Keeps the rhythm of the three beside it and says <i>whose</i> map it is, which is the whole idiom: a working sheet, marked up, rather than a published engraving.</div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid rgba(47,49,52,0.35); background: #ded7c2;">
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; opacity: 0.7;">View</div>
+      <select style="font: inherit; font-size: 14px; padding: 6px 8px; border: 1px solid rgba(47,49,52,0.55); background: #ded7c2; color: #2f3134;"><option>Chart plate</option><option>Night plate</option><option>Atlas</option><option selected>Situation map</option></select>
+    </div>
+    <div style="font-size: 13px; line-height: 1.45;"><b>The doctrinal term</b> (SITMAP) for a map showing the present disposition — which is exactly what our picture is, at every phase. The most accurate of the three, and the only one that describes the <i>content</i>, which breaks the pattern the other three set.</div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid rgba(47,49,52,0.35); background: #ded7c2;">
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; opacity: 0.7;">View</div>
+      <select style="font: inherit; font-size: 14px; padding: 6px 8px; border: 1px solid rgba(47,49,52,0.55); background: #ded7c2; color: #2f3134;"><option>Chart plate</option><option>Night plate</option><option>Atlas</option><option selected>Operations map</option></select>
+    </div>
+    <div style="font-size: 13px; line-height: 1.45;"><b>Also real</b>, and the most familiar of the three to a general reader. Leans toward the plan rather than the present state, which is slightly wrong for a view whose whole job is to show where things are now.</div>
+  </div>
+  <div style="font-size: 12px; line-height: 1.45; opacity: 0.75;">Whatever wins is only what the chooser shows. The id stays <code>staff</code> either way, and the id is what player state, the remembered view (ADR-0023) and the URL carry.</div>
+</div>
+</x-dc>
+</body>
+</html>
