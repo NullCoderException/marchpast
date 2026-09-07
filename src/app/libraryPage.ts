@@ -18,7 +18,7 @@
  */
 import { compareBattles, type Library } from "../data/library.ts";
 import { element } from "../player/dom.ts";
-import { battleQuery, libraryHref } from "./battleName.ts";
+import { battleQuery } from "./battleName.ts";
 import { markSvg } from "./mark.ts";
 import "./library.css";
 
@@ -96,13 +96,6 @@ export function createLibraryPage(library: Library): HTMLElement {
 
   root.append(credit());
   return root;
-}
-
-/** The way back to the library from a page that could not play a battle. */
-export function createLibraryLink(): HTMLAnchorElement {
-  const link = element("a", "st-library-back", "← All battles");
-  link.href = libraryHref();
-  return link;
 }
 
 /** One battle in the list: the whole entry is the link, so the summary is part of the target. */

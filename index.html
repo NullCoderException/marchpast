@@ -34,13 +34,40 @@
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
 
+    <!--
+      The ground the last visit left, before anything is painted. The player's
+      surface is derived from the view the viewer picked and written on the
+      root by src/player/surface.ts, but that is a module and a module runs
+      after first paint: without these three lines a viewer who chose the night
+      plate meets a full screen of the default view's parchment first
+      (ADR-0023). rememberView stores the resolved colour, so this copies no
+      palette and knows no view ids.
+
+      They are blind to the route, which they have to be — the route is the
+      module's to work out, and there is no module yet. So a viewer who left a
+      dark view and then opens the library gets that view's letterbox for the
+      one paint before library.css claims the page back on .st-library-page.
+      The library is never themed after that (ADR-0023, ADR-0029): the class
+      and the list arrive together.
+    -->
+    <script>
+      try {
+        const ground = localStorage.getItem("marchpast.ground");
+        if (ground) document.documentElement.style.setProperty("--st-edge", ground);
+      } catch {}
+    </script>
+
     <style>
       html,
       body {
         margin: 0;
         height: 100%;
         overflow: hidden;
-        background: #efe3c6;
+      }
+      /* The one colour this file carries: the Chart plate's letterbox, for the
+         first visit, which has nothing remembered to paint instead. */
+      html {
+        background: var(--st-edge, #d9c8a2);
       }
       /* The plate above, the controls beneath: the canvas takes whatever height the controls leave. */
       body,

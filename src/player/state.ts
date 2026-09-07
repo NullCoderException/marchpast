@@ -3,8 +3,10 @@
  *
  * The state is a clock, a flag and the viewer's four choices — speed, view,
  * level and the unit card they have open: nothing here is authored, and
- * nothing survives a reload (issue #13's resolution, #47 for the view,
- * ADR-0017 for the level, #60 for the card). Every
+ * nothing survives a reload but the view (issue #13's resolution, #47 for the
+ * view, ADR-0017 for the level, #60 for the card). The view is the one
+ * exception, and it is remembered outside these rules: `rememberedView.ts`
+ * reads storage and `initialState` is handed what it found (ADR-0023). Every
  * transition is a pure function of the battle and the state before it, so the
  * controls can be read as "which transition does this button call" and the
  * rules are tested without a DOM. The fixed lists a chooser offers live here
@@ -45,29 +47,38 @@ export interface PlayerState {
   /**
    * The view the picture is drawn in: player state like the multiplier, never
    * authored and never in the picture, so two viewers of the same instant see
-   * the same battle in whichever treatment each has picked (ADR-0014).
+   * the same battle in whichever treatment each has picked (ADR-0014). Alone
+   * among the viewer's choices it outlives the visit, because it is a look
+   * rather than a place in the battle (ADR-0023).
    */
   view: ViewId;
   /**
    * The depth of the unit tree the plate draws: `0` is the coarsest, and every
-   * visit opens on it. Player state like the view — never authored, never on
-   * the URL, never remembered — and a battle with one level never moves it off
-   * `0` (ADR-0017).
+   * visit opens on it. Player state — never authored, never on the URL, and
+   * never remembered, unlike the view — and a battle with one level never
+   * moves it off `0` (ADR-0017).
    */
   level: number;
   /**
    * The unit whose card is open, and whether a click or an Enter pinned it
    * there — a pointer at rest and a focused muster entry open one alike. Player
-   * state like the view and the level — viewer-opened, never authored, never
-   * on the URL and never remembered — and absent when no card is open (#60).
+   * state like the level — viewer-opened, never authored, never on the URL and
+   * never remembered, unlike the view — and absent when no card is open (#60).
    */
   card?: CardTarget;
 }
 
-/** Paused on the first phase in the default view at the coarsest level, which is what loading lands on (schema.md 2.11, #47). */
-export function initialState(battle: Battle, multiplier = 1): PlayerState {
+/**
+ * Paused on the first phase at the coarsest level in the view the visit opens
+ * in, which is what loading lands on (schema.md 2.11, #47). The opening view
+ * is the remembered one where there is one and the default where there is
+ * not; which of those it is, this file does not know and must not — that is
+ * `rememberedView.ts`'s, so every transition here stays a pure function of the
+ * battle and the state before it (ADR-0023).
+ */
+export function initialState(battle: Battle, view: ViewId = DEFAULT_VIEW.id, multiplier = 1): PlayerState {
   checkMultiplier(multiplier);
-  return { clock: startClock(battle), playing: false, multiplier, view: DEFAULT_VIEW.id, level: 0 };
+  return { clock: startClock(battle), playing: false, multiplier, view, level: 0 };
 }
 
 /** Whether the clock has reached `end`, where the last picture holds. */

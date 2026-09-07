@@ -1,8 +1,9 @@
 /**
- * The controls beneath the plate: play/pause, the phase-segmented scrubber and
- * its battle-clock readout, the phase-jump buttons, the speed multiplier, the
- * View chooser, the Level chooser when the battle has more than one level, the
- * details-panel toggle and the Picker. Plain DOM, no framework.
+ * The controls beneath the plate: the way back to the library, play/pause, the
+ * phase-segmented scrubber and its battle-clock readout, the phase-jump
+ * buttons, the speed multiplier, the View chooser, the Level chooser when the
+ * battle has more than one level, the details-panel toggle and the Picker.
+ * Plain DOM, no framework.
  *
  * Nothing here decides anything: every gesture calls one of the transitions in
  * `state.ts` through the handlers it was given, and `update` is the only way
@@ -13,6 +14,7 @@
  * is focusable and the ticks are not, so a battle of twenty-one phases costs
  * the tab order one stop rather than twenty-one.
  */
+import { libraryHref } from "../app/battleName.ts";
 import type { LibraryEntry } from "../data/library.ts";
 import { formatClock, VIEWS, viewById, type ViewId } from "../render/index.ts";
 import type { Battle } from "../schema/types.ts";
@@ -68,6 +70,7 @@ export function createControls(battle: Battle, handlers: ControlHandlers, picker
   const listeners = new Listeners();
   const root = element("div", "st-controls");
 
+  const back = libraryLink();
   const play = button("st-play", "Play", () => handlers.togglePlay());
   const previous = button("st-step", "⏮", () => handlers.previous(), "Previous phase");
   const next = button("st-step", "⏭", () => handlers.next(), "Next phase");
@@ -85,11 +88,13 @@ export function createControls(battle: Battle, handlers: ControlHandlers, picker
   const details = button("st-details-toggle", "Details", () => handlers.toggleDetails());
   details.setAttribute("aria-expanded", "false");
 
-  // The tail of the strip is the controls that change how the battle is
-  // presented rather than where in it we are (#47, ADR-0017). The Picker comes
-  // after even those: it leaves the battle altogether, so it sits apart from
-  // the transport (ADR-0011).
-  root.append(previous, play, next, bar, readout, multiplier, view, ...(level === undefined ? [] : [level]), details);
+  // The way back heads the strip: from a battle's own page the Picker moves
+  // sideways to another battle, so nothing else on the page leaves for the
+  // library (ADR-0030). The tail is the controls that change how the battle is
+  // presented rather than where in it we are (#47, ADR-0017), and the Picker
+  // comes after even those: it leaves the battle altogether, so it sits apart
+  // from the transport (ADR-0011).
+  root.append(back, previous, play, next, bar, readout, multiplier, view, ...(level === undefined ? [] : [level]), details);
   if (picker !== undefined) root.append(battlePicker(listeners, picker));
 
   return {
@@ -128,6 +133,30 @@ export function createControls(battle: Battle, handlers: ControlHandlers, picker
     listeners.on<MouseEvent>(node, "click", onClick);
     return node;
   }
+}
+
+/**
+ * The way back, as the whole strip: what the page carries when a battle would
+ * not load and there is no player to control. The link is the same one the
+ * strip's head carries, so the error path is the strip with everything else
+ * taken off rather than a page furniture of its own.
+ */
+export function createLibraryStrip(): HTMLElement {
+  const root = element("div", "st-controls");
+  root.append(libraryLink());
+  return root;
+}
+
+/**
+ * `← All battles`: a real `<a>` with a real target, so it is middle-clickable
+ * and shows where it goes on hover. It is the one thing on the strip that
+ * leaves the page, and the only one that should behave like the web
+ * (ADR-0030).
+ */
+function libraryLink(): HTMLAnchorElement {
+  const link = element("a", "st-library-back", "← All battles");
+  link.href = libraryHref();
+  return link;
 }
 
 /** How the scrubber makes its buttons: the same helper the rest of the controls use. */

@@ -269,6 +269,17 @@ export interface Type {
   font(sizePx: number, voice: Voice): string;
   /** The line from a placed label to its glyph: the plate's hairline and dot, the staff map's elbow and tick. */
   leader(ctx: CanvasRenderingContext2D, request: LeaderRequest): void;
+  /**
+   * The chooser's caret, drawn in `ink` and answered as an SVG data URI for
+   * the surface to hang on `--st-caret` (ADR-0030). It is the one mark the
+   * aesthetic makes off the canvas: the three choosers stay native
+   * `<select>`s, so the popup, the phone's wheel picker and the arrow keys are
+   * all still the operating system's, and only the glyph inside the box
+   * changes hands. It sits on `type` because #139 widened that hand to *a
+   * view's hand for setting a name against a thing*, and a caret set against a
+   * value is one; no slot is cut for it.
+   */
+  caret(ink: string): string;
 }
 
 /* ---------------------------------------------------------------- ground */

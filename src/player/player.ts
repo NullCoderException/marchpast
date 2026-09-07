@@ -27,6 +27,8 @@ import { createControls, type PickerOptions } from "./controls.ts";
 import { createDetailsPanel } from "./details.ts";
 import { Listeners, plainKey } from "./dom.ts";
 import { createMuster } from "./muster.ts";
+import { rememberView } from "./rememberedView.ts";
+import { applySurface } from "./surface.ts";
 import "./player.css";
 import {
   closeAbsentCard,
@@ -60,6 +62,12 @@ export interface PlayerOptions {
   map?: MapFile;
   /** What the Picker offers. Absent when the library could not be loaded: the battle still plays, without a Picker. */
   picker?: PickerOptions;
+  /**
+   * The view this visit opens in: the one the last visit left, which `main.ts`
+   * read out of storage, or the default. The player writes every later choice
+   * back; it never reads (ADR-0023).
+   */
+  view?: ViewId;
 }
 
 /** A running player. */
@@ -72,7 +80,7 @@ export interface Player {
 const MAX_FRAME_SECONDS = 0.25;
 
 /** Builds the player and starts its loop, paused on the first phase with its caption shown. */
-export function createPlayer({ canvas, controlsRoot, battle, map, picker }: PlayerOptions): Player {
+export function createPlayer({ canvas, controlsRoot, battle, map, picker, view }: PlayerOptions): Player {
   const renderer = createRenderer(canvas);
   const listeners = new Listeners();
   const details = createDetailsPanel(battle, map);
@@ -86,7 +94,11 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
   canvas.setAttribute("aria-label", battle.title);
   canvas.setAttribute("aria-describedby", ANNOUNCER_ID);
 
-  let state: PlayerState = initialState(battle);
+  let state: PlayerState = initialState(battle, view);
+  // The strip, the panel and the page ground follow the picture into whichever
+  // view it is drawn in: once here, once per switch, never per frame
+  // (ADR-0023, ADR-0030).
+  applySurface(viewById(state.view));
   let dirty = true;
   /** Where everything the last frame drew landed, for the pointer to be resolved against. */
   let hits: readonly HitRegion[] = [];
@@ -111,14 +123,23 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
    * the next `update` — until the face resolves. Late rather than wrong.
    */
   const applyView = (id: ViewId): void => {
-    const face = viewById(id).type.face;
-    if (faceReady(face)) {
+    // Picking the view already on is not a switch, and the surface is written
+    // once per switch (ADR-0023): without this the same tokens and the same
+    // two storage keys would be rewritten for nothing.
+    if (id === state.view) return;
+    const chosen = viewById(id);
+    const show = (): void => {
       apply(setView(state, id));
+      applySurface(chosen);
+      rememberView(id);
+    };
+    if (faceReady(chosen.type.face)) {
+      show();
       return;
     }
-    void loadFace(face)
-      .then(() => apply(setView(state, id)))
-      .catch((error: unknown) => console.warn(`Marchpast: the ${face} typeface did not load, so the view was not switched`, error));
+    void loadFace(chosen.type.face)
+      .then(show)
+      .catch((error: unknown) => console.warn(`Marchpast: the ${chosen.type.face} typeface did not load, so the view was not switched`, error));
   };
 
   const controls = createControls(battle, {
@@ -238,7 +259,17 @@ function answersItself(target: EventTarget | null, key: string): boolean {
   return key === " " && ["BUTTON", "A"].includes(target.tagName);
 }
 
-/** The keyboard shortcuts, each one the transition its button calls. */
+/**
+ * The keyboard shortcuts, each one the transition its button calls.
+ *
+ * **The unmoving path through a battle is a stated affordance**, not an
+ * accident: the phase-jump buttons cut where playback tweens, and the caption
+ * band and the details panel carry every phase's words. That is why nothing
+ * here or anywhere in the site reads `prefers-reduced-motion` — there is no
+ * unrequested motion for it to suppress, and honouring it by cutting would
+ * ship the slideshow ADR-0002 weighed and rejected to the viewer who asked to
+ * be treated with care (ADR-0029).
+ */
 const KEYS: Readonly<Record<string, (battle: Battle, state: PlayerState) => PlayerState>> = {
   " ": togglePlay,
   ArrowRight: jumpNext,

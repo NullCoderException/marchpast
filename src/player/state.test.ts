@@ -40,6 +40,15 @@ describe("initialState", () => {
   it("loads paused on the first phase at 1x, on the default view", () => {
     expect(initialState(TEST_BATTLE)).toEqual({ clock: clock("10:00"), playing: false, multiplier: 1, view: "plate" as const, level: 0 });
   });
+
+  it("opens on the view it is handed, which is the one the last visit left (ADR-0023)", () => {
+    expect(initialState(TEST_BATTLE, "night").view).toBe("night");
+    expect(initialState(TEST_BATTLE, "atlas").view).toBe("atlas");
+  });
+
+  it("opens on the coarsest level and paused whichever view it opens in: only the view is remembered", () => {
+    expect(initialState(TEST_BATTLE, "night")).toEqual({ clock: clock("10:00"), playing: false, multiplier: 1, view: "night" as const, level: 0 });
+  });
 });
 
 describe("tick", () => {
