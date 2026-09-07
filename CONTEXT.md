@@ -47,7 +47,7 @@ The line a unit's position follows between one phase and the next, derived by th
 _Avoid_: Path, route, trail, vector, move
 
 **Furniture**:
-What the renderer draws around the picture without any battle authoring it and the viewer cannot operate: the compass rose, the scale bar, the wind indicator, the map's credit line.
+What the renderer draws around the picture without any battle authoring it and the viewer cannot operate: the compass rose, the battle's title, the scale bar, the wind indicator, the legend and the map's credit line. Which pieces there are and which corner each sits in are the same in every view; how each is drawn is the view's. Furniture sits in a corner of the canvas, so what is drawn in the map's own coordinates is ground however decorative it is: a graticule is not furniture.
 _Avoid_: Chrome, overlay, HUD, widgets, controls
 
 **Legend**:
@@ -169,8 +169,16 @@ _Avoid_: Commentary, alternates, uncertainty, confidence
 ### Player
 
 **View**:
-A named whole visual treatment of the picture that the viewer picks: the chart plate (the default), the night plate, or atlas. Every view is built from the one engraved system and owns only its paper and inks, its line weights, whether the sea is stippled, and how a unit and its engaged mark are drawn; the projection, the furniture and the caption band are the same in all of them. Held by the player for the current visit, never authored in a battle file.
+A named whole visual treatment of the picture that the viewer picks: the chart plate (the default), the night plate, or atlas. Every view keeps the anatomy and owns everything about how the picture is drawn — its paper and inks, its type, how the ground is drawn, how each piece of furniture is drawn, and how a unit and its engaged mark are drawn. Held by the player for the current visit, never authored in a battle file.
 _Avoid_: Theme, skin, style, mode, layer, variant
+
+**Anatomy**:
+What every view keeps: which facts the picture shows, where each one sits, and what it means. North up and one projection; the extent and its letterbox; which pieces of furniture there are and the corner each sits in; the caption band full width below the picture with the clock at the left; a label's two lines, the flank it sits on and the order it collapses in; the four states; three motion styles that stay tellable apart; each side's ink taken by roster order; a glyph's fixed length. A reader who has learned to read one view has learned to read them all.
+_Avoid_: Layout, chrome, template, skeleton, base theme, invariants
+
+**Aesthetic**:
+The idiom a view is drawn in. The chart plate, the night plate and atlas share the engraved one; a view may also be drawn in an idiom of its own. Not something the viewer picks and not something the app counts: two views in one aesthetic simply resemble each other, and the view chooser offers views, never aesthetics.
+_Avoid_: Theme, style, look, family, skin, design language
 
 **View chooser**:
 The control in the player's controls that switches the picture to another view, taking effect at once without interrupting playback and lasting only the current visit.
