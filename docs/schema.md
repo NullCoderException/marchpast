@@ -36,7 +36,7 @@ Everything else in v1 stands: positions, the extent, wind, sources and reference
 | Coordinates in the battle file | `{ "lat": number, "lon": number }` objects, WGS84 decimal degrees, north and east positive, `-90 <= lat <= 90`, `-180 <= lon <= 180`. | ADR-0001 |
 | Coordinates in the map file | GeoJSON `[lon, lat]` arrays, WGS84. Nothing converts one file into the other's convention. | ADR-0005 |
 | Lengths | None in the battle file. The only unit-bearing fields are `scale_unit`, a display unit for the scale bar, and a contour's `elevation` in metres in the map file. | ADR-0001, ADR-0012 |
-| Uncertainty | No uncertainty or confidence field anywhere. Disagreement between sources, an estimated time or position, and a modern river standing in for an ancient channel are caption and `notes` matter. | ADR-0001, ADR-0006, ADR-0012, ADR-0018 |
+| Uncertainty | No uncertainty or confidence field anywhere, and nothing marks a position, a state or a phase as conjectural. Disagreement between sources, an estimated time or position, a position read off the ground rather than from a witness, and a modern river standing in for an ancient channel are caption and `notes` matter; the battle authors one reading and names the one it declined. | ADR-0001, ADR-0006, ADR-0012, ADR-0018, ADR-0027 |
 | Styling | None in data. No colour, glyph, stroke, style, index-contour or view field in either file; the renderer styles each state, move kind, formation, arm and feature kind, and the viewer picks the view and the level. | ADR-0003, ADR-0004, ADR-0005, ADR-0012, ADR-0014, ADR-0017 |
 | Licence vocabulary | An SPDX identifier from the allowlist below, or the literal `public-domain`. | ADR-0007 |
 | Unknown fields | Rejected. Both validators are strict: an unrecognised key at any level is an error, not ignored. | ADR-0005, ADR-0007 |
@@ -119,7 +119,7 @@ The authored picture of every unit at one battle-clock instant, with the caption
 | `playback_rate` | number `> 0` | yes | Battle-clock seconds per real second while this phase plays. The player derives the phase's playback duration: `interval seconds / playback_rate`. A viewer's speed multiplier scales every rate uniformly and is never stored. |
 | `wind` | Wind | all or nothing | See 2.5. Either every phase has `wind` or none does. Absent means the battle does not track wind; it never means calm. |
 | `caption` | string | yes | Narration shown verbatim, holding until the next phase. May quote, paraphrase, modernise or trim. Length unbounded; about three sentences is the guideline. The caption is where anchoring, a truce, a crescent, a wedge, a fort's fire, an estimated time or a modern river standing in for an unknown channel are said, because no field carries them. |
-| `notes` | string | no | The author's reasoning about the sources for this phase (which reading of a disputed time was chosen and why, where a position was estimated from, that a strength is a reading rather than a count). Surfaced on demand in the Details panel; never animated. The only per-phase free text beside the caption. |
+| `notes` | string | yes | The author's account of what this phase rests on: which reading of a disputed time or place was chosen and why, which reading was declined and who argues it, where a position was read from when no witness gave it, that a strength is a reading rather than a count. Surfaced on demand in the Details panel; never animated. The only per-phase free text beside the caption. |
 | `references` | Reference[] | yes, at least one | Pointers into `sources` vouching for the phase as a whole: time, positions, states, caption. |
 | `units` | UnitSnapshot[] | yes | Exactly one snapshot for every roster unit, parents and children alike, no more, no fewer, no duplicates. |
 
@@ -280,6 +280,7 @@ Trafalgar at two levels, cut to two phases and to one squadron per column so it 
       "playback_rate": 120,
       "wind": { "from": 292.5, "force": "light" },
       "caption": "The action is general; the Combined Fleet's line is cut in two places and its centre and rear are a melee.",
+      "notes": "Time: the dispatch gives no hour for the general action, so 13:30 is the author's reading of its sequence, to the half-hour. Positions: each column's point is the centre of a body that no longer has a line to fix it, read off the dispatch rather than from any plan.",
       "references": [
         { "source": "collingwood-dispatch", "locator": "p. 1366" }
       ],
@@ -296,6 +297,13 @@ Trafalgar at two levels, cut to two phases and to one squadron per column so it 
 ```
 
 A battle that crosses midnight adds `day` to the later phases and a second entry to `dates`: the Nile's daybreak phase is `"day": 1, "t": "05:05"` under `"dates": ["1 August 1798", "2 August 1798"]`, and the battle ends `"end": "14:00", "end_day": 1`.
+
+### 2.13 Authoring guidelines, not rules
+
+- **Nothing marks a position, a state or a phase as conjectural.** No `conjectural` flag, no `basis` enum, no confidence, exactly as the map file marks no geometry (3.5). A position read off the dead and the cartridge cases is authored like one a witness gave, and `notes` says which it is.
+- **A phase's `notes` accounts for what the phase rests on.** Cannae's labelled strands are the house style: `Time:` for the reading of the clock, `Positions:` for what fixes the units, and a third strand where the evidence itself is the story. What words a battle uses for its kinds of evidence are its own; the Little Bighorn's T, M, A and R are that battle's shorthand and no other battle inherits them.
+- **A battle authors one reading and names the one it declined.** Two phase lists for one interval are not allowed. Cannae draws Kromayer’s right bank and names Delbrück, Lehmann, De Sanctis and Connolly in `notes`; the declined reading’s work belongs in `sources` whether or not any phase references it.
+- **Absence is never ignorance.** A phase omits a roster unit only when the unit does not exist on the plate at that instant — not yet launched, already recovered, not yet arrived, gone (ADR-0024). A unit whose whereabouts no witness recorded is present, authored from the author’s reading, and explained in `notes`.
 
 ## 3. The map file
 
@@ -421,6 +429,7 @@ For the reader wondering where a field went: these are renderer or player behavi
 | `broken` widened; a returning detachment costs nothing; no third move kind | [ADR-0018](adr/0018-state-strength-and-moves-carry-cannae-with-broken-widened.md) |
 | Anchoring and the truce as caption matter; heading as the fighting front; groundings | [ADR-0019](adr/0019-anchoring-and-the-truce-are-caption-matter-and-heading-is-the-fighting-front.md) |
 | `rampart`; the teeth's side from the line's direction; a quiet day; `ground` stays withdrawn | [ADR-0026](adr/0026-a-rampart-is-the-seventh-map-feature-and-alesia-needs-nothing-else.md) |
+| Conjecture as `notes` matter; `notes` required; one authored reading | [ADR-0027](adr/0027-conjecture-is-notes-matter-and-a-battle-authors-one-reading.md) |
 | Label placement, collapse order, leader rule, `short_label` (no ADR) | [Label prototype #39](https://github.com/NullCoderException/marchpast/issues/39) |
 | The View chooser (no ADR) | [Views ticket #47](https://github.com/NullCoderException/marchpast/issues/47) |
 | The design language, Billow, the three views, the phone (no ADR) | [Design language #58](https://github.com/NullCoderException/marchpast/issues/58) |

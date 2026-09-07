@@ -2,6 +2,8 @@
 
 *Amended 2026-09-06: the formation vocabulary is three words, not two (`mass` added by ADR-0016), and the schema now carries one length-bearing field outside the battle file, a contour's elevation in metres in the map file (ADR-0012). Everything else here stands.*
 
+*Amended 2026-09-07: the "positions carry no uncertainty field" clause below is confirmed at the hardest case the library holds — the Little Bighorn, where one battalion’s five phases are read off the dead and the cartridge cases — by [ADR-0027](0027-conjecture-is-notes-matter-and-a-battle-authors-one-reading.md), which rejects a per-unit `conjectural` flag and a `basis` enum and sharpens the glossary’s **Position** to the author’s reading of where a unit’s centre was (#133).*
+
 Battle files could have used per-battle abstract units (a 0..1000 box with its own "north"), which is simpler to sketch, or real WGS84 latitude/longitude. We chose lat/lon in decimal degrees from day one: the sources already speak in bearings and distances from named places (Cape Trafalgar, Cadiz), heading and wind need a real north regardless, and real coordinates make the coastline, later basemap tiles, and cross-checks against logged positions free. A battle with a disputed site still gets a best-guess lat/lon, so this does not foreclose land battles.
 
 ## Consequences

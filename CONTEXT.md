@@ -7,8 +7,8 @@ A data-driven player that animates famous battles as 2D map sequences. Each batt
 ### Geography
 
 **Position**:
-A point on the earth, latitude and longitude, where a unit's centre is at a moment in the battle.
-_Avoid_: Location, coordinates, point
+The author's reading of where a unit's centre was at a moment in the battle, in latitude and longitude. A reading rather than a measurement, and marked as one nowhere: a position read off the dead and the cartridge cases is drawn exactly as one a witness gave, and which it is is notes matter.
+_Avoid_: Location, coordinates, point, fix
 
 **Heading**:
 The direction a unit's front faces, in degrees true (0 is north, clockwise, 0 to 360). The front is where the unit's force is directed: its course while it is moving, the way its guns or its line face while it is fighting. So it is not the direction of travel — a unit that retires in good order keeps its heading toward the enemy and its track runs behind it — and a moored fleet's heading is its broadside, not its bows, which are notes matter. A unit fought from both sides still has one front: the side the attack came from.
@@ -171,7 +171,7 @@ A phase's pointer into one source: a locator precise enough to find the passage,
 _Avoid_: Citation, footnote, source ref
 
 **Notes**:
-The author's per-phase reasoning about the sources, such as which reading of a disputed time was chosen and why; surfaced on demand, never animated.
+The author's per-phase account of what the phase rests on: which reading of a disputed time or place was chosen and why, which reading was declined and who argues it, and where a position was read from when no witness gave it. Carried by every phase, surfaced on demand, never animated.
 _Avoid_: Commentary, alternates, uncertainty, confidence
 
 ### Player
