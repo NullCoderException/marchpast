@@ -1,40 +1,44 @@
 /**
  * The units pass: every unit's track and moves first (so no arrow crosses a
- * glyph), then the glyphs, then the labels. The caller has already clipped to
- * the extent, which is what clips a move head lying outside it (ADR-0004).
+ * glyph), then the glyphs. The caller has already clipped to the extent, which
+ * is what clips a move head lying outside it (ADR-0004).
  *
  * A **shared pass**, and the one that hands work to the view. It resolves the
  * side ink, turns the phase's wind into the one angle a glyph is allowed to
  * know, and calls the view's glyph — which is the whole of what changes
- * between the plate's ticks and Atlas's blocks. The label is drawn here, by
- * the same code, for every view: none of the three replaces it (ADR-0014).
+ * between the plate's ticks and Atlas's blocks.
+ *
+ * It does **not** draw the labels. Placing them needs the furniture's boxes as
+ * well as the glyphs', so the pass runs last, unclipped, over what this one
+ * reports: every drawn unit as the placer sees it — where its glyph landed,
+ * how far it reaches, and the words its roster entry offers (#39).
  *
  * It draws `plate.unitsDrawn`, not the whole picture: which units a level puts
  * on the plate is settled once, in `level.ts`, before any pass runs (ADR-0017).
  */
 import type { Arm } from "../schema/types.ts";
 import type { Picture, UnitPicture } from "../timeline/picture.ts";
+import type { LabelUnit } from "./labels/index.ts";
 import type { Plate } from "./plate.ts";
-import { drawArrow, hashString, type Point } from "./primitives.ts";
+import { drawArrow, hashString } from "./primitives.ts";
 import { toRadians } from "./projection.ts";
-import { font, GLYPH_PX } from "./style.ts";
+import { GLYPH_PX } from "./style.ts";
 import type { GlyphRequest } from "./view.ts";
 
 /** Below this many pixels a track is a dot under the glyph, not an arrow. */
 const MIN_ARROW_PX = 6;
-/** Clearance between the glyph and its label. */
-const LABEL_GAP = 30;
 
-export function drawUnits(plate: Plate): void {
+/** Draws the units this level puts on the plate and reports them for the label pass. */
+export function drawUnits(plate: Plate): LabelUnit[] {
   const { ctx, battle, picture, unitsDrawn, projection, view } = plate;
   const { palette, pens } = view;
   // The whole roster, never the level's slice of it: a unit's label — and the
   // numeral that will key it in the legend (#39) — is its whole-roster entry
   // at every level (schema.md 2.11).
-  const roster = new Map(battle.units.map((unit) => [unit.id, unit]));
+  const roster = new Map(battle.units.map((unit, rosterIndex) => [unit.id, { unit, rosterIndex }]));
 
   const colourOf = (unit: UnitPicture): string => {
-    const side = roster.get(unit.id)?.side;
+    const side = roster.get(unit.id)?.unit.side;
     return (side === undefined ? undefined : plate.colours.get(side)) ?? palette.ink;
   };
 
@@ -44,7 +48,7 @@ export function drawUnits(plate: Plate): void {
   // that was never built from this battle, and it fails the way a missing
   // snapshot does in `pictureAt` rather than drawing foot as ships.
   const armOf = (unit: UnitPicture): Arm => {
-    const arm = roster.get(unit.id)?.arm;
+    const arm = roster.get(unit.id)?.unit.arm;
     if (arm === undefined) throw new RangeError(`The roster has no unit ${JSON.stringify(unit.id)}`);
     return arm;
   };
@@ -70,6 +74,7 @@ export function drawUnits(plate: Plate): void {
   // Trafalgar three units overlap (ADR-0014).
   const windFrom = blowingWind(picture);
   const glyphs = unitsDrawn.map((unit) => ({
+    unit,
     at: projection.project(unit.position.lat, unit.position.lon),
     heading: toRadians(unit.heading),
     request: {
@@ -97,11 +102,28 @@ export function drawUnits(plate: Plate): void {
     }
   }
 
-  // Labels: the unit's name and beneath it the state word and, below full strength, the percentage.
-  for (const unit of unitsDrawn) {
-    const here = projection.project(unit.position.lat, unit.position.lon);
-    drawLabel(plate, unit, here, roster.get(unit.id)?.label ?? unit.id, colourOf(unit));
-  }
+  // What the label pass needs and only this pass knows: where each glyph
+  // landed, how far it reaches across its axis, and the roster entry behind it.
+  return glyphs.map(({ unit, at, request }) => {
+    const entry = roster.get(unit.id);
+    const label: LabelUnit = {
+      id: unit.id,
+      rosterIndex: entry?.rosterIndex ?? 0,
+      name: entry?.unit.label ?? unit.id,
+      state: unit.state,
+      strength: unit.strength,
+      colour: request.colour,
+      anchor: at,
+      heading: unit.heading,
+      formation: unit.formation,
+      length: request.length,
+      halfWidth: view.glyph.halfWidth(request.scale, unit.formation),
+      hasMove: unit.moves.length > 0,
+    };
+    if (entry?.unit.short_label !== undefined) label.shortLabel = entry.unit.short_label;
+    if (request.windTo !== undefined) label.windTo = request.windTo;
+    return label;
+  });
 }
 
 /** The bearing the phase's wind blows from, or `undefined` when there is no wind to speak of (ADR-0008). */
@@ -118,51 +140,4 @@ function blowingWind(picture: Picture): number | undefined {
  */
 export function windToRelative(heading: number, windFrom: number): number {
   return toRadians((((windFrom + 180 - heading) % 360) + 360) % 360);
-}
-
-function drawLabel(plate: Plate, unit: UnitPicture, at: Point, label: string, colour: string): void {
-  const { ctx, view } = plate;
-  const { extentRect } = plate.projection;
-  const detail = unit.strength < 1 ? `${unit.state} · ${Math.round(unit.strength * 100)}%` : unit.state;
-
-  // The label sits on the glyph's flank, across its long axis. A column's flank
-  // is beside the heading; a line's and a mass's is behind it. The track is an
-  // obstacle wherever it lies, ahead of the unit or behind it, and clearing it
-  // is the label slice's (#39), not this pass's.
-  const heading = toRadians(unit.heading);
-  const flank = unit.formation === "column" ? heading + Math.PI / 2 : heading + Math.PI;
-  // The one thing the label needs from the view: how far the glyph reaches
-  // across its axis, which for a mass is two ranks.
-  const reach = view.glyph.halfWidth(1, unit.formation) + LABEL_GAP;
-
-  ctx.save();
-  ctx.font = font(12);
-  const detailWidth = ctx.measureText(detail).width;
-  ctx.font = font(14, true);
-  const width = Math.max(ctx.measureText(label).width, detailWidth);
-  // Try the flank that puts the label rightward first, then the other, so it stays on the plate.
-  const candidates = [flank, flank + Math.PI].sort((a, b) => Math.sin(b) - Math.sin(a));
-  let placed: { x: number; y: number; align: CanvasTextAlign } | undefined;
-  for (const angle of candidates) {
-    const dx = Math.sin(angle);
-    const dy = -Math.cos(angle);
-    const align: CanvasTextAlign = dx >= -0.05 ? "left" : "right";
-    const x = at.x + dx * reach;
-    const y = at.y + dy * reach;
-    const left = align === "left" ? x : x - width;
-    if (left >= extentRect.x + 6 && left + width <= extentRect.x + extentRect.width - 6) {
-      placed = { x, y, align };
-      break;
-    }
-  }
-  placed ??= { x: at.x + reach, y: at.y, align: "left" };
-
-  ctx.textAlign = placed.align;
-  ctx.textBaseline = "middle";
-  ctx.fillStyle = colour;
-  ctx.fillText(label, placed.x, placed.y - 8);
-  ctx.fillStyle = view.palette.ink;
-  ctx.font = font(12);
-  ctx.fillText(detail, placed.x, placed.y + 8);
-  ctx.restore();
 }

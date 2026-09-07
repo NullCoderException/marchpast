@@ -10,12 +10,19 @@
  * and pens — which is the whole reason Atlas's legend shows blocks without
  * this file knowing Atlas exists (ADR-0014).
  *
+ * Every piece reports the box it stands in, because the label pass has to
+ * clear the furniture as well as the glyphs: without that the very first
+ * Cannae frame puts a unit's label across the compass rose (#39). Those boxes
+ * are the same rectangles a land plate lays its paper on, so the ink and the
+ * obstacle can never disagree about where a piece is.
+ *
  * On a plate whose map carries contours the pieces sit on **paper panels**,
  * because relief runs under every corner, and the scale bar carries the
  * contour interval so the legend gains no row (#62). A naval plate — anything
  * whose map has no relief — is drawn exactly as it was.
  */
 import type { Arm, Wind, WindForce } from "../schema/types.ts";
+import type { NumeralRow } from "./labels/index.ts";
 import type { Plate } from "./plate.ts";
 import { drawArrow, drawPlateRule, type Point } from "./primitives.ts";
 import type { Rect } from "./projection.ts";
@@ -50,27 +57,41 @@ const CORNER_PANEL_INSET = 10;
 /** How far a panel stands above and below the line of type it carries. */
 const PANEL_LEAD = 6;
 
-export function drawFurniture(plate: Plate): void {
+export function drawFurniture(plate: Plate, key: readonly NumeralRow[]): void {
   drawPlateBorder(plate);
   const scale = layoutScaleBar(plate);
   const legendBottom = scale.labelTop - LEGEND_GAP;
   // Relief runs under every corner, so on a land plate the furniture is given
   // paper first. Unruled: the legend's own rule is the only one there is.
   const onPanels = plate.contourLevels.length > 0;
-  if (onPanels) drawPanels(plate, scale, legendBottom);
+  if (onPanels) drawPanels(plate, scale, legendBottom, key);
   drawCompassRose(plate, plate.picture.wind);
   drawTitle(plate);
   drawScaleBar(plate, scale);
-  drawLegend(plate, legendBottom, onPanels);
+  drawLegend(plate, legendBottom, onPanels, key);
   drawCredit(plate);
 }
 
+/**
+ * Every box the furniture occupies, for the label pass to clear (#39). Built
+ * from the same rectangles `drawPanels` fills, which bound the ink whether or
+ * not a plate paints them, and taking the frame's numeral key because the
+ * legend is the one piece whose size the labels decide.
+ */
+export function furnitureBoxes(plate: Plate, key: readonly NumeralRow[]): Rect[] {
+  const scale = layoutScaleBar(plate);
+  const legendBottom = scale.labelTop - LEGEND_GAP;
+  const credit = creditPanel(plate);
+  const boxes = [rosePanel(plate), titlePanel(plate), scalePanel(plate, scale, legendBottom, key)];
+  return credit === undefined ? boxes : [...boxes, credit];
+}
+
 /** Paper under the rose, the title, the scale bar with the legend, and the credit. Filled and never ruled (#62). */
-function drawPanels(plate: Plate, scale: ScaleBarLayout, legendBottom: number): void {
+function drawPanels(plate: Plate, scale: ScaleBarLayout, legendBottom: number, key: readonly NumeralRow[]): void {
   const { ctx } = plate;
   ctx.save();
   ctx.fillStyle = plate.view.palette.panel;
-  for (const panel of [rosePanel(plate), titlePanel(plate), scalePanel(plate, scale, legendBottom), creditPanel(plate)]) {
+  for (const panel of [rosePanel(plate), titlePanel(plate), scalePanel(plate, scale, legendBottom, key), creditPanel(plate)]) {
     if (panel !== undefined) ctx.fillRect(panel.x, panel.y, panel.width, panel.height);
   }
   ctx.restore();
@@ -280,12 +301,12 @@ const SCALE_BAR_LABEL_SIZE = 12;
  * One panel behind the legend and the scale bar together: they stand in the
  * same corner, and two panels there would show their own seam.
  */
-function scalePanel(plate: Plate, scale: ScaleBarLayout, legendBottom: number): Rect {
+function scalePanel(plate: Plate, scale: ScaleBarLayout, legendBottom: number, key: readonly NumeralRow[]): Rect {
   const captionWidth = textWidth(plate.ctx, scale.caption, font(SCALE_BAR_LABEL_SIZE, true));
-  const widest = Math.max(LEGEND_WIDTH, scale.bar.pixels, captionWidth);
+  const widest = Math.max(legendWidth(plate, key), scale.bar.pixels, captionWidth);
   const frame = plate.projection.extentRect;
   const x = scale.x - PANEL_PAD;
-  const top = legendBottom - legendHeight(plate) - PANEL_LEAD;
+  const top = legendBottom - legendHeight(plate, key) - PANEL_LEAD;
   // Down to the same corner inset the title's and the credit's panels take, which clears the bar's end ticks.
   const bottom = frame.y + frame.height - CORNER_PANEL_INSET;
   return { x, y: top, width: scale.x + widest + PANEL_PAD - x, height: bottom - top };
@@ -305,25 +326,40 @@ const LEGEND_LINE_ROWS = 3;
  * the only ones whose count is a decision (ADR-0015), and a decision is worth a
  * test.
  */
-export function legendRowCount(sides: number, arms: readonly Arm[]): number {
-  return sides + STATES.length + arms.length + LEGEND_LINE_ROWS;
+export function legendRowCount(sides: number, arms: readonly Arm[], key = 0): number {
+  return sides + STATES.length + arms.length + LEGEND_LINE_ROWS + key;
 }
 
 /** The same in pixels, padding and all: the panel a land plate lays under the legend has to know before either is drawn. */
-function legendHeight(plate: Plate): number {
-  return legendRowCount(plate.colours.size, legendArms(plate.battle.units)) * LEGEND_ROW + 16;
+function legendHeight(plate: Plate, key: readonly NumeralRow[]): number {
+  return legendRowCount(plate.colours.size, legendArms(plate.battle.units), key.length) * LEGEND_ROW + 16;
+}
+
+/** Gap between the legend's edge and what it carries. */
+const LEGEND_PAD = 12;
+
+/** One row of the numeral key: the numeral the plate showed, and the name it stood in for. */
+function keyRow(row: NumeralRow): string {
+  return `${row.numeral} · ${row.label}`;
+}
+
+/** How wide the legend stands: its own width, or wider when the numeral key has a longer name to carry (#39). */
+function legendWidth(plate: Plate, key: readonly NumeralRow[]): number {
+  const longest = key.reduce((wide, row) => Math.max(wide, textWidth(plate.ctx, keyRow(row), font(12, true))), 0);
+  return Math.max(LEGEND_WIDTH, longest + LEGEND_PAD * 2);
 }
 
 /**
  * The always-on legend: each side's colour and name, the four state glyphs, one
- * row per arm when the roster has two or more (ADR-0015), and the three line
- * styles. Its bottom sits at `bottom`.
+ * row per arm when the roster has two or more (ADR-0015), the three line
+ * styles, and a row for every numeral a label showed this frame (#39). Its
+ * bottom sits at `bottom`.
  *
  * `onPanel` says a land plate has already laid paper under this corner, so the
  * legend draws its rule and not a second ground: the panel is the paper at .92
  * once, not twice over (#62).
  */
-function drawLegend(plate: Plate, bottom: number, onPanel: boolean): void {
+function drawLegend(plate: Plate, bottom: number, onPanel: boolean, key: readonly NumeralRow[]): void {
   const { ctx, colours, view } = plate;
   const { palette, pens, glyph } = view;
   const frame = plate.projection.extentRect;
@@ -332,18 +368,19 @@ function drawLegend(plate: Plate, bottom: number, onPanel: boolean): void {
   // The rows that are not about an arm still have to be drawn in one: the arm
   // most of the battle is made of, so Cannae's states are not ship-ticks.
   const ordinary = legendArm(plate.battle.units);
-  const height = legendHeight(plate);
+  const height = legendHeight(plate, key);
+  const width = legendWidth(plate, key);
   const x = frame.x + MARGIN;
   const y = bottom - height;
 
   ctx.save();
   if (!onPanel) {
     ctx.fillStyle = palette.panel;
-    ctx.fillRect(x, y, LEGEND_WIDTH, height);
+    ctx.fillRect(x, y, width, height);
   }
   ctx.strokeStyle = palette.ink;
   ctx.lineWidth = 1;
-  ctx.strokeRect(x + 0.5, y + 0.5, LEGEND_WIDTH - 1, height - 1);
+  ctx.strokeRect(x + 0.5, y + 0.5, width - 1, height - 1);
 
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
@@ -408,6 +445,14 @@ function drawLegend(plate: Plate, bottom: number, onPanel: boolean): void {
     drawArrow(ctx, { x: x + 12, y: rowY }, { x: x + 12 + LEGEND_SAMPLE, y: rowY }, pen, colour);
     ctx.fillStyle = palette.ink;
     ctx.fillText(label, textX, rowY);
+    rowY += LEGEND_ROW;
+  }
+
+  // The numeral key: what a label that has collapsed all the way stands for.
+  // Nothing is drawn when no label showed a numeral this frame (#39).
+  ctx.fillStyle = palette.ink;
+  for (const row of key) {
+    ctx.fillText(keyRow(row), x + LEGEND_PAD, rowY);
     rowY += LEGEND_ROW;
   }
   ctx.restore();

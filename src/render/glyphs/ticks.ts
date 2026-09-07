@@ -14,9 +14,9 @@
  * is drawn at the origin heading up the negative y axis; the caller has
  * rotated, so a bearing never reaches this file.
  */
-import type { Arm, Formation } from "../../schema/types.ts";
+import type { Arm, Formation, UnitState } from "../../schema/types.ts";
 import { seeded } from "../primitives.ts";
-import { GLYPH_PX, SIGN_HALF_HEIGHT, SIGN_HALF_WIDTH, SIGNS_PER_GLYPH } from "../style.ts";
+import { axes, GLYPH_PX, leeDrift, SIGN_HALF_HEIGHT, SIGN_HALF_WIDTH, SIGNS_PER_GLYPH } from "../style.ts";
 import type { Glyph, GlyphRequest, Sign } from "../view.ts";
 import { frontage, signPositions, signSlots } from "./slots.ts";
 
@@ -96,6 +96,18 @@ export const ticks: Glyph = {
   // A mass is two ranks deep, so the label clears the rear one (ADR-0016).
   halfWidth: (scale, formation) => (formation === "mass" ? SIGN_PITCH / 2 + SIGN_HALF_HEIGHT : SIGN_HALF_WIDTH) * scale,
 };
+
+/**
+ * How far the cloud reaches from the unit's centre, downwind: the hull
+ * clearance, the drift, the furthest puff's radius and the outline it is drawn
+ * with. Exported so a test can hold it inside `MARK_REACH`, which is what the
+ * shared label pass clears (ADR-0014 keeps that pass out of this file).
+ */
+export function billowReach(state: UnitState, scale: number): number {
+  if (state !== "engaged" && state !== "broken") return 0;
+  const cloud = state === "broken" ? BILLOW.broken : BILLOW.engaged;
+  return (SIGN_HALF_WIDTH + HULL_CLEARANCE + cloud.reach + cloud.radius + cloud.growth + OUTLINE_WIDTH) * scale;
+}
 
 /** The smoke, laid down before any unit's ships so a melee does not erase itself. */
 function mark(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
@@ -295,46 +307,4 @@ function tracePuffs(ctx: CanvasRenderingContext2D, puffs: readonly Puff[], grow:
     ctx.moveTo(x + radius, y);
     ctx.arc(x, y, radius, 0, Math.PI * 2);
   }
-}
-
-/**
- * Where the cloud goes: downwind, but always clear of the ticks. The component
- * across the unit's body is never less than half and the component along it is
- * damped, so smoke clears a column running dead downwind (#58, ADR-0008).
- *
- * `windTo` is radians clockwise from the unit's own heading, and the glyph is
- * heading-up, so the wind is `(sin, -cos)` of it and nothing here knows north.
- * With no wind the cloud takes the flank the label does not: `drawUnits` puts
- * the label beside a column and astern of a line.
- */
-export function leeDrift(windTo: number | undefined, formation: Formation): Point {
-  const { along, across } = axes(formation);
-  // Written out rather than negated from `across`, which would answer a negative zero.
-  if (windTo === undefined) return formation === "column" ? { x: -1, y: 0 } : { x: 0, y: -1 };
-
-  const wind = { x: Math.sin(windTo), y: -Math.cos(windTo) };
-  const alongPart = (wind.x * along.x + wind.y * along.y) * ALONG_DAMPING;
-  const acrossRaw = wind.x * across.x + wind.y * across.y;
-  const acrossPart = Math.abs(acrossRaw) < MIN_ACROSS ? (acrossRaw < 0 ? -MIN_ACROSS : MIN_ACROSS) : acrossRaw;
-
-  const x = along.x * alongPart + across.x * acrossPart;
-  const y = along.y * alongPart + across.y * acrossPart;
-  const magnitude = Math.hypot(x, y) || 1;
-  return { x: x / magnitude, y: y / magnitude };
-}
-
-/** How much of the wind's across-hull component survives at the least: the clamp that clears the ticks. */
-const MIN_ACROSS = 0.5;
-/** How much of the wind along the hull survives: damped, so the cloud never runs the length of the unit. */
-const ALONG_DAMPING = 0.35;
-
-/**
- * A unit's own axes at the origin heading up: `along` its long axis, `across`
- * its flanks. A column runs in line ahead, so its length is the heading; a
- * line runs abreast, so its length is across it, and a mass — wider than it is
- * deep — lies the same way a line does.
- */
-function axes(formation: Formation): { along: Point; across: Point } {
-  if (formation === "column") return { along: { x: 0, y: 1 }, across: { x: 1, y: 0 } };
-  return { along: { x: 1, y: 0 }, across: { x: 0, y: 1 } };
 }
