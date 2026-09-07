@@ -35,9 +35,9 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run validate
-      # `base` is /sandtable/ for the build (vite.config.ts), which is the path
-      # Pages serves a project site under, and `vite/serve-data.ts` copies
-      # data/ into dist/data/.
+      # The site serves from the root of its own domain, so the build sets no
+      # base (vite.config.ts), and `vite/serve-data.ts` copies data/ into
+      # dist/data/.
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

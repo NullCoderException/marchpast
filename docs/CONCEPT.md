@@ -122,6 +122,7 @@ The v0.1 questions are all answered: real lat/lon from day one (ADR-0001), a lin
 | 2026-09-06 | Hierarchy is authored at every level and the viewer picks the level; sixteen units drawn at once is the ceiling (ADR-0017) | Both the coarse and the fine picture are facts from the sources, never a roll-up; the label proof set the ceiling |
 | 2026-09-06 | v1's states, strength and moves carry Cannae, the Nile and Copenhagen unchanged; `broken` widened; heading is the fighting front; anchoring and the truce are caption matter (ADR-0018, ADR-0019) | Every proposed fifth state or third move kind priced a glyph and a legend row for a sentence the caption already writes |
 | 2026-09-06 | Labels place by a sticky search with a five-step collapse and an authored `short_label`; the unit card is the label unfolded; the view and level choosers are `<select>`s that never remember | Measured over whole playbacks: the only algorithm with no overlap to sixteen units; neither derived short name survives Cannae |
+| 2026-09-07 | Hosting stays GitHub Pages, now behind the custom domain `marchpast.com` (`.app` and `.org` held alongside and redirected); the Pages base becomes a bare `/` (ADR-0020) | A brand needs its own address and an unregistered name can go any day; the domain in front of Pages is also what makes the repository rename free, and it deletes the base-path literal rather than rewriting it twice |
 
 ## Known risks
 
