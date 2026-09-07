@@ -89,7 +89,7 @@ _Avoid_: Speed, time scale, compression, duration
 ### Units
 
 **Unit**:
-A body of force the battle follows as one marker on the map, such as a fleet column, a squadron, or an army wing. Every phase lists every unit, whether or not it has a parent or is drawn at the level shown.
+A body of force the battle follows as one marker on the map, such as a fleet column, a squadron, an army wing, or a carrier strike. A unit is listed in every phase it exists in, whether or not it has a parent or is drawn at the level shown, and in one unbroken run of them: a strike that has not launched, or has been recovered, or a relief army still on the march, is left out of the phase rather than parked somewhere. Being left out says the unit is not on the plate at that instant, never that its position is unknown or off the extent.
 _Avoid_: Marker, force, group, side, formation
 
 **Parent**:
@@ -101,11 +101,11 @@ How far down the tree of parents and children the plate is drawing, counted from
 _Avoid_: Resolution, granularity, tier, zoom, depth (in prose)
 
 **State**:
-Which of four conditions a unit is in during a phase: intact (not yet in action), engaged (in the action or its aftermath, cohesion held), broken (cohesion lost, no longer acting as one body, whether it flees or fights on in fragments), or destroyed (ceased to exist as a fighting unit, whatever became of its men). A unit that has fought stays engaged when the firing stops. A state says what condition a unit is in and never where it is: a wing that has ridden off the field keeps whatever state its condition earns.
+Which of four conditions a unit is in during a phase: intact (not yet in action), engaged (in the action or its aftermath, cohesion held), broken (cohesion lost, no longer acting as one body, whether it flees or fights on in fragments), or destroyed (ceased to exist as a fighting unit, whatever became of its men). A unit that has fought stays engaged when the firing stops. Destroyed is the moment a source attests, not the moment fighting became hopeless: a ship burning and abandoned is broken and turns destroyed when she sinks or is scuttled. A state says what condition a unit is in and never where it is: a wing that has ridden off the field keeps whatever state its condition earns.
 _Avoid_: Status, condition, morale, struck, routed, annihilated
 
 **Strength**:
-The fraction, 0 to 1, of a unit's opening fighting strength still fighting as part of the unit during a phase. Damage to ships or men who stay in the fight does not reduce it; ships or men that have struck, fled, or been detached from the unit for the rest of the battle have left it and do. A detachment that returns to the unit never left it and costs nothing; whether it returns is judged inside the battle the file holds, so a ship still aground at the last phase has left the unit whatever became of her afterwards. Never a casualty count: a unit that has run is near zero before any of its men are dead.
+The fraction, 0 to 1, of a unit's opening fighting strength still fighting as part of the unit during a phase, opening strength being what it had in the first phase it appears in. Damage to ships or men who stay in the fight does not reduce it; ships or men that have struck, fled, or been detached from the unit for the rest of the battle have left it and do. A detachment that returns to the unit never left it and costs nothing; whether it returns is judged inside the battle the file holds, so a ship still aground at the last phase has left the unit whatever became of her afterwards. Never a casualty count: a unit that has run is near zero before any of its men are dead.
 _Avoid_: Health, casualties, hit points, size, losses
 
 **Commander**:
@@ -113,7 +113,7 @@ The named person commanding a unit, recorded once per battle as part of the unit
 _Avoid_: Admiral, general, leader, flag officer, owner
 
 **Arm**:
-What a unit is made of, one word from a fixed list, recorded once per battle as part of the unit's identity: infantry, cavalry, or ship in v2. Never changes during a battle; heavy or light, a ship of the line or a frigate, is label and caption matter.
+What a unit is made of, one word from a fixed list, recorded once per battle as part of the unit's identity: infantry, cavalry, ship or aircraft. Never changes during a battle; heavy or light, a ship of the line or a frigate, a dive bomber or a torpedo plane, is label and caption matter.
 _Avoid_: Type, kind, class, branch, troop type, category
 
 **Infantry**:
@@ -127,6 +127,10 @@ _Avoid_: Horse (in data), mounted, dragoons
 **Ship**:
 The arm of a unit made of vessels, whatever their rate or whether they are under way or at anchor: a fleet column, a squadron, the Danish line of blockships.
 _Avoid_: Naval, fleet, vessel, sail
+
+**Aircraft**:
+The arm of a unit made of aeroplanes: a carrier strike, an island's air group. A strike belongs to the force that sent it and not to the ship it flew from, which stays on the plate while its aircraft are away; it is listed only from its launch to its recovery, and a second sortie is a second unit.
+_Avoid_: Air, plane, squadron, sortie, flight, group
 
 **Formation**:
 The shape a unit's signs are arranged in, one of three words: column (in file along the heading), line (abreast across the heading) or mass (in ranks, four across and two deep). A shape and never a condition, so a fleet at anchor is drawn in the shape it lies in and its anchoring is caption matter; a fleet in line of battle is a line, abreast of its own front, as a line of foot is. A styled label the renderer draws at a fixed size; a battle file never carries the shape's geometry, so a crescent, a wedge or a hollow is caption matter.
