@@ -187,8 +187,8 @@ describe("furnitureBoxes", () => {
     const bare = inCorner(furnitureBoxes(plate(), []), bottomLeft);
     const keyed = inCorner(
       furnitureBoxes(plate(), [
-        { numeral: 2, label: "Weather column, van of the weather division" },
-        { numeral: 4, label: "Combined Fleet" },
+        { numeral: 2, label: "Weather column, van of the weather division", id: "weather-van" },
+        { numeral: 4, label: "Combined Fleet", id: "combined" },
       ]),
       bottomLeft,
     );

@@ -220,11 +220,44 @@ export function insidePlate(box: Rect, plate: Rect): boolean {
   );
 }
 
+/**
+ * How many square pixels of a box fall outside the plate, the inset included:
+ * what leaving the plate costs a placement with no free slot to take. Nothing
+ * for a box wholly inside, which is what `insidePlate` answers as a rule.
+ */
+export function areaOutside(box: Rect, plate: Rect): number {
+  const left = plate.x + PLATE_INSET;
+  const top = plate.y + PLATE_INSET;
+  const right = plate.x + plate.width - PLATE_INSET;
+  const bottom = plate.y + plate.height - PLATE_INSET;
+  const width = Math.max(0, Math.min(box.x + box.width, right) - Math.max(box.x, left));
+  const height = Math.max(0, Math.min(box.y + box.height, bottom) - Math.max(box.y, top));
+  return box.width * box.height - width * height;
+}
+
 /** Distance from a point to a box; zero inside it. */
 export function distanceToRect(point: Point, rect: Rect): number {
   const dx = Math.max(rect.x - point.x, 0, point.x - (rect.x + rect.width));
   const dy = Math.max(rect.y - point.y, 0, point.y - (rect.y + rect.height));
   return Math.hypot(dx, dy);
+}
+
+/**
+ * How much further out an anchor must go for the **near edge** of the box hung
+ * on it — not its anchor — to stand a given clearance off the glyph. The four
+ * edges are signed offsets from the anchor, so a box that reaches back across
+ * it costs its whole width. Nothing when the box hangs straight out sideways,
+ * since there the anchor *is* the near edge; a whole box depth when it sits
+ * above or below.
+ *
+ * The label and the unit card both hang from a point on the glyph's flank and
+ * both must clear it by `LABEL_GAP` exactly, so the arithmetic lives here
+ * once rather than twice over.
+ */
+export function boxSetback(edges: { left: number; right: number; top: number; bottom: number }, angle: number): number {
+  const sx = Math.sin(angle);
+  const sy = -Math.cos(angle);
+  return Math.max(-edges.left * sx, -edges.right * sx) + Math.max(-edges.top * sy, -edges.bottom * sy);
 }
 
 /** The point of `rect` nearest `point`: where a leader leaves its label. */

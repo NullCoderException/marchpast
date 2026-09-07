@@ -23,11 +23,18 @@ import type { Arm, Formation, UnitState } from "../schema/types.ts";
 /** The view's key: what player state holds and the View chooser sets. */
 export type ViewId = "plate" | "night" | "atlas";
 
+/** The unit whose card is open, and whether a click pinned it there or the pointer is merely resting on it (#60). */
+export interface CardTarget {
+  /** The roster `units[].id`. */
+  id: string;
+  /** `true` when a click or tap pinned the card, so the pointer moving off no longer closes it. */
+  pinned: boolean;
+}
+
 /**
  * What one viewer chose, for one frame. Per-frame viewer state, never renderer
  * state: the renderer holds nothing but its canvases, and two viewers of the
- * same instant hold the same picture and different viewers of it. The unit
- * card extends this object in its own slice.
+ * same instant hold the same picture and different viewers of it.
  */
 export interface Viewer {
   view: ViewId;
@@ -37,6 +44,12 @@ export interface Viewer {
    * (ADR-0017, schema.md 2.11).
    */
   level: number;
+  /**
+   * The unit card the viewer has open, when one is. Viewer-chosen and never
+   * authored, like the view and the level; the renderer reads the id and
+   * nothing else, since a pinned card and a hovered one are drawn alike (#60).
+   */
+  card?: CardTarget;
 }
 
 /** The materials a view is drawn in. */

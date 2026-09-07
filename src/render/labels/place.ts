@@ -15,13 +15,22 @@
  * then allowing it, which is the whole of what "soft" means here: smoke buys
  * a displacement and never a word.
  *
+ * The **unit card** enters this same search (#60): the frame's open card is
+ * one unit's label unfolded into a wider box, placed first at the highest
+ * priority so every other label displaces or collapses around it, never
+ * collapsing itself, and taking the sticky slot and the leader on the same
+ * rules. When no slot on the ring is free it takes the least-bad one and draws
+ * over it, because a card is transient and asked for.
+ *
  * Pure: the memory goes in and a new memory comes out, so the renderer can run
  * the placer twice in one frame (the legend's numeral key changes the legend's
  * size, which changes the obstacles) without the frame counting twice.
  */
+import { cardBox, type CardContent, type CardLayout, cardSetback, layoutCard } from "./card.ts";
 import type { Align, Measure } from "./content.ts";
 import { contentAt, contentWidth, labelBox, LAST_STEP, nearEdgeSetback } from "./content.ts";
 import {
+  areaOutside,
   clearance,
   distanceToRect,
   glyphBox,
@@ -29,6 +38,7 @@ import {
   LABEL_GAP,
   type LabelUnit,
   nearestPointOnRect,
+  overlapArea,
   overlaps,
   preferredAngles,
   RING_RADII,
@@ -40,6 +50,22 @@ import type { Rect } from "../projection.ts";
 
 /** Frames a label must have held its slot before it may climb back up the collapse order. */
 export const RECOVER_FRAMES = 30;
+
+/**
+ * The card's place in the collapse order: below its first step, because a card
+ * never collapses. It is a step so that one memory, one sticky search and one
+ * leader rule serve both — and so a label taking a unit back from a card can
+ * tell that its remembered slot was a card's.
+ */
+export const CARD_STEP = -1;
+
+/**
+ * What a square pixel off the plate costs the least-bad search, against one
+ * square pixel of something covered. A card that must cover something covers a
+ * label rather than hanging off the plate's edge, and among two that must hang
+ * off it, the one hanging off least wins.
+ */
+const OFF_PLATE_WEIGHT = 4;
 
 /**
  * The collapse order in runs of steps that say the same words: 0 and 1 are the
@@ -57,7 +83,7 @@ export interface Slot {
   angle: number;
   /** Displacement beyond the clearance, from the ring. */
   extra: number;
-  /** Which step of the collapse order the label is on. */
+  /** Which step of the collapse order the label is on, or `CARD_STEP` when the unit's card is open. */
   step: number;
   /** Consecutive frames the label has held exactly this slot. */
   clean: number;
@@ -72,7 +98,7 @@ export const NO_LABEL_MEMORY: LabelMemory = new Map();
 /** One label, placed. */
 export interface Placed {
   unit: LabelUnit;
-  /** 0 to `LAST_STEP` of the collapse order. */
+  /** 0 to `LAST_STEP` of the collapse order, or `CARD_STEP` for the frame's open card. */
   step: number;
   name: string;
   detail?: string;
@@ -83,6 +109,8 @@ export interface Placed {
   box: Rect;
   /** Where a leader leaves the label for its glyph's centre, when the label's own glyph is not the nearest one. */
   leader?: Point;
+  /** The unfolded card, when this unit is the one the viewer has open. The drawing reads its lines from here. */
+  card?: CardLayout;
 }
 
 export interface PlaceOptions {
@@ -94,6 +122,8 @@ export interface PlaceOptions {
   obstacles: readonly Rect[];
   measure: Measure;
   memory: LabelMemory;
+  /** The card the viewer has open, when its unit is one this level draws. */
+  card?: CardContent;
 }
 
 export interface Placement {
@@ -107,21 +137,30 @@ export interface NumeralRow {
   numeral: number;
   /** The unit's full label, which is what the numeral stands in for. */
   label: string;
+  /** The roster id behind it, so the row can open that unit's card (#60). */
+  id: string;
 }
 
-export function placeLabels({ units, plate, obstacles, measure, memory }: PlaceOptions): Placement {
+export function placeLabels({ units, plate, obstacles, measure, memory, card }: PlaceOptions): Placement {
   const boxes = new Map(units.map((unit) => [unit.id, glyphBox(unit)]));
   const smoke = new Map(units.map((unit) => [unit.id, smokeBox(unit)]));
   const taken: Rect[] = [];
   const placed: Placed[] = [];
   const next = new Map(memory);
+  // The open card is measured once and placed first: it is the widest box of
+  // the frame and the highest priority in it (#60).
+  const open = card === undefined ? undefined : layoutCard(card, measure);
 
-  for (const unit of byPriority(units)) {
+  for (const unit of byPriority(units, card?.id)) {
     const own = boxes.get(unit.id) ?? glyphBox(unit);
     const others = units.filter((other) => other.id !== unit.id);
     const hard = others.flatMap((other) => boxes.get(other.id) ?? []);
     const soft = others.flatMap((other) => smoke.get(other.id) ?? []);
-    const previous = memory.get(unit.id);
+    const mine = open !== undefined && open.content.id === unit.id ? open : undefined;
+    // A slot a closed card left behind is not a step of the collapse order, so
+    // the label taking its unit back keeps the angle and starts the order again.
+    const remembered = memory.get(unit.id);
+    const previous = mine === undefined && remembered?.step === CARD_STEP ? { ...remembered, step: 0, clean: 0 } : remembered;
 
     const free = (box: Rect, avoidSmoke: boolean): boolean => {
       if (!insidePlate(box, plate)) return false;
@@ -132,8 +171,13 @@ export function placeLabels({ units, plate, obstacles, measure, memory }: PlaceO
       return !(avoidSmoke && soft.some((other) => overlaps(box, other)));
     };
 
-    const chosen = choose(unit, previous, measure, free);
-    const label = build(unit, chosen, measure) ?? fallback(unit, measure);
+    /** How bad a slot is when none is free: what it would cover, and how much of it would leave the plate. */
+    const cost = (box: Rect): number =>
+      areaOutside(box, plate) * OFF_PLATE_WEIGHT +
+      [own, ...hard, ...taken, ...obstacles].reduce((sum, other) => sum + overlapArea(box, other), 0);
+
+    const chosen = mine === undefined ? choose(unit, previous, measure, free) : chooseCard(unit, previous, mine, free, cost);
+    const label = mine === undefined ? (build(unit, chosen, measure) ?? fallback(unit, measure)) : buildCard(unit, chosen, mine);
     const clean = previous !== undefined && sameSlot(previous, chosen) ? previous.clean + 1 : 0;
 
     next.set(unit.id, { ...chosen, clean });
@@ -205,6 +249,61 @@ function choose(unit: LabelUnit, previous: Slot | undefined, measure: Measure, f
   return search(previous?.step ?? 0, LAST_STEP) ?? { angle: flanks[0] ?? 0, extra: 0, step: LAST_STEP };
 }
 
+/**
+ * Where the card stands this frame: the slot it already had while that is
+ * free, else the first free slot on the ring, else the least-bad one. There is
+ * no collapse and so no recovery — a card says the same words wherever it goes.
+ */
+function chooseCard(
+  unit: LabelUnit,
+  previous: Slot | undefined,
+  layout: CardLayout,
+  free: (box: Rect, avoidSmoke: boolean) => boolean,
+  cost: (box: Rect) => number,
+): Omit<Slot, "clean"> {
+  const angles = ringAngles(unit, previous?.angle);
+  const slots = RING_RADII.flatMap((extra) => angles.map((angle) => ({ angle, extra, step: CARD_STEP })));
+
+  // Stay: the sticky search holds the card still while its unit moves under it.
+  if (previous?.step === CARD_STEP) {
+    const held = { angle: previous.angle, extra: previous.extra, step: CARD_STEP };
+    if (free(cardSlot(unit, held, layout).box, true)) return held;
+  }
+
+  for (const avoidSmoke of [true, false]) {
+    for (const slot of slots) {
+      if (free(cardSlot(unit, slot, layout).box, avoidSmoke)) return slot;
+    }
+  }
+
+  // Nothing free anywhere: draw over the least-bad slot rather than the worst
+  // one. A card is transient and asked for, so a covered label for a moment is
+  // accepted (#60).
+  let best = slots[0] ?? { angle: preferredAngles(unit)[0] ?? 0, extra: 0, step: CARD_STEP };
+  let worst = Number.POSITIVE_INFINITY;
+  for (const slot of slots) {
+    const badness = cost(cardSlot(unit, slot, layout).box);
+    if (badness >= worst) continue;
+    worst = badness;
+    best = slot;
+  }
+  return best;
+}
+
+/** Where a slot puts the card: the point it hangs from, the side its panel runs and the box it fills. */
+function cardSlot(unit: LabelUnit, slot: Omit<Slot, "clean">, layout: CardLayout): { at: Point; align: Align; box: Rect } {
+  const align: Align = Math.sin(slot.angle) >= -1e-9 ? "left" : "right";
+  const radius = clearance(unit, slot.angle) + LABEL_GAP + slot.extra + cardSetback(align, layout, slot.angle);
+  const at = { x: unit.anchor.x + Math.sin(slot.angle) * radius, y: unit.anchor.y - Math.cos(slot.angle) * radius };
+  return { at, align, box: cardBox(at, align, layout) };
+}
+
+/** The card a slot produces. A card never collapses, so unlike a label this always answers. */
+function buildCard(unit: LabelUnit, slot: Omit<Slot, "clean">, layout: CardLayout): Placed {
+  const { at, align, box } = cardSlot(unit, slot, layout);
+  return { unit, step: CARD_STEP, name: layout.content.name, at, align, box, card: layout };
+}
+
 /** The label a slot produces, or nothing when this unit skips that step of the collapse order. */
 function build(unit: LabelUnit, slot: Omit<Slot, "clean">, measure: Measure): Placed | undefined {
   const content = contentAt(unit, slot.step);
@@ -233,9 +332,11 @@ function sameSlot(previous: Slot, slot: Omit<Slot, "clean">): boolean {
   return previous.angle === slot.angle && previous.extra === slot.extra && previous.step === slot.step;
 }
 
-/** Engaged units first, then units with a move, then roster order (#58). */
-function byPriority(units: readonly LabelUnit[]): LabelUnit[] {
+/** The frame's open card first (#60), then engaged units, then units with a move, then roster order (#58). */
+function byPriority(units: readonly LabelUnit[], cardId: string | undefined): LabelUnit[] {
   return [...units].sort((a, b) => {
+    const card = Number(b.id === cardId) - Number(a.id === cardId);
+    if (card !== 0) return card;
     const engaged = Number(b.state === "engaged") - Number(a.state === "engaged");
     if (engaged !== 0) return engaged;
     const move = Number(b.hasMove) - Number(a.hasMove);
@@ -253,6 +354,6 @@ export function needsLeader(at: Point, unit: LabelUnit, units: readonly LabelUni
 /** The legend's numeral key: a row per unit showing a numeral this frame, in numeral order. Empty when none is. */
 export function numeralKey(placed: readonly Placed[]): NumeralRow[] {
   return placed
-    .flatMap((label) => (label.numeral === undefined ? [] : [{ numeral: label.numeral, label: label.unit.name }]))
+    .flatMap((label) => (label.numeral === undefined ? [] : [{ numeral: label.numeral, label: label.unit.name, id: label.unit.id }]))
     .sort((a, b) => a.numeral - b.numeral);
 }

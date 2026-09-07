@@ -4,23 +4,27 @@
  *
  * Each frame turns the wall-clock delta into battle-clock time through
  * `tick`, asks the timeline for the picture at the new instant, and renders
- * it. Paused frames render nothing unless something else changed — a scrub, a
+ * it — keeping the hit regions that frame drew, which is how a pointer over
+ * the canvas becomes a unit id and so a unit card (#60). Paused frames render nothing unless something else changed — a scrub, a
  * jump, a resize — which is what the `dirty` flag tracks. Every rule about
  * what a control does lives in `state.ts`; this file only wires gestures to
  * transitions and state to pixels.
  */
 import type { Battle, MapFile } from "../schema/types.ts";
-import { createRenderer } from "../render/index.ts";
+import { createRenderer, type HitRegion, unitAt } from "../render/index.ts";
 import { pictureAt } from "../timeline/pictureAt.ts";
 import { createControls, type PickerOptions } from "./controls.ts";
 import { createDetailsPanel } from "./details.ts";
 import { Listeners } from "./dom.ts";
 import "./player.css";
 import {
+  closeCard,
+  hoverUnit,
   initialState,
   jumpNext,
   jumpPrevious,
   jumpToPhase,
+  pinUnit,
   scrubTo,
   setLevel,
   setMultiplier,
@@ -61,9 +65,17 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
 
   let state: PlayerState = initialState(battle);
   let dirty = true;
+  /** Where everything the last frame drew landed, for the pointer to be resolved against. */
+  let hits: readonly HitRegion[] = [];
 
-  /** Takes the state a transition returned, and marks the next frame for redrawing. */
+  /**
+   * Takes the state a transition returned, and marks the next frame for
+   * redrawing. A transition that answered the state it was given changed
+   * nothing, so nothing is redrawn: every pointer move over the plate is a
+   * transition, and only the few that open or close a card cost a frame.
+   */
   const apply = (next: PlayerState): void => {
+    if (next === state) return;
     state = next;
     dirty = true;
   };
@@ -76,7 +88,7 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
     jumpToPhase: (index) => apply(jumpToPhase(battle, state, index)),
     setMultiplier: (multiplier) => apply(setMultiplier(state, multiplier)),
     setView: (view) => apply(setView(state, view)),
-    setLevel: (level) => apply(setLevel(state, level)),
+    setLevel: (level) => apply(setLevel(battle, state, level)),
     toggleDetails: () => {
       details.setOpen(!details.isOpen());
       dirty = true;
@@ -100,6 +112,20 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
     dirty = true;
   });
 
+  // The pointer on the plate: hover shows a card, a click pins it, and a click
+  // on bare plate closes it. A tap is a click, so one pair of rules serves
+  // both inputs (#60). Keyboard access to a card is out of scope for v0.2.
+  const canvasPoint = (event: MouseEvent): { x: number; y: number } => {
+    const rect = canvas.getBoundingClientRect();
+    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+  };
+  listeners.on<PointerEvent>(canvas, "pointermove", (event) => apply(hoverUnit(state, unitAt(hits, canvasPoint(event)))));
+  listeners.on<PointerEvent>(canvas, "pointerleave", () => apply(hoverUnit(state, undefined)));
+  listeners.on<MouseEvent>(canvas, "click", (event) => {
+    const id = unitAt(hits, canvasPoint(event));
+    apply(id === undefined ? closeCard(state) : pinUnit(state, id));
+  });
+
   let previousTimestamp: number | undefined;
   let frame = requestAnimationFrame(function step(timestamp: number): void {
     frame = requestAnimationFrame(step);
@@ -113,7 +139,7 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
     dirty = false;
 
     const picture = pictureAt(battle, state.clock);
-    renderer.render(battle, map, picture, { view: state.view, level: state.level });
+    hits = renderer.render(battle, map, picture, { view: state.view, level: state.level, card: state.card });
     details.update(picture);
     controls.update(state, picture, details.isOpen());
   });

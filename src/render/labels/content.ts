@@ -16,12 +16,16 @@
  */
 import type { Point } from "../primitives.ts";
 import type { Rect } from "../projection.ts";
-import type { LabelUnit } from "./geometry.ts";
+import { boxSetback, type LabelUnit } from "./geometry.ts";
 
 export const NAME_SIZE = 14;
 export const DETAIL_SIZE = 12;
 /** The last step of the collapse order: the numeral keyed in the legend. */
 export const LAST_STEP = 4;
+
+/** How far the name's baseline sits above the point the label hangs from, and the state word's below it. */
+export const NAME_RISE = 8;
+export const DETAIL_DROP = 8;
 
 /** How far the box reaches above the point the label hangs from, and below it with and without the state word. */
 const BOX_TOP = 19;
@@ -80,10 +84,13 @@ export function labelBox(at: Point, align: Align, width: number, hasDetail: bool
  * label lay straight across its own unit (#39).
  */
 export function nearEdgeSetback(align: Align, width: number, hasDetail: boolean, angle: number): number {
-  const sx = Math.sin(angle);
-  const sy = -Math.cos(angle);
-  const left = align === "left" ? 0 : -width;
-  const right = align === "left" ? width : 0;
-  const bottom = hasDetail ? BOX_BOTTOM_DETAIL : BOX_BOTTOM_NAME;
-  return Math.max(-left * sx, -right * sx) + Math.max(BOX_TOP * sy, -bottom * sy);
+  return boxSetback(
+    {
+      left: align === "left" ? 0 : -width,
+      right: align === "left" ? width : 0,
+      top: -BOX_TOP,
+      bottom: hasDetail ? BOX_BOTTOM_DETAIL : BOX_BOTTOM_NAME,
+    },
+    angle,
+  );
 }
