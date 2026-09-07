@@ -1,0 +1,78 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1240,
+      "h": 1660,
+      "title": "The mark · four directions"
+    },
+    {
+      "file": "Icons.dc.html",
+      "x": 1360,
+      "y": 0,
+      "w": 940,
+      "h": 1000,
+      "title": "Icons and the manifest"
+    },
+    {
+      "file": "Words.dc.html",
+      "x": 2400,
+      "y": 0,
+      "w": 940,
+      "h": 1420,
+      "title": "The words · masthead line, title, description"
+    },
+    {
+      "file": "SocialCard.dc.html",
+      "x": 0,
+      "y": 1840,
+      "w": 1264,
+      "h": 1840,
+      "title": "The social card · 1200 × 630"
+    },
+    {
+      "file": "Masthead.dc.html",
+      "x": 1380,
+      "y": 1840,
+      "w": 1024,
+      "h": 1000,
+      "title": "The library masthead · desktop"
+    },
+    {
+      "file": "Phone.dc.html",
+      "x": 2520,
+      "y": 1840,
+      "w": 390,
+      "h": 1010,
+      "title": "The library masthead · phone, 390"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "brief",
+      "x": 0,
+      "y": -230,
+      "w": 1240,
+      "text": "BRAND · issue #135 on the v0.3 map (#121).\nThe name is settled (Marchpast, ADR-0020) and the domain is live (marchpast.com, #136), so everything here is drawable and the card can print the domain.\nThe engraved system of #58 governs: one face, IM Fell English; ink #2b2418 on parchment #efe3c6; the plate's doubled rule; no bold anywhere. The library keeps one look and does not follow the view (map #121), so none of this is themed."
+    },
+    {
+      "id": "decide",
+      "x": 1360,
+      "y": 1080,
+      "w": 940,
+      "text": "TO DECIDE\n1. Which mark: A The Review, B The Cartouche, C The Arrow, D The Rose — or none, and the wordmark alone.\n2. Which masthead line, L1 to L4 (the Words sheet). This is the one that matters most: it is now the only thing on the page that explains the app.\n3. The social card: S1 the plate behind, or S2 the plate alone.\n4. Whether the head carries a third line linking to the story, as drawn, or whether that link stays in the credit footer where the GitHub link already is.\n5. The title and the meta description, T1/T2 and D1/D2."
+    },
+    {
+      "id": "masthead-note",
+      "x": 1380,
+      "y": 1690,
+      "w": 1024,
+      "text": "The masthead is drawn at the real measure and the real ramp: 736px container, 56/24/40 padding, name 30, idea 15 italic, the 3px doubled rule under the head, entries at 20/12 with a 1px hairline between — every value read out of src/app/library.css rather than chosen here. The only new things are the mark, the third line, and L2 in place of L1. Four battles are what the library holds today; grouping at seven is #129, not this ticket."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

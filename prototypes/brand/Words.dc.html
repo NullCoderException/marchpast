@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: "IM Fell English", Georgia, "Times New Roman", serif; color: #2b2418; background: #efe3c6; }
+    a { color: #8f2f24; } a:hover { color: #2b2418; }
+    svg text { font-family: "IM Fell English", Georgia, "Times New Roman", serif; }
+  </style>
+</helmet>
+<div style="width: 940px; padding: 32px 36px; box-sizing: border-box; background: #efe3c6; display: flex; flex-direction: column; gap: 26px;">
+  <div style="display: flex; flex-direction: column; gap: 6px;">
+    <div style="font-size: 30px;">The words</div>
+    <div style="font-size: 15px; font-style: italic;">ADR-0020 left the masthead line load-bearing: “Marchpast” gestures at nothing, so this line is now the only thing on the page that says what the site is. The rest follows from it — the title, the description and the README's opening are the same sentence at three lengths.</div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-size: 20px;">The masthead line</div>
+    <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid rgba(43,36,24,0.55); background: rgba(43,36,24,0.04);">
+      <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">L1 · what ships today</div>
+      <div style="font-size: 15px; line-height: 1.45;">A web app that plays back famous battles as animated 2D “grand strategy” sequences, driven by a reusable JSON timeline format, with the timelines extracted from public-domain primary and secondary sources.</div>
+      <div style="font-size: 13px; font-style: italic; line-height: 1.4;">The concept document's one-liner, lifted whole (src/app/libraryPage.ts). It survived because the name used to carry some of the load. It names the implementation twice — “web app”, “JSON timeline format” — to a reader who came to watch a battle, and at 210 characters it wraps to three lines under the mark.</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid rgba(43,36,24,0.2); background: transparent;">
+      <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">L2</div>
+      <div style="font-size: 15px; line-height: 1.45;">Famous battles, played back on the map: the units, their moves and a caption, phase by phase, from public-domain sources.</div>
+      <div style="font-size: 13px; font-style: italic; line-height: 1.4;">What a visitor gets, in the order they will meet it, and it keeps the licence fact that makes the project what it is. Drops “JSON” and “web app”, which the README still carries for the people who want them. Drawn on the masthead artboards.</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid rgba(43,36,24,0.2); background: transparent;">
+      <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">L3</div>
+      <div style="font-size: 15px; line-height: 1.45;">A march-past of famous battles: each one played back on its own map, phase by phase, from the primary sources.</div>
+      <div style="font-size: 13px; font-style: italic; line-height: 1.4;">Spends the name's one available reading — a column filing past while the reviewer stands still — so the word starts to mean something. Risk: a reader who does not know the term learns nothing and now has two unfamiliar things.</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid rgba(43,36,24,0.2); background: transparent;">
+      <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">L4</div>
+      <div style="font-size: 15px; line-height: 1.45;">Watch a battle unfold: units, arrows and a caption at every phase, drawn from public-domain sources.</div>
+      <div style="font-size: 13px; font-style: italic; line-height: 1.4;">The shortest and the most direct, and the only one that opens with a verb aimed at the reader. Drops “famous”, which is doing real work — it is why anyone recognises a name in the list.</div>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-size: 20px;">The title</div>
+    <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid rgba(43,36,24,0.55); background: rgba(43,36,24,0.04);">
+      <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">T1 · what ships today</div>
+      <div style="font-size: 15px; line-height: 1.45;"><code>Marchpast</code> on the library; <code>The Battle of Trafalgar · Marchpast</code> on a battle.</div>
+      <div style="font-size: 13px; font-style: italic; line-height: 1.4;">What ships today. A bare name is a bare name: in a search result, a bookmark bar or a shared tab, it says nothing, and now the name says nothing either.</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid rgba(43,36,24,0.2); background: transparent;">
+      <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">T2</div>
+      <div style="font-size: 15px; line-height: 1.45;"><code>Marchpast — famous battles, played back on the map</code> on the library; the battle title unchanged.</div>
+      <div style="font-size: 13px; font-style: italic; line-height: 1.4;">The library's title is the one that gets indexed and shared, so it carries the line; a battle page already has a self-explaining title and needs no tagline behind it.</div>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-size: 20px;">The meta description</div>
+    <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid rgba(43,36,24,0.55); background: rgba(43,36,24,0.04);">
+      <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">D1 · what ships today</div>
+      <div style="font-size: 15px; line-height: 1.45;">There is none.</div>
+      <div style="font-size: 13px; font-style: italic; line-height: 1.4;"><code>index.html</code> has no description tag at all, so a search engine invents one from whatever text it finds first, and the social card has no text to fall back on.</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid rgba(43,36,24,0.2); background: transparent;">
+      <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">D2</div>
+      <div style="font-size: 15px; line-height: 1.45;">“Famous battles played back on the map, phase by phase — units, moves and a caption, drawn from public-domain primary sources. Cannae, the Nile, Copenhagen, Trafalgar.”</div>
+      <div style="font-size: 13px; font-style: italic; line-height: 1.4;">155 characters, which is the length a result snippet keeps. Naming the battles is what makes it findable: nobody searches for “battle playback”, they search for a battle.</div>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-size: 20px;">The README's first paragraph</div>
+    <div style="font-size: 13px; font-style: italic; line-height: 1.5;">Already rewritten by the rename (#147) and already the long version: it names the format, the bar, and what the project is not, then points at <code>docs/CONCEPT.md</code>. Nothing here asks it to change — the README's reader is a contributor, not a visitor, and the split between L2 on the masthead and the full paragraph in the README is exactly the split ADR-0020 predicted. The one edit worth making is the sentence order: lead with what a reader sees, not with the phrase “driven by a reusable JSON timeline format”.</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
