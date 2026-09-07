@@ -4,14 +4,17 @@
  * renderer (paper, letterbox, double ink rule, the plate face; ADR-0009), so
  * the two states read as the app rather than as a browser page. It is painted
  * before there is any player state to hold a view, so it takes the default
- * view's palette (ADR-0014).
+ * view's palette (ADR-0014), and it reaches for the engraved face directly:
+ * it is drawn in that aesthetic and not through a view's eight roles, none of
+ * which is a notice. #173 moves it off the canvas and into the DOM.
  *
  * Lines are word-wrapped to the plate; when they overrun, the last visible
  * line says how many more there are, since the full list is also logged.
  */
 import { DEFAULT_VIEW, fitBackingStore } from "../render/index.ts";
 import { drawPlateRule } from "../render/primitives.ts";
-import { PLATE_MARGIN, font } from "../render/style.ts";
+import { PLATE_MARGIN } from "../render/anatomy.ts";
+import { font } from "../render/views/engraved/type.ts";
 import { wrapText } from "../render/text.ts";
 
 /** Inset from the plate's rule to its text. */

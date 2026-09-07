@@ -5,6 +5,7 @@
 import { describe, expect, it } from "vitest";
 import type { CardContent } from "./card.ts";
 import type { Measure } from "./content.ts";
+import { ticks } from "../glyphs/ticks.ts";
 import { glyphBox, type LabelUnit, LABEL_GAP, smokeBox } from "./geometry.ts";
 import type { LayoutMode } from "../layout.ts";
 import { CARD_STEP, needsLeader, NO_LABEL_MEMORY, numeralKey, placeLabels, type Placed, type Slot } from "./place.ts";
@@ -27,6 +28,7 @@ function unit(over: Partial<LabelUnit> & Pick<LabelUnit, "id">): LabelUnit {
     formation: "column",
     length: 72,
     halfWidth: 2.6,
+    markReach: ticks.markReach(1, over.state ?? "intact"),
     hasMove: false,
     ...over,
   };

@@ -6,7 +6,7 @@
  */
 import { describe, expect, it } from "vitest";
 import type { Battle, MapFile } from "../schema/types.ts";
-import { keyRowLabel } from "../render/drawFurniture.ts";
+import { keyRowLabel } from "../render/key.ts";
 import { plateKey } from "./details.ts";
 
 /** A roster of ships, or of the arms named: the arm rows are all the roster is read for. */

@@ -12,13 +12,13 @@
  */
 import { describe, expect, it } from "vitest";
 import { furnitureBoxes } from "./drawFurniture.ts";
-import { drawMap, mapPoints } from "./drawMap.ts";
+import { drawNamedThings, mapPoints, paintGround } from "./ground.ts";
 import { touches } from "./labels/geometry.ts";
 import { type MapPoint, placeMapLabels } from "./labels/index.ts";
 import type { Plate } from "./plate.ts";
 import { fitProjection } from "./projection.ts";
 import { contourLevels } from "./relief.ts";
-import { PLATE_MARGIN, sideColours } from "./style.ts";
+import { PLATE_MARGIN, sideColours } from "./anatomy.ts";
 import { VIEWS } from "./views.ts";
 import type { Battle, MapFile } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
@@ -156,10 +156,13 @@ describe("a rampart, read but not drawn yet", () => {
     features: FIXTURE.features.filter(({ properties }) => properties.kind !== "rampart"),
   };
 
-  /** Every mark the pass laid, in order, drawing `map` on the Nile's plate. */
+  /** Every mark the ground laid, in order, drawing `map` on the Nile's plate. */
   const marks = (map: MapFile): string[] => {
     const calls: string[] = [];
-    drawMap({ ...shippedPlate("nile.json", VIEWS[0]!), ctx: fakeContext(calls), map }, []);
+    const ctx = fakeContext(calls);
+    const plate = { ...shippedPlate("nile.json", VIEWS[0]!), ctx, map };
+    paintGround(ctx, plate, { width: 1120, plateHeight: 640 });
+    drawNamedThings(plate, []);
     return calls;
   };
 

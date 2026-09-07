@@ -16,9 +16,9 @@
  */
 import type { Arm, Formation, UnitState } from "../../schema/types.ts";
 import { seeded } from "../primitives.ts";
-import { axes, GLYPH_PX, leeDrift, SIGN_HALF_HEIGHT, SIGN_HALF_WIDTH, SIGNS_PER_GLYPH } from "../style.ts";
+import { axes, GLYPH_PX, leeDrift } from "../anatomy.ts";
 import type { Glyph, GlyphRequest, Sign } from "../view.ts";
-import { frontage, signPositions, signSlots } from "./slots.ts";
+import { frontage, signPositions, signSlots, SIGNS_PER_GLYPH } from "./slots.ts";
 
 /**
  * Billow's two weights: a full cloud when a unit is engaged, the same cloud
@@ -41,6 +41,15 @@ const CHORDS = [0.3, 0.52, 0.74];
 const CHORD_LENGTH = 0.82;
 /** Below this scale the chords are too fine to read, so the legend's sample leaves them off. */
 const CHORD_MIN_SCALE = 0.9;
+
+/**
+ * Half the footprint one sign fills, across and along the heading. Every arm's
+ * sign is drawn inside it. It says how a tick fills its share of the glyph's 72
+ * pixels and means nothing to a view that draws a unit as one rectangle, so it
+ * is the engraved glyph's and not the anatomy's (ADR-0021).
+ */
+const SIGN_HALF_WIDTH = 2.6;
+const SIGN_HALF_HEIGHT = 3.25;
 
 /** The rank bar's weight: solid, because hollow already means destroyed (ADR-0016). */
 const RANK_BAR_THICKNESS = 2.6;
@@ -103,13 +112,37 @@ export const ticks: Glyph = {
   body,
   // A mass is two ranks deep, so the label clears the rear one (ADR-0016).
   halfWidth: (scale, formation) => (formation === "mass" ? SIGN_PITCH / 2 + SIGN_HALF_HEIGHT : SIGN_HALF_WIDTH) * scale,
+  markReach: engravedMarkReach,
 };
+
+/**
+ * How far the engraved engaged mark reaches past a unit's signs, downwind:
+ * Billow's plume at its furthest, in plate pixels (#58). `billowReach` below is
+ * held inside these numbers by a test, and the shared label pass clears them.
+ *
+ * It sits on the glyph rather than on the anatomy because one view's engaged
+ * mark is nothing like another's, and a shared worst-case constant charged
+ * every view for the plate's Billow (ADR-0021). Overstating it costs a label
+ * one displacement and never a word, which is why it is a table of the cloud's
+ * furthest reach rather than the cloud's own arithmetic.
+ */
+const MARK_REACH: Readonly<Record<UnitState, number>> = { intact: 0, engaged: 44, broken: 30, destroyed: 0 };
+
+/**
+ * The reach the engraved views clear. Atlas names it too: its hatching stands
+ * only `HATCH_PAD` off the block and is narrower than this, but cutting it to
+ * that moves every Atlas label, which is a drawing to judge and not a
+ * refactor (#168, ADR-0021).
+ */
+export function engravedMarkReach(scale: number, state: UnitState): number {
+  return MARK_REACH[state] * scale;
+}
 
 /**
  * How far the cloud reaches from the unit's centre, downwind: the hull
  * clearance, the drift, the furthest puff's radius and the outline it is drawn
- * with. Exported so a test can hold it inside `MARK_REACH`, which is what the
- * shared label pass clears (ADR-0014 keeps that pass out of this file).
+ * with. Exported so a test can hold it inside `MARK_REACH`, which is the
+ * number the shared label pass clears.
  */
 export function billowReach(state: UnitState, scale: number): number {
   if (state !== "engaged" && state !== "broken") return 0;

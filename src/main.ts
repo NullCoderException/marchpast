@@ -26,7 +26,8 @@ import { loadBattle, type LoadResult } from "./app/loadBattle.ts";
 import { loadLibrary, type LibraryResult } from "./app/loadLibrary.ts";
 import { mapFixtureNameFrom, MAP_FIXTURES, mapFixturesThereAre } from "./app/mapFixtures.ts";
 import { showNotice } from "./app/notice.ts";
-import { loadPlateFont } from "./fonts/plate.ts";
+import { loadFace, prefetchFaces } from "./fonts/faces.ts";
+import { DEFAULT_VIEW } from "./render/index.ts";
 import { createPlayer } from "./player/index.ts";
 
 /** The two slots `index.html` sets out. */
@@ -44,7 +45,7 @@ async function start(): Promise<void> {
   // A fixture is not a battle: nothing is fetched, so the library is never asked for either.
   const fixture = fixtureNameFrom(window.location.search);
   if (fixture !== undefined) {
-    await loadFace();
+    await loadOpeningFace();
     playFixture(page, fixture, mapFixtureNameFrom(window.location.search));
     return;
   }
@@ -55,13 +56,13 @@ async function start(): Promise<void> {
   const library = loadLibrary();
 
   if (name === null) {
-    await loadFace();
+    await loadOpeningFace();
     await showLibrary(page, library);
     return;
   }
 
   const battle = loadBattle(name);
-  await loadFace();
+  await loadOpeningFace();
   await playBattle(page, name, battle, library);
 }
 
@@ -99,6 +100,8 @@ async function playBattle(page: Page, name: string, loading: Promise<LoadResult>
   }
 
   document.title = `${result.battle.title} — Marchpast`;
+  // Whatever else there is to fetch goes after first paint, never before it.
+  prefetchFaces(OPENING_FACE);
   createPlayer({
     canvas: page.canvas,
     controlsRoot: page.controlsRoot,
@@ -132,12 +135,23 @@ function playFixture(page: Page, name: string, mapName: string | undefined): voi
     return;
   }
   document.title = `${battle.title} — Marchpast`;
+  prefetchFaces(OPENING_FACE);
   createPlayer({ canvas: page.canvas, controlsRoot: page.controlsRoot, battle, map });
 }
 
-/** The plate face. It is bundled, so this is quick; if it fails all the same, the fallback serif in every font string is better than a blank page. */
-function loadFace(): Promise<void> {
-  return loadPlateFont().catch((error: unknown) => console.warn("Marchpast: the plate typeface did not load", error));
+/**
+ * The face the opening view is set in. It blocks the first frame, because
+ * canvas text falls back silently to whatever font is there (ADR-0009); every
+ * other view's face is fetched at idle once something is on the screen, and a
+ * switch to a view whose face has not resolved waits rather than drawing in a
+ * fallback (ADR-0021, ADR-0023). Today every view is engraved and there is one
+ * face, so the prefetch has nothing to do; #175 gives it a second entry.
+ */
+const OPENING_FACE = DEFAULT_VIEW.type.face;
+
+/** It is bundled, so this is quick; if it fails all the same, the fallback serif in every font string is better than a blank page. */
+function loadOpeningFace(): Promise<void> {
+  return loadFace(OPENING_FACE).catch((error: unknown) => console.warn("Marchpast: the opening view's typeface did not load", error));
 }
 
 /** What stopped the page, on the plate and in the console: file, path and message, as `npm run validate` prints them. */

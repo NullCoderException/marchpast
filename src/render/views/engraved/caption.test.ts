@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { drawCaption, layoutCaption } from "./drawCaption.ts";
-import type { Battle } from "../schema/types.ts";
-import type { Picture } from "../timeline/picture.ts";
-import { pictureAt } from "../timeline/pictureAt.ts";
-import { NIGHT_BATTLE, clock } from "../timeline/testBattle.ts";
-import { DEFAULT_VIEW } from "./views.ts";
+import { drawCaption, layoutCaption } from "./caption.ts";
+import type { Battle } from "../../../schema/types.ts";
+import type { Picture } from "../../../timeline/picture.ts";
+import { pictureAt } from "../../../timeline/pictureAt.ts";
+import { NIGHT_BATTLE, clock } from "../../../timeline/testBattle.ts";
+import { DEFAULT_VIEW } from "../../views.ts";
 
 /** A measuring context: every glyph six pixels wide, which is all the layout needs. */
 function fakeContext(): CanvasRenderingContext2D {

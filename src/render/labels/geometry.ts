@@ -11,7 +11,7 @@
 import type { Formation, UnitState } from "../../schema/types.ts";
 import type { Point } from "../primitives.ts";
 import { type Rect, toRadians } from "../projection.ts";
-import { leeDrift, MARK_REACH } from "../style.ts";
+import { leeDrift } from "../anatomy.ts";
 
 /**
  * One unit as the placer sees it: the glyph it must clear and the words it may
@@ -40,6 +40,12 @@ export interface LabelUnit {
   length: number;
   /** Half the glyph's extent across its long axis: the view's own `halfWidth` (ADR-0014). */
   halfWidth: number;
+  /**
+   * How far the unit's engaged mark reaches past the glyph, downwind: the
+   * view's own `markReach`. A view whose mark is drawn inside the unit's own
+   * footprint answers zero and its labels clear less (ADR-0021, #139).
+   */
+  markReach: number;
   hasMove: boolean;
   /**
    * Where the wind blows *to*, in radians clockwise from the unit's heading —
@@ -125,7 +131,7 @@ export function leeDirection(unit: LabelUnit): Point {
  */
 export function smokeBox(unit: LabelUnit): Rect {
   const box = glyphBox(unit);
-  const reach = MARK_REACH[unit.state];
+  const reach = unit.markReach;
   if (reach === 0) return box;
   const lee = leeDirection(unit);
   const dx = lee.x * reach;
@@ -159,7 +165,7 @@ export function isForward(unit: LabelUnit, angle: number): boolean {
  * abeam; a line's is astern, its ends second. Windward first is the whole of
  * how a label keeps out of its own smoke (#39): with no wind at all
  * `leeDrift` puts the mark on the flank this leaves free, and both read the
- * one answer in `style.ts` rather than two that can disagree.
+ * one answer in `anatomy.ts` rather than two that can disagree.
  */
 export function preferredAngles(unit: LabelUnit): number[] {
   const heading = toRadians(unit.heading);

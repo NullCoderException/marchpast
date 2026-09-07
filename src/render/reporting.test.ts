@@ -18,7 +18,7 @@ import { unitsDrawn } from "./level.ts";
 import type { LayoutMode } from "./layout.ts";
 import type { Plate } from "./plate.ts";
 import { fitProjection, type Rect } from "./projection.ts";
-import { GLYPH_PX, sideColours } from "./style.ts";
+import { GLYPH_PX, sideColours } from "./anatomy.ts";
 import { ATLAS, DEFAULT_VIEW } from "./views.ts";
 import type { Battle, MapFile, Unit } from "../schema/types.ts";
 import type { Picture, UnitPicture } from "../timeline/picture.ts";

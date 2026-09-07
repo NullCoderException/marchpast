@@ -16,6 +16,7 @@
 import type { Arm, Formation } from "../../schema/types.ts";
 import type { Glyph, GlyphRequest, Sign, SignBox } from "../view.ts";
 import { frontage, MASS_RANKS } from "./slots.ts";
+import { engravedMarkReach } from "./ticks.ts";
 
 /** The block's thickness across its long axis. */
 const THICKNESS = 10;
@@ -93,6 +94,9 @@ export const block: Glyph = {
   body,
   // A mass is twice as thick, so the label clears the whole of it (ADR-0016).
   halfWidth: (scale, formation) => ((formation === "mass" ? THICKNESS * MASS_RANKS : THICKNESS) / 2 + HATCH_PAD) * scale,
+  // The plate's reach, named rather than cut down to this hatching's own: see
+  // `engravedMarkReach`. Value reuse, never inheritance.
+  markReach: engravedMarkReach,
 };
 
 /**

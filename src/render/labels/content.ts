@@ -32,6 +32,7 @@
 import type { LayoutMode } from "../layout.ts";
 import type { Point } from "../primitives.ts";
 import type { Rect } from "../projection.ts";
+import type { Voice } from "../view.ts";
 import { boxSetback, type LabelUnit } from "./geometry.ts";
 
 export const NAME_SIZE = 14;
@@ -83,8 +84,12 @@ const BOX_TOP = 19;
 const BOX_BOTTOM_DETAIL = 17;
 const BOX_BOTTOM_NAME = 5;
 
-/** Measures a string at a size, upright or italic. Injected so the placer never touches a canvas. */
-export type Measure = (text: string, sizePx: number, italic: boolean) => number;
+/**
+ * Measures a string at a size, in one of the two voices. Injected so the
+ * placer never touches a canvas, and taking a voice rather than a slope
+ * because the device that tells a name from a fact is the view's (ADR-0021).
+ */
+export type Measure = (text: string, sizePx: number, voice: Voice) => number;
 
 /** Which side of its anchor a label's words run. */
 export type Align = "left" | "right";
@@ -130,8 +135,8 @@ export function contentAt(unit: LabelUnit, step: number, mode: LayoutMode): Labe
 
 /** The widest of the label's lines, each measured at its own size. */
 export function contentWidth(content: LabelContent, measure: Measure): number {
-  const name = measure(content.name, NAME_SIZE, true);
-  return content.detail === undefined ? name : Math.max(name, measure(content.detail, DETAIL_SIZE, false));
+  const name = measure(content.name, NAME_SIZE, "name");
+  return content.detail === undefined ? name : Math.max(name, measure(content.detail, DETAIL_SIZE, "fact"));
 }
 
 /** The box the words occupy around the point they hang from. */
