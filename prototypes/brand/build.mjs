@@ -325,15 +325,15 @@ const cardTwo = `<div style="width: 1200px; height: 630px; box-sizing: border-bo
 const social = page(
   `${head(
     "The social card · 1200 × 630",
-    "What a link unfurls to on Slack, Discord, X, iMessage and every preview crawler. Two takes on the same question: whether a plate stands behind the name.",
+    "What a link unfurls to on Slack, Discord, X, iMessage and every preview crawler. <strong style=\"font-weight: normal; font-style: normal;\">S2 is chosen</strong>, on 7 September 2026: one static file, drawn once, that never claims a link points at a battle it does not. S1 is kept below as the record of what it beat.",
   )}
   <div style="display: flex; flex-direction: column; gap: 10px;">
-    ${section("S1 · The plate behind")}
+    ${section("S1 · The plate behind — cut")}
     ${cardOne}
     <div style="font-size: 13px; font-style: italic; line-height: 1.5;">The plate here is a hand-drawn stand-in, not the renderer's output: what would actually sit behind is a real still, and #126 proved the machinery — the same <code>@napi-rs/canvas</code> call the thumbnails use, at 1200 × 630, byte-identical run to run. <span style="color: ${RED};">For.</span> It shows the product in the preview rather than describing it, which is the whole job of an unfurl. <span style="color: ${BLUE};">Against.</span> It pins one battle to the whole site — every link to every page unfurls as Trafalgar — and the panel eats a third of the plate it is advertising.</div>
   </div>
   <div style="display: flex; flex-direction: column; gap: 10px;">
-    ${section("S2 · The plate alone")}
+    ${section("S2 · The plate alone — chosen")}
     ${cardTwo}
     <div style="font-size: 13px; font-style: italic; line-height: 1.5;"><span style="color: ${RED};">For.</span> Never misrepresents which battle a link points at, survives every crop a platform applies, and is one static file with nothing to regenerate. <span style="color: ${BLUE};">Against.</span> A preview that shows no product is a wasted preview, and this one is a title card for a site whose whole argument is the picture.</div>
   </div>
@@ -370,7 +370,7 @@ const masthead = page(
     <div style="padding-bottom: 16px; border-bottom: 3px double ${RULE};">
       ${lockup({ size: 40, type: 30 })}
       <div style="margin: 10px 0 0; font-size: 15px; font-style: italic; line-height: 1.45;">${IDEA_LINE}</div>
-      <div style="margin: 8px 0 0; font-size: 13px; font-style: italic;"><a href="#" style="color: ${RED};">How it is made, and where the battles come from →</a></div>
+      <div style="margin: 8px 0 0; font-size: 13px; font-style: italic;"><a href="#" style="color: ${INK};">How it is made, and where the battles come from →</a></div>
     </div>
     <ol style="margin: 0; padding: 0; list-style: none;">
       ${BATTLES.map((b) => entry(b)).join("\n      ")}
@@ -385,7 +385,7 @@ const phone = page(
     <div style="padding-bottom: 16px; border-bottom: 3px double ${RULE};">
       ${lockup({ size: 32, type: 30 })}
       <div style="margin: 10px 0 0; font-size: 15px; font-style: italic; line-height: 1.45;">${IDEA_LINE}</div>
-      <div style="margin: 8px 0 0; font-size: 13px; font-style: italic;"><a href="#" style="color: ${RED};">How it is made →</a></div>
+      <div style="margin: 8px 0 0; font-size: 13px; font-style: italic;"><a href="#" style="color: ${INK};">How it is made →</a></div>
     </div>
     <ol style="margin: 0; padding: 0; list-style: none;">
       ${BATTLES.slice(0, 3).map((b) => entry(b, { compact: true })).join("\n      ")}
@@ -401,7 +401,7 @@ const phone = page(
 function option(key, text, note, { tone = "plain" } = {}) {
   const border = tone === "plain" ? HAIR : RULE;
   const fill = tone === "plain" ? "transparent" : "rgba(43,36,24,0.04)";
-  const tag = { ships: " · what ships today", drawn: " · drawn, and cut", lead: " · drawn on the masthead" }[tone] ?? "";
+  const tag = { ships: " · what ships today", drawn: " · drawn, and cut", chosen: " · chosen" }[tone] ?? "";
   return `<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid ${border}; background: ${fill};">
       <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">${key}${tag}</div>
       <div style="font-size: 15px; line-height: 1.45;">${text}</div>
@@ -418,7 +418,7 @@ const words = page(
     ${section("The masthead line")}
     ${option("L1", "A web app that plays back famous battles as animated 2D “grand strategy” sequences, driven by a reusable JSON timeline format, with the timelines extracted from public-domain primary and secondary sources.", "The concept document's one-liner, lifted whole into <code>src/app/libraryPage.ts</code>. It survived because the name used to carry some of the load. It names the implementation twice — “web app”, “JSON timeline format” — to a reader who came to watch a battle, and at 210 characters it wraps to three lines under the mark.", { tone: "ships" })}
     ${option("L2", "Famous battles, played back on the map: the units, their moves and a caption, phase by phase, from public-domain sources.", "Cut. Three faults, all mechanical. Four clauses hang off the subject with nothing governing them, a colon and three commas doing the same job. “The units, their moves and a caption” is the renderer's parts list, and a caption is not a reason to visit. And it ends on a licence fact, which is the least interesting thing here to a visitor and the most interesting to a contributor.", { tone: "drawn" })}
-    ${option("N1", "Famous battles, played back on the map — phase by phase, from the sources up.", "77 characters, one line under the mark at every width down to the phone. One clause, one em-dash, and the dash does the governing the colon failed at. “From the sources up” carries the provenance in four words without saying “public domain”, and it is a claim about how the thing is built rather than a licence note.", { tone: "lead" })}
+    ${option("N1", "Famous battles, played back on the map — phase by phase, from the sources up.", "77 characters, one line under the mark at every width down to the phone. One clause, one em-dash, and the dash does the governing the colon failed at. “From the sources up” carries the provenance in four words without saying “public domain”, and it is a claim about how the thing is built rather than a licence note.", { tone: "chosen" })}
     ${option("N2", "Famous battles, played back on the map phase by phase. Every position is drawn from a primary source.", "Two sentences, each doing one job: the what, then the claim. The safest of the four and the easiest to read aloud. Costs a second line under the mark, and “every position” is a promise the conjecture ticket (#133) may have to qualify.")}
     ${option("N3", "Watch a famous battle unfold on the map, phase by phase, drawn from the primary sources.", "The only one that opens with a verb aimed at the reader, which is what a front door usually wants. Against it: “watch” is what every video site says, and the plate's voice is a document's, not a broadcaster's.")}
     ${option("N4", "A march-past of famous battles: each one played back on its own map, phase by phase, from the primary sources.", "Spends the name's one available reading — a column filing past while the reviewer stands still — so the word starts to mean something, and the mark draws the same idea. Against it: a reader who does not know the term now has two unfamiliar things instead of one, and it is the longest of the four.")}
@@ -426,12 +426,12 @@ const words = page(
   <div style="display: flex; flex-direction: column; gap: 12px;">
     ${section("The title")}
     ${option("T1", "<code>Marchpast</code> on the library; <code>The Battle of Trafalgar · Marchpast</code> on a battle.", "What ships today. A bare name is a bare name: in a search result, a bookmark bar or a shared tab it says nothing, and now the name says nothing either.", { tone: "ships" })}
-    ${option("T2", "<code>Marchpast — famous battles, played back on the map</code> on the library; the battle title unchanged.", "The library's title is the one that gets indexed and shared, so it carries the line; a battle page already has a self-explaining title and needs no tagline behind it.")}
+    ${option("T2", "<code>Marchpast — famous battles, played back on the map</code> on the library; the battle title unchanged.", "The library's title is the one that gets indexed and shared, so it carries the line; a battle page already has a self-explaining title and needs no tagline behind it.", { tone: "chosen" })}
   </div>
   <div style="display: flex; flex-direction: column; gap: 12px;">
     ${section("The meta description")}
     ${option("D1", "There is none.", "<code>index.html</code> has no description tag at all, so a search engine invents one from whatever text it finds first, and a link with no card has no text to fall back on.", { tone: "ships" })}
-    ${option("D2", "“Famous battles played back on the map, phase by phase — the positions, the moves and the clock, drawn from public-domain primary sources. Cannae, the Nile, Copenhagen, Trafalgar.”", "175 characters; a result snippet keeps about 155 and the rest still helps the match. Naming the battles is what makes it findable — nobody searches for “battle playback”, they search for a battle. Grows as battles land, which is a build-time job if the description is generated from the library.")}
+    ${option("D2", "“Famous battles played back on the map, phase by phase — the positions, the moves and the clock, drawn from public-domain primary sources. Cannae, the Nile, Copenhagen, Trafalgar.”", "175 characters; a result snippet keeps about 155 and the rest still helps the match. Naming the battles is what makes it findable — nobody searches for “battle playback”, they search for a battle. Grows as battles land, which is a build-time job if the description is generated from the library.", { tone: "chosen" })}
   </div>
   <div style="display: flex; flex-direction: column; gap: 12px;">
     ${section("The README's first paragraph")}
@@ -485,7 +485,7 @@ const canvas = {
       y: 1080,
       w: 940,
       page: "page-1",
-      text: "STILL TO DECIDE\n1. The masthead line — N1 is drawn on the masthead, the card and the phone; N2, N3 and N4 are beside it on the Words sheet. This is the one that matters most: ADR-0020 left it as the only thing on the page that explains the app.\n2. The social card — S1, a real build-time still behind a parchment panel, or S2, the plate alone.\n3. Whether the head carries a third line linking to the story, as drawn, or whether that link stays in the credit footer beside the GitHub link.\n4. The title and the meta description, T1/T2 and D1/D2.",
+      text: "DECIDED, 7 September 2026\nThe mark: A · The Review.\nThe masthead line: N1 — Famous battles, played back on the map, phase by phase, from the sources up. One line under the mark at every width down to the phone.\nThe social card: S2, the plate alone. S1 pinned one battle to every link the site has.\nThe title: T2. The meta description: D2, where there is none today.\nThe story link stays in the head as a third line, and in ink: a side ink belongs to the sides of a battle and is never decorative (#58).",
     },
     {
       id: "masthead-note",
