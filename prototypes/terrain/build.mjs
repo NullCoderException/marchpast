@@ -383,6 +383,10 @@ const COST = page("What each treatment costs",
     ${["View", "Treatment", "Kind", "What it costs", "New in the view"].map((h) => `<div style="padding: 9px 11px; border-bottom: 1px solid #2b2418; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">${h}</div>`).join("")}
     ${COST_ROWS.map((row, i) => row.map((cell) => `<div style="padding: 9px 11px; ${i < COST_ROWS.length - 1 ? "border-bottom: 1px solid rgba(43,36,24,0.25);" : ""} line-height: 1.45;">${cell}</div>`).join("")).join("")}
   </div>
+  <div style="display: flex; flex-direction: column; gap: 6px; padding: 13px 15px; border: 1px solid #2b2418; background: rgba(143,47,36,0.05);">
+    <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">The cost none of the rows carries: the ground is redrawn every frame</div>
+    <div style="font-size: 13px; line-height: 1.45;"><code>renderer.ts:156</code> calls <code>drawMap</code> inside the per-frame render, with no cache. Today that is cheap — 44 contour paths. A hachure pass is ~5 000 strokes and the staff map’s ground is tints, a graticule, contours and numerals, and both would run on every frame of the playback. But <b style="font-weight: normal; font-style: normal;">the ground is invariant across a battle</b>: the map file does not change between phases, and the projection and extent are fixed for the whole picture (ADR-0001). So any ground past the cheapest wants drawing once to an offscreen canvas keyed by view, extent and device pixel ratio, and blitting thereafter — one buffer, invalidated when the view or the size changes. That is a build item the handoff (#141) must budget for whichever treatments win here, and it is the same buffer for all of them.</div>
+  </div>
   <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
     <div style="display: flex; flex-direction: column; gap: 6px; padding: 13px 15px; border: 1px solid #2b2418;">
       <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">The anatomy, unchanged by any of it</div>
@@ -409,7 +413,7 @@ const canvas = {
     { file: "StaffMap.dc.html", x: 1220, y: 800, w: 1120, h: 650, title: "Staff map · Cannae (sheet chip)", page: P1 },
     { file: "Shore.dc.html", x: 0, y: 0, w: 1140, h: SHORE_H, title: "Shore, sea and a work at a point", page: P2 },
     { file: "LineWorks.dc.html", x: 1240, y: 0, w: 1140, h: WORKS_H, title: "A work that is a line", page: P2 },
-    { file: "Cost.dc.html", x: 2480, y: 0, w: 1140, h: 700, title: "What each treatment costs", page: P2 },
+    { file: "Cost.dc.html", x: 2480, y: 0, w: 1140, h: 860, title: "What each treatment costs", page: P2 },
   ],
   annotations: [
     { id: "ground-intro", x: 0, y: -230, w: 1120, page: P1, text: "TERRAIN TREATMENTS PER VIEW (#138). ADR-0021 made `ground` a module the view supplies, so the question #62 answered once for one shared pass is open again per view. Each board is Cannae phase 6 — seven units, eight labels, 64 contour lines at 10 m — with a chip that switches that view's ground. The crowding is the point: a treatment that drowns the units is out however well it draws. Units are the tick and block glyphs already decided; what a legion looks like, and the staff map's own glyph, type and furniture, are #139's." },
