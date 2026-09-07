@@ -1,0 +1,131 @@
+{
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "The four surfaces"
+    },
+    {
+      "id": "page-2",
+      "name": "The open questions"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1120,
+      "h": 802,
+      "title": "Chart plate · Trafalgar 13:30",
+      "page": "page-1"
+    },
+    {
+      "file": "Night.dc.html",
+      "x": 1260,
+      "y": 0,
+      "w": 1120,
+      "h": 802,
+      "title": "Night plate · Trafalgar 13:30",
+      "page": "page-1"
+    },
+    {
+      "file": "Atlas.dc.html",
+      "x": 0,
+      "y": 972,
+      "w": 1120,
+      "h": 846,
+      "title": "Atlas · Cannae 11:00",
+      "page": "page-1"
+    },
+    {
+      "file": "Staff.dc.html",
+      "x": 1260,
+      "y": 972,
+      "w": 1120,
+      "h": 770,
+      "title": "Staff map · Midway 10:25",
+      "page": "page-1"
+    },
+    {
+      "file": "PhonePlate.dc.html",
+      "x": 2520,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Phone · chart plate",
+      "page": "page-1"
+    },
+    {
+      "file": "PhoneStaff.dc.html",
+      "x": 3050,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Phone · staff map",
+      "page": "page-1"
+    },
+    {
+      "file": "Tokens.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1180,
+      "h": 1010,
+      "title": "The surface, derived",
+      "page": "page-2"
+    },
+    {
+      "file": "Choosers.dc.html",
+      "x": 1320,
+      "y": 0,
+      "w": 1440,
+      "h": 1180,
+      "title": "The chooser",
+      "page": "page-2"
+    },
+    {
+      "file": "Details.dc.html",
+      "x": 0,
+      "y": 1180,
+      "w": 1120,
+      "h": 1180,
+      "title": "The details panel",
+      "page": "page-2"
+    },
+    {
+      "file": "Boundary.dc.html",
+      "x": 1320,
+      "y": 1350,
+      "w": 1180,
+      "h": 1200,
+      "title": "The library's boundary",
+      "page": "page-2"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "brief",
+      "x": 0,
+      "y": -220,
+      "w": 640,
+      "text": "#137 · The player surface under each view.\nThe pictures are the real app captured at 1120; the strip, the panel and the choosers beneath them are player.css and controls.ts redrawn at the same scale, so nothing here is a sketch of the app — it is the app.\nTwo chips on every surface board: the derivation (what --st-sunk and --st-rule come off) and the chooser."
+    },
+    {
+      "id": "staff-fails",
+      "x": 1260,
+      "y": 822,
+      "w": 620,
+      "text": "The staff map is where the derivation was never tested. Flip the derivation chip: the trough and the Details toggle appear. As decided, its fill sits 1.05 from its ground — no step at all — and its rule measures 2.91 against ADR-0023's own 3:1."
+    },
+    {
+      "id": "wrap",
+      "x": 700,
+      "y": -220,
+      "w": 640,
+      "text": "At 1120 the strip already wraps to two rows on any battle with a level chooser, and the scrubber is squeezed to about 215px for eight phases. Midway wants twenty-one."
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-1"
+  }
+}
