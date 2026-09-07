@@ -223,8 +223,16 @@ _Avoid_: Tooltip, popup, popover, info box, unit panel
 ### Site
 
 **Library**:
-The collection of every battle the site holds, and the front-door page that lists them oldest first, each by title, date, sides and summary, drawn from the battle files themselves. It is never grouped.
+The collection of every battle the site holds, and the front-door page that lists them oldest first, each by its still, title, date, sides and summary, drawn from the battle files themselves. It is never grouped.
 _Avoid_: Catalogue, index, list, home page, menu, gallery
+
+**Still**:
+The picture of one phase of a battle, drawn by the build with the renderer the player uses, at a size and a view the build chooses rather than a viewer. The phase a battle marks for it is its **still phase**; a battle that marks none has one picked by rule.
+_Avoid_: Snapshot, screenshot, render, image, poster, preview
+
+**Thumbnail**:
+Where a still is shown: the small picture on a battle's entry in the library. A still is the picture; the thumbnail is the slot it fills, so a still shown at another size for another purpose is not one.
+_Avoid_: Thumb, tile, cover, card image
 
 **Chronology rail**:
 The line down the library's left gutter that gives the list its spine: a bare node beside each battle, and between two battles the years that passed, in words. Its spacing is even and means nothing; the interval is written rather than drawn, because the library spans two millennia and no scale holds both a gap of eighteen centuries and a gap of two years.
