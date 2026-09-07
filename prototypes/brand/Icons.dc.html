@@ -12,12 +12,13 @@
     body { margin: 0; font-family: "IM Fell English", Georgia, "Times New Roman", serif; color: #2b2418; background: #efe3c6; }
     a { color: #8f2f24; } a:hover { color: #2b2418; }
     svg text { font-family: "IM Fell English", Georgia, "Times New Roman", serif; }
+    code { font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.9em; }
   </style>
 </helmet>
 <div style="width: 940px; padding: 32px 36px; box-sizing: border-box; background: #efe3c6; display: flex; flex-direction: column; gap: 26px;">
   <div style="display: flex; flex-direction: column; gap: 6px;">
     <div style="font-size: 30px;">Icons and the manifest</div>
-    <div style="font-size: 15px; font-style: italic;">Drawn with A · The Review as the leading candidate; swapping the direction swaps every specimen on this sheet and nothing else. The set is what an installable web app asks for, and no more: no service worker, no offline (map #121).</div>
+    <div style="font-size: 15px; font-style: italic; line-height: 1.45;">The chosen mark at the sizes an installable web app asks for, and no more: no service worker, no offline (map #121).</div>
   </div>
   <div style="display: flex; flex-direction: column; gap: 12px;">
     <div style="font-size: 20px;">The favicon</div>
@@ -38,7 +39,7 @@
     <line x1="5.6" y1="7.4" x2="5.6" y2="12.6" stroke="#2b2418" stroke-width="1.4"/>
     <line x1="9.4" y1="2.6" x2="9.4" y2="14.2" stroke="#2b2418" stroke-width="1.8"/>
     <line x1="13.2" y1="7.4" x2="13.2" y2="12.6" stroke="#2b2418" stroke-width="1.4"/></svg></div>
-        <div style="font-size: 11px; font-style: italic; opacity: 0.8; text-align: center;">the same, at 2×</div>
+        <div style="font-size: 11px; font-style: italic; opacity: 0.8; text-align: center;">the same cut, at 2×</div>
       </div>
       <div style="display: flex; flex-direction: column; gap: 5px; align-items: center;">
         <div style="display: flex; align-items: center; justify-content: center; width: 118px; height: 118px; padding: 10px; box-sizing: border-box; background: #efe3c6; border: 1px solid rgba(43,36,24,0.2);"><svg width="32" height="32" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="display: block;">
@@ -61,7 +62,7 @@
         <div style="font-size: 11px; font-style: italic; opacity: 0.8; text-align: center;">in a browser tab</div>
       </div>
     </div>
-    <div style="font-size: 13px; font-style: italic; line-height: 1.5;">One <code>favicon.svg</code> carrying the redrawn 16px geometry, plus a 32px PNG for the browsers that still want one. The SVG is ink on transparent, so a dark-themed tab strip gets the mark in ink on its own ground — if that reads badly, the SVG takes a <code>prefers-color-scheme</code> block and inverts, which is the one place the site is allowed to follow the viewer's theme.</div>
+    <div style="font-size: 13px; font-style: italic; line-height: 1.5;">One <code>favicon.svg</code> carrying the redrawn 16 geometry, plus a 32px PNG for the browsers that still want one. The SVG is ink on transparent, so a dark tab strip gets ink on its own ground — if that reads badly, the file takes a <code>prefers-color-scheme</code> block and inverts, which is the one place anything here follows the viewer's theme.</div>
   </div>
   <div style="display: flex; flex-direction: column; gap: 12px;">
     <div style="font-size: 20px;">The app icon</div>
@@ -98,7 +99,7 @@
     <line x1="37.5" y1="5" x2="37.5" y2="58" stroke="#2b2418" stroke-width="1.6"/>
     <line x1="42.5" y1="5" x2="42.5" y2="58" stroke="#2b2418" stroke-width="1.6"/>
     <line x1="52" y1="28" x2="52" y2="50" stroke="#2b2418" stroke-width="3.6"/></svg>
-          <div style="position: absolute; left: 11.8px; top: 11.8px; width: 94.4px; height: 94.4px; border: 1px dashed #8f2f24; border-radius: 50%;"></div>
+          <div style="position: absolute; left: 11.8px; top: 11.8px; width: 94.4px; height: 94.4px; border: 1px dashed #8f2f24; border-radius: 50%; box-sizing: border-box;"></div>
         </div>
         <div style="font-size: 11px; font-style: italic; opacity: 0.8; text-align: center;">512 · maskable, 80% safe zone</div>
       </div>
@@ -114,7 +115,7 @@
         <div style="font-size: 11px; font-style: italic; opacity: 0.8; text-align: center;">180 · apple-touch, square</div>
       </div>
     </div>
-    <div style="font-size: 13px; font-style: italic; line-height: 1.5;">The maskable icon is the mark at about 60% of the tile so every platform's crop — circle, squircle, rounded square — still clears it. The Apple touch icon ships square and opaque on parchment: iOS rounds it itself and composites a transparent one onto black. The tile is never ink-on-parchment <em>and</em> rounded by us; the platform owns the corner.</div>
+    <div style="font-size: 13px; font-style: italic; line-height: 1.5;">The maskable icon is the mark at about 60% of the tile so every platform's crop — circle, squircle, rounded square — clears it. The Apple touch icon ships square and opaque on parchment: iOS rounds it itself and composites a transparent one onto black. The tile is never rounded by us <em>and</em> handed to a platform that rounds it again.</div>
   </div>
   <div style="display: flex; flex-direction: column; gap: 12px;">
     <div style="font-size: 20px;">The manifest</div>
@@ -124,7 +125,7 @@
       <div><span style="font-style: italic;">display</span> — standalone</div><div><span style="font-style: italic;">start_url</span> — / , the library (ADR-0011)</div>
       <div><span style="font-style: italic;">scope</span> — /</div><div><span style="font-style: italic;">orientation</span> — unset; the plate letterboxes either way</div>
     </div>
-    <div style="font-size: 13px; font-style: italic; line-height: 1.5;">The name fits in one field, so <code>short_name</code> does not have to shorten anything. The theme colour is the parchment rather than the ink: an installed window frames the plate, and the plate's ground is the paper. There is nothing to decide about the description field — it is the meta description on the Words sheet.</div>
+    <div style="font-size: 13px; font-style: italic; line-height: 1.5;">The name fits in one field, so <code>short_name</code> shortens nothing. The theme colour is the parchment rather than the ink: an installed window frames the plate, and the plate's ground is the paper. The manifest's <code>description</code> is the meta description on the Words sheet, written once and used twice.</div>
   </div>
 </div>
 </x-dc>
