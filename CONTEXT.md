@@ -169,7 +169,7 @@ _Avoid_: Commentary, alternates, uncertainty, confidence
 ### Player
 
 **View**:
-A named whole visual treatment of the picture that the viewer picks: the chart plate (the default), the night plate, or atlas. Every view keeps the anatomy and owns everything about how the picture is drawn — its paper and inks, its type, how the ground is drawn, how each piece of furniture is drawn, and how a unit and its engaged mark are drawn. Held by the player for the current visit, never authored in a battle file.
+A named whole visual treatment of the picture and the player's surface that the viewer picks: the chart plate (the default), the night plate, or atlas. Every view keeps the anatomy and owns everything about how the picture is drawn — its paper and inks, its type, how the ground is drawn, how each piece of furniture is drawn, and how a unit and its engaged mark are drawn. Remembered from one visit to the next, never authored in a battle file.
 _Avoid_: Theme, skin, style, mode, layer, variant
 
 **Anatomy**:
@@ -181,7 +181,7 @@ The idiom a view is drawn in. The chart plate, the night plate and atlas share t
 _Avoid_: Theme, style, look, family, skin, design language
 
 **View chooser**:
-The control in the player's controls that switches the picture to another view, taking effect at once without interrupting playback and lasting only the current visit.
+The control in the player's controls that switches the picture and the surface to another view, taking effect at once without interrupting playback, and remembered so the next visit opens in the view it was left on.
 _Avoid_: Theme switcher, view toggle, style menu, mode
 
 **Level chooser**:
@@ -196,8 +196,12 @@ _Avoid_: Icon, symbol, marker, sprite, token
 The shape by which a view tells one arm from another inside a glyph: the chart plate's chevron tick for a ship, its rank bar for foot and barred rank bar for horse, atlas's diagonal across a cavalry block. Every view has a sign for every arm.
 _Avoid_: Mark (the state's), icon, symbol, tick (except for the ship sign), badge
 
+**Surface**:
+The player's page around the plate — the control strip, the details panel and the ground they sit on — drawn as a page rather than on the canvas, and drawn in the current view's inks and face. It is what a view reaches beyond the picture; the library is not part of it and never follows a view.
+_Avoid_: Chrome, UI, shell, skin, theme, frame
+
 **Controls**:
-What the viewer operates to drive playback: play and pause, the scrubber, the phase-jump buttons, the speed multiplier, the view chooser, the level chooser, the picker, and the toggle for the details panel. Never authored in a battle file.
+What the viewer operates to drive playback: play and pause, the scrubber, the phase-jump buttons, the speed multiplier, the view chooser, the level chooser, the picker, and the toggle for the details panel. Drawn in the current view's language, on the surface. Never authored in a battle file.
 _Avoid_: Furniture, UI, transport, toolbar
 
 **Scrubber**:
