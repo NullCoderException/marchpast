@@ -16,7 +16,7 @@
  *
  * Today every view is engraved and there is one face, so this is the mechanism
  * with one entry. The staff map adds the second (#139), and the build-time
- * still renderer adds a second hook entry beside it (#126).
+ * still renderer registers the same list with a Node canvas (#126).
  */
 import { PLATE_FONT_FAMILY } from "./plate.ts";
 import plateFontUrl from "./IMFellEnglish-Regular.woff2";
@@ -25,12 +25,18 @@ import plateFontUrl from "./IMFellEnglish-Regular.woff2";
 export type FaceId = "plate";
 
 /** One bundled face: the family a font shorthand names, and the file it is loaded from. */
-interface Face {
+export interface Face {
   family: string;
   url: string;
 }
 
-const FACES: Readonly<Record<FaceId, Face>> = {
+/**
+ * Every bundled face by id. Exported because the browser is not the only thing
+ * that draws in them: `vite/stills.ts` registers the same bytes with a Node
+ * canvas rather than a document, and reads the list from here so that a face
+ * added for a view cannot be forgotten by the build (#126, ADR-0025).
+ */
+export const FACES: Readonly<Record<FaceId, Face>> = {
   plate: { family: PLATE_FONT_FAMILY, url: plateFontUrl },
 };
 

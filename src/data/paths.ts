@@ -7,7 +7,8 @@
  * which is a bare slash now the site serves from the root of its own domain,
  * so `/data/…` resolves on the dev server and on the live site alike, and a
  * deployment under a path would follow its base with no change here. The dev
- * server and build step that make these URLs real live in `vite/serve-data.ts`.
+ * server and build steps that make these URLs real live in `vite/serve-data.ts`
+ * and `vite/stills.ts`.
  */
 
 /** Directory the data files are served under, beneath the app's base URL. Mirrors the repo's `data/`, which `vite/serve-data.ts` mounts at the server's root (where the base leaves it) and copies into `dist/data/` for the build. */
@@ -31,4 +32,19 @@ export function indexUrl(): string {
 /** URL of the map file `data/maps/<name>.geojson`. */
 export function mapUrl(name: string): string {
   return `${dataPrefix()}/maps/${name}.geojson`;
+}
+
+/**
+ * URL of the still `data/stills/<name>.png`: the picture of one phase of the
+ * battle, drawn by the build with the app's own renderer and shown in the
+ * library (ADR-0025). Like the index, it is generated rather than stored, by
+ * `vite/stills.ts`.
+ *
+ * The social card the same file draws, `data/cards/<name>.png`, has no
+ * function here: nothing in `src/` fetches one — the build writes it and a
+ * crawler reads it — and this module turns a name into a URL the app fetches
+ * (ADR-0028).
+ */
+export function stillUrl(name: string): string {
+  return `${dataPrefix()}/stills/${name}.png`;
 }

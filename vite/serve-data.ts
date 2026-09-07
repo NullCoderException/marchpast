@@ -4,7 +4,10 @@
  * the same way in both. Anything under `/data/` that is not a file is a plain
  * 404, never the SPA's index.html fallback.
  *
- * One file on that route is on no one's disk: `/data/index.json` is the
+ * Two kinds of file on that route are on no one's disk. The pictures —
+ * `/data/stills/` and `/data/cards/` — belong to `stills.ts`, which is
+ * registered before this plugin so its middleware answers them before the 404
+ * below can. The other is the library: `/data/index.json` is the
  * library, built from the battle files themselves by `library.ts` (ADR-0011).
  * The build writes it into `dist/data/`; dev generates it per request, so a
  * battle file added or edited while the server runs shows up on the front door

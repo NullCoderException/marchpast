@@ -1,9 +1,10 @@
 /**
  * Which phase a battle's still is drawn from (ADR-0025), as one pure rule, so
- * that the still renderer (#174) and the tests below cannot come to different
- * answers. Nothing but the tests calls it yet; it lands here rather than
- * inside #174 because it is schema matter, and because the four shipped files'
- * marked phases are worth pinning the moment they are marked.
+ * that the still renderer and the tests below cannot come to different
+ * answers. `vite/stills.ts` calls it for the thumbnail, the card and the
+ * card's alt; it lives here rather than beside them because it is schema
+ * matter, and because the four shipped files' marked phases were worth
+ * pinning the moment they were marked.
  *
  * A battle marks the phase whose picture stands for it with `still: true`, and
  * the validator allows at most one (rule 18). When no phase carries it the

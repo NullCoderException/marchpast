@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { battleUrl, indexUrl, mapUrl } from "./paths";
+import { battleUrl, indexUrl, mapUrl, stillUrl } from "./paths";
 
 describe("data served by name", () => {
   it("resolves a battle name to data/battles/<name>.json", () => {
@@ -12,6 +12,10 @@ describe("data served by name", () => {
 
   it("puts the library index at data/index.json", () => {
     expect(indexUrl()).toBe("/data/index.json");
+  });
+
+  it("resolves a battle name to the still data/stills/<name>.png", () => {
+    expect(stillUrl("trafalgar")).toBe("/data/stills/trafalgar.png");
   });
 });
 
@@ -34,5 +38,9 @@ describe("data under a base path", () => {
 
   it("puts the index beneath the app's base URL", () => {
     expect(indexUrl()).toBe("/under-a-path/data/index.json");
+  });
+
+  it("puts a still beneath the app's base URL", () => {
+    expect(stillUrl("trafalgar")).toBe("/under-a-path/data/stills/trafalgar.png");
   });
 });
