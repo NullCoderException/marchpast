@@ -4,14 +4,21 @@
  * derived from them once per pass.
  */
 import type { Battle, MapFile } from "../schema/types.ts";
+import type { LayoutMode } from "./layout.ts";
 import type { Picture, UnitPicture } from "../timeline/picture.ts";
-import type { Projection } from "./projection.ts";
+import type { Projection, Rect } from "./projection.ts";
 import type { View } from "./view.ts";
 
 export interface Plate {
   ctx: CanvasRenderingContext2D;
   /** The treatment this frame is drawn in: the passes read every colour, pen and glyph from here. */
   view: View;
+  /**
+   * How wide the plate is, as one global rule (`layout.ts`, #86): which
+   * furniture is drawn, and how many words a label may spend. Derived from the
+   * canvas's own width once per frame, so a resize is just another frame.
+   */
+  mode: LayoutMode;
   battle: Battle;
   map: MapFile | undefined;
   picture: Picture;
@@ -30,6 +37,13 @@ export interface Plate {
    * carries (#62).
    */
   contourLevels: readonly number[];
+  /**
+   * The rectangle the projection was fitted into: the canvas above the caption
+   * band, inset by the plate margin. The extent letterboxes inside it, and on
+   * a phone this is where the furniture hangs from rather than the extent
+   * (#86).
+   */
+  plateArea: Rect;
   projection: Projection;
   /** Side name to ink colour, by roster order, in the view's palette. */
   colours: Map<string, string>;

@@ -34,6 +34,7 @@ import { drawFurniture, furnitureBoxes } from "./drawFurniture.ts";
 import { drawMap, mapPoints } from "./drawMap.ts";
 import { drawUnits, layoutUnits } from "./drawUnits.ts";
 import type { HitRegion } from "./hit.ts";
+import { layoutMode } from "./layout.ts";
 import {
   canvasMeasure,
   type CardContent,
@@ -90,21 +91,26 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
       const view = viewById(viewer.view);
       const { palette } = view;
       const { width, height } = fitBackingStore(canvas, ctx);
+      // One global rule about width, read once and handed to every pass that
+      // answers to it: the furniture set, the band's anatomy, and the step the
+      // labels start collapsing from (#86).
+      const mode = layoutMode(width);
 
       // Ground: everything is the view's paper until a land polygon says otherwise.
       ctx.fillStyle = palette.paper;
       ctx.fillRect(0, 0, width, height);
 
       // The caption band's height comes first, so the plate fits above it.
-      const caption = layoutCaption(ctx, battle, picture, width);
+      const caption = layoutCaption(ctx, battle, picture, width, mode);
       const plateHeight = Math.max(1, height - caption.height);
 
-      const projection = fitProjection(battle.extent, {
+      const plateArea: Rect = {
         x: PLATE_MARGIN,
         y: PLATE_MARGIN,
         width: Math.max(1, width - PLATE_MARGIN * 2),
         height: Math.max(1, plateHeight - PLATE_MARGIN * 2),
-      });
+      };
+      const projection = fitProjection(battle.extent, plateArea);
       const { extentRect } = projection;
 
       // Letterbox: another tone outside the extent, the plate itself back in the paper.
@@ -121,11 +127,13 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
       const plate: Plate = {
         ctx,
         view,
+        mode,
         battle,
         map,
         picture,
         unitsDrawn: unitsDrawn(battle.units, picture.units, viewer.level),
         contourLevels: contourLevels(map),
+        plateArea,
         projection,
         colours: sideColours(battle, palette),
         pixelsPerMetre,
@@ -155,7 +163,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
       // up showing.
       const rows = drawFurniture(plate, key);
       drawLabels(ctx, placed, palette);
-      drawCaption(ctx, battle, picture, caption, plateHeight, width, palette);
+      drawCaption(ctx, picture, caption, plateHeight, width, palette, mode);
       return hitRegions(placed, rows);
     },
   };
@@ -203,7 +211,7 @@ export function layoutPlate({ plate, units, memory, measure, card }: PlateLayout
     // unit label, which may be displaced or collapsed instead (#107).
     const names = placeMapLabels({ points, plate: extentRect, obstacles: furniture });
     const obstacles = [...furniture, ...names.map(({ box }) => box)];
-    return { names, ...placeLabels({ units, plate: extentRect, obstacles, measure, memory, card }) };
+    return { names, ...placeLabels({ units, plate: extentRect, obstacles, measure, memory, card, mode: plate.mode }) };
   };
 
   let placement = place([]);

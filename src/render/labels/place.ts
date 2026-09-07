@@ -25,10 +25,15 @@
  * Pure: the memory goes in and a new memory comes out, so the renderer can run
  * the placer twice in one frame (the legend's numeral key changes the legend's
  * size, which changes the obstacles) without the frame counting twice.
+ *
+ * The mode is an argument, not a constant: which step the search starts from
+ * and how many words each step spends are the plate's width's business (#86),
+ * and a resize is just another frame.
  */
+import { type LayoutMode, labelFloor } from "../layout.ts";
 import { cardBox, type CardContent, type CardLayout, cardSetback, layoutCard } from "./card.ts";
 import type { Align, Measure } from "./content.ts";
-import { contentAt, contentWidth, labelBox, LAST_STEP, nearEdgeSetback } from "./content.ts";
+import { contentAt, contentWidth, labelBox, LAST_STEP, nearEdgeSetback, rungAbove } from "./content.ts";
 import {
   areaOutside,
   clearance,
@@ -75,7 +80,7 @@ const OFF_PLATE_WEIGHT = 4;
  * to 104px to stay clear of a billow, and cross it rather than lose its state
  * word.
  */
-const WORD_RUNS: readonly (readonly number[])[] = [[0, 1], [2], [3], [LAST_STEP]];
+const WORD_RUNS: readonly (readonly number[])[] = [[0, 1], [2], [3, 4], [5], [LAST_STEP]];
 
 /** The one piece of frame-to-frame state the renderer holds: where a label stood and for how long. */
 export interface Slot {
@@ -124,6 +129,8 @@ export interface PlaceOptions {
   memory: LabelMemory;
   /** The card the viewer has open, when its unit is one this level draws. */
   card?: CardContent;
+  /** Which mode the plate is drawn in: it sets the floor the search starts from and the words each step spends (#86). */
+  mode: LayoutMode;
 }
 
 export interface Placement {
@@ -141,7 +148,7 @@ export interface NumeralRow {
   id: string;
 }
 
-export function placeLabels({ units, plate, obstacles, measure, memory, card }: PlaceOptions): Placement {
+export function placeLabels({ units, plate, obstacles, measure, memory, card, mode }: PlaceOptions): Placement {
   const boxes = new Map(units.map((unit) => [unit.id, glyphBox(unit)]));
   const smoke = new Map(units.map((unit) => [unit.id, smokeBox(unit)]));
   const taken: Rect[] = [];
@@ -160,7 +167,8 @@ export function placeLabels({ units, plate, obstacles, measure, memory, card }: 
     // A slot a closed card left behind is not a step of the collapse order, so
     // the label taking its unit back keeps the angle and starts the order again.
     const remembered = memory.get(unit.id);
-    const previous = ownCard === undefined && remembered?.step === CARD_STEP ? { ...remembered, step: 0, clean: 0 } : remembered;
+    const previous =
+      ownCard === undefined && remembered?.step === CARD_STEP ? { ...remembered, step: labelFloor(mode), clean: 0 } : remembered;
 
     const free = (box: Rect, avoidSmoke: boolean): boolean => {
       if (!insidePlate(box, plate)) return false;
@@ -176,8 +184,8 @@ export function placeLabels({ units, plate, obstacles, measure, memory, card }: 
       areaOutside(box, plate) * OFF_PLATE_WEIGHT +
       [own, ...hard, ...taken, ...obstacles].reduce((sum, other) => sum + overlapArea(box, other), 0);
 
-    const chosen = ownCard === undefined ? choose(unit, previous, measure, free) : chooseCard(unit, previous, ownCard, free, cost);
-    const label = ownCard === undefined ? (build(unit, chosen, measure) ?? fallback(unit, measure)) : buildCard(unit, chosen, ownCard);
+    const chosen = ownCard === undefined ? choose(unit, previous, measure, free, mode) : chooseCard(unit, previous, ownCard, free, cost);
+    const label = ownCard === undefined ? (build(unit, chosen, measure, mode) ?? fallback(unit, measure, mode)) : buildCard(unit, chosen, ownCard);
     const clean = previous !== undefined && sameSlot(previous, chosen) ? previous.clean + 1 : 0;
 
     next.set(unit.id, { ...chosen, clean });
@@ -202,24 +210,35 @@ export function placeLabels({ units, plate, obstacles, measure, memory, card }: 
  * **recover** a step it has earned back, else **stay** where it was while that
  * is still free, else **search** from the step it was on.
  */
-function choose(unit: LabelUnit, previous: Slot | undefined, measure: Measure, free: (box: Rect, avoidSmoke: boolean) => boolean): Omit<Slot, "clean"> {
+function choose(
+  unit: LabelUnit,
+  previous: Slot | undefined,
+  measure: Measure,
+  free: (box: Rect, avoidSmoke: boolean) => boolean,
+  mode: LayoutMode,
+): Omit<Slot, "clean"> {
   const flanks = preferredAngles(unit);
   const ring = ringAngles(unit, previous?.angle);
+  // The mode's floor is the top of the ladder here: a label carried across a
+  // resize may hold a step the new mode does not spend, and it climbs no
+  // higher than the floor however long it has been clean.
+  const floor = labelFloor(mode);
+  const from = Math.max(previous?.step ?? floor, floor);
 
   /** The first free slot between two steps of the collapse order, or nothing. */
   const search = (from: number, to: number): Omit<Slot, "clean"> | undefined => {
     for (const run of WORD_RUNS) {
-      const steps = run.filter((step) => step >= from && step <= to && contentAt(unit, step) !== undefined);
+      const steps = run.filter((step) => step >= from && step <= to && contentAt(unit, step, mode) !== undefined);
       if (steps.length === 0) continue;
       for (const avoidSmoke of [true, false]) {
         for (const step of steps) {
-          // Step 0 *is* the flank, undisplaced; every step above it may take
-          // the whole ring, exhausted before the run gives up a word.
-          const angles = step === 0 ? flanks : ring;
-          const radii = step === 0 ? [0] : RING_RADII;
+          // The floor *is* the flank, undisplaced; every step below it may
+          // take the whole ring, exhausted before the run gives up a word.
+          const angles = step === floor ? flanks : ring;
+          const radii = step === floor ? [0] : RING_RADII;
           for (const extra of radii) {
             for (const angle of angles) {
-              const candidate = build(unit, { angle, extra, step }, measure);
+              const candidate = build(unit, { angle, extra, step }, measure, mode);
               if (candidate !== undefined && free(candidate.box, avoidSmoke)) return { angle, extra, step };
             }
           }
@@ -232,21 +251,25 @@ function choose(unit: LabelUnit, previous: Slot | undefined, measure: Measure, f
   if (previous !== undefined) {
     // 1. Recover: a step is given back only after the label has held its slot
     //    for thirty frames, and one step at a time — the clean count resets
-    //    with the slot, so the next costs another thirty.
-    if (previous.clean >= RECOVER_FRAMES && previous.step > 0) {
-      const better = search(previous.step - 1, previous.step - 1);
+    //    with the slot, so the next costs another thirty. One step means one
+    //    rung of *this* mode's ladder: the modes share a ladder and take
+    //    different rungs of it, so `step - 1` would offer a desktop label a
+    //    rung only a phone spends and give it nothing back at all.
+    const above = previous.step > floor ? rungAbove(previous.step, mode) : undefined;
+    if (previous.clean >= RECOVER_FRAMES && above !== undefined) {
+      const better = search(above, above);
       if (better !== undefined) return better;
     }
 
     // 2. Stay. A label that need not move does not move, so nothing shifts
     //    under a viewer while the units around it drift.
-    const held = build(unit, previous, measure);
+    const held = build(unit, previous, measure, mode);
     if (held !== undefined && free(held.box, true)) return { angle: previous.angle, extra: previous.extra, step: previous.step };
   }
 
-  // 3. Search, from the step it was on.
+  // 3. Search, from the step it was on, or the floor when that is higher.
   // Nothing free anywhere leaves the numeral on the flank, overlapping and all.
-  return search(previous?.step ?? 0, LAST_STEP) ?? { angle: flanks[0] ?? 0, extra: 0, step: LAST_STEP };
+  return search(from, LAST_STEP) ?? { angle: flanks[0] ?? 0, extra: 0, step: LAST_STEP };
 }
 
 /**
@@ -320,8 +343,8 @@ function buildCard(unit: LabelUnit, slot: Omit<Slot, "clean">, layout: CardLayou
 }
 
 /** The label a slot produces, or nothing when this unit skips that step of the collapse order. */
-function build(unit: LabelUnit, slot: Omit<Slot, "clean">, measure: Measure): Placed | undefined {
-  const content = contentAt(unit, slot.step);
+function build(unit: LabelUnit, slot: Omit<Slot, "clean">, measure: Measure, mode: LayoutMode): Placed | undefined {
+  const content = contentAt(unit, slot.step, mode);
   if (content === undefined) return undefined;
   const width = contentWidth(content, measure);
   const hasDetail = content.detail !== undefined;
@@ -335,9 +358,9 @@ function build(unit: LabelUnit, slot: Omit<Slot, "clean">, measure: Measure): Pl
 }
 
 /** The last step is never skipped, so this always answers; it exists only to keep the caller total. */
-function fallback(unit: LabelUnit, measure: Measure): Placed {
+function fallback(unit: LabelUnit, measure: Measure, mode: LayoutMode): Placed {
   const angle = preferredAngles(unit)[0] ?? 0;
-  const label = build(unit, { angle, extra: 0, step: LAST_STEP }, measure);
+  const label = build(unit, { angle, extra: 0, step: LAST_STEP }, measure, mode);
   if (label === undefined) throw new Error(`no label could be built for ${unit.id}`);
   return label;
 }

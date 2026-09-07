@@ -10,6 +10,20 @@
  * and pens — which is the whole reason Atlas's legend shows blocks without
  * this file knowing Atlas exists (ADR-0014).
  *
+ * What the *width* changes is a different question from what the view does,
+ * and it is answered once in `layout.ts` (#86). On a phone the set thins: the
+ * title goes to the caption band's date line, the rose becomes a north arrow
+ * with the wind sentence beside it, the legend becomes a one-line strip of the
+ * sides with its state, arm and line rows in the Details panel, and the credit
+ * goes to Details too. The scale bar is the one piece that never goes: nothing
+ * else says how big the ground is.
+ *
+ * A phone's furniture hangs from the **plate area** rather than the extent, as
+ * the Phone board draws it: the extent letterboxes hard on a narrow screen,
+ * and a scale bar laid inside it would cover the picture it measures. On a
+ * desktop the two are all but the same rectangle, and the frame is the extent
+ * as it always was.
+ *
  * Every piece reports the box it stands in, because the label pass has to
  * clear the furniture as well as the glyphs: without that the very first
  * Cannae frame puts a unit's label across the compass rose (#39). Those boxes
@@ -29,8 +43,9 @@
  * contour interval so the legend gains no row (#62). A naval plate — anything
  * whose map has no relief — is drawn exactly as it was.
  */
-import type { Arm, Wind, WindForce } from "../schema/types.ts";
+import type { Arm, Unit, UnitState, Wind, WindForce } from "../schema/types.ts";
 import type { HitRegion } from "./hit.ts";
+import { furnitureFor } from "./layout.ts";
 import type { NumeralRow } from "./labels/index.ts";
 import type { Plate } from "./plate.ts";
 import { drawArrow, drawPlateRule, type Point } from "./primitives.ts";
@@ -39,7 +54,7 @@ import { toRadians } from "./projection.ts";
 import { contourInterval } from "./relief.ts";
 import { METRES_PER_UNIT, scaleBarCaption, scaleBarLength, type ScaleBarLength } from "./scaleBar.ts";
 import { font, STATES } from "./style.ts";
-import type { GlyphRequest } from "./view.ts";
+import type { GlyphRequest, Pens, View } from "./view.ts";
 import { legendArm, legendArms } from "./glyphs/arms.ts";
 import { compassPoint } from "./text.ts";
 
@@ -67,18 +82,25 @@ const CORNER_PANEL_INSET = 10;
 const PANEL_LEAD = 6;
 
 export function drawFurniture(plate: Plate, key: readonly NumeralRow[]): HitRegion[] {
-  drawPlateBorder(plate);
-  const scale = layoutScaleBar(plate);
-  const legendBottom = scale.labelTop - LEGEND_GAP;
+  const set = furnitureFor(plate.mode);
+  const frame = furnitureFrame(plate);
+  drawPlateBorder(plate, frame);
+  const scale = layoutScaleBar(plate, frame);
   // Relief runs under every corner, so on a land plate the furniture is given
   // paper first. Unruled: the legend's own rule is the only one there is.
   const onPanels = plate.contourLevels.length > 0;
-  if (onPanels) drawPanels(plate, scale, legendBottom, key);
-  drawCompassRose(plate, plate.picture.wind);
-  drawTitle(plate);
+  if (onPanels) drawPanels(plate, scale, key);
+
+  if (set.compass === "rose") drawCompassRose(plate, frame, plate.picture.wind);
+  else drawNorthArrow(plate, frame, plate.picture.wind);
+  if (set.title) drawTitle(plate, frame);
   drawScaleBar(plate, scale);
-  const rows = drawLegend(plate, legendBottom, onPanels, key);
-  drawCredit(plate);
+  // Both forms of the legend key the frame's numerals, and both report those
+  // rows as hit regions: a phone's strip is where a collapsed label is
+  // rescued from, exactly as the desktop legend is (#60).
+  const rows =
+    set.legend === "full" ? drawLegend(plate, frame, legendBottom(scale), onPanels, key) : drawSideStrip(plate, frame, onPanels, key);
+  if (set.credit) drawCredit(plate, frame);
   return rows;
 }
 
@@ -89,21 +111,40 @@ export function drawFurniture(plate: Plate, key: readonly NumeralRow[]): HitRegi
  * legend is the one piece whose size the labels decide.
  */
 export function furnitureBoxes(plate: Plate, key: readonly NumeralRow[]): Rect[] {
-  const scale = layoutScaleBar(plate);
-  const legendBottom = scale.labelTop - LEGEND_GAP;
-  const credit = creditPanel(plate);
-  const boxes = [rosePanel(plate), titlePanel(plate), scalePanel(plate, scale, legendBottom, key)];
-  return credit === undefined ? boxes : [...boxes, credit];
+  return furniturePanels(plate, layoutScaleBar(plate, furnitureFrame(plate)), key);
 }
 
-/** Paper under the rose, the title, the scale bar with the legend, and the credit. Filled and never ruled (#62). */
-function drawPanels(plate: Plate, scale: ScaleBarLayout, legendBottom: number, key: readonly NumeralRow[]): void {
+/**
+ * The rectangle a phone's or a desktop's furniture hangs from: the plate area
+ * on a phone, where the extent letterboxes hard, and the extent itself
+ * everywhere else.
+ */
+function furnitureFrame(plate: Plate): Rect {
+  return plate.mode === "phone" ? plate.plateArea : plate.projection.extentRect;
+}
+
+/** Where the legend's bottom hangs from: the top of the scale bar's caption, a gap above it. */
+function legendBottom(scale: ScaleBarLayout): number {
+  return scale.labelTop - LEGEND_GAP;
+}
+
+/** Every box the mode's furniture stands in, which is both the paper it is laid on and the obstacle a label clears. */
+function furniturePanels(plate: Plate, scale: ScaleBarLayout, key: readonly NumeralRow[]): Rect[] {
+  const set = furnitureFor(plate.mode);
+  const frame = furnitureFrame(plate);
+  if (plate.mode === "phone") return [arrowPanel(plate, frame), scalePanelOnly(plate, scale), stripPanel(plate, frame, key)];
+
+  const credit = creditPanel(plate, frame);
+  const boxes = [rosePanel(plate, frame), titlePanel(plate, frame), scalePanel(plate, frame, scale, legendBottom(scale), key)];
+  return set.credit && credit !== undefined ? [...boxes, credit] : boxes;
+}
+
+/** Paper under every piece the mode draws. Filled and never ruled (#62). */
+function drawPanels(plate: Plate, scale: ScaleBarLayout, key: readonly NumeralRow[]): void {
   const { ctx } = plate;
   ctx.save();
   ctx.fillStyle = plate.view.palette.panel;
-  for (const panel of [rosePanel(plate), titlePanel(plate), scalePanel(plate, scale, legendBottom, key), creditPanel(plate)]) {
-    if (panel !== undefined) ctx.fillRect(panel.x, panel.y, panel.width, panel.height);
-  }
+  for (const panel of furniturePanels(plate, scale, key)) ctx.fillRect(panel.x, panel.y, panel.width, panel.height);
   ctx.restore();
 }
 
@@ -116,9 +157,13 @@ function textWidth(ctx: CanvasRenderingContext2D, text: string, face: string): n
   return width;
 }
 
-/** A double rule at the extent's edge, where the letterbox begins. */
-function drawPlateBorder({ ctx, view, projection: { extentRect } }: Plate): void {
-  drawPlateRule(ctx, extentRect, view.palette.ink);
+/**
+ * A double rule at the frame's edge. On a desktop that is the extent's edge,
+ * where the letterbox begins; on a phone it is the plate area, so the rule
+ * encloses the furniture that stands in the letterbox beside the picture.
+ */
+function drawPlateBorder({ ctx, view }: Plate, frame: Rect): void {
+  drawPlateRule(ctx, frame, view.palette.ink);
 }
 
 /** Where the rose stands, and where the wind sentence starts beside it: the panel and the drawing have to agree. */
@@ -138,7 +183,7 @@ function windText(wind: Wind | undefined): string | undefined {
  * arrow's tail, which reaches further than the rose itself, and wide enough
  * for whatever the sentence says.
  */
-function rosePanel({ ctx, picture, projection: { extentRect: frame } }: Plate): Rect {
+function rosePanel({ ctx, picture }: Plate, frame: Rect): Rect {
   const x = frame.x + ROSE_PANEL_INSET;
   const y = frame.y + ROSE_PANEL_INSET;
   const text = windText(picture.wind);
@@ -147,10 +192,9 @@ function rosePanel({ ctx, picture, projection: { extentRect: frame } }: Plate): 
   return { x, y, width: right - x, height: ROSE_PANEL_HEIGHT };
 }
 
-function drawCompassRose(plate: Plate, wind: Wind | undefined): void {
+function drawCompassRose(plate: Plate, frame: Rect, wind: Wind | undefined): void {
   const { ctx } = plate;
   const ink = plate.view.palette.ink;
-  const frame = plate.projection.extentRect;
   const { x: cx, y: cy } = roseCentre(frame);
 
   ctx.save();
@@ -224,13 +268,66 @@ function drawCompassRose(plate: Plate, wind: Wind | undefined): void {
   }
 }
 
+/**
+ * The phone's compass: a north needle with its letter, and the wind as a
+ * sentence beside it rather than an arrow across a rose (#86). The rose's
+ * sixteen points and its feathered arrow need room a 390px plate has not got,
+ * and what they say — which way is north, where the wind blows from and how
+ * hard — these two say in a fifth of the width.
+ */
+const ARROW_N_SIZE = 10;
+const ARROW_TEXT_SIZE = 11;
+const arrowCentre = (frame: Rect): Point => ({ x: frame.x + 22, y: frame.y + 34 });
+const arrowTextLeft = (frame: Rect): number => frame.x + 36;
+
+function drawNorthArrow(plate: Plate, frame: Rect, wind: Wind | undefined): void {
+  const { ctx } = plate;
+  const ink = plate.view.palette.ink;
+  const { x: cx, y: cy } = arrowCentre(frame);
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.fillStyle = ink;
+  ctx.beginPath();
+  ctx.moveTo(0, -12);
+  ctx.lineTo(3, 4);
+  ctx.lineTo(0, 0);
+  ctx.lineTo(-3, 4);
+  ctx.closePath();
+  ctx.fill();
+  ctx.font = font(ARROW_N_SIZE);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+  ctx.fillText("N", 0, -16);
+  ctx.restore();
+
+  const text = windText(wind);
+  if (text === undefined) return;
+  ctx.save();
+  ctx.fillStyle = ink;
+  ctx.font = font(ARROW_TEXT_SIZE, true);
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, arrowTextLeft(frame), cy - 2);
+  ctx.restore();
+}
+
+/** Paper behind the north arrow and its wind sentence, cut to whatever the sentence says. */
+function arrowPanel({ ctx, picture }: Plate, frame: Rect): Rect {
+  const text = windText(picture.wind);
+  const x = frame.x + 8;
+  const sentenceRight = text === undefined ? 0 : arrowTextLeft(frame) + textWidth(ctx, text, font(ARROW_TEXT_SIZE, true)) + PANEL_PAD;
+  const right = Math.max(x + 40, sentenceRight);
+  return { x, y: frame.y + 4, width: right - x, height: 40 };
+}
+
 const TITLE_SIZE = 22;
 /** Where the title's right edge sits and where its cap-line starts: the panel and the drawing have to agree. */
 const titleRight = (frame: Rect): number => frame.x + frame.width - 22;
 const titleTop = (frame: Rect): number => frame.y + 18;
 
 /** The battle's title, top right, as the plate's cartouche. */
-function drawTitle({ ctx, battle, view, projection: { extentRect: frame } }: Plate): void {
+function drawTitle({ ctx, battle, view }: Plate, frame: Rect): void {
   ctx.save();
   ctx.fillStyle = view.palette.ink;
   ctx.textAlign = "right";
@@ -241,7 +338,7 @@ function drawTitle({ ctx, battle, view, projection: { extentRect: frame } }: Pla
 }
 
 /** Paper behind the title, cut to the title's own width. */
-function titlePanel({ ctx, battle, projection: { extentRect: frame } }: Plate): Rect {
+function titlePanel({ ctx, battle }: Plate, frame: Rect): Rect {
   const width = textWidth(ctx, battle.title, font(TITLE_SIZE)) + PANEL_PAD * 2;
   const right = frame.x + frame.width - CORNER_PANEL_INSET;
   return { x: right - width, y: titleTop(frame) - PANEL_LEAD, width, height: TITLE_SIZE + PANEL_LEAD * 2 };
@@ -253,27 +350,36 @@ interface ScaleBarLayout {
   y: number;
   bar: ScaleBarLength;
   caption: string;
+  /** The size the caption is set at: smaller on a phone, where it is the only line of type in its corner. */
+  captionSize: number;
   /** The top of the caption, which is where the legend's bottom hangs from. */
   labelTop: number;
 }
 
-function layoutScaleBar(plate: Plate): ScaleBarLayout {
-  const frame = plate.projection.extentRect;
+/** The phone's scale bar sits closer in than a desktop's: the corner it is in is a band, not a margin. */
+const PHONE_SCALE_INSET_X = 14;
+const PHONE_SCALE_INSET_Y = 17;
+const PHONE_SCALE_LABEL_SIZE = 10;
+
+function layoutScaleBar(plate: Plate, frame: Rect): ScaleBarLayout {
+  const phone = plate.mode === "phone";
   const unit = plate.battle.scale_unit;
   const pixelsPerUnit = METRES_PER_UNIT[unit] * plate.pixelsPerMetre;
   const bar = scaleBarLength({ pixelsPerUnit, maxPixels: Math.max(40, Math.min(180, frame.width / 4)) });
-  const y = frame.y + frame.height - MARGIN;
+  const y = frame.y + frame.height - (phone ? PHONE_SCALE_INSET_Y : MARGIN);
+  const captionSize = phone ? PHONE_SCALE_LABEL_SIZE : SCALE_BAR_LABEL_SIZE;
   return {
-    x: frame.x + MARGIN,
+    x: frame.x + (phone ? PHONE_SCALE_INSET_X : MARGIN),
     y,
     bar,
     caption: scaleBarCaption({ units: bar.units, unit, contourInterval: contourInterval(plate.contourLevels) }),
-    labelTop: y - SCALE_BAR_LABEL_GAP - SCALE_BAR_LABEL_HEIGHT,
+    captionSize,
+    labelTop: y - SCALE_BAR_LABEL_GAP - (phone ? captionSize + 2 : SCALE_BAR_LABEL_HEIGHT),
   };
 }
 
 /** The scale bar, bottom left, in the battle's unit, captioned with the contour interval when the map has relief. */
-function drawScaleBar(plate: Plate, { x, y, bar, caption }: ScaleBarLayout): void {
+function drawScaleBar(plate: Plate, { x, y, bar, caption, captionSize }: ScaleBarLayout): void {
   const { ctx } = plate;
   const ink = plate.view.palette.ink;
 
@@ -298,7 +404,7 @@ function drawScaleBar(plate: Plate, { x, y, bar, caption }: ScaleBarLayout): voi
     ctx.lineTo(tx, y + 3);
     ctx.stroke();
   }
-  ctx.font = font(SCALE_BAR_LABEL_SIZE, true);
+  ctx.font = font(captionSize, true);
   ctx.textAlign = "left";
   ctx.textBaseline = "bottom";
   ctx.fillText(caption, x, y - SCALE_BAR_LABEL_GAP);
@@ -311,15 +417,23 @@ const SCALE_BAR_LABEL_SIZE = 12;
  * One panel behind the legend and the scale bar together: they stand in the
  * same corner, and two panels there would show their own seam.
  */
-function scalePanel(plate: Plate, scale: ScaleBarLayout, legendBottom: number, key: readonly NumeralRow[]): Rect {
-  const captionWidth = textWidth(plate.ctx, scale.caption, font(SCALE_BAR_LABEL_SIZE, true));
+function scalePanel(plate: Plate, frame: Rect, scale: ScaleBarLayout, bottom: number, key: readonly NumeralRow[]): Rect {
+  const captionWidth = textWidth(plate.ctx, scale.caption, font(scale.captionSize, true));
   const widest = Math.max(legendWidth(plate, key), scale.bar.pixels, captionWidth);
-  const frame = plate.projection.extentRect;
   const x = scale.x - PANEL_PAD;
-  const top = legendBottom - legendHeight(plate, key) - PANEL_LEAD;
+  const top = bottom - legendHeight(plate, key) - PANEL_LEAD;
   // Down to the same corner inset the title's and the credit's panels take, which clears the bar's end ticks.
-  const bottom = frame.y + frame.height - CORNER_PANEL_INSET;
-  return { x, y: top, width: scale.x + widest + PANEL_PAD - x, height: bottom - top };
+  const cornerBottom = frame.y + frame.height - CORNER_PANEL_INSET;
+  return { x, y: top, width: scale.x + widest + PANEL_PAD - x, height: cornerBottom - top };
+}
+
+/** The phone's scale bar stands alone in its corner: the sides' strip is in the other one. */
+function scalePanelOnly(plate: Plate, scale: ScaleBarLayout): Rect {
+  const captionWidth = textWidth(plate.ctx, scale.caption, font(scale.captionSize, true));
+  const widest = Math.max(scale.bar.pixels, captionWidth);
+  const x = scale.x - PANEL_PAD / 2;
+  const top = scale.labelTop - PANEL_LEAD / 2;
+  return { x, y: top, width: scale.x + widest + PANEL_PAD / 2 - x, height: scale.y + 7 - top };
 }
 
 const LEGEND_ROW = 18;
@@ -329,6 +443,103 @@ const LEGEND_SAMPLE = 40;
 const LEGEND_SCALE = 0.75;
 /** The three motion styles, which the legend always keys: track, intent, detachment. */
 const LEGEND_LINE_ROWS = 3;
+
+/** The three motion styles, in the order the legend keys them. */
+const LINES: readonly (keyof Pens)[] = ["track", "intent", "detachment"];
+
+/**
+ * One row of the plate's key: a sample of the view's own drawing and the word
+ * it teaches. The desktop legend draws every kind; a phone's strip draws the
+ * sides and the Details panel draws the rest (#86), and both go through this
+ * one description so the two can never key the same thing differently.
+ */
+export type KeyRow =
+  | { kind: "side"; side: string; colour: string }
+  | { kind: "state"; state: UnitState }
+  | { kind: "arm"; arm: Arm }
+  | { kind: "line"; line: keyof Pens };
+
+/** A row per side, in roster order, in its own ink. */
+export function sideRows(colours: ReadonlyMap<string, string>): KeyRow[] {
+  return [...colours].map(([side, colour]) => ({ kind: "side", side, colour }));
+}
+
+/**
+ * The rows that are not about a side: the four states, one per arm the roster
+ * keys (ADR-0015), and the three line styles. These are exactly the rows a
+ * phone moves off the plate and into the Details panel (#86).
+ */
+export function plateKeyRows(units: readonly Unit[]): KeyRow[] {
+  return [
+    ...STATES.map((state): KeyRow => ({ kind: "state", state })),
+    ...legendArms(units).map((arm): KeyRow => ({ kind: "arm", arm })),
+    ...LINES.map((line): KeyRow => ({ kind: "line", line })),
+  ];
+}
+
+/** The word a row teaches. */
+export function keyRowLabel(row: KeyRow): string {
+  if (row.kind === "side") return row.side;
+  if (row.kind === "state") return row.state;
+  if (row.kind === "arm") return row.arm;
+  return row.line;
+}
+
+/** How wide a row's sample is drawn, which is also the length its glyph is given less its margin. */
+export const KEY_SAMPLE_WIDTH = LEGEND_SAMPLE;
+/** How deep one row stands, sample and word together. */
+export const KEY_ROW_HEIGHT = LEGEND_ROW;
+/** The scale a key's sample is drawn at, small enough that a glyph leaves off its finest detail. */
+export const KEY_SAMPLE_SCALE = LEGEND_SCALE;
+
+/** What a row's sample needs beyond the row itself: where it goes, and the two things a sample is not told by its kind. */
+export interface KeySamplePlace {
+  left: number;
+  centreY: number;
+  width: number;
+  scale: number;
+  /**
+   * The arm the rows that are not about an arm are drawn in: the one most of
+   * the battle is made of, so Cannae's states are not ship-ticks.
+   */
+  arm: Arm;
+  /** The first side's ink, which the detachment pen is drawn in. */
+  firstSide: string;
+}
+
+/**
+ * A sample of the view's own glyph or pen, laid across a row. No wind reaches
+ * a key, so nothing here drifts. Shared by the legend, the phone's side strip
+ * and the Details panel, which is why it takes a place rather than reading one
+ * off a plate.
+ */
+export function drawKeyRowSample(ctx: CanvasRenderingContext2D, view: View, row: KeyRow, at: KeySamplePlace): void {
+  const { palette, pens, glyph } = view;
+  if (row.kind === "line") {
+    const colour = row.line === "detachment" ? at.firstSide : palette.ink;
+    drawArrow(ctx, { x: at.left, y: at.centreY }, { x: at.left + at.width, y: at.centreY }, pens[row.line], colour);
+    return;
+  }
+
+  const request: GlyphRequest = {
+    length: at.width - 6,
+    formation: "column",
+    arm: row.kind === "arm" ? row.arm : at.arm,
+    state: row.kind === "state" ? row.state : "intact",
+    strength: row.kind === "state" && row.state === "broken" ? 0.4 : 1,
+    colour: row.kind === "side" ? row.colour : palette.ink,
+    seed: row.kind === "side" ? 1 : row.kind === "state" ? 3 : 5,
+    scale: at.scale,
+    windTo: undefined,
+    palette,
+  };
+  ctx.save();
+  ctx.translate(at.left + at.width / 2, at.centreY);
+  ctx.rotate(Math.PI / 2);
+  glyph.mark?.(ctx, request);
+  glyph.body(ctx, request);
+  ctx.restore();
+}
 
 /**
  * How tall the legend stands, in rows: one per side, one per state, one per arm
@@ -372,15 +583,17 @@ function legendWidth(plate: Plate, key: readonly NumeralRow[]): number {
  * Returns the numeral rows' boxes, which are the only rows a click opens
  * anything from: the side, state, arm and line rows do nothing (#60).
  */
-function drawLegend(plate: Plate, bottom: number, onPanel: boolean, key: readonly NumeralRow[]): HitRegion[] {
+function drawLegend(plate: Plate, frame: Rect, bottom: number, onPanel: boolean, key: readonly NumeralRow[]): HitRegion[] {
   const { ctx, colours, view } = plate;
-  const { palette, pens, glyph } = view;
-  const frame = plate.projection.extentRect;
-  // Trafalgar is all ships, so it keys no arm and its legend is unchanged.
-  const arms = legendArms(plate.battle.units);
-  // The rows that are not about an arm still have to be drawn in one: the arm
-  // most of the battle is made of, so Cannae's states are not ship-ticks.
-  const ordinary = legendArm(plate.battle.units);
+  const { palette } = view;
+  const place: Omit<KeySamplePlace, "centreY"> = {
+    left: frame.x + MARGIN + 12,
+    width: LEGEND_SAMPLE,
+    scale: LEGEND_SCALE,
+    // Trafalgar is all ships, so it keys no arm and its legend is unchanged.
+    arm: legendArm(plate.battle.units),
+    firstSide: colours.values().next().value ?? palette.ink,
+  };
   const height = legendHeight(plate, key);
   const width = legendWidth(plate, key);
   const x = frame.x + MARGIN;
@@ -397,67 +610,14 @@ function drawLegend(plate: Plate, bottom: number, onPanel: boolean, key: readonl
 
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
+  ctx.font = font(12, true);
   const textX = x + 12 + LEGEND_SAMPLE + 10;
   let rowY = y + 8 + LEGEND_ROW / 2;
-  const sampleCentre = (): Point => ({ x: x + 12 + LEGEND_SAMPLE / 2, y: rowY });
 
-  /** A sample of the view's own glyph, laid across the row. No wind reaches the legend. */
-  const sample = (state: (typeof STATES)[number], strength: number, colour: string, seed: number, arm: Arm): void => {
-    const centre = sampleCentre();
-    const request: GlyphRequest = {
-      length: LEGEND_SAMPLE - 6,
-      formation: "column",
-      arm,
-      state,
-      strength,
-      colour,
-      seed,
-      scale: LEGEND_SCALE,
-      windTo: undefined,
-      palette,
-    };
-    ctx.save();
-    ctx.translate(centre.x, centre.y);
-    ctx.rotate(Math.PI / 2);
-    glyph.mark?.(ctx, request);
-    glyph.body(ctx, request);
-    ctx.restore();
-  };
-
-  ctx.font = font(12, true);
-  for (const [side, colour] of colours) {
-    sample("intact", 1, colour, 1, ordinary);
-    ctx.fillStyle = colour;
-    ctx.fillText(side, textX, rowY);
-    rowY += LEGEND_ROW;
-  }
-
-  for (const state of STATES) {
-    sample(state, state === "broken" ? 0.4 : 1, palette.ink, 3, ordinary);
-    ctx.fillStyle = palette.ink;
-    ctx.fillText(state, textX, rowY);
-    rowY += LEGEND_ROW;
-  }
-
-  // Sampled from the view's own glyph, like the state rows: the whole point is
-  // that a reader learns this view's foot from this view's horse.
-  for (const arm of arms) {
-    sample("intact", 1, palette.ink, 5, arm);
-    ctx.fillStyle = palette.ink;
-    ctx.fillText(arm, textX, rowY);
-    rowY += LEGEND_ROW;
-  }
-
-  const firstSide = colours.values().next().value ?? palette.ink;
-  const lines = [
-    ["track", pens.track, palette.ink],
-    ["intent", pens.intent, palette.ink],
-    ["detachment", pens.detachment, firstSide],
-  ] as const;
-  for (const [label, pen, colour] of lines) {
-    drawArrow(ctx, { x: x + 12, y: rowY }, { x: x + 12 + LEGEND_SAMPLE, y: rowY }, pen, colour);
-    ctx.fillStyle = palette.ink;
-    ctx.fillText(label, textX, rowY);
+  for (const row of [...sideRows(colours), ...plateKeyRows(plate.battle.units)]) {
+    drawKeyRowSample(ctx, view, row, { ...place, centreY: rowY });
+    ctx.fillStyle = row.kind === "side" ? row.colour : palette.ink;
+    ctx.fillText(keyRowLabel(row), textX, rowY);
     rowY += LEGEND_ROW;
   }
 
@@ -474,12 +634,105 @@ function drawLegend(plate: Plate, bottom: number, onPanel: boolean, key: readonl
   return rows;
 }
 
+/**
+ * The phone's legend: one line of the sides, bottom right, opposite the scale
+ * bar (#86). Everything else the legend keys — the states, the arms, the line
+ * styles — is in the Details panel, which is where a reader who wants the
+ * whole key goes. The numeral key is not one of those: a numeral on the plate
+ * is unreadable without the name it stands for, so its rows stay here, stacked
+ * above the sides, and on the frames where no label has collapsed that far the
+ * strip is the one line the board draws.
+ *
+ * Returns those numeral rows' boxes, as the desktop legend returns its own: a
+ * click on one opens that unit's card, which is what rescues a label that has
+ * collapsed all the way (#60), and a phone collapses that far far more often.
+ */
+const STRIP_ROW = 18;
+const STRIP_KEY_ROW = 14;
+const STRIP_SAMPLE = 16;
+const STRIP_SCALE = 0.45;
+const STRIP_TEXT_SIZE = 10;
+/** Between a side's sample and its name, and between one side's name and the next side's sample. */
+const STRIP_SAMPLE_GAP = 4;
+const STRIP_SIDE_GAP = 16;
+const STRIP_PAD = 6;
+/** How far the strip stands off the frame's bottom-right corner. */
+const STRIP_INSET_X = 6;
+const STRIP_INSET_Y = 12;
+
+/** How wide one side's sample and name run together. */
+function stripSideWidth(plate: Plate, side: string): number {
+  return STRIP_SAMPLE + STRIP_SAMPLE_GAP + textWidth(plate.ctx, side, font(STRIP_TEXT_SIZE, true));
+}
+
+/** The strip's own rectangle, which is both the paper it is drawn on and the obstacle a label clears. */
+function stripPanel(plate: Plate, frame: Rect, key: readonly NumeralRow[]): Rect {
+  const sides = [...plate.colours.keys()];
+  const sidesWidth = sides.reduce((wide, side) => wide + stripSideWidth(plate, side) + STRIP_SIDE_GAP, -STRIP_SIDE_GAP);
+  const keyWidth = key.reduce((wide, row) => Math.max(wide, textWidth(plate.ctx, keyRow(row), font(STRIP_TEXT_SIZE, true))), 0);
+  const width = Math.max(sidesWidth, keyWidth) + STRIP_PAD * 2;
+  const height = STRIP_ROW + key.length * STRIP_KEY_ROW;
+  return {
+    x: frame.x + frame.width - STRIP_INSET_X - width,
+    y: frame.y + frame.height - STRIP_INSET_Y - height,
+    width,
+    height,
+  };
+}
+
+function drawSideStrip(plate: Plate, frame: Rect, onPanel: boolean, key: readonly NumeralRow[]): HitRegion[] {
+  const { ctx, colours, view } = plate;
+  const { palette } = view;
+  const panel = stripPanel(plate, frame, key);
+
+  ctx.save();
+  if (!onPanel) {
+    ctx.fillStyle = palette.panel;
+    ctx.fillRect(panel.x, panel.y, panel.width, panel.height);
+  }
+  ctx.strokeStyle = palette.ink;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(panel.x + 0.5, panel.y + 0.5, panel.width - 1, panel.height - 1);
+
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.font = font(STRIP_TEXT_SIZE, true);
+
+  // The numeral key first, stacked above the sides: the strip grows upward, so
+  // the line of sides stays where it is however many numerals a frame shows.
+  ctx.fillStyle = palette.ink;
+  const rows: HitRegion[] = [];
+  let rowY = panel.y + STRIP_KEY_ROW / 2;
+  for (const row of key) {
+    ctx.fillText(keyRow(row), panel.x + STRIP_PAD, rowY);
+    rows.push({ id: row.id, box: { x: panel.x, y: rowY - STRIP_KEY_ROW / 2, width: panel.width, height: STRIP_KEY_ROW }, hover: false });
+    rowY += STRIP_KEY_ROW;
+  }
+
+  const place: Omit<KeySamplePlace, "centreY" | "left"> = {
+    width: STRIP_SAMPLE,
+    scale: STRIP_SCALE,
+    arm: legendArm(plate.battle.units),
+    firstSide: colours.values().next().value ?? palette.ink,
+  };
+  let x = panel.x + STRIP_PAD;
+  const centreY = panel.y + panel.height - STRIP_ROW / 2;
+  for (const row of sideRows(colours)) {
+    drawKeyRowSample(ctx, view, row, { ...place, left: x, centreY });
+    ctx.fillStyle = row.kind === "side" ? row.colour : palette.ink;
+    ctx.fillText(keyRowLabel(row), x + STRIP_SAMPLE + STRIP_SAMPLE_GAP, centreY);
+    x += stripSideWidth(plate, keyRowLabel(row)) + STRIP_SIDE_GAP;
+  }
+  ctx.restore();
+  return rows;
+}
+
 const CREDIT_SIZE = 11;
 const creditRight = (frame: Rect): number => frame.x + frame.width - 14;
 const creditBaseline = (frame: Rect): number => frame.y + frame.height - 12;
 
 /** The map file's attribution, bottom right, whenever a map is loaded and has one (ADR-0007). */
-function drawCredit({ ctx, map, view, projection: { extentRect: frame } }: Plate): void {
+function drawCredit({ ctx, map, view }: Plate, frame: Rect): void {
   const credit = map?.attribution;
   if (credit === undefined || credit === "") return;
   ctx.save();
@@ -492,7 +745,7 @@ function drawCredit({ ctx, map, view, projection: { extentRect: frame } }: Plate
 }
 
 /** Paper behind the credit line, or nothing when the map carries no credit to draw. */
-function creditPanel({ ctx, map, projection: { extentRect: frame } }: Plate): Rect | undefined {
+function creditPanel({ ctx, map }: Plate, frame: Rect): Rect | undefined {
   const credit = map?.attribution;
   if (credit === undefined || credit === "") return undefined;
   const width = textWidth(ctx, credit, font(CREDIT_SIZE, true)) + PANEL_PAD;
