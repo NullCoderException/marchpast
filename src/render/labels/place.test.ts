@@ -3,9 +3,10 @@
  * collapse, the leader trigger and the legend's numeral key.
  */
 import { describe, expect, it } from "vitest";
+import type { CardContent } from "./card.ts";
 import type { Measure } from "./content.ts";
 import { glyphBox, type LabelUnit, LABEL_GAP, smokeBox } from "./geometry.ts";
-import { needsLeader, NO_LABEL_MEMORY, numeralKey, placeLabels, type Placed, type Slot } from "./place.ts";
+import { CARD_STEP, needsLeader, NO_LABEL_MEMORY, numeralKey, placeLabels, type Placed, type Slot } from "./place.ts";
 import { toRadians } from "../projection.ts";
 
 /** A measurer with no canvas: every glyph a half of its point size wide. */
@@ -31,13 +32,14 @@ function unit(over: Partial<LabelUnit> & Pick<LabelUnit, "id">): LabelUnit {
 }
 
 /** Places one frame from nothing, the common case in these tests. */
-function place(units: readonly LabelUnit[], over: { obstacles?: readonly { x: number; y: number; width: number; height: number }[]; plate?: typeof PLATE; memory?: ReadonlyMap<string, Slot> } = {}) {
+function place(units: readonly LabelUnit[], over: { obstacles?: readonly { x: number; y: number; width: number; height: number }[]; plate?: typeof PLATE; memory?: ReadonlyMap<string, Slot>; card?: CardContent } = {}) {
   return placeLabels({
     units,
     plate: over.plate ?? PLATE,
     obstacles: over.obstacles ?? [],
     measure,
     memory: over.memory ?? NO_LABEL_MEMORY,
+    card: over.card,
   });
 }
 
@@ -177,8 +179,8 @@ describe("numeralKey", () => {
       { ...stub("c"), numeral: 1, unit: unit({ id: "c", rosterIndex: 0, name: "Rear" }) },
     ];
     expect(numeralKey(placed)).toEqual([
-      { numeral: 1, label: "Rear" },
-      { numeral: 3, label: "Van" },
+      { numeral: 1, label: "Rear", id: "c" },
+      { numeral: 3, label: "Van", id: "a" },
     ]);
   });
 
@@ -319,3 +321,82 @@ function shortest(radians: number): number {
   if (d < -Math.PI) d += Math.PI * 2;
   return d;
 }
+
+describe("the unit card in the label pass", () => {
+  /** One open card, as the renderer would have built it from the roster and the picture. */
+  const CARD: CardContent = {
+    id: "a",
+    name: "Weather column",
+    commander: "Nelson",
+    facts: "ship · column · intact · 100%",
+    tree: ["Van of the weather column · intact", "Rear of the weather column · engaged"],
+  };
+
+  it("gives the card's unit a box wider and taller than its label had", () => {
+    const units = [unit({ id: "a" })];
+    const plain = byId(place(units).placed, "a");
+    const opened = byId(place(units, { card: CARD }).placed, "a");
+    expect(opened.box.width).toBeGreaterThan(plain.box.width);
+    expect(opened.box.height).toBeGreaterThan(plain.box.height);
+    expect(opened.card?.content).toBe(CARD);
+  });
+
+  it("stands the card's near edge off the signs by the same clearance a label takes", () => {
+    const only = unit({ id: "a" });
+    const { placed } = place([only], { card: CARD });
+    const glyph = glyphBox(only);
+    expect(byId(placed, "a").box.x - (glyph.x + glyph.width)).toBeCloseTo(LABEL_GAP);
+  });
+
+  it("is placed first, so every other label of the frame goes round it", () => {
+    const units = [
+      unit({ id: "a" }),
+      unit({ id: "b", rosterIndex: 1, anchor: { x: 470, y: 300 } }),
+      unit({ id: "c", rosterIndex: 2, state: "engaged", anchor: { x: 430, y: 380 } }),
+    ];
+    const { placed } = place(units, { card: CARD });
+    const card = byId(placed, "a");
+    for (const label of placed) {
+      if (label.unit.id === "a") continue;
+      expect(overlapping(label.box, card.box)).toBe(false);
+    }
+  });
+
+  it("never collapses, however crowded the plate is", () => {
+    const units = Array.from({ length: 10 }, (_, index) =>
+      unit({ id: index === 0 ? "a" : `u${index}`, rosterIndex: index, anchor: { x: 400 + index * 14, y: 300 + index * 9 } }),
+    );
+    const card = byId(place(units, { card: CARD }).placed, "a");
+    expect(card.step).toBe(CARD_STEP);
+    expect(card.card?.content.name).toBe("Weather column");
+    expect(card.numeral).toBeUndefined();
+  });
+
+  it("keeps the slot it had while that is still free, so it does not jitter under a moving unit", () => {
+    const units = [unit({ id: "a" })];
+    const first = place(units, { card: CARD });
+    const second = place(units, { card: CARD, memory: first.memory });
+    expect(byId(second.placed, "a").box).toEqual(byId(first.placed, "a").box);
+  });
+
+  it("gives the unit its ordinary label back the moment the card closes", () => {
+    const units = [unit({ id: "a" })];
+    const opened = place(units, { card: CARD });
+    const closed = place(units, { memory: opened.memory });
+    const label = byId(closed.placed, "a");
+    expect(label.card).toBeUndefined();
+    expect(label.step).toBe(0);
+    expect(label.name).toBe("Van");
+  });
+
+  it("draws over the least-bad slot rather than the first one when nothing is free", () => {
+    // A plate barely bigger than the card leaves no slot inside it at all.
+    const tight = { x: 0, y: 0, width: 260, height: 200 };
+    const { placed } = place([unit({ id: "a", anchor: { x: 130, y: 100 } })], { card: CARD, plate: tight });
+    const card = byId(placed, "a");
+    expect(card.card).toBeDefined();
+    // Least-bad is still on the plate as far as it can be: it never runs away from it.
+    expect(card.box.x + card.box.width).toBeGreaterThan(tight.x);
+    expect(card.box.x).toBeLessThan(tight.x + tight.width);
+  });
+});

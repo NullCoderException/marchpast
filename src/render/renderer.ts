@@ -14,6 +14,15 @@
  * the units this level draws (schema.md 2.11). Nothing else in the frame
  * varies with it.
  *
+ * The frame's **unit card**, when the viewer has one open, is the label pass's
+ * business too: it is one unit's label unfolded, so it is measured before the
+ * placer runs and drawn with the labels (#60). A card whose unit this level
+ * does not draw is no card at all.
+ *
+ * `render` is also the only thing that knows where anything landed, so it
+ * hands back the frame's **hit regions**: the boxes the player resolves a
+ * pointer against to open a card.
+ *
  * Sizing: each call reads the canvas's CSS size and the devicePixelRatio and
  * resizes the backing store when either changed, so resizes and zooms need
  * nothing more than another `render`.
@@ -24,7 +33,22 @@ import { drawCaption, layoutCaption } from "./drawCaption.ts";
 import { drawFurniture, furnitureBoxes } from "./drawFurniture.ts";
 import { drawMap } from "./drawMap.ts";
 import { drawUnits } from "./drawUnits.ts";
-import { canvasMeasure, drawLabels, type LabelMemory, type LabelUnit, type Measure, NO_LABEL_MEMORY, type NumeralRow, numeralKey, type Placed, placeLabels } from "./labels/index.ts";
+import type { HitRegion } from "./hit.ts";
+import {
+  canvasMeasure,
+  type CardContent,
+  cardContent,
+  drawLabels,
+  glyphBox,
+  type LabelMemory,
+  type LabelUnit,
+  type Measure,
+  NO_LABEL_MEMORY,
+  type NumeralRow,
+  numeralKey,
+  type Placed,
+  placeLabels,
+} from "./labels/index.ts";
 import { unitsDrawn } from "./level.ts";
 import { seeded } from "./primitives.ts";
 import { fitProjection, type Rect } from "./projection.ts";
@@ -35,8 +59,12 @@ import type { Viewer } from "./view.ts";
 import { viewById } from "./views.ts";
 
 export interface Renderer {
-  /** Draws the picture as this viewer has chosen to see it. Synchronous; returns when the canvas holds it. */
-  render(battle: Battle, map: MapFile | undefined, picture: Picture, viewer: Viewer): void;
+  /**
+   * Draws the picture as this viewer has chosen to see it. Synchronous;
+   * returns when the canvas holds it, with the frame's hit regions for the
+   * player to resolve pointers against (#60).
+   */
+  render(battle: Battle, map: MapFile | undefined, picture: Picture, viewer: Viewer): HitRegion[];
 }
 
 export function createRenderer(canvas: HTMLCanvasElement): Renderer {
@@ -114,10 +142,11 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
       // furniture as well as the glyphs (#39). The furniture is measured
       // first, drawn after: its legend carries a key for any numeral the
       // labels end up showing, and a bigger legend is a bigger obstacle.
-      const { placed, key } = layoutLabels(plate, units, extentRect, labels, measure);
-      drawFurniture(plate, key);
+      const { placed, key } = layoutLabels(plate, units, extentRect, labels, measure, openCard(plate, viewer));
+      const rows = drawFurniture(plate, key);
       drawLabels(ctx, placed, palette);
       drawCaption(ctx, battle, picture, caption, plateHeight, width, palette);
+      return hitRegions(placed, rows);
     },
   };
 
@@ -134,9 +163,10 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
     extentRect: Rect,
     memory: LabelMemory,
     measureText: Measure,
+    card: CardContent | undefined,
   ): { placed: Placed[]; key: NumeralRow[] } {
     const place = (against: readonly NumeralRow[]) =>
-      placeLabels({ units, plate: extentRect, obstacles: furnitureBoxes(plate, against), measure: measureText, memory });
+      placeLabels({ units, plate: extentRect, obstacles: furnitureBoxes(plate, against), measure: measureText, memory, card });
 
     let placement = place([]);
     let key = numeralKey(placement.placed);
@@ -149,6 +179,37 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
     labels = placement.memory;
     return { placed: placement.placed, key };
   }
+}
+
+/**
+ * The card the viewer has open, or nothing: nothing when no card is open, and
+ * nothing when this level does not draw its unit, which is the renderer's half
+ * of the rule the player's `setLevel` keeps (#60, ADR-0017).
+ */
+function openCard(plate: Plate, viewer: Viewer): CardContent | undefined {
+  const id = viewer.card?.id;
+  if (id === undefined || !plate.unitsDrawn.some((unit) => unit.id === id)) return undefined;
+  return cardContent(plate.battle.units, plate.picture.units, id);
+}
+
+/**
+ * What the player resolves a pointer against: two boxes for every unit drawn —
+ * its glyph, and whatever label or card that glyph carries — and one for each
+ * of the legend's numeral rows, which a click opens the same card from. Two
+ * boxes and never one around both: a label displaced a hundred pixels would
+ * otherwise open a card from the bare plate between them.
+ *
+ * They go out **in the order they were drawn**, because the topmost region
+ * containing a point is the one that answers: the glyphs, then the legend, then
+ * the labels, and the frame's open card last of all, so a card that had to draw
+ * over a label is what the pointer finds there.
+ */
+function hitRegions(placed: readonly Placed[], rows: readonly HitRegion[]): HitRegion[] {
+  const box = (label: Placed, rect: Rect): HitRegion => ({ id: label.unit.id, box: rect, hover: true });
+  const glyphs = placed.map((label) => box(label, glyphBox(label.unit)));
+  const labels = placed.flatMap((label) => (label.card === undefined ? [box(label, label.box)] : []));
+  const cards = placed.flatMap((label) => (label.card === undefined ? [] : [box(label, label.box)]));
+  return [...glyphs, ...rows, ...labels, ...cards];
 }
 
 /** Sizes the backing store to the canvas's CSS size at the current devicePixelRatio. Returns the CSS size. */

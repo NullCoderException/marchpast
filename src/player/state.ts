@@ -1,15 +1,17 @@
 /**
  * What the player holds between frames, and every way a control moves it.
  *
- * The state is a clock, a flag and the viewer's three choices — speed, view
- * and level: nothing here is authored, and nothing survives a reload (issue
- * #13's resolution, #47 for the view, ADR-0017 for the level). Every
+ * The state is a clock, a flag and the viewer's four choices — speed, view,
+ * level and the unit card they have open: nothing here is authored, and
+ * nothing survives a reload (issue #13's resolution, #47 for the view,
+ * ADR-0017 for the level, #60 for the card). Every
  * transition is a pure function of the battle and the state before it, so the
  * controls can be read as "which transition does this button call" and the
  * rules are tested without a DOM. The fixed lists a chooser offers live here
  * for the same reason.
  */
-import { DEFAULT_VIEW, type ViewId } from "../render/index.ts";
+import { DEFAULT_VIEW, type CardTarget, type ViewId } from "../render/index.ts";
+import { unitsAtLevel } from "../schema/hierarchy.ts";
 import type { Battle } from "../schema/types.ts";
 import { checkMultiplier, clockIntervals, endClock, intervalAt, startClock } from "../timeline/intervals.ts";
 import type { ClockSeconds } from "../timeline/picture.ts";
@@ -52,6 +54,12 @@ export interface PlayerState {
    * `0` (ADR-0017).
    */
   level: number;
+  /**
+   * The unit whose card is open, and whether a click pinned it there. Player
+   * state like the view and the level — viewer-opened, never authored, never
+   * on the URL and never remembered — and absent when no card is open (#60).
+   */
+  card?: CardTarget;
 }
 
 /** Paused on the first phase in the default view at the coarsest level, which is what loading lands on (schema.md 2.11, #47). */
@@ -118,17 +126,56 @@ export function setMultiplier(state: PlayerState, multiplier: number): PlayerSta
   return { ...state, multiplier };
 }
 
-/** Switch the view, leaving the clock and the play state where they are: a switch never interrupts (#47). */
+/**
+ * Switch the view, leaving the clock, the play state and any open card where
+ * they are: a switch never interrupts (#47), and the card is redrawn in the
+ * new palette rather than closed (#60).
+ */
 export function setView(state: PlayerState, view: ViewId): PlayerState {
   return { ...state, view };
 }
 
 /**
- * Switch the level drawn, leaving the clock and the play state where they are:
- * only the renderer's choice of units changes, mid-playback included (ADR-0017).
+ * The pointer has come to rest on a unit, or on none. An unpinned card follows
+ * the pointer and closes when it leaves; a **pinned** card ignores it entirely,
+ * which is the whole point of pinning — a unit slides out from under a still
+ * pointer while the battle plays (#60).
  */
-export function setLevel(state: PlayerState, level: number): PlayerState {
-  return { ...state, level };
+export function hoverUnit(state: PlayerState, id: string | undefined): PlayerState {
+  if (state.card?.pinned === true) return state;
+  if (id === undefined) return closeCard(state);
+  if (state.card?.id === id) return state;
+  return { ...state, card: { id, pinned: false } };
+}
+
+/** A click or tap on a unit: the card is pinned to it, swapping from whatever it was on. One card at a time. */
+export function pinUnit(state: PlayerState, id: string): PlayerState {
+  return { ...state, card: { id, pinned: true } };
+}
+
+/** Close the card, which is what a click or tap on bare plate does. Nothing at all when none is open. */
+export function closeCard(state: PlayerState): PlayerState {
+  if (state.card === undefined) return state;
+  const next = { ...state };
+  delete next.card;
+  return next;
+}
+
+/**
+ * Switch the level drawn, leaving the clock and the play state where they are:
+ * only the renderer's choice of units changes, mid-playback included
+ * (ADR-0017).
+ *
+ * The one thing it does close is a card on a unit the new level stops drawing.
+ * A card is anchored at its unit's glyph, so a card on a unit with no glyph
+ * has nowhere to be; there is no re-pinning to a drawn ancestor, which is a
+ * rule nobody asked for (#60).
+ */
+export function setLevel(battle: Battle, state: PlayerState, level: number): PlayerState {
+  const next = { ...state, level };
+  const id = state.card?.id;
+  if (id === undefined) return next;
+  return unitsAtLevel(battle.units, level).some((unit) => unit.id === id) ? next : closeCard(next);
 }
 
 /** Jump to a phase's own `t` — what a scrubber tick clicks to — keeping the play state. */

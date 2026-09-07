@@ -16,12 +16,21 @@
  * are the same rectangles a land plate lays its paper on, so the ink and the
  * obstacle can never disagree about where a piece is.
  *
+ * The legend's numeral rows are the one piece of furniture a pointer may act
+ * on: a **click** on a numeral row opens that unit's card, which is what
+ * rescues a unit whose label has collapsed all the way (#60). So this pass
+ * reports their boxes as hit regions, in the same way it reports every piece's
+ * box as an obstacle. They answer a click alone: the key is built from the
+ * numerals the frame showed, so a card opening takes the numeral — and with it
+ * the row — out from under a resting pointer.
+ *
  * On a plate whose map carries contours the pieces sit on **paper panels**,
  * because relief runs under every corner, and the scale bar carries the
  * contour interval so the legend gains no row (#62). A naval plate — anything
  * whose map has no relief — is drawn exactly as it was.
  */
 import type { Arm, Wind, WindForce } from "../schema/types.ts";
+import type { HitRegion } from "./hit.ts";
 import type { NumeralRow } from "./labels/index.ts";
 import type { Plate } from "./plate.ts";
 import { drawArrow, drawPlateRule, type Point } from "./primitives.ts";
@@ -57,7 +66,7 @@ const CORNER_PANEL_INSET = 10;
 /** How far a panel stands above and below the line of type it carries. */
 const PANEL_LEAD = 6;
 
-export function drawFurniture(plate: Plate, key: readonly NumeralRow[]): void {
+export function drawFurniture(plate: Plate, key: readonly NumeralRow[]): HitRegion[] {
   drawPlateBorder(plate);
   const scale = layoutScaleBar(plate);
   const legendBottom = scale.labelTop - LEGEND_GAP;
@@ -68,8 +77,9 @@ export function drawFurniture(plate: Plate, key: readonly NumeralRow[]): void {
   drawCompassRose(plate, plate.picture.wind);
   drawTitle(plate);
   drawScaleBar(plate, scale);
-  drawLegend(plate, legendBottom, onPanels, key);
+  const rows = drawLegend(plate, legendBottom, onPanels, key);
   drawCredit(plate);
+  return rows;
 }
 
 /**
@@ -358,8 +368,11 @@ function legendWidth(plate: Plate, key: readonly NumeralRow[]): number {
  * `onPanel` says a land plate has already laid paper under this corner, so the
  * legend draws its rule and not a second ground: the panel is the paper at .92
  * once, not twice over (#62).
+ *
+ * Returns the numeral rows' boxes, which are the only rows a click opens
+ * anything from: the side, state, arm and line rows do nothing (#60).
  */
-function drawLegend(plate: Plate, bottom: number, onPanel: boolean, key: readonly NumeralRow[]): void {
+function drawLegend(plate: Plate, bottom: number, onPanel: boolean, key: readonly NumeralRow[]): HitRegion[] {
   const { ctx, colours, view } = plate;
   const { palette, pens, glyph } = view;
   const frame = plate.projection.extentRect;
@@ -451,11 +464,14 @@ function drawLegend(plate: Plate, bottom: number, onPanel: boolean, key: readonl
   // The numeral key: what a label that has collapsed all the way stands for.
   // Nothing is drawn when no label showed a numeral this frame (#39).
   ctx.fillStyle = palette.ink;
+  const rows: HitRegion[] = [];
   for (const row of key) {
     ctx.fillText(keyRow(row), x + LEGEND_PAD, rowY);
+    rows.push({ id: row.id, box: { x, y: rowY - LEGEND_ROW / 2, width, height: LEGEND_ROW }, hover: false });
     rowY += LEGEND_ROW;
   }
   ctx.restore();
+  return rows;
 }
 
 const CREDIT_SIZE = 11;
