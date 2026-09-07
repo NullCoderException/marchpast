@@ -374,7 +374,7 @@ function boardAtlas() {
 // 6 · StaffMap — the symbol-tradition mark
 // ===================================================================================================
 function boardStaff() {
-  const SF = ["#139 drew three arm marks and greyed the fourth, saying in words that whether aircraft is an arm at all was #131's and what its sign looks like is this ticket's. ADR-0024 answered the first. This answers the second.","The glyph itself is still #139's open choice (A frame-to-frontage or B symbol-on-the-trace); the mark is drawn on both, because it has to survive either."];
+  const SF = ["#139 drew three arm marks and greyed the fourth, saying in words that whether aircraft is an arm at all was #131's and what its sign looks like is this ticket's. ADR-0024 answered the first. This answers the second.","#139 has since closed and chose its glyph A, the frame to frontage; the mark is drawn on that and on the B it left on the chip, because a mark that only works on the winner is a mark fitted to one drawing."];
   const W = 1300, ink = STAFF.ink;
   const US_S = STAFF.sides[0], JP_S = STAFF.sides[1];
   let s = "";
@@ -409,8 +409,8 @@ function boardStaff() {
       AIRCRAFT_STAFF[k]({ x: 15, y: 9.5 }, US_S, 1.35) + `</g>` +
       `<g transform="translate(0 128) scale(0.62)">${frameGlyph({ formation: "line", arm: "none", state: "intact", strength: 1, colour: ink, ink })}` +
       AIRCRAFT_STAFF[k]({ x: 36, y: 9 }, ink, 1.35) + `</g>` +
-      cap(0, 30, "on #139's candidate A, frame to frontage", ink) +
-      cap(0, 92, "on #139's candidate B, symbol on the trace", ink) +
+      cap(0, 30, "on #139's A, the chosen glyph", ink) +
+      cap(0, 92, "on #139's B, left on the chip", ink) +
       cap(0, 158, "legend scale, 0.62", ink);
     s += scard(x, y, 390, staffH, head, n, inner, 175, 60);
   });
@@ -533,7 +533,7 @@ const boards = {
   "Burning.dc.html": plateBoard("burning", { candidate: "A" }),
   "NightBurning.dc.html": plateBoard("burning", { v: NIGHT, candidate: "A" }),
   "Aboard.dc.html": boardAboard(),
-  "MidwayStaff.dc.html": staffBoard("midway", { kind: "A", aircraft: true }),
+  "MidwayStaff.dc.html": staffBoard("midway", { kind: "A", aircraft: true, sea: "lightened" }),
 };
 
 for (const [name, html] of Object.entries(boards)) writeFileSync(new URL(name, import.meta.url), html);
