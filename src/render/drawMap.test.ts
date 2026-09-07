@@ -12,7 +12,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { furnitureBoxes } from "./drawFurniture.ts";
-import { mapPoints } from "./drawMap.ts";
+import { drawMap, mapPoints } from "./drawMap.ts";
 import { touches } from "./labels/geometry.ts";
 import { type MapPoint, placeMapLabels } from "./labels/index.ts";
 import type { Plate } from "./plate.ts";
@@ -100,6 +100,7 @@ const FIXTURE: MapFile = {
     { type: "Feature", geometry: { type: "Point", coordinates: [30.1052, 31.3583] }, properties: { kind: "place", name: "Aboukir Island" } },
     { type: "Feature", geometry: { type: "LineString", coordinates: [[30.1, 31.3], [30.2, 31.4]] }, properties: { kind: "river" } },
     { type: "Feature", geometry: { type: "Point", coordinates: [30.1072, 31.3587] }, properties: { kind: "work", name: "Island battery" } },
+    { type: "Feature", geometry: { type: "MultiLineString", coordinates: [[[30.11, 31.35], [30.12, 31.36]], [[30.13, 31.36], [30.14, 31.37]]] }, properties: { kind: "rampart" } },
   ],
 } as unknown as MapFile;
 
@@ -131,6 +132,17 @@ describe("mapPoints", () => {
 
   it("reports nothing at all for a battle with no map", () => {
     expect(mapPoints({ ...plate(), map: undefined })).toEqual([]);
+  });
+
+  /**
+   * The fixture carries a rampart, and neither the pass nor the placer knows
+   * what one looks like yet (#170). A map with ramparts on it has to load and
+   * play all the same, with the lines simply not there: the kind arrived in
+   * the format ahead of the ink (#167), so this is the thing that would break.
+   */
+  it("passes over a rampart: nameless, so it reaches no label, and drawn nowhere yet", () => {
+    expect(mapPoints(plate()).map(({ text }) => text)).toEqual(["Aboukir Island", "ISLAND BATTERY"]);
+    expect(() => drawMap(plate(), [])).not.toThrow();
   });
 });
 
