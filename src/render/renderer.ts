@@ -1,13 +1,14 @@
 /**
  * The renderer: one synchronous pass that draws the picture the timeline hands
- * it for one instant, in the **view** the viewer has picked (ADR-0014). No
- * animation loop lives here; the player owns that and calls `render` whenever
- * the picture, the viewer's choices or the canvas changes.
+ * it for one instant, in the **view** the viewer has picked (ADR-0014,
+ * ADR-0021). No animation loop lives here; the player owns that and calls
+ * `render` whenever the picture, the viewer's choices or the canvas changes.
  *
  * The viewer's state is as per-frame as the picture is — a view or a level may
  * be switched at any instant — so it is an argument to `render`, not
- * construction config. The renderer holds nothing but the canvas and its
- * context (and the one scratch canvas the plate's smoke is composited on).
+ * construction config. The renderer holds nothing but the canvas, its context,
+ * where the labels stood last frame, and the ground buffer (and, inside the
+ * plate's glyph, the one scratch canvas its smoke is composited on).
  *
  * The viewer's **level** is applied once, here, before any pass runs: the
  * timeline hands over every roster unit's picture and `level.ts` narrows it to
@@ -29,10 +30,11 @@
  */
 import type { Battle, MapFile } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
-import { drawCaption, layoutCaption } from "./drawCaption.ts";
+import { PLATE_MARGIN, sideColours } from "./anatomy.ts";
 import { drawFurniture, furnitureBoxes } from "./drawFurniture.ts";
-import { drawMap, mapPoints } from "./drawMap.ts";
 import { drawUnits, layoutUnits } from "./drawUnits.ts";
+import { drawNamedThings, mapPoints } from "./ground.ts";
+import { createGroundBuffer } from "./groundBuffer.ts";
 import type { HitRegion } from "./hit.ts";
 import { layoutMode } from "./layout.ts";
 import {
@@ -53,11 +55,9 @@ import {
   placeMapLabels,
 } from "./labels/index.ts";
 import { unitsDrawn } from "./level.ts";
-import { seeded } from "./primitives.ts";
 import { fitProjection, type Rect } from "./projection.ts";
 import { contourLevels } from "./relief.ts";
 import type { Plate } from "./plate.ts";
-import { PLATE_MARGIN, sideColours } from "./style.ts";
 import type { Viewer } from "./view.ts";
 import { viewById } from "./views.ts";
 
@@ -73,14 +73,15 @@ export interface Renderer {
 export function createRenderer(canvas: HTMLCanvasElement): Renderer {
   const ctx = canvas.getContext("2d");
   if (ctx === null) throw new Error("Canvas 2D is not available in this browser");
-  const measure = canvasMeasure(ctx);
 
-  // The one piece of frame-to-frame state the renderer holds: where each
-  // label stood last frame, so it does not move when it need not (#39). It is
-  // per battle — the slots are keyed by roster id — so a new battle starts
-  // over.
+  // The frame-to-frame state the renderer holds. First, where each label stood
+  // last frame, so it does not move when it need not (#39). It is per battle —
+  // the slots are keyed by roster id — so a new battle starts over.
   let labels: LabelMemory = NO_LABEL_MEMORY;
   let drawing: Battle | undefined;
+  // Second, the ground: drawn once per view, battle, plate rectangle and device
+  // pixel ratio, and blitted every frame after that (#138).
+  const ground = createGroundBuffer();
 
   return {
     render(battle, map, picture, viewer) {
@@ -90,18 +91,24 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
       }
       const view = viewById(viewer.view);
       const { palette } = view;
-      const { width, height } = fitBackingStore(canvas, ctx);
+      // Every box the placer judges is measured in the view's own face, so the
+      // measurer is built per frame rather than per renderer (ADR-0021).
+      const measure = canvasMeasure(ctx, view.type);
+      const { width, height, dpr } = fitBackingStore(canvas, ctx);
       // One global rule about width, read once and handed to every pass that
       // answers to it: the furniture set, the band's anatomy, and the step the
       // labels start collapsing from (#86).
       const mode = layoutMode(width);
 
-      // Ground: everything is the view's paper until a land polygon says otherwise.
+      // Ground: everything is the view's paper until the buffer or the band says otherwise.
       ctx.fillStyle = palette.paper;
       ctx.fillRect(0, 0, width, height);
 
-      // The caption band's height comes first, so the plate fits above it.
-      const caption = layoutCaption(ctx, battle, picture, width, mode);
+      // The caption band's height comes first, so the plate fits above it. The
+      // band is one of the view's own hands — measured and inked together,
+      // because a view lays it out however it likes and the shared half knows
+      // only that it runs the whole width below the plate (ADR-0021).
+      const caption = view.furniture.caption.measure({ ctx, battle, picture, width, mode, palette, type: view.type });
       const plateHeight = Math.max(1, height - caption.height);
 
       const plateArea: Rect = {
@@ -112,13 +119,6 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
       };
       const projection = fitProjection(battle.extent, plateArea);
       const { extentRect } = projection;
-
-      // Letterbox: another tone outside the extent, the plate itself back in the paper.
-      ctx.fillStyle = palette.letterbox;
-      ctx.fillRect(0, 0, width, plateHeight);
-      ctx.fillStyle = palette.paper;
-      ctx.fillRect(extentRect.x, extentRect.y, extentRect.width, extentRect.height);
-      if (palette.stipple !== undefined) mottle(ctx, extentRect, palette.stipple);
 
       // For the scale bar alone: a glyph's length is a plate constant and owes
       // nothing to the ground it stands on (ADR-0016).
@@ -139,10 +139,15 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
         pixelsPerMetre,
       };
 
-      // Everything is laid out before anything is inked. The map's names, the
-      // units' labels and the legend's numeral key each depend on the others,
-      // and the map is drawn first of the three, so no pass can settle its own
-      // question while it draws (#107).
+      // The ground — the letterbox, the sea, the land, the relief treatment and
+      // the water — is blitted rather than drawn: it is the same picture on
+      // every frame of this battle in this view at this size (#138).
+      ground.paint(plate, { width, plateHeight }, dpr);
+
+      // Everything else is laid out before anything is inked. The map's names,
+      // the units' labels and the legend's numeral key each depend on the
+      // others, and the names are drawn first of the three, so no pass can
+      // settle its own question while it draws (#107).
       const laid = layoutUnits(plate);
       const layout = layoutPlate({ plate, units: laid.map(({ label }) => label), memory: labels, measure, card: openCard(plate, viewer) });
       const { names, placed, key } = layout;
@@ -153,7 +158,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
       ctx.beginPath();
       ctx.rect(extentRect.x, extentRect.y, extentRect.width, extentRect.height);
       ctx.clip();
-      drawMap(plate, names);
+      drawNamedThings(plate, names);
       drawUnits(plate, laid);
       ctx.restore();
 
@@ -162,8 +167,8 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
       // before them because its legend carries a key for any numeral they end
       // up showing.
       const rows = drawFurniture(plate, key);
-      drawLabels(ctx, placed, palette);
-      drawCaption(ctx, picture, caption, plateHeight, width, palette, mode);
+      drawLabels(ctx, placed, view);
+      caption.draw(plateHeight);
       return hitRegions(placed, rows);
     },
   };
@@ -256,8 +261,12 @@ function hitRegions(placed: readonly Placed[], rows: readonly HitRegion[]): HitR
   return [...glyphs, ...rows, ...labels, ...cards];
 }
 
-/** Sizes the backing store to the canvas's CSS size at the current devicePixelRatio. Returns the CSS size. */
-export function fitBackingStore(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): { width: number; height: number } {
+/**
+ * Sizes the backing store to the canvas's CSS size at the current
+ * devicePixelRatio. Answers the CSS size and the ratio it was fitted at, so
+ * nothing downstream reads `window` again and finds a different one.
+ */
+export function fitBackingStore(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): { width: number; height: number; dpr: number } {
   const dpr = window.devicePixelRatio || 1;
   const width = canvas.clientWidth || canvas.width;
   const height = canvas.clientHeight || canvas.height;
@@ -268,20 +277,5 @@ export function fitBackingStore(canvas: HTMLCanvasElement, ctx: CanvasRenderingC
     canvas.height = storeHeight;
   }
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  return { width, height };
-}
-
-/** A faint fixed mottle so the paper is not a flat fill. Seeded, so it never shimmers from one render to the next. */
-function mottle(ctx: CanvasRenderingContext2D, { x, y, width, height }: Rect, stipple: string): void {
-  const random = seeded(7);
-  ctx.save();
-  ctx.fillStyle = stipple;
-  for (let i = 0; i < 900; i++) {
-    const px = x + random() * width;
-    const py = y + random() * height;
-    ctx.beginPath();
-    ctx.arc(px, py, random() * 6, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
+  return { width, height, dpr };
 }

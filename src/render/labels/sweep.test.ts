@@ -12,6 +12,7 @@
  */
 import { describe, expect, it } from "vitest";
 import type { Measure } from "./content.ts";
+import { ticks } from "../glyphs/ticks.ts";
 import { glyphBox, insidePlate, type LabelUnit, overlapArea } from "./geometry.ts";
 import { type LabelMemory, NO_LABEL_MEMORY, type Placed, placeLabels } from "./place.ts";
 import type { Rect } from "../projection.ts";
@@ -43,7 +44,7 @@ const FURNITURE: Rect[] = [
 ];
 
 /** A measurer with no canvas, near enough to the plate face's widths to be worth measuring against. */
-const measure: Measure = (text, size, italic) => text.length * size * (italic ? 0.47 : 0.5);
+const measure: Measure = (text, size, voice) => text.length * size * (voice === "name" ? 0.47 : 0.5);
 
 const SIDES = ["British", "Combined"] as const;
 const NAMES = [
@@ -77,6 +78,7 @@ function roster(): LabelUnit[] {
         formation: "line",
         length: 64,
         halfWidth: 2.6,
+        markReach: ticks.markReach(1, "intact"),
         hasMove: false,
       });
     }
@@ -101,6 +103,7 @@ function frame(units: readonly LabelUnit[], t: number): LabelUnit[] {
       anchor: { x: from + (to - from) * t, y: 96 + i * 66 + (side === 0 ? 0 : 33) },
       heading: (unit.heading + (side === 0 ? 45 : -45) * t + 360) % 360,
       state: fighting ? "engaged" : "intact",
+      markReach: ticks.markReach(1, fighting ? "engaged" : "intact"),
       strength: fighting ? 1 - (t - 0.5) * 0.7 : 1,
       hasMove: i === 0,
       // The wind blows to the south-east; what a unit is handed is that

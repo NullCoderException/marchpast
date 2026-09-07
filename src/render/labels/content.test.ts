@@ -7,6 +7,7 @@ import { contentAt, contentWidth, labelBox, LAST_STEP, type Measure, nearEdgeSet
 import type { LabelUnit } from "./geometry.ts";
 import { labelFloor } from "../layout.ts";
 import { toRadians } from "../projection.ts";
+import { ticks } from "../glyphs/ticks.ts";
 
 function unit(over: Partial<LabelUnit> = {}): LabelUnit {
   return {
@@ -21,6 +22,7 @@ function unit(over: Partial<LabelUnit> = {}): LabelUnit {
     formation: "column",
     length: 72,
     halfWidth: 2.6,
+    markReach: ticks.markReach(1, over.state ?? "engaged"),
     hasMove: false,
     ...over,
   };

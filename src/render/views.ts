@@ -1,12 +1,25 @@
 /**
  * The views there are: the three v0.2 views decided in #58, each one a palette,
- * a set of pens and a glyph over the shared passes. Adding a fourth view is
- * adding a value to this file — and, only if it draws a unit differently, one
- * glyph module.
+ * a set of pens and the five hands ADR-0021 and #139 settled.
+ *
+ * All three are the **engraved** aesthetic, so all three name hands out of
+ * `views/engraved/`. That sharing is by value and never by inheritance: the
+ * night plate names the plate's glyph, type, furniture and moves and supplies
+ * its own ground — the plate's relief treatment, under its own palette — and
+ * Atlas names the plate's type, furniture and moves, supplies its own block
+ * glyph, and supplies its own ground with the tint bands in it. #170 takes the
+ * night plate's ground to illuminated contours and Atlas's to a hypsometric
+ * ramp, and neither costs anything outside this file and one hand (#138).
+ *
+ * Adding a fourth view is a value here plus one folder per new aesthetic.
  */
 import { block } from "./glyphs/block.ts";
 import { ticks } from "./glyphs/ticks.ts";
 import type { Pens, View } from "./view.ts";
+import { engravedFurniture } from "./views/engraved/furniture.ts";
+import { engravedGround, tintedContours, weightedContours } from "./views/engraved/ground.ts";
+import { engravedMoves } from "./views/engraved/moves.ts";
+import { engravedType } from "./views/engraved/type.ts";
 
 /** The plate's pens: fine dotted track, dashed intent, solid detachment (ADR-0009, #58). */
 const PLATE_PENS: Pens = {
@@ -39,6 +52,10 @@ export const CHART_PLATE: View = {
   },
   pens: PLATE_PENS,
   glyph: ticks,
+  type: engravedType,
+  ground: engravedGround(weightedContours),
+  furniture: engravedFurniture,
+  moves: engravedMoves,
 };
 
 /** The plate inverted: parchment ink on an indigo ground, the side inks lifted to read on it. */
@@ -58,6 +75,12 @@ export const NIGHT_PLATE: View = {
   },
   pens: PLATE_PENS,
   glyph: ticks,
+  type: engravedType,
+  // Its own ground, drawing the plate's treatment under its own palette, until
+  // #170 lights the contours from the north-west (#138).
+  ground: engravedGround(weightedContours),
+  furniture: engravedFurniture,
+  moves: engravedMoves,
 };
 
 /** Units as blocks, strength as the filled fraction, engaged as a hatched zone, arrows thickened. */
@@ -72,6 +95,10 @@ export const ATLAS: View = {
   },
   pens: ATLAS_PENS,
   glyph: block,
+  type: engravedType,
+  ground: engravedGround(tintedContours),
+  furniture: engravedFurniture,
+  moves: engravedMoves,
 };
 
 /** Every view, in the order the View chooser offers them. The first is the default. */

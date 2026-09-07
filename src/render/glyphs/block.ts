@@ -16,6 +16,7 @@
 import type { Arm, Formation } from "../../schema/types.ts";
 import type { Glyph, GlyphRequest, Sign, SignBox } from "../view.ts";
 import { frontage, MASS_RANKS } from "./slots.ts";
+import { engravedMarkReach } from "./ticks.ts";
 
 /** The block's thickness across its long axis. */
 const THICKNESS = 10;
@@ -93,6 +94,9 @@ export const block: Glyph = {
   body,
   // A mass is twice as thick, so the label clears the whole of it (ADR-0016).
   halfWidth: (scale, formation) => ((formation === "mass" ? THICKNESS * MASS_RANKS : THICKNESS) / 2 + HATCH_PAD) * scale,
+  // The plate's reach, named rather than cut down to this hatching's own: see
+  // `engravedMarkReach`. Value reuse, never inheritance.
+  markReach: engravedMarkReach,
 };
 
 /**
@@ -136,6 +140,12 @@ function body(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
   const { w, h } = blockSize(formation, length, scale);
 
   ctx.save();
+  // A block has square corners, which is what the design canvas drew and what
+  // tells it from the plate's rounded destroyed outline. Said here rather than
+  // left to the context, because until #168 buffered the ground the relief
+  // pass's own `lineJoin` leaked this far and rounded them on any plate that
+  // carried contours — and on no other.
+  ctx.lineJoin = "miter";
   if (state === "broken") ctx.globalAlpha = BROKEN_ALPHA;
 
   const filled = state === "destroyed" ? 0 : strength;

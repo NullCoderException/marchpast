@@ -16,7 +16,7 @@ import { unitsDrawn } from "./level.ts";
 import type { Plate } from "./plate.ts";
 import { fitProjection, type Rect } from "./projection.ts";
 import { layoutPlate } from "./renderer.ts";
-import { sideColours } from "./style.ts";
+import { sideColours } from "./anatomy.ts";
 import { DEFAULT_VIEW } from "./views.ts";
 import type { Battle, MapFile, Unit } from "../schema/types.ts";
 import type { Picture, UnitPicture } from "../timeline/picture.ts";

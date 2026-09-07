@@ -6,7 +6,7 @@
  * Content, top to bottom and nothing else:
  *
  *   1. the full `label` and, when the roster names one, the `commander`, in
- *      the label's own italic and the label's own side ink;
+ *      the label's own name voice and the label's own side ink;
  *   2. one upright facts line: the arm word, the formation word, the state
  *      word and strength as a percentage;
  *   3. the tree (ADR-0017): `of <parent label>` on a child's card, and a row
@@ -30,12 +30,13 @@ import type { Unit } from "../../schema/types.ts";
 import type { UnitPicture } from "../../timeline/picture.ts";
 import type { Point } from "../primitives.ts";
 import type { Rect } from "../projection.ts";
+import type { Voice } from "../view.ts";
 import { type Align, type Measure, NAME_RISE, NAME_SIZE } from "./content.ts";
 import { boxSetback } from "./geometry.ts";
 
 /** Gap between the panel's rule and the words inside it. */
 export const CARD_PAD = 10;
-/** The commander, a shade under the name it belongs to. */
+/** The commander, a shade under the name it belongs to. A name too, so it takes the same voice. */
 const COMMANDER_SIZE = 13;
 /** The facts line and the tree: upright, and the label's own detail size. */
 const CARD_TEXT_SIZE = 12;
@@ -69,7 +70,8 @@ export interface CardContent {
 export interface CardLine {
   text: string;
   size: number;
-  italic: boolean;
+  /** Whether the line is a name or a fact: the view's type carries the difference (ADR-0021). */
+  voice: Voice;
   /** The unit's own side ink rather than the palette's: the name alone takes it, exactly as the label's does. */
   side: boolean;
   /** The line's middle, measured down from the panel's top edge. */
@@ -130,13 +132,13 @@ function treeLines(roster: readonly Unit[], units: readonly UnitPicture[], entry
 
 /** The panel the content fills and where each line sits in it, measured with the plate's own face. */
 export function layoutCard(content: CardContent, measure: Measure): CardLayout {
-  const groups: { text: string; size: number; italic: boolean; side: boolean }[][] = [
+  const groups: { text: string; size: number; voice: Voice; side: boolean }[][] = [
     [
-      { text: content.name, size: NAME_SIZE, italic: true, side: true },
-      ...(content.commander === undefined ? [] : [{ text: content.commander, size: COMMANDER_SIZE, italic: true, side: false }]),
+      { text: content.name, size: NAME_SIZE, voice: "name", side: true },
+      ...(content.commander === undefined ? [] : [{ text: content.commander, size: COMMANDER_SIZE, voice: "name" as Voice, side: false }]),
     ],
-    [{ text: content.facts, size: CARD_TEXT_SIZE, italic: false, side: false }],
-    content.tree.map((text) => ({ text, size: CARD_TEXT_SIZE, italic: false, side: false })),
+    [{ text: content.facts, size: CARD_TEXT_SIZE, voice: "fact", side: false }],
+    content.tree.map((text) => ({ text, size: CARD_TEXT_SIZE, voice: "fact" as Voice, side: false })),
   ];
 
   const lines: CardLine[] = [];
@@ -149,7 +151,7 @@ export function layoutCard(content: CardContent, measure: Measure): CardLayout {
       y += line.size / 2;
       lines.push({ ...line, y });
       y += line.size / 2 + LINE_LEAD;
-      width = Math.max(width, measure(line.text, line.size, line.italic));
+      width = Math.max(width, measure(line.text, line.size, line.voice));
     }
   }
 

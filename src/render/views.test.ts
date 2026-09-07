@@ -1,9 +1,11 @@
 /**
  * The views table: the shape every view has to hold, checked once for all
  * three, plus the fallback an unknown id takes. What each view *looks* like is
- * checked by eye against the design canvas (ADR-0014), never here.
+ * checked by eye against the design canvas (ADR-0014), and what every view
+ * *keeps* is `anatomy.test.ts`.
  */
 import { describe, expect, it } from "vitest";
+import { TYPE_ROLES } from "./anatomy.ts";
 import { DEFAULT_VIEW, VIEWS, viewById } from "./views.ts";
 
 describe("the views there are", () => {
@@ -26,6 +28,61 @@ describe("the views there are", () => {
         expect(pen.width).toBeGreaterThan(0);
         expect(pen.headSize).toBeGreaterThan(0);
       }
+    }
+  });
+
+  it("supplies all five hands, so no view is half a treatment", () => {
+    // A view that cannot draw a scale bar is broken, not degraded — the same
+    // rule ADR-0015 sets for arms, and the reason these are required members
+    // rather than optional ones (ADR-0021).
+    for (const view of VIEWS) {
+      expect(typeof view.glyph.body).toBe("function");
+      expect(typeof view.type.role).toBe("function");
+      expect(typeof view.ground.land).toBe("function");
+      expect(typeof view.furniture.scaleBar.draw).toBe("function");
+      expect(typeof view.moves.detachment).toBe("function");
+    }
+  });
+
+  it("names every piece of the furniture set and the caption band with it", () => {
+    for (const { furniture } of VIEWS) {
+      for (const piece of [furniture.compass, furniture.title, furniture.credit]) {
+        expect(typeof piece.panel).toBe("function");
+        expect(typeof piece.draw).toBe("function");
+      }
+      expect(typeof furniture.scaleBar.layout).toBe("function");
+      expect(typeof furniture.legend.draw).toBe("function");
+      expect(typeof furniture.caption.measure).toBe("function");
+      expect(typeof furniture.border).toBe("function");
+      expect(typeof furniture.panel).toBe("function");
+    }
+  });
+
+  it("names all eight type roles, in both modes, and a face to set them in", () => {
+    for (const view of VIEWS) {
+      expect(view.type.face).toBeTruthy();
+      for (const mode of ["desktop", "phone"] as const) {
+        for (const role of TYPE_ROLES) {
+          const setting = view.type.role(role, mode);
+          expect(setting.size).toBeGreaterThan(0);
+          expect(setting.font).toContain("px");
+          expect(setting.spell("Weather column")).toBeTruthy();
+        }
+      }
+    }
+  });
+
+  it("draws every named point's mark and names it in a face of its own", () => {
+    for (const { ground } of VIEWS) {
+      for (const kind of ["place", "work"] as const) {
+        const naming = ground.naming(kind);
+        expect(naming.size).toBeGreaterThan(0);
+        expect(naming.gap).toBeGreaterThan(0);
+        expect(naming.half).toBeGreaterThan(0);
+        expect(naming.font).toContain("px");
+      }
+      expect(ground.naming("work").spell("camp")).toBe("CAMP");
+      expect(ground.naming("place").spell("Cannae")).toBe("Cannae");
     }
   });
 });
