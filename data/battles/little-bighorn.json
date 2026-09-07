@@ -1,0 +1,771 @@
+{
+  "schema_version": 2,
+  "title": "The Battle of the Little Bighorn",
+  "summary": "The 7th Cavalry is divided at the divide and attacks the largest village on the plains from two directions; Reno is driven out of the valley onto the bluffs, and Custer's five companies are destroyed within sight and hearing of a command that cannot reach them.",
+  "dates": ["25 June 1876", "26 June 1876"],
+  "sort_date": { "year": 1876, "month": 6, "day": 25 },
+  "extent": { "north": 45.62, "south": 45.43, "east": -107.1, "west": -107.52 },
+  "scale_unit": "km",
+  "map": "little-bighorn",
+  "end": "22:00",
+  "end_day": 1,
+  "license": "CC-BY-4.0",
+  "attribution": "Marchpast contributors, CC BY 4.0. Positions and captions authored from the public-domain sources listed in the file.",
+  "sources": {
+    "rcoi": {
+      "label": "Reno Court of Inquiry",
+      "work": "Proceedings of a court of inquiry in the case of Major Marcus A. Reno, Chicago, 13 January to 11 February 1879; typescript prepared under W. A. Graham for the Office of the Judge Advocate General, 1933, 2 vols and exhibits",
+      "url": "https://tile.loc.gov/storage-services/service/ll/llmlp/Reno_Volume-1/Reno_Volume-1.pdf",
+      "license": "public-domain",
+      "license_note": "An 1879 US Army record in a 1933 US government typescript. Library of Congress, Military Legal Resources: 'The Library of Congress is not aware of any copyright restrictions in the Military Legal Resources collection.' Graham's 1951 printed edition carries its own copyright notice and is not used here; page numbers below are the pages of the Library of Congress PDFs."
+    },
+    "godfrey-century": {
+      "label": "Godfrey's account",
+      "work": "E. S. Godfrey, 'Custer's Last Battle. By one of his troop commanders', The Century Illustrated Monthly Magazine vol. 43 no. 3 (January 1892), pp. 358-384",
+      "url": "https://archive.org/details/sim_century-illustrated-monthly-magazine_1892-01_43_3",
+      "license": "public-domain",
+      "license_note": "Published 1892; Godfrey died in 1932. Quotations are checked against the archive.org text of the microfilm, joining the scan's line-end hyphens."
+    },
+    "reno-report": {
+      "label": "Reno's report",
+      "work": "M. A. Reno to Capt. E. W. Smith, A.D.C. and A.A.A.G., Headquarters 7th U.S. Cavalry, Camp on Yellowstone River, 5 July 1876; the certified copy of 9 January 1879 filed as Exhibit 4 of the Reno Court of Inquiry, and printed in the Annual Report of the Secretary of War 1876, vol. I, pp. 476-479",
+      "url": "https://tile.loc.gov/storage-services/service/ll/llmlp/Reno_Exhibits/Reno_Exhibits.pdf",
+      "license": "public-domain",
+      "license_note": "A US government work. Quotations are taken from the certified copy in the Court's exhibits, which differs from the 1876 printing in small wordings ('afterwards' for 'afterward'); where the two differ the exhibit is followed, because it is the text this file could read."
+    },
+    "benteen-report": {
+      "label": "Benteen's report",
+      "work": "F. W. Benteen to Lt. G. D. Wallace, adjutant, Camp Seventh Cavalry, 4 July 1876, enclosed with Reno's report",
+      "url": "https://littlebighorn.info/Articles/benteen1.htm",
+      "license": "public-domain",
+      "license_note": "A US government work of 1876; read in a transcription of the 1876 printing."
+    },
+    "maguire-report": {
+      "label": "Maguire's report",
+      "work": "Lt. Edward Maguire, Corps of Engineers, annual report for the fiscal year ending 30 June 1876, dated Camp on the Yellowstone River, 10 July 1876; Appendix OO of the Report of the Chief of Engineers 1876, pp. 699-704",
+      "url": "https://archive.org/details/annualreportofse1876unit",
+      "license": "public-domain",
+      "license_note": "A US government work. Maguire walked the field on 27 and 28 June and his report is the earliest survey of where the dead lay."
+    },
+    "maguire-map": {
+      "label": "Maguire's map",
+      "work": "'Custer's Battle-Field (June 25th 1876)', surveyed by Lt. Edward Maguire and drawn by Sergeant Charles Becker, plate to Appendix OO of the Report of the Chief of Engineers 1876; the same sheet filed as Exhibit 2 of the Reno Court of Inquiry",
+      "url": "https://tile.loc.gov/storage-services/service/ll/llmlp/Reno_Exhibits/Reno_Exhibits.pdf",
+      "license": "public-domain",
+      "license_note": "A US government work. Maguire told the Court the sheet 'except with regard to the relative position of points, is a mere sketch; it is not like a survey made with a transit and chain' (vol. 1, p. 10), and it is used here for relative positions only."
+    },
+    "terry-report": {
+      "label": "Terry's dispatches",
+      "work": "Brig.-Gen. A. H. Terry to the Adjutant General, Camp on Little Big Horn River, Montana, 27 June 1876, and his later telegrams; Annual Report of the Secretary of War 1876, vol. I, pp. 462-464",
+      "url": "https://archive.org/details/annualreportswa23deptgoog",
+      "license": "public-domain",
+      "license_note": "A US government work. Senate Ex. Doc. 81, the first printing of the dispatches, was not found in an open scan."
+    },
+    "arikara-1920": {
+      "label": "The Arikara narrative",
+      "work": "O. G. Libby (ed.), The Arikara Narrative of the Campaign against the Hostile Dakotas, June 1876, North Dakota Historical Collections vol. 6 (1920)",
+      "url": "https://archive.org/details/arikaranarrative00libb",
+      "license": "public-domain",
+      "license_note": "Published 1920; the archive.org item is marked NOT_IN_COPYRIGHT."
+    },
+    "two-moon-1898": {
+      "label": "Two Moon's account",
+      "work": "Hamlin Garland, 'General Custer's Last Fight as Seen by Two Moon', McClure's Magazine vol. 11 no. 5 (September 1898), pp. 443-448",
+      "url": "https://archive.org/details/sim_new-mcclures-magazine_1898-09_11_5",
+      "license": "public-domain",
+      "license_note": "Published 1898."
+    },
+    "wooden-leg-1931": {
+      "label": "Wooden Leg",
+      "work": "Thomas B. Marquis, A Warrior Who Fought Custer (Minneapolis: Midwest Company, 1931), chapter VIII and the map key",
+      "url": "https://archive.org/details/warriorwhofought027166mbp",
+      "license": "public-domain",
+      "license_note": "A determination by absence: no renewal was found for the 1931 printing in the Catalog of Copyright Entries for 1958-60, and HathiTrust shows the volume full-view. It is held a notch below the pre-1929 sources and is used for the order of the camp circles, not for a position. Kate Bighead's She Watched Custer's Last Battle (Marquis, 1933) was renewed on 8 February 1961, R270718, is in copyright until 2029, and is not a source for this file."
+    },
+    "gall-1886": {
+      "label": "Gall's account",
+      "work": "Gall's account given on the field at the tenth-anniversary reunion, 25 June 1886, St. Paul Pioneer Press 18 July 1886, syndicated in the Press and Daily Dakotaian (Yankton) 21 July 1886 p. 4 and the Bismarck Weekly Tribune 23 July 1886 p. 3",
+      "url": "https://www.loc.gov/resource/sn91099608/1886-07-21/ed-1/?sp=4",
+      "license": "public-domain",
+      "license_note": "Library of Congress: 'Newspapers published in the United States more than 95 years ago are in the public domain in their entirety.' The Chronicling America text could not be fetched by this session, so Gall is cited for what he says and never quoted."
+    },
+    "fort-yates-1881": {
+      "label": "The Fort Yates interviews",
+      "work": "Low Dog, Crow King, Hump and Iron Thunder, interviewed at Fort Yates for the Cincinnati Commercial, August 1881; reprinted in the Jamestown Alert 19 August 1881 p. 3 and the New-York Tribune 10 August 1881 p. 2",
+      "url": "https://www.loc.gov/resource/sn85042404/1881-08-19/ed-1/?sp=3",
+      "license": "public-domain",
+      "license_note": "An 1881 newspaper, public domain. Cited for what the four men say and never quoted, the text having been read for this file only in the research note."
+    },
+    "sitting-bull-1877": {
+      "label": "Sitting Bull's interview",
+      "work": "'Sitting Bull Talks', New York Herald 16 November 1877 p. 3, from the interview at Fort Walsh of 17 October 1877",
+      "url": "https://www.loc.gov/resource/sn83030313/1877-11-16/ed-1/?sp=3",
+      "license": "public-domain",
+      "license_note": "An 1877 newspaper, public domain."
+    },
+    "red-horse-1893": {
+      "label": "Red Horse",
+      "work": "Red Horse's account and pictographs of 1881, in Garrick Mallery, 'Picture-Writing of the American Indians', Tenth Annual Report of the Bureau of Ethnology (1893), pp. 563-566 and plates XXXIX-XLVIII",
+      "url": "https://www.gutenberg.org/ebooks/54653",
+      "license": "public-domain",
+      "license_note": "A US government work of 1893; read in the Project Gutenberg transcription."
+    },
+    "curley-1876": {
+      "label": "Curley's first account",
+      "work": "Lt. James Bradley's interview with the Crow scout Curley, Helena Daily Herald 15 July 1876, reprinted Helena Weekly Herald 20 July 1876 p. 1",
+      "url": "https://www.loc.gov/resource/sn84036143/1876-07-20/ed-1/?sp=1",
+      "license": "public-domain",
+      "license_note": "An 1876 newspaper, public domain. Cited and not quoted, for the same reason as the other newspaper accounts."
+    },
+    "dixon-1913": {
+      "label": "The Crow scouts' accounts",
+      "work": "J. K. Dixon, The Vanishing Race (1913), 'The Indians' Story of the Custer Fight': Two Moons, Runs-the-Enemy, Red Cloud, and the Crow scouts Goes-Ahead, White-Man-Runs-Him and Curly",
+      "url": "https://www.gutenberg.org/ebooks/27616",
+      "license": "public-domain",
+      "license_note": "Published 1913; read in the Project Gutenberg transcription."
+    },
+    "nps-handbook-1969": {
+      "label": "Utley's handbook",
+      "work": "Robert M. Utley, Custer Battlefield National Monument, National Park Service Historical Handbook Series no. 1 (Washington: NPS, 1969)",
+      "url": "https://npshistory.com/handbooks/historical/1-1969.pdf",
+      "license": "public-domain",
+      "license_note": "A US government work; the archive.org copy carries 'in the public domain'."
+    },
+    "nps-handbook-1988": {
+      "label": "Utley's guide",
+      "work": "Robert M. Utley, Custer Battlefield: A History and Guide to the Battle of the Little Bighorn, National Park Handbook 132 (Washington: NPS, 1988)",
+      "url": "https://archive.org/details/custerbattlefiel88nati",
+      "license": "public-domain",
+      "license_note": "A US government work."
+    },
+    "mwac-124": {
+      "label": "The archaeology",
+      "work": "Douglas D. Scott, Uncovering History: The Legacy of Archeological Investigations at the Little Bighorn Battlefield National Monument, Midwest Archeological Center Technical Report no. 124 (NPS, 2010)",
+      "url": "https://npshistory.com/series/archeology/mwac/tech/124.pdf",
+      "license": "public-domain",
+      "license_note": "A US government work, and the public-domain synthesis of the 1984-85, 1989, 1994-96 and 2004 surveys. The copyright monographs it paraphrases (Scott and Fox 1987, Fox 1993, Gray 1991) are not sources for this file."
+    },
+    "usgs-1891-sheet": {
+      "label": "The 1891 survey",
+      "work": "Custer Battlefield, Montana, 1:5280, surveyed 1891 by R. B. Marshall, topographer; United States Geological Survey (edition of September 1908)",
+      "url": "https://commons.wikimedia.org/wiki/File:Custer_Battlefield_1891_1-5280_-_PCL_Map_Collection_-_txu-pclmaps-topo-mt-custer_battlefield-1891.jpg",
+      "license": "public-domain",
+      "license_note": "A US government work; the map file's river is traced from this sheet. Its note reads 'River meanders from an Indian Office survey', and it is the nearest thing to the channel of 1876 that a public-domain survey holds."
+    }
+  },
+  "levels": ["Commands", "Wings"],
+  "units": [
+    { "id": "custer-battalion", "side": "7th Cavalry", "label": "Custer's battalion (C, E, F, I, L)", "short_label": "Custer", "commander": "Custer", "arm": "cavalry" },
+    { "id": "keogh-wing", "side": "7th Cavalry", "label": "Keogh's wing (C, I, L)", "short_label": "Keogh", "commander": "Keogh", "arm": "cavalry", "parent": "custer-battalion" },
+    { "id": "yates-wing", "side": "7th Cavalry", "label": "Yates's wing (E, F)", "short_label": "Yates", "commander": "Yates", "arm": "cavalry", "parent": "custer-battalion" },
+    { "id": "reno-battalion", "side": "7th Cavalry", "label": "Reno's battalion (A, G, M) with the scouts", "short_label": "Reno", "commander": "Reno", "arm": "cavalry" },
+    { "id": "benteen-battalion", "side": "7th Cavalry", "label": "Benteen's battalion (D, H, K)", "short_label": "Benteen", "commander": "Benteen", "arm": "cavalry" },
+    { "id": "pack-train", "side": "7th Cavalry", "label": "Pack train and escort (B)", "short_label": "Pack train", "commander": "McDougall", "arm": "cavalry" },
+    { "id": "village", "side": "Lakota and Cheyenne", "label": "The village's fighting men", "short_label": "The village", "arm": "cavalry" },
+    { "id": "village-south", "side": "Lakota and Cheyenne", "label": "Hunkpapa and the upper circles", "short_label": "Upper circles", "arm": "cavalry", "parent": "village" },
+    { "id": "village-north", "side": "Lakota and Cheyenne", "label": "Cheyenne and Oglala from the lower circles", "short_label": "Lower circles", "arm": "cavalry", "parent": "village" }
+  ],
+  "phases": [
+    {
+      "id": "divide",
+      "label": "The regiment is divided at the divide",
+      "t": "12:15",
+      "playback_rate": 600,
+      "caption": "A little before noon the 7th Cavalry crosses the divide between the Rosebud and the Little Bighorn. Custer had meant to attack at dawn on the 26th; believing the regiment discovered, he divides it here instead: five companies to himself, three to Reno, three to Benteen, and one to McDougall with the pack train. Benteen is sent off to the left to look into the valleys beyond; the rest march down Reno Creek toward a village nobody in the column has yet seen the size of.",
+      "notes": "The clock in this file is the regiment's watch time and nothing else. The watches were compared on the evening of 22 June and never set to the sun: Wallace, the itinerist, told the Court he never claimed his readings were the local time of the place (RCOI vol. 1, p. 77) and Godfrey said the command did not have the local time and its watches were not changed (vol. 2, p. 102). A reading of 16:30 in this file means late afternoon by the regiment's watches, about an hour off local mean time. Where witnesses disagree, the notes give the spread and the phase takes the reading nearest Wallace's chain.\n\nThe notes also carry four letters for what each picture rests on. T is testimony from a man who was there, army or Native; M is the Maguire survey of 27-28 June 1876 or Godfrey's 1892 plan, both of them records of where the dead lay; A is the archaeology of 1984-85, 1989, 1994-96 and 2004 as reported in MWAC Technical Report 124; R is reconstruction, which here means the author's geometry on fixed points or a reading later historians have agreed on. Nothing on the plate marks a position as one or the other; that is what these notes are for.\n\nThis phase: time T, and the best-agreed instant of the day (Wallace 'about a quarter after 12', RCOI vol. 1, p. 22; Godfrey 'a little before noon'; Mathey 'near 12 o'clock'; DeRudio 'about 11 or 12'). The division T. Positions R: the Crow's Nest and the divide have no gazetteer point, and the four army markers are spread along the head of Reno Creek by the author. The village T for being in camp and asleep (Low Dog, Fort Yates 1881, has the sun about noon); the circles' places M and T. Custer's two wings are drawn from this phase to the last, because the file will not let a battalion vanish from the fine level in the hours before anyone can say which companies rode where: the split into a right and left wing is R throughout, and only becomes a fact on the ground at phase 8.",
+      "references": [
+        {
+          "source": "godfrey-century",
+          "locator": "p. 368, the crossing of the divide",
+          "quote": "We crossed the dividing ridge between the Rosebud and Little Big Horn valleys a little before noon. Shortly afterward the regiment was divided into battalions"
+        },
+        {
+          "source": "godfrey-century",
+          "locator": "p. 368, why the attack was made on the 25th",
+          "quote": "he had not intended to make the attack until the next morning, the 26th, but our discovery made it imperative to act at once, as delay would allow the village to scatter and escape"
+        },
+        {
+          "source": "rcoi",
+          "locator": "vol. 1, p. 22, Wallace on the division of the regiment",
+          "note": "Wallace fixes the halt at about a quarter after twelve and lists the battalions as they were given out. Read in the Library of Congress typescript; not quoted here, because this file quotes only editions it could check word for word."
+        },
+        {
+          "source": "fort-yates-1881",
+          "locator": "Low Dog, on where he was when the attack came",
+          "note": "Low Dog was asleep in his lodge and puts the sun about noon, which is the village's only clock."
+        }
+      ],
+      "units": [
+        { "id": "custer-battalion", "position": { "lat": 45.4448, "lon": -107.142 }, "heading": 280, "formation": "column", "state": "intact" },
+        { "id": "keogh-wing", "position": { "lat": 45.4455, "lon": -107.14 }, "heading": 280, "formation": "column", "state": "intact" },
+        { "id": "yates-wing", "position": { "lat": 45.4441, "lon": -107.144 }, "heading": 280, "formation": "column", "state": "intact" },
+        { "id": "reno-battalion", "position": { "lat": 45.4462, "lon": -107.147 }, "heading": 280, "formation": "column", "state": "intact" },
+        { "id": "benteen-battalion", "position": { "lat": 45.442, "lon": -107.136 }, "heading": 280, "formation": "column", "state": "intact" },
+        { "id": "pack-train", "position": { "lat": 45.4405, "lon": -107.129 }, "heading": 280, "formation": "column", "state": "intact" },
+        { "id": "village", "position": { "lat": 45.542, "lon": -107.427 }, "heading": 340, "formation": "mass", "state": "intact" }
+      ]
+    },
+    {
+      "id": "lone-tepee",
+      "label": "Custer orders Reno to charge; Benteen is off to the left",
+      "t": "14:15",
+      "playback_rate": 120,
+      "caption": "Two hours down Reno Creek the column passes a burning lodge with a dead warrior in it, and a few dust clouds ahead are taken for the village running away. Cooke brings Reno the order: move forward at as rapid a gait as prudent, charge, and the whole outfit will support him. Benteen, who has ridden ten miles of bluffs to the left and found nothing, is back on the trail just ahead of the pack train, which is strung out at the morass behind.",
+      "notes": "Time T with a two-hour spread. Wallace looked at his watch as Custer called Reno over and made it about a quarter after two (RCOI vol. 1, p. 77); Girard corrected his own record to about two o'clock (vol. 1, p. 108); Reno's report has half past twelve, printed with the editor's bracketed query, two hours off every other watch and off Reno's own later account. This file takes Wallace.\n\nReno T for the order and R for the position: the lone tepee's site is not fixed to better than a mile and the marker is set on Reno Creek two miles above its mouth, which is where a battalion at the trot would be fifteen minutes before the crossing. His intent arrow at the village is the order itself, not a movement anyone saw. Benteen T (his own report puts him back on the trail just in advance of the pack train), position R. The pack train T for being at the morass, position R. Custer T for following Reno closely (Godfrey p. 368), position R. Benteen's ten-mile scout to the left is his own motion between two phases and is a track, not an arrow. The village T and unmoved: nothing in the accounts has the camp doing anything before Reno's line came in sight.",
+      "references": [
+        {
+          "source": "godfrey-century",
+          "locator": "p. 369, the burning tepee",
+          "quote": "We passed a burning tepee, fired presumably by our scouts"
+        },
+        {
+          "source": "benteen-report",
+          "locator": "Benteen to Wallace, 4 July 1876, on returning to the trail",
+          "quote": "I accordingly did so, reaching the trail just in advance of the pack-train"
+        },
+        {
+          "source": "rcoi",
+          "locator": "vol. 1, p. 77, Wallace on the time of the order",
+          "note": "'Approximately it must have been about a quarter after two. The exact time I can't tell.' The one watch reading anybody claims for the order."
+        },
+        {
+          "source": "reno-report",
+          "locator": "Exhibit 4, Reno on the order Cooke brought him",
+          "note": "The certified copy reads that he was to move forward at as rapid a gait as prudent and to charge afterwards, the whole outfit supporting him, and that he thinks those were the exact words."
+        }
+      ],
+      "units": [
+        { "id": "custer-battalion", "position": { "lat": 45.493, "lon": -107.312 }, "heading": 280, "formation": "column", "state": "intact" },
+        { "id": "keogh-wing", "position": { "lat": 45.4935, "lon": -107.31 }, "heading": 280, "formation": "column", "state": "intact" },
+        { "id": "yates-wing", "position": { "lat": 45.4922, "lon": -107.314 }, "heading": 280, "formation": "column", "state": "intact" },
+        {
+          "id": "reno-battalion",
+          "position": { "lat": 45.4963, "lon": -107.33 },
+          "heading": 280,
+          "formation": "column",
+          "state": "intact",
+          "moves": [{ "kind": "intent", "to": { "lat": 45.535, "lon": -107.42 } }]
+        },
+        { "id": "benteen-battalion", "position": { "lat": 45.483, "lon": -107.27 }, "heading": 300, "formation": "column", "state": "intact" },
+        { "id": "pack-train", "position": { "lat": 45.485, "lon": -107.25 }, "heading": 290, "formation": "column", "state": "intact" },
+        { "id": "village", "position": { "lat": 45.542, "lon": -107.427 }, "heading": 340, "formation": "mass", "state": "intact" }
+      ]
+    },
+    {
+      "id": "reno-crosses",
+      "label": "Reno crosses the river; Custer turns up the bluffs",
+      "t": "14:30",
+      "playback_rate": 120,
+      "caption": "Reno crosses at the mouth of Reno Creek, halts ten minutes to close up, and goes down the valley in line with the Arikara scouts on his left. Custer does not follow him over. He turns to the right along the high bluffs on the east bank, out of Reno's sight and out of his reach, and the two battalions fight the rest of the afternoon on opposite sides of the river. In the upper circles the Hunkpapa are turning out to meet the line coming at them down the bottom.",
+      "notes": "Time T: Wallace has the crossing about twenty minutes after two (RCOI vol. 1, p. 57), Reno's field note of the 27th says he charged about two, Herendeen puts it between two and three. Reno T and M: the ford at the creek mouth is on Maguire's sheet and the map file's river runs through it. Custer T for turning right along the bluffs (Godfrey p. 370; Curley, in Bradley's interview of July 1876, describes the column going round the base of a high hill through a ravine wide enough for fours) and R for the route, which no army witness followed. Benteen and the pack train T for being on the trail and R for where exactly.\n\nThe village: the coarse marker stays intact this phase and steps to engaged in the next, which is the file's reading of an alarm that took minutes to run three miles of camp. The upper circles T (Gall's 1886 account has the fight forced on the village by the speed of Reno's approach at its upper end; Sitting Bull, asked in 1877 where the camp was first struck, pointed at Reno's crossing). The lower circles are R for still being at rest: no account has the Cheyenne end alarmed before the firing in the valley, and the two bodies are drawn apart from this phase because from here the sources put them in different places doing different things.",
+      "references": [
+        {
+          "source": "godfrey-century",
+          "locator": "p. 370, Reno's advance down the valley",
+          "quote": "Reno moved forward in column of fours about half a mile, then formed the battalion in line of battle across the valley with the scouts on the left"
+        },
+        {
+          "source": "godfrey-century",
+          "locator": "p. 370, Custer on the far side of the bluffs",
+          "quote": "Custer had moved off to the right, being separated from Reno by a line of high bluffs and the river"
+        },
+        {
+          "source": "reno-report",
+          "locator": "Exhibit 4, the crossing",
+          "quote": "halted about ten minutes or less to gather the battalion"
+        },
+        {
+          "source": "sitting-bull-1877",
+          "locator": "New York Herald, 16 November 1877, p. 3, on where the camp was first attacked",
+          "note": "Sitting Bull put the first attack at the upper end and the time at about two hours past the sun's centre, which is the Native accounts' agreement with the soldiers' watches."
+        }
+      ],
+      "units": [
+        { "id": "custer-battalion", "position": { "lat": 45.509, "lon": -107.374 }, "heading": 340, "formation": "column", "state": "intact" },
+        { "id": "keogh-wing", "position": { "lat": 45.5085, "lon": -107.372 }, "heading": 340, "formation": "column", "state": "intact" },
+        { "id": "yates-wing", "position": { "lat": 45.5098, "lon": -107.3762 }, "heading": 340, "formation": "column", "state": "intact" },
+        { "id": "reno-battalion", "position": { "lat": 45.5016, "lon": -107.3803 }, "heading": 330, "formation": "line", "state": "intact" },
+        { "id": "benteen-battalion", "position": { "lat": 45.493, "lon": -107.335 }, "heading": 290, "formation": "column", "state": "intact" },
+        { "id": "pack-train", "position": { "lat": 45.489, "lon": -107.29 }, "heading": 285, "formation": "column", "state": "intact" },
+        { "id": "village", "position": { "lat": 45.54, "lon": -107.426 }, "heading": 340, "formation": "mass", "state": "intact" },
+        { "id": "village-south", "position": { "lat": 45.53, "lon": -107.421 }, "heading": 150, "formation": "mass", "state": "intact" },
+        { "id": "village-north", "position": { "lat": 45.5595, "lon": -107.444 }, "heading": 340, "formation": "mass", "state": "intact" }
+      ]
+    },
+    {
+      "id": "skirmish-line",
+      "label": "Reno dismounts and deploys; the scouts are rolled up",
+      "t": "14:50",
+      "playback_rate": 120,
+      "caption": "Two miles down the valley, a few hundred yards short of the first lodges, Reno stops the charge, dismounts and puts his three companies on a skirmish line across the bottom, every fourth man holding the horses behind it. The Arikara on the left are ridden over by a body of horsemen coming out from behind the low hills and go off after the pony herds; the left of the line bends back. On the bluff across the river a party of Custer's command, Custer with it, is seen watching, and Martin is sent back with Cooke's note to Benteen.",
+      "notes": "Time R between two fixed points: no witness times the halt, and Wallace's chain runs crossing at 14:20 and timber by 14:30 to 15:15, so the line is set at 14:50.\n\nReno T for the deployment and the horse holders (Godfrey p. 371; the Arikara narrative describes the horses held in groups behind the line) and A for where: MWAC 124 reports eleven .45-55 cases in a roughly linear alignment, north-west to south-east, in the fields west of the Garryowen post office. The marker is the author's geometry on that alignment, two and a half miles down the valley from the ford, which is Reno's own distance, and a few hundred yards short of the Hunkpapa circle, which is the Park Service's. The detachment arrow is the scouts' raid on the pony herd across the valley, T from the Arikara narrative; the men who rode off after it never came back to the fight and are the first draw on the battalion's strength, which stays at 1 here because Godfrey counts only one man hit so far. Custer T for being seen on the bluff, position R at the height later called Weir Point. Benteen T at the morass, the pack train T behind him, both positions R.\n\nThe upper circles T for working round Reno's left (Godfrey p. 371; Low Dog says the fight was held to give the women and children time to get away), position R. The lower circles R and unmoved.",
+      "references": [
+        {
+          "source": "godfrey-century",
+          "locator": "p. 371, why Reno dismounted",
+          "quote": "Reno, not seeing the \"whole outfit\" within supporting distance, did not obey his orders to charge the village, but dismounted his command to fight on foot"
+        },
+        {
+          "source": "arikara-1920",
+          "locator": "p. 95, the line as the Arikara saw it",
+          "quote": "The soldiers and the scouts dismounted, the horses were held in groups behind the line"
+        },
+        {
+          "source": "godfrey-century",
+          "locator": "p. 371, the left bends back",
+          "quote": "The movements of the Indians around the left flank and the flight of the scouts caused the left to fall back"
+        },
+        {
+          "source": "mwac-124",
+          "locator": "the valley fight: the .45-55 cases west of the Garryowen post office",
+          "note": "Eleven government cases in a roughly linear alignment from north-west to south-east are the only physical trace of the skirmish line, and the only reason this marker is anywhere in particular."
+        }
+      ],
+      "units": [
+        { "id": "custer-battalion", "position": { "lat": 45.53, "lon": -107.39 }, "heading": 340, "formation": "column", "state": "intact" },
+        { "id": "keogh-wing", "position": { "lat": 45.5295, "lon": -107.388 }, "heading": 340, "formation": "column", "state": "intact" },
+        { "id": "yates-wing", "position": { "lat": 45.5308, "lon": -107.3922 }, "heading": 340, "formation": "column", "state": "intact" },
+        {
+          "id": "reno-battalion",
+          "position": { "lat": 45.5268, "lon": -107.411 },
+          "heading": 330,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "detachment", "to": { "lat": 45.532, "lon": -107.44 } }]
+        },
+        { "id": "benteen-battalion", "position": { "lat": 45.49, "lon": -107.315 }, "heading": 290, "formation": "column", "state": "intact" },
+        { "id": "pack-train", "position": { "lat": 45.488, "lon": -107.275 }, "heading": 285, "formation": "column", "state": "intact" },
+        { "id": "village", "position": { "lat": 45.53, "lon": -107.42 }, "heading": 150, "formation": "line", "state": "engaged" },
+        { "id": "village-south", "position": { "lat": 45.5285, "lon": -107.419 }, "heading": 150, "formation": "line", "state": "engaged" },
+        { "id": "village-north", "position": { "lat": 45.5595, "lon": -107.444 }, "heading": 340, "formation": "mass", "state": "intact" }
+      ]
+    },
+    {
+      "id": "timber",
+      "label": "Reno falls back into the timber; Custer descends Medicine Tail Coulee",
+      "t": "15:10",
+      "playback_rate": 120,
+      "caption": "The line falls back to its right into the timber in the loop of the river, where the bank covers the front and the horses can stand. The grass is fired in front of it. Bloody Knife is shot dead beside Reno as he asks the scout what the Sioux are doing. Three miles down the river Custer's battalion is going down the broad coulee that comes out at a ford opposite the Cheyenne circle, and Benteen, coming up the trail, meets Martin with the note: Benteen, come on. Big village. Be quick. Bring packs.",
+      "notes": "Time T with an hour's spread. Wallace makes the timber about half past two and the command there some forty-five minutes; Girard swore first to ten minutes past one by a watch just back from the jeweller and corrected it to ten minutes past two; Godfrey says witnesses differ between a few minutes and about an hour. This file takes the middle.\n\nReno T for the timber and M for where it stood: Maguire's sheet draws the wood in the river's loop, and MWAC 124 puts the fight on the land circumscribed by the abandoned meander at Garryowen. The map file's river is the 1891 survey's, forty years after the fight and already moved; the loop it draws is the nearest a public-domain survey comes to the timber Reno held. Strength 0.95 for the losses to this point, which Godfrey counts as one wounded before the timber and heavy only after it.\n\nCuster is drawn here from the ground and not from a watch. That he went down toward the ford is Maguire's reading of the trail two days later, Terry's, Martin's and Curley's, against Godfrey, who denied to the end that the column was ever nearer the river than the ridge it died on. The archaeology sides with Maguire: MWAC 124 finds the evidence for combat at the mouth of Medicine Tail Coulee meagre but definitely present. This file follows Maguire, and the intent arrow at the ford is the reading, not a movement any soldier survived to describe. Position R on the coulee; both wings together, because the case matches that split them belong to the next hour.\n\nBenteen T for the note and R for the position. The upper circles T closing on the timber, position R; the lower circles T for being alerted at last, R for a position they do not leave until phase 6: Gall told Godfrey that the first the village knew of Custer's column was a warrior on a high point calling that more soldiers were coming.",
+      "references": [
+        {
+          "source": "reno-report",
+          "locator": "Exhibit 4, taking the timber",
+          "quote": "Taking possession of a front of woods, and which furnished (near its edge) a shelter for the horses, dismounted and fought them on foot"
+        },
+        {
+          "source": "godfrey-century",
+          "locator": "p. 371, the position in the timber",
+          "quote": "well protected in front by the bank and fringe of timber, somewhat open in the rear, but sheltered by timber in the bottom"
+        },
+        {
+          "source": "maguire-report",
+          "locator": "p. 703, Custer at the ford",
+          "quote": "Custer had gone down stream and attempted to make a crossing at the point B, but was met by an overpowering force"
+        },
+        {
+          "source": "mwac-124",
+          "locator": "the mouth of Medicine Tail Coulee",
+          "note": "The cases and bullets there are few but real, and they are the physical answer to Godfrey's denial that Custer went to the river."
+        }
+      ],
+      "units": [
+        {
+          "id": "custer-battalion",
+          "position": { "lat": 45.5495, "lon": -107.405 },
+          "heading": 250,
+          "formation": "column",
+          "state": "intact",
+          "moves": [{ "kind": "intent", "to": { "lat": 45.5465, "lon": -107.4145 } }]
+        },
+        { "id": "keogh-wing", "position": { "lat": 45.5502, "lon": -107.403 }, "heading": 250, "formation": "column", "state": "intact" },
+        { "id": "yates-wing", "position": { "lat": 45.5488, "lon": -107.4072 }, "heading": 250, "formation": "column", "state": "intact" },
+        { "id": "reno-battalion", "position": { "lat": 45.525, "lon": -107.405 }, "heading": 330, "formation": "line", "state": "engaged", "strength": 0.95 },
+        { "id": "benteen-battalion", "position": { "lat": 45.496, "lon": -107.348 }, "heading": 290, "formation": "column", "state": "intact" },
+        { "id": "pack-train", "position": { "lat": 45.49, "lon": -107.305 }, "heading": 285, "formation": "column", "state": "intact" },
+        { "id": "village", "position": { "lat": 45.5285, "lon": -107.411 }, "heading": 160, "formation": "mass", "state": "engaged" },
+        { "id": "village-south", "position": { "lat": 45.5275, "lon": -107.409 }, "heading": 160, "formation": "mass", "state": "engaged" },
+        { "id": "village-north", "position": { "lat": 45.559, "lon": -107.443 }, "heading": 200, "formation": "mass", "state": "intact" }
+      ]
+    },
+    {
+      "id": "retreat",
+      "label": "Reno's charge to the bluffs",
+      "t": "15:30",
+      "playback_rate": 120,
+      "caption": "Reno mounts what he can and charges out of the timber for the bluffs across the river. There is no rear guard and no order: the column jams in the ford and again in the funnel of the ravine beyond, and the warriors ride into it as into a buffalo herd. Three officers and a third of the battalion are gone by the time the rest reach the top. At the same hour, three miles down the river, Custer's leading companies come to the ford at the mouth of the coulee and are checked there by a handful of men in the brush on the far bank.",
+      "notes": "Time T: Wallace makes the top of the hill a quarter or half past three, Culbertson between two and three, the Park Service about four o'clock.\n\nReno broken and not destroyed: the battalion loses all order and most of its casualties in twenty minutes, and re-forms on the hill as three companies, which is exactly what a broken state means in this format. Heading 60 is the direction of the flight, not a front, because there is no front. T for the whole of it (Reno's report, Godfrey p. 371-372) and M for the crossing where Hodgson fell, which Maguire measured at nine tenths of a mile from the hill; A for the ravine, where MWAC 124 found no patterning at all, which is what a rout leaves. Strength 0.65: three officers and twenty-nine men killed, seven wounded, and sixteen missing out of about a hundred and seventy-five, most of them lost after leaving the timber. The thirteen men and Herendeen left in the woods come back in phase 8 and cost the battalion nothing.\n\nCuster at the ford is A and T, and it is meagre A. Utley's guide has perhaps thirty warriors holding the crossing against Yates. The intent arrow across the river at the Cheyenne circle is the attack that was checked there. Both wings still together: MWAC 124 reads the Finley-Finckle case matches as E and F firing while the command reassembled on Calhoun Hill, which puts the split in the next phase. The lower circles at the ford is T from Wooden Leg's map key, which has the warriors fording at Medicine Tail Coulee, and R for the position. Benteen T in sight of the valley, position R.",
+      "references": [
+        {
+          "source": "reno-report",
+          "locator": "Exhibit 4, the charge to the bluffs",
+          "quote": "I accomplished this by mounting and charging the Indians between me and the bluffs on the opposite side of the river"
+        },
+        {
+          "source": "godfrey-century",
+          "locator": "p. 371, the retreat",
+          "quote": "Here the command got jammed and lost all semblance of organization"
+        },
+        {
+          "source": "godfrey-century",
+          "locator": "p. 371, what the retreat was not",
+          "quote": "There does not appear to have been any resistance, certainly no organized resistance, during this retreat"
+        },
+        {
+          "source": "two-moon-1898",
+          "locator": "McClure's Magazine, September 1898, the soldiers driven into the river",
+          "quote": "I saw the soldiers fall back and drop into the river-bed like buffalo fleeing"
+        },
+        {
+          "source": "benteen-report",
+          "locator": "Benteen to Wallace, 4 July 1876, coming in sight of the valley",
+          "quote": "Another mile and a half brought me in sight of the stream and plain in which were some of our dismounted men fighting"
+        }
+      ],
+      "units": [
+        {
+          "id": "custer-battalion",
+          "position": { "lat": 45.5465, "lon": -107.4145 },
+          "heading": 250,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "intent", "to": { "lat": 45.5595, "lon": -107.444 } }]
+        },
+        { "id": "keogh-wing", "position": { "lat": 45.5472, "lon": -107.413 }, "heading": 250, "formation": "line", "state": "engaged" },
+        { "id": "yates-wing", "position": { "lat": 45.5458, "lon": -107.4162 }, "heading": 250, "formation": "line", "state": "engaged" },
+        { "id": "reno-battalion", "position": { "lat": 45.5205, "lon": -107.387 }, "heading": 60, "formation": "column", "state": "broken", "strength": 0.65 },
+        { "id": "benteen-battalion", "position": { "lat": 45.51, "lon": -107.38 }, "heading": 320, "formation": "column", "state": "intact" },
+        { "id": "pack-train", "position": { "lat": 45.498, "lon": -107.34 }, "heading": 300, "formation": "column", "state": "intact" },
+        { "id": "village", "position": { "lat": 45.5245, "lon": -107.398 }, "heading": 70, "formation": "mass", "state": "engaged" },
+        { "id": "village-south", "position": { "lat": 45.523, "lon": -107.395 }, "heading": 70, "formation": "mass", "state": "engaged" },
+        { "id": "village-north", "position": { "lat": 45.5455, "lon": -107.42 }, "heading": 70, "formation": "line", "state": "engaged" }
+      ]
+    },
+    {
+      "id": "benteen-joins",
+      "label": "Benteen joins Reno on the hill; the warriors stream down-river",
+      "t": "16:00",
+      "playback_rate": 120,
+      "caption": "Benteen's three companies come up the bluff and report to Reno, and are put in on the edge overlooking the valley. Almost at once the pressure lifts: the valley empties as every horseman in it turns and rides down-river. On the far side of the ridge Custer's battalion is coming up the long coulee from the ford toward the high ground at the end of it, and the men on the hill can hear firing from that direction without knowing what it is.",
+      "notes": "The worst-agreed instant on the army side, and the notes must carry the spread: Godfrey remembered half past two in 1892 but swore between three and four in 1879; Benteen said about three; Mathey about three; McDougall a quarter to four or four; Wallace, without looking at his watch, about four or after. This file takes Wallace's, being the itinerist's, and the reader should hold it to no better than ninety minutes.\n\nReno and Benteen T. The pack train T for coming up (Mathey, McDougall), position R. The village T for going down-river, and it is the best-attested movement of the day: Godfrey watched the valley empty, Gall told him the warriors left Reno to meet Custer, and Red Horse describes the word going round like a whirlwind. Positions R.\n\nCuster A: the artefact distribution gives the impression of soldiers moving up Deep Coulee toward Calhoun Hill under fire, and that is the whole of the evidence for this phase. The division into wings, Keogh's three companies to Calhoun Hill and Yates's two beyond it, is R: it is the reading modern historians agree on and no witness states it.",
+      "references": [
+        {
+          "source": "benteen-report",
+          "locator": "Benteen to Wallace, 4 July 1876, joining Reno",
+          "quote": "I then moved up to the bluffs and reported my command to Maj. M. A. Reno"
+        },
+        {
+          "source": "godfrey-century",
+          "locator": "p. 372, Benteen's battalion put on the bluff edge",
+          "quote": "Benteen's battalion was ordered to dismount and deploy as skirmishers on the edge of the bluffs overlooking the valley"
+        },
+        {
+          "source": "godfrey-century",
+          "locator": "p. 373, the valley empties",
+          "quote": "Suddenly they all started down the valley, and in a few minutes scarcely a horseman was to be seen"
+        },
+        {
+          "source": "godfrey-century",
+          "locator": "p. 380, Gall on why Reno was not pushed",
+          "quote": "Before they could do so the great body of warriors had left Reno, and hastened to attack Custer. This explains why Reno was not pushed"
+        },
+        {
+          "source": "mwac-124",
+          "locator": "Deep Coulee: the movement toward Calhoun Hill",
+          "note": "Government cases going up the coulee with Indian-calibre bullets among them are why this phase draws the battalion moving and under fire rather than halted."
+        }
+      ],
+      "units": [
+        { "id": "custer-battalion", "position": { "lat": 45.56, "lon": -107.418 }, "heading": 350, "formation": "column", "state": "engaged" },
+        { "id": "keogh-wing", "position": { "lat": 45.562, "lon": -107.4175 }, "heading": 350, "formation": "column", "state": "engaged" },
+        { "id": "yates-wing", "position": { "lat": 45.5655, "lon": -107.4215 }, "heading": 350, "formation": "column", "state": "engaged" },
+        { "id": "reno-battalion", "position": { "lat": 45.5219, "lon": -107.3775 }, "heading": 270, "formation": "mass", "state": "engaged", "strength": 0.65 },
+        { "id": "benteen-battalion", "position": { "lat": 45.5212, "lon": -107.3795 }, "heading": 270, "formation": "line", "state": "engaged" },
+        { "id": "pack-train", "position": { "lat": 45.512, "lon": -107.366 }, "heading": 330, "formation": "column", "state": "intact" },
+        { "id": "village", "position": { "lat": 45.542, "lon": -107.413 }, "heading": 340, "formation": "mass", "state": "engaged" },
+        { "id": "village-south", "position": { "lat": 45.535, "lon": -107.408 }, "heading": 340, "formation": "mass", "state": "engaged" },
+        { "id": "village-north", "position": { "lat": 45.552, "lon": -107.426 }, "heading": 340, "formation": "mass", "state": "engaged" }
+      ]
+    },
+    {
+      "id": "custer-engaged",
+      "label": "Firing down the river; the pack train arrives; Weir starts north",
+      "t": "16:30",
+      "playback_rate": 120,
+      "still": true,
+      "caption": "Custer's battalion is fighting on the long ridge above the river: Keogh's three companies dismounted about the knoll at its southern end, Yates's two on the hill at the northern with Custer among them. The warriors are under the crests all round, the upper circles working up the ravines from the south and south-east, the lower circles across the ford and up the coulees from the west. On the bluffs three miles away the pack train comes in, Godfrey notes the time in his book, two volleys are heard down the river, and Weir takes his company north to look.",
+      "notes": "Time T at its weakest. Godfrey looked at his watch at twenty past four and could never afterwards recall what for, though he thought it was the pack train coming in; Girard heard heavy firing between three and four; Reno's report alone says about six. Crow King said Custer's men were all dead within half an hour of the attack opening, Maguire heard on the field that it lasted two or three hours, and Curley's first account has it going on until nearly sunset. This file follows Godfrey and Utley: opening shortly after four, over by about five.\n\nKeogh's wing M and A with T for the sequence. Godfrey has Gall's account of two troops dismounted to fight on foot at the knoll now marked by Crittenden's stone; MWAC 124 counts at least fifteen Springfield carbines and three Colt pistols in the Calhoun position and puts Company I below the ridge crest on the east side. Yates's wing M and A on the hill and the ridge north of it, with R for the loop out to the north-west, which the archaeology supports only as far as a quarter of a mile.\n\nThe upper circles A and T: at least fifty-five different firearms fired from the lower part of Greasy Grass Ridge, and Calhoun's position overrun by the men who fired from there and from Henry Ridge; Gall's route up a ravine south of Keogh and Calhoun is his own account by way of Godfrey. The lower circles A and T: Godfrey names Crazy Horse, Crow King and Hump coming up the ravine west of Custer's hill, Two Moon says the Cheyennes went up the left way, and the archaeology gives them a knoll six hundred and sixty feet north-east of the hill, with non-government cases on it. That the two bodies were these two peoples is R, and it is the file's device for showing what the Native accounts and the cartridge cases agree on.\n\nReno, Benteen and the pack train T. The detachment arrow is Weir's company going north to the point that carries his name. This is the phase the library's still is drawn from: it is the only one in which every unit on the roster is in action at once.",
+      "references": [
+        {
+          "source": "godfrey-century",
+          "locator": "p. 373, the volleys heard from down the river",
+          "quote": "We heard two distinct volleys which excited some surprise"
+        },
+        {
+          "source": "godfrey-century",
+          "locator": "p. 380, Gall on Keogh's and Calhoun's troops",
+          "quote": "dismounted two troops, Keogh's and Calhoun's, to fight on foot"
+        },
+        {
+          "source": "godfrey-century",
+          "locator": "p. 381, the charge from the lower village",
+          "quote": "the Indians under Crazy Horse from the lower part of the village, among whom were the Cheyennes, formed for the charge on Custer's Hill"
+        },
+        {
+          "source": "two-moon-1898",
+          "locator": "McClure's Magazine, September 1898, the ridge surrounded",
+          "quote": "Then the Sioux rode up the ridge on all sides, riding very fast. The Cheyennes went up the left way"
+        },
+        {
+          "source": "mwac-124",
+          "locator": "the Calhoun position, Greasy Grass Ridge and the knoll north-east of Last Stand Hill",
+          "note": "The firearm identifications are the reason the two Native bodies stand where they do; they are the best evidence on the field for anything, and they say nothing whatever about the time."
+        }
+      ],
+      "units": [
+        { "id": "custer-battalion", "position": { "lat": 45.567, "lon": -107.4222 }, "heading": 220, "formation": "line", "state": "engaged" },
+        { "id": "keogh-wing", "position": { "lat": 45.5639, "lon": -107.4175 }, "heading": 200, "formation": "line", "state": "engaged" },
+        { "id": "yates-wing", "position": { "lat": 45.5703, "lon": -107.4269 }, "heading": 240, "formation": "line", "state": "engaged" },
+        { "id": "reno-battalion", "position": { "lat": 45.5219, "lon": -107.3775 }, "heading": 340, "formation": "mass", "state": "engaged", "strength": 0.65 },
+        {
+          "id": "benteen-battalion",
+          "position": { "lat": 45.5225, "lon": -107.379 },
+          "heading": 340,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "detachment", "to": { "lat": 45.5342, "lon": -107.3928 } }]
+        },
+        { "id": "pack-train", "position": { "lat": 45.521, "lon": -107.376 }, "heading": 340, "formation": "mass", "state": "engaged" },
+        { "id": "village", "position": { "lat": 45.565, "lon": -107.427 }, "heading": 45, "formation": "mass", "state": "engaged" },
+        { "id": "village-south", "position": { "lat": 45.5605, "lon": -107.423 }, "heading": 20, "formation": "mass", "state": "engaged" },
+        { "id": "village-north", "position": { "lat": 45.57, "lon": -107.435 }, "heading": 70, "formation": "mass", "state": "engaged" }
+      ]
+    },
+    {
+      "id": "weir-point",
+      "label": "The command reaches Weir Point and sees the end of Custer's fight",
+      "t": "17:00",
+      "playback_rate": 480,
+      "caption": "Reno and Benteen follow Weir down the bluffs and from the point look two miles north at a field full of horsemen riding through dust and shooting into the ground. There is nothing left to join. Calhoun's men are ridden over first and Keogh's in the depression behind them; about twenty-eight men break for the ravine toward the river and are killed in it; the last of the battalion is destroyed on the hill above. Then the firing stops, the groups scatter, and the whole mass of horsemen turns back up the river toward the command on the point.",
+      "notes": "Time T for what the command did (Godfrey has the move down at about five, Varnum the return at half past five, Wallace back between five and six) and inference for the rest: Custer's battalion is placed here by the light and by the ear of men three miles away, and no watch in the world was on it.\n\nCuster's battalion destroyed with strength 0, both wings with it: M and T for the fact, from Maguire's survey of the bodies and Bradley's count of a hundred and ninety-seven dead on the 27th. The order of the collapse, Calhoun then Keogh then the hill, is T from Gall through Godfrey and R from every modern reading; MWAC 124 will say only that tactical disintegration most likely occurred. A split into two phases fifteen minutes apart would put a clock on it that nobody has. The break for the ravine is M: Maguire found twenty-eight bodies in it and a line of dead with skirmish intervals up to the crest.\n\nThe army units T, positions R along the bluffs to the point. The village T for converging back on the command, positions R. This is the last phase in which the two Native bodies are drawn: from the tenth they are one crowd round one hill again, which is what the accounts describe and all they will bear.",
+      "references": [
+        {
+          "source": "godfrey-century",
+          "locator": "p. 374, what was seen from Weir's point",
+          "quote": "Looking toward Custer's field, on a hill two miles away we saw a large assemblage"
+        },
+        {
+          "source": "godfrey-century",
+          "locator": "p. 381, Gall on the end of Calhoun's stand",
+          "quote": "the whole mass rushed upon and crushed Calhoun"
+        },
+        {
+          "source": "maguire-report",
+          "locator": "p. 703, the line of retreat and the ravine",
+          "quote": "The column which retreated along the line B H E must have been dismounted"
+        },
+        {
+          "source": "godfrey-century",
+          "locator": "p. 384, the order of the two fights",
+          "quote": "Custer's attack did not begin until after Reno had reached the bluffs"
+        }
+      ],
+      "units": [
+        { "id": "custer-battalion", "position": { "lat": 45.569, "lon": -107.425 }, "heading": 240, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "keogh-wing", "position": { "lat": 45.5639, "lon": -107.4175 }, "heading": 200, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "yates-wing", "position": { "lat": 45.5703, "lon": -107.4269 }, "heading": 240, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "reno-battalion", "position": { "lat": 45.529, "lon": -107.387 }, "heading": 340, "formation": "column", "state": "engaged", "strength": 0.65 },
+        { "id": "benteen-battalion", "position": { "lat": 45.5342, "lon": -107.3928 }, "heading": 340, "formation": "column", "state": "engaged" },
+        { "id": "pack-train", "position": { "lat": 45.5245, "lon": -107.381 }, "heading": 340, "formation": "column", "state": "engaged" },
+        { "id": "village", "position": { "lat": 45.55, "lon": -107.412 }, "heading": 160, "formation": "mass", "state": "engaged" },
+        { "id": "village-south", "position": { "lat": 45.545, "lon": -107.406 }, "heading": 160, "formation": "mass", "state": "engaged" },
+        { "id": "village-north", "position": { "lat": 45.559, "lon": -107.423 }, "heading": 160, "formation": "mass", "state": "engaged" }
+      ]
+    },
+    {
+      "id": "reno-hill",
+      "label": "The command falls back to Reno Hill and is surrounded",
+      "t": "19:00",
+      "playback_rate": 600,
+      "caption": "Driven off the point, the seven companies fall back to the first hill they crossed and dig in with knives, tin cups and three spades: a ragged ring on the ridge, the hospital and the animals in the swale behind it, the packs and dead horses built into a breastwork. By seven o'clock the warriors hold every high point round them and the fire comes in from all sides at once. The nearest water is under the guns, four hundred yards down a ravine.",
+      "notes": "Time T: Godfrey makes the ring closed about seven, Benteen the fire beginning about half past five, Reno's report about six, and the Park Service seven.\n\nAll three army units T, and the layout is Godfrey's: five troops on the ridge, Moylan across the swale with the packs and dead animals for cover, Benteen's own troop on the high hill to the south. M for the rifle pits, which Maguire drew, and A for them too. The single heading is the format's one real difficulty here: a perimeter has no front, the fire came from opposite sides at once, and the marker is pointed north at Sharpshooter Hill because the heaviest fire came from there.\n\nThe village T and A: the ring of cases round the perimeter confirms the accounts, and Sharpshooter Hill and the ravines south of the position are where they cluster. The two bodies are gone from this phase and the four that follow, because from here the accounts describe one crowd round one hill and dividing it would be the author inventing an order of battle. That is absence in the strict sense the format means: not that nobody knows where the Cheyenne were, but that after Custer's field there is no second body to draw.",
+      "references": [
+        {
+          "source": "godfrey-century",
+          "locator": "p. 375, the position surrounded",
+          "quote": "sent a large force up the valley, and soon our position was entirely surrounded. It was now about seven o'clock"
+        },
+        {
+          "source": "reno-report",
+          "locator": "Exhibit 4, the loss on the hill on the 25th",
+          "note": "Reno gives the ground held from about six until the attack ceased about nine, with eighteen enlisted men killed and forty-six wounded."
+        },
+        {
+          "source": "mwac-124",
+          "locator": "the Reno-Benteen defence site, Sharpshooter Hill and the ravines",
+          "note": "The distribution of Indian-associated cases confirms that the warriors surrounded the perimeter and fired into it from every side."
+        },
+        {
+          "source": "fort-yates-1881",
+          "locator": "Low Dog, on turning back to the soldiers on the hill",
+          "note": "Low Dog describes going back to fight the soldiers who had retreated to the high hill on the east side of the river, which is this phase from the other side."
+        }
+      ],
+      "units": [
+        { "id": "custer-battalion", "position": { "lat": 45.569, "lon": -107.425 }, "heading": 240, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "keogh-wing", "position": { "lat": 45.5639, "lon": -107.4175 }, "heading": 200, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "yates-wing", "position": { "lat": 45.5703, "lon": -107.4269 }, "heading": 240, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "reno-battalion", "position": { "lat": 45.5219, "lon": -107.3775 }, "heading": 350, "formation": "mass", "state": "engaged", "strength": 0.65 },
+        { "id": "benteen-battalion", "position": { "lat": 45.5205, "lon": -107.3768 }, "heading": 350, "formation": "mass", "state": "engaged" },
+        { "id": "pack-train", "position": { "lat": 45.5228, "lon": -107.3788 }, "heading": 350, "formation": "mass", "state": "engaged" },
+        { "id": "village", "position": { "lat": 45.5245, "lon": -107.381 }, "heading": 170, "formation": "mass", "state": "engaged" }
+      ]
+    },
+    {
+      "id": "dark",
+      "label": "Firing ceases at dark; the command digs in; the village dances",
+      "t": "21:30",
+      "playback_rate": 2400,
+      "caption": "The fire slackens with the light and stops between nine and ten. All night the command deepens its pits, moves the wounded, and listens to the drums and the firing in the village below, which is lit up and dancing. Four men are still alive in the timber across the river and will crawl in over the next two nights. Nobody on the hill knows what has become of Custer.",
+      "notes": "Time T: Godfrey has the firing continue till nearly dark between nine and ten, Reno makes twilight last till about nine and the withdrawal at about nine, Girard, still in the timber, says nine o'clock and it was then dark. Local civil dusk was about half past eight, so the watches were not far out.\n\nNo unit moves. The village marker is drawn back to the camp, T from both sides: Godfrey and Reno both describe the night's dancing below them. Benteen's strength falls to 0.9 here; his H company took the worst of the losses on the hill.\n\nThis phase carries five and a quarter hours on the clock at a high playback rate, which is how this format holds a gap: there is no pause and no gap concept, so the author sets the rate and the caption earns the time. What happens in it is the entrenching, the dance, and four men in the woods.",
+      "references": [
+        {
+          "source": "godfrey-century",
+          "locator": "p. 375, the end of the day's firing",
+          "quote": "The firing continued till nearly dark (between nine and ten o'clock)"
+        },
+        {
+          "source": "reno-report",
+          "locator": "Exhibit 4, the night on the hill",
+          "quote": "the Indians holding a scalp dance underneath us in the bottom and in our hearing"
+        },
+        {
+          "source": "rcoi",
+          "locator": "vol. 2, pp. 185-187, Reno on how he fixes the end of the fight",
+          "note": "Reno used the length of the twilight rather than a watch, which is as good as the regiment's time gets."
+        }
+      ],
+      "units": [
+        { "id": "custer-battalion", "position": { "lat": 45.569, "lon": -107.425 }, "heading": 240, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "keogh-wing", "position": { "lat": 45.5639, "lon": -107.4175 }, "heading": 200, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "yates-wing", "position": { "lat": 45.5703, "lon": -107.4269 }, "heading": 240, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "reno-battalion", "position": { "lat": 45.5219, "lon": -107.3775 }, "heading": 350, "formation": "mass", "state": "engaged", "strength": 0.65 },
+        { "id": "benteen-battalion", "position": { "lat": 45.5205, "lon": -107.3768 }, "heading": 350, "formation": "mass", "state": "engaged", "strength": 0.9 },
+        { "id": "pack-train", "position": { "lat": 45.5228, "lon": -107.3788 }, "heading": 350, "formation": "mass", "state": "engaged" },
+        { "id": "village", "position": { "lat": 45.54, "lon": -107.42 }, "heading": 350, "formation": "mass", "state": "engaged" }
+      ]
+    },
+    {
+      "id": "dawn-attack",
+      "label": "Fire reopens at first light; Benteen's charge",
+      "t": "02:45",
+      "day": 1,
+      "playback_rate": 2400,
+      "caption": "Two rifle shots at first light open a fire heavier than anything the day before. The valley pours horsemen up onto every ridge round the hill. Benteen's line on the south is the most exposed and the most pressed; twice he takes his men out at a run to clear the ground in front of them, and Reno does the same on the other face. The wounded lie in the swale in the middle with no water at all.",
+      "notes": "Time T with an hour's spread: Reno's report says daylight about half past two, Godfrey between half past two and three, Wallace a little before three, Benteen about half past three, and Godfrey told the Court the watches were not local time. Local nautical dawn was about a quarter to three, so the readings are honest.\n\nAll units T. Reno's strength falls to 0.6 and Benteen's to 0.85 for the day's losses, which Godfrey totals at eighteen killed and fifty-two wounded on the hill, most of them on the 26th; the pack train to 0.95. The village T, ringing the hill again, position R.\n\nBenteen's charge and Reno's sortie of seventy-five or a hundred yards are caption matter: they are minutes long and they change no position this format would draw.",
+      "references": [
+        {
+          "source": "reno-report",
+          "locator": "Exhibit 4, the reopening of the fire",
+          "quote": "at daylight about 2-30 a.m. I heard the crack of two rifles"
+        },
+        {
+          "source": "godfrey-century",
+          "locator": "p. 377, the fire at early dawn",
+          "quote": "the enemy opened fire at early dawn, between half-past two and three o'clock"
+        },
+        {
+          "source": "rcoi",
+          "locator": "vol. 2, p. 102, Godfrey on the regiment's watches",
+          "note": "'We did not have the local time, our watches were not changed.' The sentence this file's whole clock rests on."
+        }
+      ],
+      "units": [
+        { "id": "custer-battalion", "position": { "lat": 45.569, "lon": -107.425 }, "heading": 240, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "keogh-wing", "position": { "lat": 45.5639, "lon": -107.4175 }, "heading": 200, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "yates-wing", "position": { "lat": 45.5703, "lon": -107.4269 }, "heading": 240, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "reno-battalion", "position": { "lat": 45.5219, "lon": -107.3775 }, "heading": 350, "formation": "mass", "state": "engaged", "strength": 0.6 },
+        { "id": "benteen-battalion", "position": { "lat": 45.5205, "lon": -107.3768 }, "heading": 350, "formation": "mass", "state": "engaged", "strength": 0.85 },
+        { "id": "pack-train", "position": { "lat": 45.5228, "lon": -107.3788 }, "heading": 350, "formation": "mass", "state": "engaged", "strength": 0.95 },
+        { "id": "village", "position": { "lat": 45.525, "lon": -107.383 }, "heading": 170, "formation": "mass", "state": "engaged" }
+      ]
+    },
+    {
+      "id": "lull",
+      "label": "Water parties; the fire slackens and the warriors draw off",
+      "t": "11:00",
+      "day": 1,
+      "playback_rate": 2400,
+      "caption": "By late morning the fire is slack enough for volunteers to run the ravine to the river with camp kettles, covered by marksmen on the bluff. The warriors are drawing off toward the camp, though they still hold the water. Through the afternoon they come back once, drive the command into its pits again, and then stop for good; by three or four o'clock there is no firing anywhere on the hill.",
+      "notes": "Time T with a long spread, and the whole afternoon in one phase: Godfrey has the firing slack about eleven, nearly all the warriors gone by one, a return about two and silence by three; Reno's report says the fire did not slacken until about half past nine; Porter says four in the afternoon, Mathey half past three or four, McDougall five. The lull is authored as one phase and its caption carries the afternoon's coming and going, because nothing on the plate would move.\n\nNo army unit moves. The village T, drawing off toward the camp, position R, with an intent arrow at the ford it still guarded: the water parties are the only reason the file records that the river was held.",
+      "references": [
+        {
+          "source": "godfrey-century",
+          "locator": "p. 378, the water parties",
+          "quote": "About 11 A. M. the firing was slack, and parties of volunteers were formed to get water"
+        },
+        {
+          "source": "reno-report",
+          "locator": "Exhibit 4, filling every vessel in the lull",
+          "note": "Reno describes taking advantage of the lull to fill all vessels with water, by camp kettle full."
+        }
+      ],
+      "units": [
+        { "id": "custer-battalion", "position": { "lat": 45.569, "lon": -107.425 }, "heading": 240, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "keogh-wing", "position": { "lat": 45.5639, "lon": -107.4175 }, "heading": 200, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "yates-wing", "position": { "lat": 45.5703, "lon": -107.4269 }, "heading": 240, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "reno-battalion", "position": { "lat": 45.5219, "lon": -107.3775 }, "heading": 350, "formation": "mass", "state": "engaged", "strength": 0.6 },
+        { "id": "benteen-battalion", "position": { "lat": 45.5205, "lon": -107.3768 }, "heading": 350, "formation": "mass", "state": "engaged", "strength": 0.85 },
+        { "id": "pack-train", "position": { "lat": 45.5228, "lon": -107.3788 }, "heading": 350, "formation": "mass", "state": "engaged", "strength": 0.95 },
+        {
+          "id": "village",
+          "position": { "lat": 45.532, "lon": -107.398 },
+          "heading": 300,
+          "formation": "mass",
+          "state": "engaged",
+          "moves": [{ "kind": "intent", "to": { "lat": 45.5205, "lon": -107.387 } }]
+        }
+      ]
+    },
+    {
+      "id": "village-departs",
+      "label": "The village moves off toward the Bighorn Mountains",
+      "t": "19:00",
+      "day": 1,
+      "playback_rate": 900,
+      "caption": "The bottom is fired, and out of the smoke in the evening comes the whole village on the move: horsemen, women and children on foot, travois and pony herds, a mass three miles long going away to the south in what the men on the hill describe as almost perfect military order. The command watches it out of sight, moves its position in the night for water, and is still there next morning when Terry's column comes up the valley and the burial parties find what happened to Custer.",
+      "notes": "Time T from both sides of the hill: Godfrey has the mass emerge about seven, Reno between six and seven, Terry six, Benteen about sunset and in sight till dark. Local sunset was just before eight.\n\nThe village stays engaged: a state in this format is a condition and never a place, and a village that has beaten off a regiment and is moving away in order has not been broken by anything. Strength 0.95 for its dead, which the accounts put anywhere from Gall's forty-three and Two Moon's forty-six to Red Horse's hundred and thirty-six, and the Park Service at sixty to a hundred. Position R on the bench west of the river, heading south-south-west; the track carries the move and the file's end at ten o'clock lets it run off the plate. The camp circles stay drawn on the map, because a map file is one moment and nothing marks a work as gone.\n\nThe 27th is a coda in this caption and not a phase: Terry rode into Reno's lines at about half past ten in the morning, and Bradley's party had already counted a hundred and ninety-seven dead on the ridge. The relief column never enters this file, whose clock stops at ten on the night of the 26th.",
+      "references": [
+        {
+          "source": "godfrey-century",
+          "locator": "p. 378, the village moving off",
+          "quote": "About 7 P. M. we saw emerge from behind this screen of smoke an immense moving mass crossing the plateau, going toward the Big Horn Mountains"
+        },
+        {
+          "source": "reno-report",
+          "locator": "Exhibit 4, the village filing away",
+          "note": "Reno puts it between six and seven, with a close and good view of the village filing away toward the Big Horn mountains in almost perfect military order."
+        },
+        {
+          "source": "terry-report",
+          "locator": "Terry to the Adjutant General, 27 June 1876",
+          "note": "Terry has the Indians withdraw from the valley on the evening of the 26th, taking their village with them, and gives the village as about three miles long and a mile wide."
+        },
+        {
+          "source": "wooden-leg-1931",
+          "locator": "chapter VIII, the Cheyenne circle and Medicine Tail Coulee",
+          "quote": "Across the river east of us and a little upstream from us was a broad coulee"
+        }
+      ],
+      "units": [
+        { "id": "custer-battalion", "position": { "lat": 45.569, "lon": -107.425 }, "heading": 240, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "keogh-wing", "position": { "lat": 45.5639, "lon": -107.4175 }, "heading": 200, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "yates-wing", "position": { "lat": 45.5703, "lon": -107.4269 }, "heading": 240, "formation": "line", "state": "destroyed", "strength": 0 },
+        { "id": "reno-battalion", "position": { "lat": 45.5219, "lon": -107.3775 }, "heading": 350, "formation": "mass", "state": "engaged", "strength": 0.6 },
+        { "id": "benteen-battalion", "position": { "lat": 45.5205, "lon": -107.3768 }, "heading": 350, "formation": "mass", "state": "engaged", "strength": 0.85 },
+        { "id": "pack-train", "position": { "lat": 45.5228, "lon": -107.3788 }, "heading": 350, "formation": "mass", "state": "engaged", "strength": 0.95 },
+        { "id": "village", "position": { "lat": 45.515, "lon": -107.43 }, "heading": 200, "formation": "mass", "state": "engaged", "strength": 0.95 }
+      ]
+    }
+  ]
+}
