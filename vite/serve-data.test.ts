@@ -77,7 +77,7 @@ describe("route ownership", () => {
 let root: string;
 
 beforeEach(() => {
-  root = fs.mkdtempSync(path.join(os.tmpdir(), "sandtable-serve-data-"));
+  root = fs.mkdtempSync(path.join(os.tmpdir(), "marchpast-serve-data-"));
 });
 
 afterEach(() => {

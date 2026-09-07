@@ -76,7 +76,7 @@ async function showLibrary(page: Page, loading: Promise<LibraryResult>): Promise
     return;
   }
 
-  // The title is index.html's `Sandtable` already: only a battle changes it.
+  // The title is index.html's `Marchpast` already: only a battle changes it.
   page.canvas.remove();
   page.controlsRoot.remove();
   document.documentElement.classList.add("st-library-page");
@@ -98,7 +98,7 @@ async function playBattle(page: Page, name: string, loading: Promise<LoadResult>
     return;
   }
 
-  document.title = `${result.battle.title} — Sandtable`;
+  document.title = `${result.battle.title} — Marchpast`;
   createPlayer({
     canvas: page.canvas,
     controlsRoot: page.controlsRoot,
@@ -119,31 +119,31 @@ async function playBattle(page: Page, name: string, loading: Promise<LoadResult>
 function playFixture(page: Page, name: string, mapName: string | undefined): void {
   const battle = FIXTURES[name];
   if (battle === undefined) {
-    console.error(`Sandtable has no fixture "${name}"`);
+    console.error(`Marchpast has no fixture "${name}"`);
     showNotice(page.canvas, { heading: `No fixture “${name}”`, lines: [fixturesThereAre()] });
     page.controlsRoot.append(createLibraryLink());
     return;
   }
   const map = mapName === undefined ? undefined : MAP_FIXTURES[mapName];
   if (mapName !== undefined && map === undefined) {
-    console.error(`Sandtable has no map fixture "${mapName}"`);
+    console.error(`Marchpast has no map fixture "${mapName}"`);
     showNotice(page.canvas, { heading: `No map fixture “${mapName}”`, lines: [mapFixturesThereAre()] });
     page.controlsRoot.append(createLibraryLink());
     return;
   }
-  document.title = `${battle.title} — Sandtable`;
+  document.title = `${battle.title} — Marchpast`;
   createPlayer({ canvas: page.canvas, controlsRoot: page.controlsRoot, battle, map });
 }
 
 /** The plate face. It is bundled, so this is quick; if it fails all the same, the fallback serif in every font string is better than a blank page. */
 function loadFace(): Promise<void> {
-  return loadPlateFont().catch((error: unknown) => console.warn("Sandtable: the plate typeface did not load", error));
+  return loadPlateFont().catch((error: unknown) => console.warn("Marchpast: the plate typeface did not load", error));
 }
 
 /** What stopped the page, on the plate and in the console: file, path and message, as `npm run validate` prints them. */
 function report(canvas: HTMLCanvasElement, heading: string, errors: readonly LoadError[]): void {
   const lines = formatLoadErrors(errors);
-  console.error(`Sandtable: ${heading}\n${lines.join("\n")}`);
+  console.error(`Marchpast: ${heading}\n${lines.join("\n")}`);
   showNotice(canvas, { heading, lines });
 }
 

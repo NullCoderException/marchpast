@@ -1,7 +1,7 @@
 {
   "type": "FeatureCollection",
   "license": "CC-BY-4.0",
-  "attribution": "Saltholm and the outer coast from Natural Earth 1:10m (public domain); the 1801 inner shoreline and the Middle Ground drawn by Sandtable contributors from Brydon's 1802 plan and Clowes's 1899 sketch, CC BY 4.0",
+  "attribution": "Saltholm and the outer coast from Natural Earth 1:10m (public domain); the 1801 inner shoreline and the Middle Ground drawn by Marchpast contributors from Brydon's 1802 plan and Clowes's 1899 sketch, CC BY 4.0",
   "features": [
     {
       "type": "Feature",

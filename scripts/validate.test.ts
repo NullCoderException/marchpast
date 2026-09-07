@@ -9,7 +9,7 @@ import { formatReports, validateDataDir } from "./validate.ts";
 let dataDir: string;
 
 beforeEach(() => {
-  dataDir = fs.mkdtempSync(path.join(os.tmpdir(), "sandtable-validate-"));
+  dataDir = fs.mkdtempSync(path.join(os.tmpdir(), "marchpast-validate-"));
 });
 
 afterEach(() => {

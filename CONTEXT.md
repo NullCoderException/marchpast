@@ -1,4 +1,4 @@
-# Sandtable
+# Marchpast
 
 A data-driven player that animates famous battles as 2D map sequences. Each battle is a timeline of phases in a JSON file; the renderer knows nothing about any specific battle.
 

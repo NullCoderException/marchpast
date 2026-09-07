@@ -1,4 +1,4 @@
-# Sandtable (working title)
+# Marchpast
 
 *Concept document — started September 2026 for v0.1, roadmap and decisions log kept current through v0.2. Living doc; expand freely.*
 
@@ -96,7 +96,7 @@ Explicitly out of scope this weekend: per-ship detail, terrain, the extraction p
 
 ## Open questions
 
-The v0.1 questions are all answered: real lat/lon from day one (ADR-0001), a linear tween between snapshots (ADR-0002), authored state and strength rather than a simulation (ADR-0003), one caption per phase with the argument in `notes` (ADR-0006). "Sandtable" stuck. What remains open is what the next map charts:
+The v0.1 questions are all answered: real lat/lon from day one (ADR-0001), a linear tween between snapshots (ADR-0002), authored state and strength rather than a simulation (ADR-0003), one caption per phase with the argument in `notes` (ADR-0006). The name is settled the other way: the product was renamed from Sandtable to Marchpast on 2026-09-07 (ADR-0020). What remains open is what the next map charts:
 
 - An extraction test on Cannae from Polybius, before or alongside the pipeline effort (v0.3).
 - Library thumbnails: a still per battle rendered by the build from a chosen phase in a decided view.
@@ -122,6 +122,7 @@ The v0.1 questions are all answered: real lat/lon from day one (ADR-0001), a lin
 | 2026-09-06 | Hierarchy is authored at every level and the viewer picks the level; sixteen units drawn at once is the ceiling (ADR-0017) | Both the coarse and the fine picture are facts from the sources, never a roll-up; the label proof set the ceiling |
 | 2026-09-06 | v1's states, strength and moves carry Cannae, the Nile and Copenhagen unchanged; `broken` widened; heading is the fighting front; anchoring and the truce are caption matter (ADR-0018, ADR-0019) | Every proposed fifth state or third move kind priced a glyph and a legend row for a sentence the caption already writes |
 | 2026-09-06 | Labels place by a sticky search with a five-step collapse and an authored `short_label`; the unit card is the label unfolded; the view and level choosers are `<select>`s that never remember | Measured over whole playbacks: the only algorithm with no overlap to sixteen units; neither derived short name survives Cannae |
+| 2026-09-07 | The product is renamed from Sandtable to Marchpast (ADR-0020) | The name research found a live USPTO application for SANDTABLE in classes 9 and 42 for software that simulates forces over terrain, a registered SIMTABLE beside it, the npm name taken and every useful domain held; a brand ticket was about to draw a logo and a task ticket about to buy a domain, so this was the cheapest hour the rename would ever cost |
 | 2026-09-07 | Hosting stays GitHub Pages, now behind the custom domain `marchpast.com` (`.app` and `.org` held alongside and redirected); the Pages base becomes a bare `/` (ADR-0020) | A brand needs its own address and an unregistered name can go any day; the domain in front of Pages is also what makes the repository rename free, and it deletes the base-path literal rather than rewriting it twice |
 
 ## Known risks

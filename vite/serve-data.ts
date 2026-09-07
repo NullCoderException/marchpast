@@ -93,7 +93,7 @@ export function serveData(): Plugin {
   let outDir = "";
 
   return {
-    name: "sandtable:serve-data",
+    name: "marchpast:serve-data",
 
     configResolved(config) {
       dataDir = path.resolve(config.root, "data");

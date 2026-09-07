@@ -51,7 +51,7 @@ export function readLibrary(dataDir: string): Library {
     battles.push({ name: path.basename(file, ".json"), battle: result.battle });
   }
 
-  if (errors.length > 0) throw new Error(["Sandtable: the library cannot be built.", ...errors].join("\n"));
+  if (errors.length > 0) throw new Error(["Marchpast: the library cannot be built.", ...errors].join("\n"));
   return buildLibrary(battles);
 }
 

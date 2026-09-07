@@ -18,7 +18,7 @@ git checkout -b <type>/<issue>-<slug>      # e.g. feat/20-schema-validator
 Sessions share one object store but never one checkout: a second session's `git checkout` would swap the files out from under the first. A session that may run alongside another works in its own worktree on its own branch. Claude Code's worktree isolation does this under `.claude/worktrees/` (gitignored); the manual form is:
 
 ```sh
-git worktree add ../sandtable-<slug> -b <type>/<issue>-<slug> main
+git worktree add ../marchpast-<slug> -b <type>/<issue>-<slug> main
 ```
 
 Anything numbered in sequence (ADRs, anything else with a running number) is re-read from `main` immediately before writing, because another session may have taken the next number since the branch was cut.
