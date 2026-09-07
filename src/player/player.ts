@@ -18,7 +18,8 @@
  * frame and neither costs anything on a frame that changed nothing.
  */
 import type { Battle, MapFile } from "../schema/types.ts";
-import { createRenderer, type HitRegion, hoverAt, unitAt } from "../render/index.ts";
+import { faceReady, loadFace } from "../fonts/faces.ts";
+import { createRenderer, type HitRegion, hoverAt, unitAt, type ViewId, viewById } from "../render/index.ts";
 import { layoutMode } from "../render/layout.ts";
 import { pictureAt } from "../timeline/pictureAt.ts";
 import { ANNOUNCER_ID, createAnnouncer } from "./announcer.ts";
@@ -102,6 +103,24 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
     dirty = true;
   };
 
+  /**
+   * A view switch waits for that view's face rather than drawing in a fallback
+   * (ADR-0021, ADR-0023). After the idle prefetch the face is always already
+   * in hand, so the switch applies on the spot; if it somehow is not, the
+   * picture stays in the view it is in — and the chooser snaps back to it on
+   * the next `update` — until the face resolves. Late rather than wrong.
+   */
+  const applyView = (id: ViewId): void => {
+    const face = viewById(id).type.face;
+    if (faceReady(face)) {
+      apply(setView(state, id));
+      return;
+    }
+    void loadFace(face)
+      .then(() => apply(setView(state, id)))
+      .catch((error: unknown) => console.warn(`Marchpast: the ${face} typeface did not load, so the view was not switched`, error));
+  };
+
   const controls = createControls(battle, {
     togglePlay: () => apply(togglePlay(battle, state)),
     next: () => apply(jumpNext(battle, state)),
@@ -109,7 +128,7 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
     scrub: (fraction) => apply(scrubTo(battle, state, fraction)),
     jumpToPhase: (index) => apply(jumpToPhase(battle, state, index)),
     setMultiplier: (multiplier) => apply(setMultiplier(state, multiplier)),
-    setView: (view) => apply(setView(state, view)),
+    setView: applyView,
     setLevel: (level) => apply(setLevel(battle, state, level)),
     toggleDetails: () => {
       details.setOpen(!details.isOpen());

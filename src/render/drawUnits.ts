@@ -26,10 +26,10 @@ import type { Arm } from "../schema/types.ts";
 import type { Picture, UnitPicture } from "../timeline/picture.ts";
 import type { LabelUnit } from "./labels/index.ts";
 import type { Plate } from "./plate.ts";
-import { drawArrow, hashString, type Point } from "./primitives.ts";
+import { hashString, type Point } from "./primitives.ts";
 import { toRadians } from "./projection.ts";
-import { GLYPH_PX } from "./style.ts";
-import type { GlyphRequest } from "./view.ts";
+import { GLYPH_PX } from "./anatomy.ts";
+import type { GlyphRequest, MoveRequest, MoveStyle } from "./view.ts";
 
 /** Below this many pixels a track is a dot under the glyph, not an arrow. */
 const MIN_ARROW_PX = 6;
@@ -105,6 +105,7 @@ export function layoutUnits(plate: Plate): LaidOutUnit[] {
       formation: unit.formation,
       length: request.length,
       halfWidth: view.glyph.halfWidth(request.scale, unit.formation),
+      markReach: view.glyph.markReach(request.scale, unit.state),
       hasMove: unit.moves.length > 0,
     };
     if (entry?.unit.short_label !== undefined) label.shortLabel = entry.unit.short_label;
@@ -116,7 +117,12 @@ export function layoutUnits(plate: Plate): LaidOutUnit[] {
 /** Draws what `layoutUnits` worked out, in the order the plate reads: every arrow, then every glyph. */
 export function drawUnits(plate: Plate, laid: readonly LaidOutUnit[]): void {
   const { ctx, projection, view } = plate;
-  const { palette, pens } = view;
+  const { palette, pens, moves } = view;
+
+  // A track and an intent take the palette's ink; a detachment takes the
+  // unit's own side, which is the whole of what the anatomy says about their
+  // colour (ADR-0014). The pen is the view's, and so is the hand that uses it.
+  const inInk = (style: MoveStyle): MoveRequest => ({ pen: pens[style], colour: palette.ink, palette });
 
   // Tracks and moves. A track runs wherever the tween takes it: heading is the
   // front, so a unit retiring in good order draws its track back through its
@@ -124,12 +130,12 @@ export function drawUnits(plate: Plate, laid: readonly LaidOutUnit[]): void {
   for (const { unit, at: here, request } of laid) {
     if (unit.track !== undefined) {
       const ahead = projection.project(unit.track.to.lat, unit.track.to.lon);
-      if (Math.hypot(ahead.x - here.x, ahead.y - here.y) >= MIN_ARROW_PX) drawArrow(ctx, here, ahead, pens.track, palette.ink);
+      if (Math.hypot(ahead.x - here.x, ahead.y - here.y) >= MIN_ARROW_PX) moves.track(ctx, here, ahead, inInk("track"));
     }
     for (const move of unit.moves) {
       const to = projection.project(move.to.lat, move.to.lon);
-      if (move.kind === "intent") drawArrow(ctx, here, to, pens.intent, palette.ink);
-      else drawArrow(ctx, here, to, pens.detachment, request.colour);
+      if (move.kind === "intent") moves.intent(ctx, here, to, inInk("intent"));
+      else moves.detachment(ctx, here, to, { pen: pens.detachment, colour: request.colour, palette });
     }
   }
 

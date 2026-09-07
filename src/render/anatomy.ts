@@ -1,47 +1,62 @@
 /**
- * The engraved system: what every view is built from and no view may change
- * (#58). The typeface and its ramp, the rule that sides take their ink by
- * roster order, the footprint of one sign and the glyph's fixed length, and
- * the plate's margin.
+ * The **anatomy**: what the picture shows, where each thing sits and what it
+ * means, which is the same in every view and no view may change (ADR-0021).
+ * How any of it is *drawn* is the view's, and lives behind the hands in
+ * `view.ts`.
  *
- * The values a view *does* own — paper, ink, land, letterbox, panel, coast,
- * stipple, the side inks and the pens — live in `view.ts` and `views.ts`, so
- * no pass imports a colour by name. Nothing here comes from data.
+ * What is here is the part of the anatomy that is a number or a piece of
+ * geometry rather than an order of drawing: the plate's margin, the glyph's
+ * fixed length, the four states, the eight type roles in their fixed rank, a
+ * unit's own axes, the lee flank a mark drifts to and the label does not, and
+ * the rule that sides take their ink by roster order.
+ *
+ * This file was `style.ts`, "the engraved system: what every view is built
+ * from and no view may change". It stopped being that when a view became an
+ * aesthetic of its own: what fills a glyph's 72 pixels, what face a role is
+ * set in and how far an engaged mark reaches are the engraved views' own
+ * answers, and they have gone to the modules that draw them.
  */
-import { plateFont } from "../fonts/plate.ts";
 import type { Battle, Formation, UnitState } from "../schema/types.ts";
 import type { Point } from "./primitives.ts";
-import type { Palette } from "./view.ts";
+import type { MoveStyle, Palette, TypeRole } from "./view.ts";
 
 /** Margin between the canvas edge and the plate. */
 export const PLATE_MARGIN = 20;
 
-/** Signs a unit glyph shows at full strength, whatever its arm. A renderer constant: no data field carries a ship count (ADR-0016). */
-export const SIGNS_PER_GLYPH = 8;
 /**
  * A glyph's long axis, in pixels. A plate constant: the same on every screen,
  * for every arm, on Trafalgar's extent and on Cannae's, because a glyph is a
  * styled label and never geometry (ADR-0016, superseding ADR-0009's nominal
- * true length with a readable floor). The scale bar says how big the field is.
+ * true length with a readable floor). It is anatomy and not a view's, because
+ * it is the comparability guarantee at unit scale — what makes Trafalgar at
+ * 13:30 equally crowded in every view. The scale bar says how big the field is.
  */
 export const GLYPH_PX = 72;
-/** Half the footprint one sign fills, across and along the heading. Every arm's sign is drawn inside it. */
-export const SIGN_HALF_WIDTH = 2.6;
-export const SIGN_HALF_HEIGHT = 3.25;
 
 export const STATES: readonly UnitState[] = ["intact", "engaged", "broken", "destroyed"];
 
 /**
- * How far a unit's engaged mark reaches past its signs, downwind: Billow's
- * plume at its furthest, in plate pixels (#58). The plate's own cloud is drawn
- * in `glyphs/ticks.ts` and a test there holds it inside these numbers; Atlas
- * marks a unit with hatching that is narrower and already inside `halfWidth`.
- *
- * It lives here rather than with the cloud because the label pass is shared
- * across views and may not read one view's glyph (ADR-0014), and because
- * overstating it costs a label one displacement and never a word.
+ * The three motion styles, in the order the legend keys them. They must stay
+ * tellable apart when they overlap (ADR-0009); what tells them apart — a pen,
+ * or a hand that draws a polygon where another strokes a line — is the view's.
  */
-export const MARK_REACH: Readonly<Record<UnitState, number>> = { intact: 0, engaged: 44, broken: 30, destroyed: 0 };
+export const MOVE_STYLES: readonly MoveStyle[] = ["track", "intent", "detachment"];
+
+/**
+ * The eight roles every view sets type in, in the fixed rank of size the
+ * anatomy gives them (ADR-0021). A view answers for all eight — the sizes and
+ * the face are its own — and the conformance test holds the rank.
+ */
+export const TYPE_ROLES: readonly TypeRole[] = [
+  "clock",
+  "title",
+  "caption",
+  "unitName",
+  "stateWord",
+  "legendLine",
+  "scaleCaption",
+  "credit",
+];
 
 /**
  * A unit's own axes at the origin heading up: `along` its long axis, `across`
@@ -67,9 +82,9 @@ const ALONG_DAMPING = 0.35;
  *
  * `windTo` is radians clockwise from the unit's own heading, and the unit is
  * drawn heading-up, so the wind is `(sin, -cos)` of it and nothing here knows
- * north. With no wind the cloud takes the flank the label does not — and that
+ * north. With no wind the mark takes the flank the label does not — and that
  * pairing is why this is one answer both read rather than two that can
- * disagree: Billow drifts to it and the label pass prefers the other.
+ * disagree: a mark drifts to it and the label pass prefers the other.
  */
 export function leeDrift(windTo: number | undefined, formation: Formation): Point {
   const { along, across } = axes(formation);
@@ -100,19 +115,4 @@ export function sideColours(battle: Battle, palette: Palette): Map<string, strin
     }
   }
   return colours;
-}
-
-/** The plate face at a size, upright or italic. The bundled face is upright; the browser slants it. */
-export function font(sizePx: number, italic = false): string {
-  return italic ? `italic ${plateFont(sizePx)}` : plateFont(sizePx);
-}
-
-/** A hex colour at an alpha, for the coastline's inward shading. */
-export function atAlpha(hex: string, alpha: number): string {
-  const value = hex.replace("#", "");
-  const full = value.length === 3 ? [...value].map((c) => c + c).join("") : value;
-  const r = Number.parseInt(full.slice(0, 2), 16);
-  const g = Number.parseInt(full.slice(2, 4), 16);
-  const b = Number.parseInt(full.slice(4, 6), 16);
-  return `rgba(${r},${g},${b},${alpha})`;
 }

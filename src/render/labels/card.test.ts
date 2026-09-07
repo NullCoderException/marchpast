@@ -102,7 +102,7 @@ describe("layoutCard", () => {
   it("stands as wide as its widest line, padded on both sides", () => {
     const content = card("weather");
     const layout = layoutCard(content, measure);
-    const widest = Math.max(...layout.lines.map((line) => measure(line.text, line.size, line.italic)));
+    const widest = Math.max(...layout.lines.map((line) => measure(line.text, line.size, line.voice)));
     expect(layout.width).toBeCloseTo(widest + CARD_PAD * 2);
   });
 

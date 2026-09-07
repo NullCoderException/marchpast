@@ -5,7 +5,7 @@
  * here.
  */
 import { describe, expect, it } from "vitest";
-import { SIGNS_PER_GLYPH } from "../style.ts";
+import { SIGNS_PER_GLYPH } from "./slots.ts";
 import { frontage, occupiedSlots, shownSigns, signPositions, signSlots } from "./slots.ts";
 
 /** A glyph is 72px long, so its signs sit on a 9px pitch. */

@@ -22,11 +22,11 @@ import {
   KEY_SAMPLE_WIDTH,
   keyRowLabel,
   plateKeyRows,
-} from "../render/drawFurniture.ts";
+} from "../render/key.ts";
 import { legendArm } from "../render/glyphs/arms.ts";
 import { type View, type ViewId, viewById } from "../render/index.ts";
 import type { LayoutMode } from "../render/layout.ts";
-import { sideColours } from "../render/style.ts";
+import { sideColours } from "../render/anatomy.ts";
 import type { Battle, MapFile, Reference } from "../schema/types.ts";
 import type { Picture } from "../timeline/picture.ts";
 import { element } from "./dom.ts";

@@ -18,6 +18,7 @@ import {
   smokeBox,
 } from "./geometry.ts";
 import { toRadians } from "../projection.ts";
+import { ticks } from "../glyphs/ticks.ts";
 
 /** A unit with the fields this file's subject reads; everything else is filler. */
 function unit(over: Partial<LabelUnit> = {}): LabelUnit {
@@ -33,6 +34,9 @@ function unit(over: Partial<LabelUnit> = {}): LabelUnit {
     formation: "column",
     length: 72,
     halfWidth: 2.6,
+    // The plate's own reach for the state asked for, so a fixture clears what
+    // the plate's Billow clears (`glyphs/ticks.ts`).
+    markReach: ticks.markReach(1, over.state ?? "intact"),
     hasMove: false,
     ...over,
   };

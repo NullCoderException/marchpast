@@ -1,11 +1,11 @@
 /**
- * The one piece of the furniture pass that is a count rather than ink: how many
- * rows the legend stands, which the arm rows change and nothing else does
- * (ADR-0015). What the legend *looks* like is checked by eye.
+ * The one piece of the key that is a count rather than ink: how many rows it
+ * stands, which the arm rows change and nothing else does (ADR-0015). What a
+ * key *looks* like is the view's, and is checked by eye.
  */
 import { describe, expect, it } from "vitest";
 import type { Arm, Unit } from "../schema/types.ts";
-import { legendRowCount } from "./drawFurniture.ts";
+import { keyRowCount } from "./key.ts";
 import { legendArms } from "./glyphs/arms.ts";
 
 /** A roster of the given arms, which is all the arm rows read. */
@@ -15,10 +15,10 @@ function roster(...arms: Arm[]): Unit[] {
 
 /** The legend for a roster of these arms, over `sides` sides. */
 function rows(sides: number, ...arms: Arm[]): number {
-  return legendRowCount(sides, legendArms(roster(...arms)));
+  return keyRowCount(sides, legendArms(roster(...arms)));
 }
 
-describe("legendRowCount", () => {
+describe("keyRowCount", () => {
   it("keys no arm for an all-ship roster, so Trafalgar's legend is the height it was", () => {
     // Two sides, the four states and the three line styles: nine rows, as before arms existed.
     expect(rows(2, "ship", "ship", "ship")).toBe(9);

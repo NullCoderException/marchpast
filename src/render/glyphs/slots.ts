@@ -10,7 +10,13 @@
  * axis, and hands in the glyph's length in pixels.
  */
 import type { Formation, UnitState } from "../../schema/types.ts";
-import { SIGNS_PER_GLYPH } from "../style.ts";
+/**
+ * Signs a unit glyph shows at full strength, whatever its arm. A constant of
+ * the **engraved** glyphs rather than of the anatomy: it says how a tick glyph
+ * fills its 72 pixels, and means nothing to a view that draws a unit as one
+ * symbol rectangle (ADR-0016, ADR-0021). No data field carries a ship count.
+ */
+export const SIGNS_PER_GLYPH = 8;
 
 /** One sign's place in the glyph, in pixels from its centre, heading up. */
 export interface Slot {
