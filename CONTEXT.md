@@ -231,8 +231,12 @@ _Avoid_: Tooltip, popup, popover, info box, unit panel
 ### Site
 
 **Library**:
-The collection of every battle the site holds, and the front-door page that lists them oldest first, each by its still, title, date, sides and summary, drawn from the battle files themselves. It is never grouped.
+The collection of every battle the site holds, and the front-door page that lists them oldest first, each by its still, title, date, sides and summary, drawn from the battle files themselves. It is never grouped. It sits at the site's root, and each battle it lists has a page of its own beneath it.
 _Avoid_: Catalogue, index, list, home page, menu, gallery
+
+**Battle page**:
+The document a battle is played at, one per battle, at the bare battle name under the site's root. The build emits it, so it carries that battle's own title, description and social card rather than the site's; every battle page is the same app over the same bundle, and what differs is the head and the URL.
+_Avoid_: Permalink, route, deep link, detail page, battle URL
 
 **Still**:
 The picture of one phase of a battle, drawn by the build with the renderer the player uses, at a size and a view the build chooses rather than a viewer. The phase a battle marks for it is its **still phase**; a battle that marks none has one picked by rule.
@@ -240,7 +244,11 @@ _Avoid_: Snapshot, screenshot, render, image, poster, preview
 
 **Thumbnail**:
 Where a still is shown: the small picture on a battle's entry in the library. A still is the picture; the thumbnail is the slot it fills, so a still shown at another size for another purpose is not one.
-_Avoid_: Thumb, tile, cover, card image
+_Avoid_: Thumb, tile, cover, card image, card
+
+**Social card**:
+Where a still is shown: the picture a link to a battle page unfurls as, in a client that previews links. The thumbnail's sibling — the same still at the size that suits sharing, with its caption band kept, so the picture carries the battle's title, date, clock and caption on its own. The library's card is not a still but a drawn plate, the site's one designed card. Nothing else on the site is a card except the unit card, which is a different thing entirely.
+_Avoid_: OG image, preview image, share image, link card, hero
 
 **Chronology rail**:
 The line down the library's left gutter that gives the list its spine: a bare node beside each battle, and between two battles the years that passed, in words. Its spacing is even and means nothing; the interval is written rather than drawn, because the library spans two millennia and no scale holds both a gap of eighteen centuries and a gap of two years.
