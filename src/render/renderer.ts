@@ -195,16 +195,21 @@ function openCard(plate: Plate, viewer: Viewer): CardContent | undefined {
 /**
  * What the player resolves a pointer against: two boxes for every unit drawn —
  * its glyph, and whatever label or card that glyph carries — and one for each
- * of the legend's numeral rows, which open the same card. Two boxes and never
- * one around both: a label displaced a hundred pixels would otherwise open a
- * card from the bare plate between them.
+ * of the legend's numeral rows, which a click opens the same card from. Two
+ * boxes and never one around both: a label displaced a hundred pixels would
+ * otherwise open a card from the bare plate between them.
+ *
+ * They go out **in the order they were drawn**, because the topmost region
+ * containing a point is the one that answers: the glyphs, then the legend, then
+ * the labels, and the frame's open card last of all, so a card that had to draw
+ * over a label is what the pointer finds there.
  */
 function hitRegions(placed: readonly Placed[], rows: readonly HitRegion[]): HitRegion[] {
-  const units = placed.flatMap((label) => [
-    { id: label.unit.id, box: glyphBox(label.unit) },
-    { id: label.unit.id, box: label.box },
-  ]);
-  return [...units, ...rows];
+  const box = (label: Placed, rect: Rect): HitRegion => ({ id: label.unit.id, box: rect, hover: true });
+  const glyphs = placed.map((label) => box(label, glyphBox(label.unit)));
+  const labels = placed.flatMap((label) => (label.card === undefined ? [box(label, label.box)] : []));
+  const cards = placed.flatMap((label) => (label.card === undefined ? [] : [box(label, label.box)]));
+  return [...glyphs, ...rows, ...labels, ...cards];
 }
 
 /** Sizes the backing store to the canvas's CSS size at the current devicePixelRatio. Returns the CSS size. */

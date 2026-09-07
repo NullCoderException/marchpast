@@ -17,9 +17,12 @@
  * obstacle can never disagree about where a piece is.
  *
  * The legend's numeral rows are the one piece of furniture a pointer may act
- * on: a numeral row opens that unit's card, which is what rescues a unit whose
- * label has collapsed all the way (#60). So this pass reports their boxes as
- * hit regions, in the same way it reports every piece's box as an obstacle.
+ * on: a **click** on a numeral row opens that unit's card, which is what
+ * rescues a unit whose label has collapsed all the way (#60). So this pass
+ * reports their boxes as hit regions, in the same way it reports every piece's
+ * box as an obstacle. They answer a click alone: the key is built from the
+ * numerals the frame showed, so a card opening takes the numeral — and with it
+ * the row — out from under a resting pointer.
  *
  * On a plate whose map carries contours the pieces sit on **paper panels**,
  * because relief runs under every corner, and the scale bar carries the
@@ -366,7 +369,7 @@ function legendWidth(plate: Plate, key: readonly NumeralRow[]): number {
  * legend draws its rule and not a second ground: the panel is the paper at .92
  * once, not twice over (#62).
  *
- * Returns the numeral rows' boxes, which are the only rows a pointer opens
+ * Returns the numeral rows' boxes, which are the only rows a click opens
  * anything from: the side, state, arm and line rows do nothing (#60).
  */
 function drawLegend(plate: Plate, bottom: number, onPanel: boolean, key: readonly NumeralRow[]): HitRegion[] {
@@ -464,7 +467,7 @@ function drawLegend(plate: Plate, bottom: number, onPanel: boolean, key: readonl
   const rows: HitRegion[] = [];
   for (const row of key) {
     ctx.fillText(keyRow(row), x + LEGEND_PAD, rowY);
-    rows.push({ id: row.id, box: { x, y: rowY - LEGEND_ROW / 2, width, height: LEGEND_ROW } });
+    rows.push({ id: row.id, box: { x, y: rowY - LEGEND_ROW / 2, width, height: LEGEND_ROW }, hover: false });
     rowY += LEGEND_ROW;
   }
   ctx.restore();

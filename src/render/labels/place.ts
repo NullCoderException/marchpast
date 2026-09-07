@@ -156,11 +156,11 @@ export function placeLabels({ units, plate, obstacles, measure, memory, card }: 
     const others = units.filter((other) => other.id !== unit.id);
     const hard = others.flatMap((other) => boxes.get(other.id) ?? []);
     const soft = others.flatMap((other) => smoke.get(other.id) ?? []);
-    const mine = open !== undefined && open.content.id === unit.id ? open : undefined;
+    const ownCard = open !== undefined && open.content.id === unit.id ? open : undefined;
     // A slot a closed card left behind is not a step of the collapse order, so
     // the label taking its unit back keeps the angle and starts the order again.
     const remembered = memory.get(unit.id);
-    const previous = mine === undefined && remembered?.step === CARD_STEP ? { ...remembered, step: 0, clean: 0 } : remembered;
+    const previous = ownCard === undefined && remembered?.step === CARD_STEP ? { ...remembered, step: 0, clean: 0 } : remembered;
 
     const free = (box: Rect, avoidSmoke: boolean): boolean => {
       if (!insidePlate(box, plate)) return false;
@@ -176,8 +176,8 @@ export function placeLabels({ units, plate, obstacles, measure, memory, card }: 
       areaOutside(box, plate) * OFF_PLATE_WEIGHT +
       [own, ...hard, ...taken, ...obstacles].reduce((sum, other) => sum + overlapArea(box, other), 0);
 
-    const chosen = mine === undefined ? choose(unit, previous, measure, free) : chooseCard(unit, previous, mine, free, cost);
-    const label = mine === undefined ? (build(unit, chosen, measure) ?? fallback(unit, measure)) : buildCard(unit, chosen, mine);
+    const chosen = ownCard === undefined ? choose(unit, previous, measure, free) : chooseCard(unit, previous, ownCard, free, cost);
+    const label = ownCard === undefined ? (build(unit, chosen, measure) ?? fallback(unit, measure)) : buildCard(unit, chosen, ownCard);
     const clean = previous !== undefined && sameSlot(previous, chosen) ? previous.clean + 1 : 0;
 
     next.set(unit.id, { ...chosen, clean });
@@ -280,21 +280,36 @@ function chooseCard(
   // one. A card is transient and asked for, so a covered label for a moment is
   // accepted (#60).
   let best = slots[0] ?? { angle: preferredAngles(unit)[0] ?? 0, extra: 0, step: CARD_STEP };
-  let worst = Number.POSITIVE_INFINITY;
+  let least = Number.POSITIVE_INFINITY;
   for (const slot of slots) {
     const badness = cost(cardSlot(unit, slot, layout).box);
-    if (badness >= worst) continue;
-    worst = badness;
+    if (badness >= least) continue;
+    least = badness;
     best = slot;
   }
   return best;
 }
 
+/** Which side of its anchor the words of a slot at this angle run. */
+function alignAt(angle: number): Align {
+  return Math.sin(angle) >= -1e-9 ? "left" : "right";
+}
+
+/**
+ * The point a box hung on this slot swings out to: clear of the signs, the
+ * gap beyond them, the ring's displacement, and whatever setback the box's own
+ * shape needs for its **near edge** to stand that gap off the glyph. A label
+ * and a card differ in that last term alone.
+ */
+function hangPoint(unit: LabelUnit, slot: Omit<Slot, "clean">, setback: number): Point {
+  const radius = clearance(unit, slot.angle) + LABEL_GAP + slot.extra + setback;
+  return { x: unit.anchor.x + Math.sin(slot.angle) * radius, y: unit.anchor.y - Math.cos(slot.angle) * radius };
+}
+
 /** Where a slot puts the card: the point it hangs from, the side its panel runs and the box it fills. */
 function cardSlot(unit: LabelUnit, slot: Omit<Slot, "clean">, layout: CardLayout): { at: Point; align: Align; box: Rect } {
-  const align: Align = Math.sin(slot.angle) >= -1e-9 ? "left" : "right";
-  const radius = clearance(unit, slot.angle) + LABEL_GAP + slot.extra + cardSetback(align, layout, slot.angle);
-  const at = { x: unit.anchor.x + Math.sin(slot.angle) * radius, y: unit.anchor.y - Math.cos(slot.angle) * radius };
+  const align = alignAt(slot.angle);
+  const at = hangPoint(unit, slot, cardSetback(align, layout, slot.angle));
   return { at, align, box: cardBox(at, align, layout) };
 }
 
@@ -310,9 +325,8 @@ function build(unit: LabelUnit, slot: Omit<Slot, "clean">, measure: Measure): Pl
   if (content === undefined) return undefined;
   const width = contentWidth(content, measure);
   const hasDetail = content.detail !== undefined;
-  const align: Align = Math.sin(slot.angle) >= -1e-9 ? "left" : "right";
-  const radius = clearance(unit, slot.angle) + LABEL_GAP + slot.extra + nearEdgeSetback(align, width, hasDetail, slot.angle);
-  const at = { x: unit.anchor.x + Math.sin(slot.angle) * radius, y: unit.anchor.y - Math.cos(slot.angle) * radius };
+  const align = alignAt(slot.angle);
+  const at = hangPoint(unit, slot, nearEdgeSetback(align, width, hasDetail, slot.angle));
 
   const label: Placed = { unit, step: slot.step, name: content.name, at, align, box: labelBox(at, align, width, hasDetail) };
   if (content.detail !== undefined) label.detail = content.detail;

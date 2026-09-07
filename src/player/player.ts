@@ -5,13 +5,14 @@
  * Each frame turns the wall-clock delta into battle-clock time through
  * `tick`, asks the timeline for the picture at the new instant, and renders
  * it — keeping the hit regions that frame drew, which is how a pointer over
- * the canvas becomes a unit id and so a unit card (#60). Paused frames render nothing unless something else changed — a scrub, a
- * jump, a resize — which is what the `dirty` flag tracks. Every rule about
+ * the canvas becomes a unit id and so a unit card (#60). Paused frames
+ * render nothing unless something else changed — a scrub, a jump, a resize,
+ * a card opening — which is what the `dirty` flag tracks. Every rule about
  * what a control does lives in `state.ts`; this file only wires gestures to
  * transitions and state to pixels.
  */
 import type { Battle, MapFile } from "../schema/types.ts";
-import { createRenderer, type HitRegion, unitAt } from "../render/index.ts";
+import { createRenderer, type HitRegion, hoverAt, unitAt } from "../render/index.ts";
 import { pictureAt } from "../timeline/pictureAt.ts";
 import { createControls, type PickerOptions } from "./controls.ts";
 import { createDetailsPanel } from "./details.ts";
@@ -112,14 +113,16 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
     dirty = true;
   });
 
-  // The pointer on the plate: hover shows a card, a click pins it, and a click
-  // on bare plate closes it. A tap is a click, so one pair of rules serves
-  // both inputs (#60). Keyboard access to a card is out of scope for v0.2.
+  // The pointer on the plate: a resting pointer shows a card, a click pins it,
+  // and a click on bare plate closes it. A tap is a click, so one pair of rules
+  // serves both inputs (#60). The two gestures read different regions: hover
+  // answers to a glyph and its label, a click to those and the legend's numeral
+  // rows as well. Keyboard access to a card is out of scope for v0.2.
   const canvasPoint = (event: MouseEvent): { x: number; y: number } => {
     const rect = canvas.getBoundingClientRect();
     return { x: event.clientX - rect.left, y: event.clientY - rect.top };
   };
-  listeners.on<PointerEvent>(canvas, "pointermove", (event) => apply(hoverUnit(state, unitAt(hits, canvasPoint(event)))));
+  listeners.on<PointerEvent>(canvas, "pointermove", (event) => apply(hoverUnit(state, hoverAt(hits, canvasPoint(event)))));
   listeners.on<PointerEvent>(canvas, "pointerleave", () => apply(hoverUnit(state, undefined)));
   listeners.on<MouseEvent>(canvas, "click", (event) => {
     const id = unitAt(hits, canvasPoint(event));
