@@ -13,6 +13,7 @@
  */
 import type { Battle, MapFile } from "../schema/types.ts";
 import { createRenderer, type HitRegion, hoverAt, unitAt } from "../render/index.ts";
+import { layoutMode } from "../render/layout.ts";
 import { pictureAt } from "../timeline/pictureAt.ts";
 import { createControls, type PickerOptions } from "./controls.ts";
 import { createDetailsPanel } from "./details.ts";
@@ -62,7 +63,7 @@ const MAX_FRAME_SECONDS = 0.25;
 export function createPlayer({ canvas, controlsRoot, battle, map, picker }: PlayerOptions): Player {
   const renderer = createRenderer(canvas);
   const listeners = new Listeners();
-  const details = createDetailsPanel(battle);
+  const details = createDetailsPanel(battle, map);
 
   let state: PlayerState = initialState(battle);
   let dirty = true;
@@ -144,6 +145,9 @@ export function createPlayer({ canvas, controlsRoot, battle, map, picker }: Play
     const picture = pictureAt(battle, state.clock);
     hits = renderer.render(battle, map, picture, { view: state.view, level: state.level, card: state.card });
     details.update(picture);
+    // The same rule the plate was just drawn to, off the same width: the
+    // panel gains the legend's rows exactly when the plate loses them (#86).
+    details.setPlate(state.view, layoutMode(canvas.clientWidth || canvas.width));
     controls.update(state, picture, details.isOpen());
   });
 

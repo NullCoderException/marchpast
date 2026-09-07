@@ -20,6 +20,7 @@ import { sideColours } from "./style.ts";
 import { DEFAULT_VIEW } from "./views.ts";
 import type { Battle, MapFile, Unit } from "../schema/types.ts";
 import type { Picture, UnitPicture } from "../timeline/picture.ts";
+import type { LayoutMode } from "./layout.ts";
 
 /** A context that measures every glyph at half its point size and swallows every drawing call. */
 function fakeContext(): CanvasRenderingContext2D {
@@ -56,16 +57,19 @@ const SNAPSHOT: UnitPicture = {
 const PICTURE = { units: [SNAPSHOT] } as unknown as Picture;
 const BATTLE = { title: "The Battle of Trafalgar", extent: EXTENT, scale_unit: "nmi", units: ROSTER, levels: ["Columns"] } as unknown as Battle;
 
-function plate(map?: MapFile): Plate {
-  const projection = fitProjection(EXTENT, { x: 20, y: 20, width: 900, height: 560 });
+function plate(map?: MapFile, mode: LayoutMode = "desktop"): Plate {
+  const plateArea = { x: 20, y: 20, width: 900, height: 560 };
+  const projection = fitProjection(EXTENT, plateArea);
   return {
     ctx: fakeContext(),
     view: DEFAULT_VIEW,
+    mode,
     battle: BATTLE,
     map,
     picture: PICTURE,
     unitsDrawn: unitsDrawn(ROSTER, PICTURE.units, 0),
     contourLevels: [],
+    plateArea,
     projection,
     colours: sideColours(BATTLE, DEFAULT_VIEW.palette),
     pixelsPerMetre: 900 / 71000,

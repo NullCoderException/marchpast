@@ -67,21 +67,24 @@ const readJson = (dir: string, file: string): unknown => {
 function shippedPlate(battleFile: string, view: (typeof VIEWS)[number]): Plate {
   const battle = readJson("battles", battleFile) as Battle;
   const map = readJson("maps", `${battle.map}.geojson`) as MapFile;
-  const projection = fitProjection(battle.extent, {
+  const plateArea = {
     x: PLATE_MARGIN,
     y: PLATE_MARGIN,
     width: 1280 - PLATE_MARGIN * 2,
     height: 640 - PLATE_MARGIN * 2,
-  });
+  };
+  const projection = fitProjection(battle.extent, plateArea);
   const picture = { units: [], wind: battle.phases[0]?.wind } as unknown as Picture;
   return {
     ctx: fakeContext(),
     view,
+    mode: "desktop",
     battle,
     map,
     picture,
     unitsDrawn: [],
     contourLevels: contourLevels(map),
+    plateArea,
     projection,
     colours: sideColours(battle, view.palette),
     pixelsPerMetre: 1 / projection.metresPerPixel((battle.extent.north + battle.extent.south) / 2),

@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import type { CardContent } from "./card.ts";
 import type { Measure } from "./content.ts";
 import { glyphBox, type LabelUnit, LABEL_GAP, smokeBox } from "./geometry.ts";
+import type { LayoutMode } from "../layout.ts";
 import { CARD_STEP, needsLeader, NO_LABEL_MEMORY, numeralKey, placeLabels, type Placed, type Slot } from "./place.ts";
 import { toRadians } from "../projection.ts";
 
@@ -32,7 +33,16 @@ function unit(over: Partial<LabelUnit> & Pick<LabelUnit, "id">): LabelUnit {
 }
 
 /** Places one frame from nothing, the common case in these tests. */
-function place(units: readonly LabelUnit[], over: { obstacles?: readonly { x: number; y: number; width: number; height: number }[]; plate?: typeof PLATE; memory?: ReadonlyMap<string, Slot>; card?: CardContent } = {}) {
+function place(
+  units: readonly LabelUnit[],
+  over: {
+    obstacles?: readonly { x: number; y: number; width: number; height: number }[];
+    plate?: typeof PLATE;
+    memory?: ReadonlyMap<string, Slot>;
+    card?: CardContent;
+    mode?: LayoutMode;
+  } = {},
+) {
   return placeLabels({
     units,
     plate: over.plate ?? PLATE,
@@ -40,6 +50,7 @@ function place(units: readonly LabelUnit[], over: { obstacles?: readonly { x: nu
     measure,
     memory: over.memory ?? NO_LABEL_MEMORY,
     card: over.card,
+    mode: over.mode ?? "desktop",
   });
 }
 
@@ -127,16 +138,61 @@ describe("the collapse order", () => {
   it("falls to the roster's short_label when the words will not fit", () => {
     const { placed } = place([unit({ id: "a", name: longName, shortLabel: "Van", anchor: { x: 110, y: 200 } })], { plate: NARROW });
     const label = byId(placed, "a");
-    expect(label.step).toBe(3);
+    expect(label.step).toBe(5);
     expect(label.name).toBe("Van");
   });
 
   it("skips that step for a unit the roster gave no short_label and goes straight to the numeral", () => {
     const { placed } = place([unit({ id: "a", name: longName, rosterIndex: 6, anchor: { x: 110, y: 200 } })], { plate: NARROW });
     const label = byId(placed, "a");
-    expect(label.step).toBe(4);
+    expect(label.step).toBe(6);
     expect(label.numeral).toBe(7);
     expect(label.name).toBe("7");
+  });
+
+  it("never spends the full label on a phone, however much room the plate has", () => {
+    const roomy = unit({ id: "a", name: longName, shortLabel: "Van", strength: 0.4, state: "broken" });
+    const { placed } = place([roomy], { mode: "phone" });
+    const label = byId(placed, "a");
+    // The phone floor: the short name, the state word, and no percentage.
+    expect(label.step).toBe(3);
+    expect(label.name).toBe("Van");
+    expect(label.detail).toBe("broken");
+  });
+
+  it("collapses onward from the phone floor to the state word, then the numeral", () => {
+    // "Van" measures 21px and "intact" beside it 36px, so a plate 60 wide has
+    // room for the short name and none for the state word; 44 has room for
+    // neither, and only the numeral is left.
+    const cramped = { x: 0, y: 0, width: 60, height: 400 };
+    const noRoom = { x: 0, y: 0, width: 44, height: 400 };
+    const wordy = unit({ id: "a", name: longName, shortLabel: "Van", rosterIndex: 6 });
+
+    const stateGone = byId(place([{ ...wordy, anchor: { x: 30, y: 200 } }], { plate: cramped, mode: "phone" }).placed, "a");
+    expect(stateGone.step).toBe(5);
+    expect(stateGone.name).toBe("Van");
+    expect(stateGone.detail).toBeUndefined();
+
+    const numeral = byId(place([{ ...wordy, anchor: { x: 22, y: 200 } }], { plate: noRoom, mode: "phone" }).placed, "a");
+    expect(numeral.step).toBe(6);
+    expect(numeral.name).toBe("7");
+  });
+
+  it("falls back to the full label at the phone floor when the roster gave no short_label", () => {
+    const { placed } = place([unit({ id: "a", name: "Van" })], { mode: "phone" });
+    expect(byId(placed, "a").name).toBe("Van");
+    expect(byId(placed, "a").step).toBe(3);
+  });
+
+  it("takes a label carried across a resize down to the new mode's floor, never above it", () => {
+    // A desktop frame settles the label at the top of the ladder; the next
+    // frame is a phone, and the same memory may not hold a step it cannot spend.
+    const only = unit({ id: "a", shortLabel: "Van" });
+    const { memory } = place([only]);
+    expect(memory.get("a")?.step).toBe(0);
+
+    const { placed } = place([only], { memory, mode: "phone" });
+    expect(byId(placed, "a").step).toBe(3);
   });
 });
 
@@ -231,6 +287,7 @@ describe("the sticky search", () => {
       obstacles: [],
       measure,
       memory: first.memory,
+      mode: "desktop",
     });
     const before = byId(first.placed, "a");
     const after = byId(second.placed, "a");
@@ -243,14 +300,14 @@ describe("the sticky search", () => {
     const only = [unit({ id: "a" })];
     const first = place(only);
     expect(first.memory.get("a")?.clean).toBe(0);
-    const second = placeLabels({ units: only, plate: PLATE, obstacles: [], measure, memory: first.memory });
+    const second = placeLabels({ units: only, plate: PLATE, obstacles: [], measure, memory: first.memory, mode: "desktop" });
     expect(second.memory.get("a")?.clean).toBe(1);
   });
 
   it("searches from the angle it had when its slot is taken, rather than restarting the ring", () => {
     const only = [unit({ id: "a" })];
     const held = new Map<string, Slot>([["a", { angle: toRadians(180), extra: 0, step: 1, clean: 0 }]]);
-    const first = placeLabels({ units: only, plate: PLATE, obstacles: [], measure, memory: held });
+    const first = placeLabels({ units: only, plate: PLATE, obstacles: [], measure, memory: held, mode: "desktop" });
     expect(first.memory.get("a")?.angle).toBeCloseTo(toRadians(180));
 
     const second = placeLabels({
@@ -259,6 +316,7 @@ describe("the sticky search", () => {
       obstacles: [byId(first.placed, "a").box],
       measure,
       memory: held,
+      mode: "desktop",
     });
     const now = second.memory.get("a")?.angle ?? 0;
     // One or two notches round the ring, not the far side of the unit.
@@ -269,12 +327,39 @@ describe("the sticky search", () => {
     const only = [unit({ id: "a" })];
     const held: Slot = { angle: toRadians(90), extra: 0, step: 2, clean: 29 };
 
-    const early = placeLabels({ units: only, plate: PLATE, obstacles: [], measure, memory: new Map([["a", held]]) });
+    const early = placeLabels({ units: only, plate: PLATE, obstacles: [], measure, memory: new Map([["a", held]]), mode: "desktop" });
     expect(byId(early.placed, "a").step).toBe(2);
     expect(early.memory.get("a")?.clean).toBe(30);
 
-    const due = placeLabels({ units: only, plate: PLATE, obstacles: [], measure, memory: new Map([["a", { ...held, clean: 30 }]]) });
+    const due = placeLabels({ units: only, plate: PLATE, obstacles: [], measure, memory: new Map([["a", { ...held, clean: 30 }]]), mode: "desktop" });
     expect(byId(due.placed, "a").step).toBe(1);
+  });
+
+  it("climbs one rung of its own mode's ladder, over the rungs only the other mode spends", () => {
+    // A desktop label sitting on the bare short_label recovers to the full
+    // name without its state word — never to the phone floor between them,
+    // which a desktop cannot spend and which would leave it stuck for good.
+    const only = [unit({ id: "a", name: "Van", shortLabel: "Van" })];
+    const held: Slot = { angle: toRadians(90), extra: 0, step: 5, clean: 30 };
+    const due = place(only, { memory: new Map([["a", held]]) });
+    expect(byId(due.placed, "a").step).toBe(2);
+  });
+
+  it("climbs a phone label from the bare short name back to its state word", () => {
+    const only = [unit({ id: "a", name: "Van", shortLabel: "Van" })];
+    const held: Slot = { angle: toRadians(90), extra: 0, step: 5, clean: 30 };
+    const due = place(only, { memory: new Map([["a", held]]), mode: "phone" });
+    // The rung above the bare short name on a phone is its displacement, and
+    // the one above that the floor: one rung at a time, thirty frames apart.
+    expect(byId(due.placed, "a").step).toBe(4);
+  });
+
+  it("never climbs a phone label above its own floor, however long it has been clean", () => {
+    const only = [unit({ id: "a", name: "Weather column", shortLabel: "Weather" })];
+    const held: Slot = { angle: toRadians(90), extra: 0, step: 3, clean: 300 };
+    const due = place(only, { memory: new Map([["a", held]]), mode: "phone" });
+    expect(byId(due.placed, "a").step).toBe(3);
+    expect(byId(due.placed, "a").name).toBe("Weather");
   });
 
   it("makes a recovered label earn the next step over again", () => {
@@ -285,6 +370,7 @@ describe("the sticky search", () => {
       obstacles: [],
       measure,
       memory: new Map([["a", { angle: toRadians(90), extra: 0, step: 2, clean: 30 }]]),
+      mode: "desktop",
     });
     expect(due.memory.get("a")?.clean).toBe(0);
   });
@@ -293,7 +379,7 @@ describe("the sticky search", () => {
     // Switching level narrows what is drawn; a unit that comes back should
     // come back where it was, so its slot must survive the frames it was off.
     const both = place([unit({ id: "a" }), unit({ id: "b", rosterIndex: 1, anchor: { x: 600, y: 300 } })]);
-    const narrowed = placeLabels({ units: [unit({ id: "a" })], plate: PLATE, obstacles: [], measure, memory: both.memory });
+    const narrowed = placeLabels({ units: [unit({ id: "a" })], plate: PLATE, obstacles: [], measure, memory: both.memory, mode: "desktop" });
     expect([...narrowed.memory.keys()].sort()).toEqual(["a", "b"]);
     expect(narrowed.memory.get("b")).toEqual(both.memory.get("b"));
   });

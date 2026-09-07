@@ -15,6 +15,7 @@ import { layoutUnits } from "./drawUnits.ts";
 import { furnitureBoxes } from "./drawFurniture.ts";
 import { glyphBox, type LabelUnit } from "./labels/index.ts";
 import { unitsDrawn } from "./level.ts";
+import type { LayoutMode } from "./layout.ts";
 import type { Plate } from "./plate.ts";
 import { fitProjection, type Rect } from "./projection.ts";
 import { GLYPH_PX, sideColours } from "./style.ts";
@@ -72,16 +73,19 @@ const BATTLE = {
   levels: ["Columns", "Squadrons"],
 } as unknown as Battle;
 
-function plate(over: { level?: number; map?: MapFile; view?: typeof DEFAULT_VIEW } = {}): Plate {
+function plate(over: { level?: number; map?: MapFile; view?: typeof DEFAULT_VIEW; mode?: LayoutMode } = {}): Plate {
   const view = over.view ?? DEFAULT_VIEW;
-  const projection = fitProjection(EXTENT, { x: 20, y: 20, width: 900, height: 560 });
+  const plateArea = { x: 20, y: 20, width: 900, height: 560 };
+  const projection = fitProjection(EXTENT, plateArea);
   return {
     ctx: fakeContext(),
     view,
+    mode: over.mode ?? "desktop",
     battle: BATTLE,
     map: over.map,
     picture: PICTURE,
     unitsDrawn: unitsDrawn(ROSTER, PICTURE.units, over.level ?? 0),
+    plateArea,
     projection,
     colours: sideColours(BATTLE, view.palette),
     contourLevels: [],

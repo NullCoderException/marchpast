@@ -134,7 +134,10 @@
   color: inherit;
 }
 
-@media (max-width: 520px) {
+/* A phone: PHONE_MAX_WIDTH from src/render/layout.ts, the same threshold
+   the plate collapses at, copied rather than published (#86). The list is
+   one column at every width, so only its margins give. */
+@media (max-width: 560px) {
   .st-library {
     padding: 32px 16px 28px;
   }

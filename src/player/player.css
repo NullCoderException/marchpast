@@ -133,6 +133,44 @@
   font-variant-numeric: tabular-nums;
 }
 
+/*
+ * The plate's key, which a phone's Details panel carries because the plate's
+ * legend has thinned to its line of sides (#86). Each row is a sample drawn on
+ * its own little canvas, in the view the plate is being drawn in, beside the
+ * word it teaches. Hidden outright on a desktop, where the legend has it all.
+ */
+.st-key {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  /* Two columns at 390px: eleven rows down one column would push the sources
+     table off the bottom of the panel's own scroll. */
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px 12px;
+}
+
+.st-key-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.st-key-sample {
+  flex: none;
+  display: block;
+}
+
+.st-key-word {
+  font-size: 13px;
+}
+
+.st-key-credit {
+  margin: 10px 0 0;
+  font-size: 11px;
+  font-style: italic;
+}
+
 /* The details panel: a column of prose above the sources table. */
 .st-details {
   max-height: 40vh;
@@ -222,14 +260,25 @@
   color: inherit;
 }
 
-/* A phone: the same controls, in the room a phone has. The strip wraps by
-   itself; this only stops the padding and gaps from spending width the
-   buttons need, and keeps the wrapped strip shallow enough that the plate
-   above it still has a picture's worth of height. */
-@media (max-width: 520px) {
+/* A phone: the same controls, in the room a phone has. The threshold is
+   PHONE_MAX_WIDTH from src/render/layout.ts, copied rather than published, as
+   the colours above are copied from views.ts: it is the one width the plate,
+   the band and the strip all collapse at (#86).
+
+   The strip wraps by itself; this only stops the padding and gaps from
+   spending width the buttons need, and keeps the wrapped strip shallow enough
+   that the plate above it still has a picture's worth of height. */
+@media (max-width: 560px) {
   .st-controls {
     gap: 8px;
     padding: 8px 10px;
+  }
+
+  /* Every control is a 36px target, which is what a finger needs and a mouse
+     does not: the type stays the size it is and the room around it grows. */
+  .st-controls button,
+  .st-controls select {
+    min-height: 36px;
   }
 
   /* The scrubber takes a line of its own rather than a squeezed tail of one;
@@ -237,6 +286,24 @@
      it would put the visual order out of step with the tab order. */
   .st-bar {
     flex-basis: 100%;
+    height: 24px;
+  }
+
+  /* A tick is aimed at with a finger too: the mark it draws is the same
+     hairline, and only its hit area grows to the 36px the buttons take. */
+  .st-tick {
+    top: -6px;
+    width: 15px;
+    height: 36px;
+    margin-left: -7px;
+  }
+
+  .st-tick::after {
+    left: 7px;
+  }
+
+  .st-tick:hover::after {
+    left: 6px;
   }
 
   /* Every button keeps its full hit area; only the room they reserve beyond
@@ -253,5 +320,42 @@
 
   .st-details {
     padding: 12px;
+  }
+
+  /* A four-column table has no room at 390px: the "read it at" column alone
+     breaks a url mid-word and the licence is a stack of single letters. Each
+     source becomes a small block instead — the same fields down the page
+     rather than across it, which is what the headings were there to name. */
+  .st-sources,
+  .st-sources tbody,
+  .st-sources tr,
+  .st-sources td {
+    display: block;
+    width: 100%;
+  }
+
+  .st-sources thead {
+    display: none;
+  }
+
+  .st-sources tr {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(43, 36, 24, 0.2);
+  }
+
+  .st-sources td {
+    padding: 0;
+    border: 0;
+  }
+
+  /* Break a long url where it must and nowhere else, rather than everywhere. */
+  .st-source-url {
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  .st-source-license {
+    font-size: 12px;
+    font-style: italic;
   }
 }

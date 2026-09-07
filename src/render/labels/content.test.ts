@@ -5,6 +5,7 @@
 import { describe, expect, it } from "vitest";
 import { contentAt, contentWidth, labelBox, LAST_STEP, type Measure, nearEdgeSetback } from "./content.ts";
 import type { LabelUnit } from "./geometry.ts";
+import { labelFloor } from "../layout.ts";
 import { toRadians } from "../projection.ts";
 
 function unit(over: Partial<LabelUnit> = {}): LabelUnit {
@@ -28,37 +29,76 @@ function unit(over: Partial<LabelUnit> = {}): LabelUnit {
 /** A measurer with no canvas: every glyph a half of its point size wide. */
 const measure: Measure = (text, size) => text.length * size * 0.5;
 
-describe("contentAt", () => {
+describe("contentAt on a desktop", () => {
   it("shows the name and the state word at full strength", () => {
-    expect(contentAt(unit(), 0)).toEqual({ name: "Weather column", detail: "engaged" });
+    expect(contentAt(unit(), 0, "desktop")).toEqual({ name: "Weather column", detail: "engaged" });
   });
 
   it("adds the percentage below full strength", () => {
-    expect(contentAt(unit({ strength: 0.62 }), 0)).toEqual({ name: "Weather column", detail: "engaged · 62%" });
+    expect(contentAt(unit({ strength: 0.62 }), 0, "desktop")).toEqual({ name: "Weather column", detail: "engaged · 62%" });
   });
 
   it("says the same thing displaced as it does in place", () => {
-    expect(contentAt(unit({ strength: 0.5 }), 1)).toEqual(contentAt(unit({ strength: 0.5 }), 0));
+    expect(contentAt(unit({ strength: 0.5 }), 1, "desktop")).toEqual(contentAt(unit({ strength: 0.5 }), 0, "desktop"));
   });
 
   it("drops the state word and the percentage together at step 2", () => {
-    expect(contentAt(unit({ strength: 0.5 }), 2)).toEqual({ name: "Weather column" });
+    expect(contentAt(unit({ strength: 0.5 }), 2, "desktop")).toEqual({ name: "Weather column" });
   });
 
-  it("takes the roster's short_label at step 3", () => {
-    expect(contentAt(unit({ shortLabel: "Weather" }), 3)).toEqual({ name: "Weather" });
+  it("skips the phone floor, so its own order is unchanged by the phone's", () => {
+    expect(contentAt(unit({ shortLabel: "Weather" }), 3, "desktop")).toBeUndefined();
+    expect(contentAt(unit({ shortLabel: "Weather" }), 4, "desktop")).toBeUndefined();
   });
 
-  it("skips step 3 for a unit the roster gave no short_label", () => {
-    expect(contentAt(unit(), 3)).toBeUndefined();
+  it("takes the roster's short_label at the short-name step", () => {
+    expect(contentAt(unit({ shortLabel: "Weather" }), 5, "desktop")).toEqual({ name: "Weather" });
+  });
+
+  it("skips the short-name step for a unit the roster gave no short_label", () => {
+    expect(contentAt(unit(), 5, "desktop")).toBeUndefined();
   });
 
   it("keys the unit by its roster numeral at the last step", () => {
-    expect(contentAt(unit(), LAST_STEP)).toEqual({ name: "4", numeral: 4 });
+    expect(contentAt(unit(), LAST_STEP, "desktop")).toEqual({ name: "4", numeral: 4 });
   });
 
   it("numbers from one, so the first roster entry is 1 and not 0", () => {
-    expect(contentAt(unit({ rosterIndex: 0 }), LAST_STEP)).toEqual({ name: "1", numeral: 1 });
+    expect(contentAt(unit({ rosterIndex: 0 }), LAST_STEP, "desktop")).toEqual({ name: "1", numeral: 1 });
+  });
+});
+
+describe("contentAt on a phone", () => {
+  const floor = labelFloor("phone");
+
+  it("never spends the full label: every step above the floor says nothing", () => {
+    for (const step of [0, 1, 2]) expect(contentAt(unit({ shortLabel: "Weather" }), step, "phone")).toBeUndefined();
+  });
+
+  it("starts at the short name with the state word kept", () => {
+    expect(contentAt(unit({ shortLabel: "Weather" }), floor, "phone")).toEqual({ name: "Weather", detail: "engaged" });
+  });
+
+  it("drops the percentage at the floor, which the desktop's own first step keeps", () => {
+    const worn = unit({ shortLabel: "Weather", strength: 0.62 });
+    expect(contentAt(worn, floor, "phone")).toEqual({ name: "Weather", detail: "engaged" });
+    expect(contentAt(worn, 0, "desktop")).toEqual({ name: "Weather column", detail: "engaged · 62%" });
+  });
+
+  it("falls back to the full label for a unit with no short_label, rather than skipping the floor", () => {
+    expect(contentAt(unit(), floor, "phone")).toEqual({ name: "Weather column", detail: "engaged" });
+  });
+
+  it("says the same thing displaced as it does in place", () => {
+    expect(contentAt(unit({ shortLabel: "Weather" }), floor + 1, "phone")).toEqual(contentAt(unit({ shortLabel: "Weather" }), floor, "phone"));
+  });
+
+  it("gives up the state word next, and never the percentage it never showed", () => {
+    expect(contentAt(unit({ shortLabel: "Weather", strength: 0.5 }), 5, "phone")).toEqual({ name: "Weather" });
+  });
+
+  it("keys the unit by its roster numeral at the last step, as a desktop does", () => {
+    expect(contentAt(unit(), LAST_STEP, "phone")).toEqual({ name: "4", numeral: 4 });
   });
 });
 

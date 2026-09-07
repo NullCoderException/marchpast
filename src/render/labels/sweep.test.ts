@@ -125,7 +125,7 @@ function sweep(units: readonly LabelUnit[], frames: number) {
   for (let f = 0; f < frames; f++) {
     const now = frame(units, f / (frames - 1));
     const hard = [...FURNITURE, ...now.map(glyphBox)];
-    const { placed, memory: after } = placeLabels({ units: now, plate: PLATE, obstacles: FURNITURE, measure, memory });
+    const { placed, memory: after } = placeLabels({ units: now, plate: PLATE, obstacles: FURNITURE, measure, memory, mode: "desktop" });
 
     overlap += residualOverlap(placed, hard);
     for (const label of placed) {
