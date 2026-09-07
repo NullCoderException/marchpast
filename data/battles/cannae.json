@@ -1,0 +1,428 @@
+{
+  "schema_version": 2,
+  "title": "The Battle of Cannae",
+  "summary": "Hannibal lets his centre give ground until the Roman army has walked into a bag, then closes his Libyans and his cavalry round it and annihilates the largest army Rome ever put in the field.",
+  "dates": ["2 August 216 BC"],
+  "sort_date": { "year": -216, "month": 8, "day": 2 },
+  "extent": { "north": 41.38, "south": 41.25, "east": 16.3, "west": 16.05 },
+  "scale_unit": "km",
+  "map": "cannae",
+  "end": "17:00",
+  "license": "CC-BY-4.0",
+  "attribution": "Sandtable contributors, CC BY 4.0. Positions and captions authored from the public-domain sources listed in the file.",
+  "sources": {
+    "polybius-shuckburgh": {
+      "label": "Polybius",
+      "work": "Polybius, The Histories, III.107-117, trans. Evelyn S. Shuckburgh, vol. I (London: Macmillan, 1889), Project Gutenberg ebook #44125",
+      "url": "https://www.gutenberg.org/ebooks/44125",
+      "license": "public-domain",
+      "license_note": "Project Gutenberg header: public domain in the USA; the translator died in 1906. Quotes are taken verbatim from the Gutenberg plain text of Shuckburgh, curly apostrophes and all."
+    },
+    "livy-spillan": {
+      "label": "Livy",
+      "work": "Livy, The History of Rome, XXII.43-50, trans. D. Spillan and Cyrus Edmonds, books 9 to 26 (London: Henry G. Bohn, 1849-50), Project Gutenberg ebook #10907",
+      "url": "https://www.gutenberg.org/ebooks/10907",
+      "license": "public-domain",
+      "license_note": "Project Gutenberg header: public domain in the USA; the Bohn translation is of 1849-50 and its translators are long dead."
+    },
+    "usma-cannae-1": {
+      "label": "USMA plan: the Roman attack",
+      "work": "Battle of Cannae, 216 BC: initial Roman attack, Department of History, United States Military Academy, cartographer Frank Martini; SVG by Hogweard",
+      "url": "https://commons.wikimedia.org/wiki/File:Battle_of_Cannae,_215_BC_-_Initial_Roman_attack.svg",
+      "license": "public-domain",
+      "license_note": "A work of the United States federal government, 17 USC 105; Wikimedia Commons PD Mark 1.0. The Academy asks for the credit 'The Department of History, United States Military Academy'. The file name says 215 and the description 216."
+    },
+    "usma-cannae-2": {
+      "label": "USMA plan: the destruction",
+      "work": "Battle of Cannae: destruction of the Roman army, Department of History, United States Military Academy, cartographer Frank Martini; SVG by Hogweard",
+      "url": "https://commons.wikimedia.org/wiki/File:Battle_cannae_destruction.svg",
+      "license": "public-domain",
+      "license_note": "Same origin and terms as usma-cannae-1: a United States federal work, 17 USC 105, credited to 'The Department of History, United States Military Academy'."
+    }
+  },
+  "units": [
+    { "id": "roman-cavalry", "side": "Roman", "label": "Roman cavalry", "short_label": "Roman horse", "commander": "Paullus", "arm": "cavalry" },
+    { "id": "roman-infantry", "side": "Roman", "label": "Roman and allied infantry", "short_label": "The legions", "commander": "Servilius", "arm": "infantry" },
+    { "id": "allied-cavalry", "side": "Roman", "label": "Allied cavalry", "short_label": "Allied horse", "commander": "Varro", "arm": "cavalry" },
+    { "id": "hasdrubal-cavalry", "side": "Carthaginian", "label": "Spanish and Gallic cavalry", "short_label": "Hasdrubal's horse", "commander": "Hasdrubal", "arm": "cavalry" },
+    { "id": "libyans-left", "side": "Carthaginian", "label": "Libyan foot (river flank)", "short_label": "Libyans (river)", "commander": "Hannibal", "arm": "infantry" },
+    { "id": "spanish-gallic-centre", "side": "Carthaginian", "label": "Spanish and Gallic foot", "short_label": "The centre", "commander": "Hannibal", "arm": "infantry" },
+    { "id": "libyans-right", "side": "Carthaginian", "label": "Libyan foot (open flank)", "short_label": "Libyans (open)", "commander": "Hannibal", "arm": "infantry" },
+    { "id": "numidians", "side": "Carthaginian", "label": "Numidian horse", "short_label": "Numidians", "commander": "Hanno", "arm": "cavalry" }
+  ],
+  "phases": [
+    {
+      "id": "first-light-crossing",
+      "label": "First light: Varro leads the army over the river",
+      "t": "05:00",
+      "playback_rate": 900,
+      "wind": { "from": 135, "force": "fresh" },
+      "caption": "On his day of command Varro gives the signal as soon as the sun is above the horizon and leads the army out of both camps and over the ford; Paullus, who had argued against fighting on this ground, follows rather than withhold his help. Hannibal's army is still in camp on the far bank. The river drawn here is the modern Ofanto: nobody knows what channel the Aufidus took in 216 BC, and every position in this playback is laid on the modern line.",
+      "notes": "Time: an estimate. Sunrise is the only instant either source fixes (Polybius III.113, Livy XXII.45); everything after it is sequence, so this t is the author's reading of the order of events and the distances, to the half-hour and no finer. Sunrise at 41.3 N on the solar date behind the Roman civil 2 August is about 05:00, which is the author's computation and not a figure in either source. Positions: Kromayer's right-bank reading, the battle downstream of the hill of Cannae with the Romans facing south and the river on their right hand, laid on the modern Ofanto because the channel of 216 BC is unknown. Delbruck, Lehmann and De Sanctis put the battle on the left bank and Connolly on a narrower plain north of the hill; either would move every marker in this file. The three camps on the map are the author's geometry from Polybius III.110-112: the larger Roman camp at the ford on the left bank, the smaller about ten stades from its lines on the right bank 'to the east of the ford', and Hannibal's camp upstream on the same bank as the larger Roman camp. None of the three has a source coordinate. This is the only phase in which a heading is a course rather than a front: the Romans are crossing and marching down the right bank, the Carthaginians are drawn up by their camp facing the crossing, and nobody is deployed yet, which is why every unit is in column. From phase 2 the sources fix the Roman front to the south and the Carthaginian to the north. Wind: Livy alone gives it (XXII.43 and 46, the Volturnus blowing violently into Roman faces) and Polybius says nothing about wind at Cannae; it holds from the south-east and blowing hard on every phase, because nothing in either source shifts it.",
+      "references": [
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 113, opening sentence",
+          "quote": "When he took over the command on the following day, as soon as the sun was above the horizon, Gaius Terentius got the army in motion from both the camps."
+        },
+        {
+          "source": "livy-spillan",
+          "locator": "book XXII, chapter 45",
+          "quote": "displayed the signal for battle, and forming his troops, led them across the river"
+        },
+        {
+          "source": "livy-spillan",
+          "locator": "book XXII, chapter 45, on Paullus",
+          "quote": "Paulus followed, because he could better disapprove of the proceeding, than withhold his assistance."
+        }
+      ],
+      "units": [
+        { "id": "roman-cavalry", "position": { "lat": 41.3074, "lon": 16.1371 }, "heading": 110, "formation": "column", "state": "intact" },
+        { "id": "roman-infantry", "position": { "lat": 41.3099, "lon": 16.1281 }, "heading": 110, "formation": "column", "state": "intact" },
+        { "id": "allied-cavalry", "position": { "lat": 41.3124, "lon": 16.1191 }, "heading": 110, "formation": "column", "state": "intact" },
+        { "id": "hasdrubal-cavalry", "position": { "lat": 41.3099, "lon": 16.1121 }, "heading": 50, "formation": "column", "state": "intact" },
+        { "id": "libyans-left", "position": { "lat": 41.3047, "lon": 16.1038 }, "heading": 50, "formation": "column", "state": "intact" },
+        { "id": "spanish-gallic-centre", "position": { "lat": 41.2995, "lon": 16.0956 }, "heading": 50, "formation": "column", "state": "intact" },
+        { "id": "libyans-right", "position": { "lat": 41.2943, "lon": 16.0874 }, "heading": 50, "formation": "column", "state": "intact" },
+        { "id": "numidians", "position": { "lat": 41.2891, "lon": 16.0791 }, "heading": 50, "formation": "column", "state": "intact" }
+      ]
+    },
+    {
+      "id": "both-armies-formed",
+      "label": "Both armies formed, the Romans facing south",
+      "t": "07:30",
+      "playback_rate": 300,
+      "wind": { "from": 135, "force": "fresh" },
+      "caption": "Both armies are over and drawn up on a front of some four kilometres. The Romans face south: the citizen horse on the right against the river, the allied horse on the left, and between them the foot with its maniples closer together than usual and each of them several times deeper than its front. Hannibal faces north, his Spanish and Gallic horse on the left close to the river and the Numidians on the right. He has pushed his Spanish and Gallic foot forward until the whole line is crescent-shaped, thinning towards the wings, and held half the Libyans back on either flank as a reserve. The rising sun troubles neither army; the wind the country calls the Volturnus rolls the dust into Roman faces.",
+      "notes": "Time: an estimate. Sunrise is the only instant either source fixes (Polybius III.113, Livy XXII.45); everything after it is sequence, so this t is the author's reading of the order of events and the distances, to the half-hour and no finer. Two to three hours to pass some seventy-six thousand men over a ford and dress a line is a guess, and Livy has the sun still oblique on both lines (XXII.46), so it is still morning. Positions: Kromayer's right-bank reading, the battle downstream of the hill of Cannae with the Romans facing south and the river on their right hand, laid on the modern Ofanto because the channel of 216 BC is unknown. The Roman right is set 350 metres off the drawn bank and the Carthaginian line 1.1 kilometres in front of the Roman one; because the river runs east-north-east while the lines run east-south-east, Hasdrubal's wing ends about 1.2 kilometres from the bank where the Roman horse is a third of that. That divergence is the geometry of the two bearings, not a reading of the sources, which put both wings on the river. The Roman foot is drawn as a body in ranks from here on, the nearest this file comes to Polybius's maniples several times deeper than their front; the crescent, Livy's wedge and the hollow it becomes in phase 5 are caption words, and the bow is drawn by setting the centre 350 metres in front of the two Libyan halves. Wind: the Volturnus in the caption is Livy's (XXII.46), and Polybius says nothing about wind at Cannae. Commanders: Polybius gives the Carthaginian right to Hanno and Livy to Maharbal, and Polybius puts Atilius in the Roman centre beside Servilius; the roster follows Polybius throughout. The modern splits of either army into Libyans, Spaniards, Gauls and Numidians by thousands are reconstructions rather than source figures and are not used here.",
+      "references": [
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 113, the Roman order of battle",
+          "quote": "The Roman horse he stationed on the right wing along the river, and their foot next them in the same line, placing the maniples, however, closer together than usual, and making the depth of each maniple several times greater than its front"
+        },
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 113, the allied horse",
+          "quote": "The cavalry of the allies he stationed on the left wing"
+        },
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 113, the Carthaginian left",
+          "quote": "On his left wing, close to the river, he stationed the Iberian and Celtic horse"
+        },
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 113, the crescent",
+          "quote": "the whole line became crescent-shaped, diminishing in depth towards its extremities"
+        },
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 113, the Libyans as a reserve",
+          "quote": "his object being to have his Libyans as a reserve in the battle, and to commence the action with his Iberians and Celts."
+        },
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 114, the aspect of the lines",
+          "quote": "And as the Roman line faced the south, as I said before, and the Carthaginian the north, the rays of the rising sun did not inconvenience either of them."
+        },
+        {
+          "source": "livy-spillan",
+          "locator": "book XXII, chapter 46, the Volturnus",
+          "quote": "The wind, which the inhabitants of the district call the Vulturnus, blowing violently in front of the Romans, prevented their seeing far by rolling clouds of dust into their faces."
+        },
+        {
+          "source": "livy-spillan",
+          "locator": "book XXII, chapter 47, the wedge",
+          "quote": "that part of the enemy's line in the form of a wedge"
+        },
+        {
+          "source": "usma-cannae-1",
+          "locator": "the deployment panel: both lines, the river on the Roman right"
+        }
+      ],
+      "units": [
+        { "id": "roman-cavalry", "position": { "lat": 41.319, "lon": 16.1776 }, "heading": 200, "formation": "line", "state": "intact" },
+        { "id": "roman-infantry", "position": { "lat": 41.3128, "lon": 16.2001 }, "heading": 200, "formation": "mass", "state": "intact" },
+        { "id": "allied-cavalry", "position": { "lat": 41.3067, "lon": 16.2226 }, "heading": 200, "formation": "line", "state": "intact" },
+        { "id": "hasdrubal-cavalry", "position": { "lat": 41.3097, "lon": 16.1731 }, "heading": 20, "formation": "line", "state": "intact" },
+        { "id": "libyans-left", "position": { "lat": 41.3065, "lon": 16.1849 }, "heading": 20, "formation": "line", "state": "intact" },
+        { "id": "spanish-gallic-centre", "position": { "lat": 41.3065, "lon": 16.197 }, "heading": 20, "formation": "line", "state": "intact" },
+        { "id": "libyans-right", "position": { "lat": 41.3006, "lon": 16.2063 }, "heading": 20, "formation": "line", "state": "intact" },
+        { "id": "numidians", "position": { "lat": 41.2974, "lon": 16.2181 }, "heading": 20, "formation": "line", "state": "intact" }
+      ]
+    },
+    {
+      "id": "light-troops-and-cavalry-clash",
+      "label": "Skirmishers open; the cavalry close on the river",
+      "t": "08:30",
+      "playback_rate": 120,
+      "wind": { "from": 135, "force": "fresh" },
+      "caption": "The light troops of both armies begin it. Then the Spanish and Gallic horse close with the Roman horse by the river, and it is no cavalry action at all: with the river on one hand and their own foot on the other there is no room to wheel, so the two bodies grapple man to man and come off their horses to fight on foot. On the far wing the Numidians ride at the allied horse first on one side and then on another without closing, and the fight there stays languid.",
+      "notes": "Time: an estimate. Sunrise is the only instant either source fixes (Polybius III.113, Livy XXII.45); everything after it is sequence, so this t is the author's reading of the order of events and the distances, to the half-hour and no finer. Neither source gives a figure; both give the order, the skirmishers first and then the cavalry on the river (Polybius III.115, Livy XXII.47). Positions: Kromayer's right-bank reading, the battle downstream of the hill of Cannae with the Romans facing south and the river on their right hand, laid on the modern Ofanto because the channel of 216 BC is unknown. The Roman foot is still intact because the velites in front of it are skirmishing and the legions have not closed; the two cavalry wings and the Numidians are engaged. Livy's five hundred Numidian false deserters are taken into the Roman line about now. They are caption matter for phase 5 and not a unit of their own, because no source has them act apart from the wing this file already rosters.",
+      "references": [
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 115, the cavalry on the river",
+          "quote": "as soon as the Iberian and Celtic cavalry got at the Romans, the battle began in earnest, and in the true barbaric fashion: for there was none of the usual formal advance and retreat; but when they once got to close quarters, they grappled man to man, and, dismounting from their horses, fought on foot."
+        },
+        {
+          "source": "livy-spillan",
+          "locator": "book XXII, chapter 47, no room at their flanks",
+          "quote": "for they were obliged to engage front to front; for as on one side the river, on the other the line of infantry hemmed them in, there was no space left at their flanks for evolution"
+        },
+        {
+          "source": "livy-spillan",
+          "locator": "book XXII, chapter 48, the false deserters",
+          "quote": "five hundred Numidians"
+        }
+      ],
+      "units": [
+        { "id": "roman-cavalry", "position": { "lat": 41.3152, "lon": 16.1758 }, "heading": 200, "formation": "line", "state": "engaged" },
+        { "id": "roman-infantry", "position": { "lat": 41.3116, "lon": 16.1995 }, "heading": 200, "formation": "mass", "state": "intact" },
+        { "id": "allied-cavalry", "position": { "lat": 41.3042, "lon": 16.2213 }, "heading": 200, "formation": "line", "state": "engaged" },
+        { "id": "hasdrubal-cavalry", "position": { "lat": 41.3135, "lon": 16.1749 }, "heading": 20, "formation": "line", "state": "engaged" },
+        { "id": "libyans-left", "position": { "lat": 41.3065, "lon": 16.1849 }, "heading": 20, "formation": "line", "state": "intact" },
+        { "id": "spanish-gallic-centre", "position": { "lat": 41.3069, "lon": 16.1972 }, "heading": 20, "formation": "line", "state": "intact" },
+        { "id": "libyans-right", "position": { "lat": 41.3006, "lon": 16.2063 }, "heading": 20, "formation": "line", "state": "intact" },
+        { "id": "numidians", "position": { "lat": 41.2999, "lon": 16.2193 }, "heading": 20, "formation": "line", "state": "engaged" }
+      ]
+    },
+    {
+      "id": "roman-cavalry-destroyed",
+      "label": "Hasdrubal breaks the Roman horse; the lines of foot meet",
+      "t": "09:00",
+      "playback_rate": 120,
+      "wind": { "from": 135, "force": "fresh" },
+      "caption": "The fight on the river is more violent than lasting. The Carthaginians get the upper hand, kill most of their opponents where they stand and chase the remainder along the bank, giving no quarter; Paullus, hit early by a sling stone, leaves the wing for the centre. As that ends the legionaries take the place of the light-armed and close with the Spanish and Gallic foot, which for a short time stands its ground and fights well. The Libyans on either flank are not yet in the action.",
+      "notes": "Time: an estimate. Sunrise is the only instant either source fixes (Polybius III.113, Livy XXII.45); everything after it is sequence, so this t is the author's reading of the order of events and the distances, to the half-hour and no finer. Livy calls the cavalry fight short and puts the meeting of the two lines of foot at its close (XXII.47), which is why this phase is half an hour after the last. Positions: Kromayer's right-bank reading, the battle downstream of the hill of Cannae with the Romans facing south and the river on their right hand, laid on the modern Ofanto because the channel of 216 BC is unknown. Which way the broken Roman horse was driven is the author's: both sources say only 'along the river'. It is drawn downstream, north-east towards the mouth, because men driven into the angle between the river and the sea are men who do not get away, which fits Polybius III.117's seventy survivors out of six thousand horse; driving them upstream past their own camps is the other honest reading. Its front swings only from 200 to 250, because Polybius has the Romans maintaining the fight 'with spirit and determination', so the wing is drawn still facing the pursuers coming up the bank behind it rather than with its back turned. Strength: the Roman horse steps to 0.2 because it has ceased to act as one body, not because four in five of its men are dead. No fraction is invented for the Roman foot, which stays whole until it breaks in phase 7, because neither source counts its losses as they mount.",
+      "references": [
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 115, the chase along the river",
+          "quote": "and began chasing the remainder along the river, slaying as they went and giving no quarter; then the legionaries took the place of the light-armed and closed with the enemy."
+        },
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 115, the Celts hold",
+          "quote": "For a short time the Iberian and Celtic lines stood their ground and fought gallantly"
+        },
+        {
+          "source": "livy-spillan",
+          "locator": "book XXII, chapter 47, the end of the cavalry fight",
+          "quote": "The battle, however, was more violent than lasting; and the Roman cavalry being repulsed, turn their backs. About the conclusion of the contest between the cavalry, the battle between the infantry commenced."
+        }
+      ],
+      "units": [
+        { "id": "roman-cavalry", "position": { "lat": 41.3309, "lon": 16.1974 }, "heading": 250, "formation": "line", "state": "broken", "strength": 0.2 },
+        { "id": "roman-infantry", "position": { "lat": 41.3082, "lon": 16.1978 }, "heading": 200, "formation": "mass", "state": "engaged" },
+        { "id": "allied-cavalry", "position": { "lat": 41.3037, "lon": 16.2211 }, "heading": 200, "formation": "line", "state": "engaged" },
+        { "id": "hasdrubal-cavalry", "position": { "lat": 41.3257, "lon": 16.1923 }, "heading": 71, "formation": "line", "state": "engaged" },
+        { "id": "libyans-left", "position": { "lat": 41.3065, "lon": 16.1849 }, "heading": 20, "formation": "line", "state": "intact" },
+        { "id": "spanish-gallic-centre", "position": { "lat": 41.3052, "lon": 16.1964 }, "heading": 20, "formation": "line", "state": "engaged" },
+        { "id": "libyans-right", "position": { "lat": 41.3006, "lon": 16.2063 }, "heading": 20, "formation": "line", "state": "intact" },
+        { "id": "numidians", "position": { "lat": 41.3003, "lon": 16.2195 }, "heading": 20, "formation": "line", "state": "engaged" }
+      ]
+    },
+    {
+      "id": "centre-gives-ground",
+      "label": "The centre gives ground; the crescent turns concave",
+      "t": "09:30",
+      "playback_rate": 180,
+      "wind": { "from": 135, "force": "fresh" },
+      "caption": "The Roman maniples cut their way into the thin Celtic line, closing up from the wings towards the centre and the point of danger, and the Spanish and Gallic foot, overpowered by the weight of the heavy-armed lines, gives way and retires, so that the bow of the crescent becomes a hollow. This is what Hannibal planned. As the Romans crowd into the gap the Libyans on both flanks face inward, those on the right to their left and those on the left to their right, and charge the Roman flanks; behind the Roman line the five hundred Numidians who came in as deserters snatch up shields from among the slain and fall on their backs. Hasdrubal, having all but annihilated the horse by the river, leaves it and rides round the Roman rear for the far wing.",
+      "notes": "Time: an estimate. Sunrise is the only instant either source fixes (Polybius III.113, Livy XXII.45); everything after it is sequence, so this t is the author's reading of the order of events and the distances, to the half-hour and no finer. Livy's 'after long and repeated efforts' (XXII.47) makes this the longest push of the morning, and it is given the longest interval of the fighting: an hour. Positions: Kromayer's right-bank reading, the battle downstream of the hill of Cannae with the Romans facing south and the river on their right hand, laid on the modern Ofanto because the channel of 216 BC is unknown. The feigned withdrawal is the centre's own movement and a caption, never an arrow, and the centre keeps its front towards the Romans while it retires, so its track runs out behind it. The Libyans' quarter turns are Polybius III.115 read literally, those on the right facing to their left and those on the left to their right, and each carries an intent arrow at the Roman flank so that the pincer is legible before the positions arrive. Hasdrubal is given a position north of the Roman mass so that his track skirts it rather than cutting through it, and an intent arrow at the allied cavalry rather than a detachment, because the whole wing rides with him. Strength: the centre steps to 0.8, the one Carthaginian fraction in the file, hung on Polybius III.117's four thousand Celts and fifteen hundred Iberians and Libyans lost in the whole battle. The Roman horse is destroyed at 0.05: the seventy who reached Venusia rode off with Varro from the allied wing, and Polybius names no survivor at all of the citizen horse by the river, so the fraction is a floor rather than a count.",
+      "references": [
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 115, the maniples cut through",
+          "quote": "The Roman maniples followed with spirit, and easily cut their way through the enemy’s line; since the Celts had been drawn up in a thin line, while the Romans had closed up from the wings towards the centre and the point of danger."
+        },
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 115, the crescent breaks up",
+          "quote": "overpowered by the weight of the heavy-armed lines, they gave way and retired to the rear, thus breaking up the crescent"
+        },
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 115, the Libyans face inward",
+          "quote": "Those on the right, facing to the left, charged from the right upon the Roman flank; while those who were on the left wing faced to the right, and, dressing by the left, charged their right flank"
+        },
+        {
+          "source": "livy-spillan",
+          "locator": "book XXII, chapter 47, the Africans on both sides",
+          "quote": "the Africans, who had now formed wings on each side of them, surrounded the Romans on both sides, who incautiously rushed into the intermediate space; and presently extending their wings, enclosed the enemy on the rear also."
+        },
+        {
+          "source": "livy-spillan",
+          "locator": "book XXII, chapter 48, the false deserters take up shields",
+          "quote": "snatching up the shields which lay scattered on all hands among the heaps of slain, they fell upon the rear of the Roman line, and striking their backs and wounding their hams, occasioned vast havoc, and still greater panic and confusion."
+        }
+      ],
+      "units": [
+        { "id": "roman-cavalry", "position": { "lat": 41.338, "lon": 16.2082 }, "heading": 250, "formation": "line", "state": "destroyed", "strength": 0.05 },
+        { "id": "roman-infantry", "position": { "lat": 41.3014, "lon": 16.1946 }, "heading": 200, "formation": "mass", "state": "engaged" },
+        { "id": "allied-cavalry", "position": { "lat": 41.3032, "lon": 16.2215 }, "heading": 200, "formation": "line", "state": "engaged" },
+        {
+          "id": "hasdrubal-cavalry",
+          "position": { "lat": 41.3201, "lon": 16.2049 },
+          "heading": 110,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "intent", "to": { "lat": 41.3032, "lon": 16.2215 } }]
+        },
+        {
+          "id": "libyans-left",
+          "position": { "lat": 41.3056, "lon": 16.1845 },
+          "heading": 110,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "intent", "to": { "lat": 41.3028, "lon": 16.1895 } }]
+        },
+        { "id": "spanish-gallic-centre", "position": { "lat": 41.2951, "lon": 16.1915 }, "heading": 20, "formation": "line", "state": "engaged", "strength": 0.8 },
+        {
+          "id": "libyans-right",
+          "position": { "lat": 41.2998, "lon": 16.2058 },
+          "heading": 290,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "intent", "to": { "lat": 41.3, "lon": 16.1996 } }]
+        },
+        { "id": "numidians", "position": { "lat": 41.3002, "lon": 16.2201 }, "heading": 20, "formation": "line", "state": "engaged" }
+      ]
+    },
+    {
+      "id": "allied-cavalry-flees",
+      "label": "Hasdrubal appears behind the allied horse; it flees",
+      "t": "10:30",
+      "playback_rate": 120,
+      "wind": { "from": 135, "force": "fresh" },
+      "caption": "Hasdrubal comes up on the allied cavalry, which sees the charge coming and breaks before it arrives; Varro goes off with it. Judging the Numidians the better troops to hunt men already forced from their ground, he leaves the pursuit to them and turns back for the infantry. The Libyans are now on both Roman flanks and beginning to reach round the Roman rear.",
+      "notes": "Time: an estimate. Sunrise is the only instant either source fixes (Polybius III.113, Livy XXII.45); everything after it is sequence, so this t is the author's reading of the order of events and the distances, to the half-hour and no finer. Polybius III.116 opens with the Numidians engaging the allied horse 'meanwhile', so this runs beside phase 5 rather than after it; an hour later is the author's spacing. Positions: Kromayer's right-bank reading, the battle downstream of the hill of Cannae with the Romans facing south and the river on their right hand, laid on the modern Ofanto because the channel of 216 BC is unknown. The allied horse is at 0.1 the moment it runs, before anyone is dead, because the fraction counts men still fighting as part of the wing and not men still alive; Polybius III.117's three hundred who reach the towns is the number behind it, and phase 8's caption says so. The Numidian pursuit is an arrow off the eastern edge while the wing itself keeps its ground and its full strength, because the pursuit comes back to it inside the day this file holds. Hasdrubal turns north-east here rather than straight back onto the Roman rear, and that is what carries his wheel round through the north: he has ridden east behind the Roman line and comes back west onto its rear in phase 7, and without this phase's picture nothing would say which way round he went.",
+      "references": [
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 116, the allied horse breaks",
+          "quote": "But when Hasdrubal, after all but annihilating the cavalry by the river, came from the left to the support of the Numidians, the Roman allied cavalry, seeing his charge approaching, broke and fled."
+        },
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 116, he leaves the pursuit to the Numidians",
+          "quote": "Seeing the Numidians to be strong in numbers, and more effective and formidable to troops that had once been forced from their ground, he left the pursuit to them; while he himself hastened to the part of the field where the infantry were engaged, and brought his men up to support the Libyans."
+        },
+        {
+          "source": "livy-spillan",
+          "locator": "book XXII, chapter 48, the Numidians sent in pursuit",
+          "quote": "Hasdrubal, who was then commanding in that quarter, withdrawing the Numidians from the centre of the army, as the conflict with their opponents was slight, sends them in pursuit of the scattered fugitives"
+        }
+      ],
+      "units": [
+        { "id": "roman-cavalry", "position": { "lat": 41.338, "lon": 16.2082 }, "heading": 250, "formation": "line", "state": "destroyed", "strength": 0.05 },
+        { "id": "roman-infantry", "position": { "lat": 41.3002, "lon": 16.1939 }, "heading": 200, "formation": "mass", "state": "engaged" },
+        { "id": "allied-cavalry", "position": { "lat": 41.3014, "lon": 16.2366 }, "heading": 110, "formation": "line", "state": "broken", "strength": 0.1 },
+        { "id": "hasdrubal-cavalry", "position": { "lat": 41.3091, "lon": 16.2276 }, "heading": 20, "formation": "line", "state": "engaged" },
+        { "id": "libyans-left", "position": { "lat": 41.3034, "lon": 16.184 }, "heading": 110, "formation": "line", "state": "engaged" },
+        { "id": "spanish-gallic-centre", "position": { "lat": 41.2938, "lon": 16.1909 }, "heading": 20, "formation": "line", "state": "engaged", "strength": 0.8 },
+        { "id": "libyans-right", "position": { "lat": 41.2978, "lon": 16.2043 }, "heading": 290, "formation": "line", "state": "engaged" },
+        {
+          "id": "numidians",
+          "position": { "lat": 41.3005, "lon": 16.2208 },
+          "heading": 20,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "detachment", "to": { "lat": 41.3, "lon": 16.36 } }]
+        }
+      ]
+    },
+    {
+      "id": "encirclement",
+      "label": "The circle closes; Paullus falls",
+      "t": "11:00",
+      "playback_rate": 300,
+      "wind": { "from": 135, "force": "fresh" },
+      "caption": "The legions are no longer a line. They fight singly and in maniples, facing about to meet the charges on their flanks and rear, while Hasdrubal's squadrons ride at the rear at many points at once. So long as they can keep an unbroken front they hold; but the outer files of the circle keep falling and the circle keeps contracting. Paullus, Servilius and Atilius die on the field. Paullus sends word to fortify Rome before the victors come, and to tell Fabius that Lucius Aemilius died mindful of his instructions. Of the allied horse driven off the field about three hundred will come through to the towns of the district; as a body it has ceased to exist.",
+      "notes": "Time: an estimate. Sunrise is the only instant either source fixes (Polybius III.113, Livy XXII.45); everything after it is sequence, so this t is the author's reading of the order of events and the distances, to the half-hour and no finer. Neither source gives a time for the encirclement. It is set at 11:00, half an hour after the allied horse breaks, and then holds for three hours, which is why it runs at a coarser rate than the phases before it: at their rate one picture would sit on the screen for a minute and a half. Positions: Kromayer's right-bank reading, the battle downstream of the hill of Cannae with the Romans facing south and the river on their right hand, laid on the modern Ofanto because the channel of 216 BC is unknown. The Roman foot steps from engaged to broken here rather than inside phase 5 or 6 because this is the moment with something to caption. Broken means the unit is no longer acting as one body, whether it runs, as the allied horse did, or fights on in fragments, as the legions do: Polybius has them fighting 'no longer in line, yet singly, or in maniples'. Strength 0.6 is a reading and not a count, hung on 'the outer files of the circle continually falling'. The allied cavalry is destroyed while three hundred of its men ride away alive, because destroyed says only that the wing has ceased to exist as a fighting body and nothing about what became of the men. Hasdrubal stands north-east of the mass with his front turned west along the Roman rear: Polybius has him hurling squadron after squadron upon them at many points at once.",
+      "references": [
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 116, the contracting circle",
+          "quote": "As long as the Romans could keep an unbroken front, to turn first in one direction and then in another to meet the assaults of the enemy, they held out; but the outer files of the circle continually falling, and the circle becoming more and more contracted, they at last were all killed on the field"
+        },
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 116, Hasdrubal on the rear",
+          "quote": "by charging the Roman legions on the rear, and harassing them by hurling squadron after squadron upon them at many points at once"
+        },
+        {
+          "source": "livy-spillan",
+          "locator": "book XXII, chapter 49, Paullus's last message",
+          "quote": "Go and tell the fathers publicly, to fortify the city of Rome, and garrison it strongly before the victorious enemy arrive: and tell Quintus Fabius individually, that Lucius Aemilius lived, and now dies, mindful of his injunctions."
+        },
+        {
+          "source": "usma-cannae-2",
+          "locator": "the encirclement panel: the Libyans on both flanks and the horse on the rear"
+        }
+      ],
+      "units": [
+        { "id": "roman-cavalry", "position": { "lat": 41.338, "lon": 16.2082 }, "heading": 250, "formation": "line", "state": "destroyed", "strength": 0.05 },
+        { "id": "roman-infantry", "position": { "lat": 41.2997, "lon": 16.1937 }, "heading": 200, "formation": "mass", "state": "broken", "strength": 0.6 },
+        { "id": "allied-cavalry", "position": { "lat": 41.2999, "lon": 16.2473 }, "heading": 110, "formation": "line", "state": "destroyed", "strength": 0.1 },
+        { "id": "hasdrubal-cavalry", "position": { "lat": 41.3048, "lon": 16.2013 }, "heading": 290, "formation": "line", "state": "engaged" },
+        { "id": "libyans-left", "position": { "lat": 41.3024, "lon": 16.1842 }, "heading": 110, "formation": "line", "state": "engaged" },
+        { "id": "spanish-gallic-centre", "position": { "lat": 41.2934, "lon": 16.1907 }, "heading": 20, "formation": "line", "state": "engaged", "strength": 0.8 },
+        { "id": "libyans-right", "position": { "lat": 41.2971, "lon": 16.2033 }, "heading": 290, "formation": "line", "state": "engaged" },
+        {
+          "id": "numidians",
+          "position": { "lat": 41.3006, "lon": 16.2221 },
+          "heading": 20,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "detachment", "to": { "lat": 41.3, "lon": 16.36 } }]
+        }
+      ]
+    },
+    {
+      "id": "annihilation-and-the-camps",
+      "label": "The Roman army dies where it stands; Hannibal takes the camps",
+      "t": "14:00",
+      "playback_rate": 1200,
+      "wind": { "from": 135, "force": "fresh" },
+      "caption": "The circle is gone. Of the foot actually engaged perhaps three thousand get away and the rest die nobly, to the number of seventy thousand on Polybius's count and forty thousand on Livy's. Out of six thousand horse only seventy reach Venusia with Varro. Seven thousand escape to the smaller camp, ten thousand to the larger and about two thousand to the village of Cannae; the Numidians ride in the fugitives all afternoon, and Hannibal takes the camps.",
+      "notes": "Time: an estimate. Sunrise is the only instant either source fixes (Polybius III.113, Livy XXII.45); everything after it is sequence, so this t is the author's reading of the order of events and the distances, to the half-hour and no finer. Polybius III.117 has Hannibal turning on the camp guard while he is 'by this time gaining a victory all along the line', so the end of the battle and the storming of the camps overlap; 14:00 for the last picture and 17:00 for the end of the playback are the author's, on the reckoning that both fall after midday and that the Numidians were bringing in fugitives from the strongholds of the district until evening. Positions: Kromayer's right-bank reading, the battle downstream of the hill of Cannae with the Romans facing south and the river on their right hand, laid on the modern Ofanto because the channel of 216 BC is unknown. Strength: the Roman foot at 0.05 is Polybius's three thousand who got away set against the seventy thousand who died beside them. Polybius's seventy thousand dead against Livy's forty thousand is the famous gap, and it is left standing in the caption rather than resolved. The ten thousand foot left in the camps and Hannibal's own camp guard are not rostered: this file is at wing granularity on the field, and the storming of the camps is caption matter. The Carthaginian wings all stay engaged, the word for a unit still in the action or its aftermath with its cohesion held.",
+      "references": [
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 117, the horse",
+          "quote": "out of six thousand horse, only seventy escaped with Gaius Terentius to Venusia"
+        },
+        {
+          "source": "polybius-shuckburgh",
+          "locator": "book III, chapter 117, the foot",
+          "quote": "all the rest died nobly"
+        },
+        {
+          "source": "livy-spillan",
+          "locator": "book XXII, chapter 49, where the survivors went",
+          "quote": "Seven thousand escaped to the lesser camp, ten to the greater, about two thousand to the village itself of Cannae"
+        }
+      ],
+      "units": [
+        { "id": "roman-cavalry", "position": { "lat": 41.338, "lon": 16.2082 }, "heading": 250, "formation": "line", "state": "destroyed", "strength": 0.05 },
+        { "id": "roman-infantry", "position": { "lat": 41.2997, "lon": 16.1937 }, "heading": 200, "formation": "mass", "state": "destroyed", "strength": 0.05 },
+        { "id": "allied-cavalry", "position": { "lat": 41.2995, "lon": 16.2522 }, "heading": 110, "formation": "line", "state": "destroyed", "strength": 0.1 },
+        { "id": "hasdrubal-cavalry", "position": { "lat": 41.3067, "lon": 16.1946 }, "heading": 290, "formation": "line", "state": "engaged" },
+        { "id": "libyans-left", "position": { "lat": 41.3022, "lon": 16.1847 }, "heading": 110, "formation": "line", "state": "engaged" },
+        { "id": "spanish-gallic-centre", "position": { "lat": 41.2938, "lon": 16.1909 }, "heading": 20, "formation": "line", "state": "engaged", "strength": 0.8 },
+        { "id": "libyans-right", "position": { "lat": 41.2973, "lon": 16.2027 }, "heading": 290, "formation": "line", "state": "engaged" },
+        {
+          "id": "numidians",
+          "position": { "lat": 41.3007, "lon": 16.2235 },
+          "heading": 20,
+          "formation": "line",
+          "state": "engaged",
+          "moves": [{ "kind": "detachment", "to": { "lat": 41.3, "lon": 16.36 } }]
+        }
+      ]
+    }
+  ]
+}
