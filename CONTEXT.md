@@ -217,3 +217,7 @@ _Avoid_: Catalogue, index, list, home page, menu, gallery
 **Picker**:
 The control in the player's controls that switches to another battle in the library, starting a fresh visit to it.
 _Avoid_: Switcher, dropdown, battle select, menu
+
+**Fixture**:
+Something battle-shaped that exists to exercise the code rather than to be watched: invented positions, a summary that says so, held to nothing but the schema. It lives in the source rather than among the battle files, is never fetched and never in the library, and it goes once a real battle covers what it stood in for.
+_Avoid_: Example, sample, demo, test battle, illustrative battle
