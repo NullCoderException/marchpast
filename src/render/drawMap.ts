@@ -1,9 +1,15 @@
 /**
- * The map pass (ADR-0005, ADR-0012): the six feature kinds the map file can
- * carry, drawn in the order land, shoal, contours, river, places and works, so
- * that relief lies over the shore, the river lies over the relief, and every
- * named thing lies over all of it. The caller has already clipped to the
- * extent.
+ * The map pass (ADR-0005, ADR-0012): the feature kinds the map file can carry,
+ * drawn in the order land, shoal, contours, river, places and works, so that
+ * relief lies over the shore, the river lies over the relief, and every named
+ * thing lies over all of it. The caller has already clipped to the extent.
+ *
+ * The seventh kind, `rampart`, is **read and not drawn**. It reached the
+ * format on #167 ahead of its ink, and every selector here picks its kind out
+ * by name, so a map with ramparts on it loads and plays with the lines simply
+ * not there. #170 puts them among the ground — after the river and before the
+ * named things, which is where schema.md section 4 has them — in the engraved
+ * and atlas hands; #175 in the staff map's.
  *
  * A **shared pass**: no view replaces it. Every colour it draws with comes off
  * the palette, which is how the Night plate gets a dark shore for nothing, and

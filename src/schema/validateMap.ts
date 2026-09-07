@@ -1,14 +1,16 @@
 /**
  * Runtime validator for the map file (schema.md section 3): a GeoJSON
- * FeatureCollection with exactly two foreign members, holding only the six
- * feature kinds — `land`, `river`, `shoal`, `contour`, `place` and `work` —
- * each with a geometry its kind allows and only the properties its kind lists,
- * every coordinate a `[lon, lat]` pair in range and nothing else anywhere.
+ * FeatureCollection with exactly two foreign members, holding only the seven
+ * feature kinds — `land`, `river`, `shoal`, `contour`, `place`, `work` and
+ * `rampart` — each with a geometry its kind allows and only the properties its
+ * kind lists, every coordinate a `[lon, lat]` pair in range and nothing else
+ * anywhere.
  *
  * Three tables are what a kind is: the geometries it allows, the properties it
  * carries beyond `kind`, and how each of those properties is read. A seventh
  * kind is one row in the first two; a property no kind carries yet is one
- * more reader.
+ * more reader. `rampart` was that seventh kind and cost exactly that, which is
+ * the promise ADR-0026 weighed the alternatives against (#167).
  *
  * Never throws on bad data; collects every error with a JSON-pointer path.
  * Ring winding and polygon validity are not checked (schema.md 3.3).
@@ -21,7 +23,7 @@ import {
   ELEVATION_BOUNDS,
   Errors,
   LAT_BOUNDS,
-  LON_BOUNDS,
+  type NumberBounds,
   ObjectReader,
   readNumber,
   type ValidationError,
@@ -33,6 +35,20 @@ export type MapValidation = { ok: true; map: MapFile } | { ok: false; errors: Va
 type MapKind = MapFeature["properties"]["kind"];
 type Geometry = MapFeature["geometry"];
 type GeometryType = Geometry["type"];
+
+/**
+ * Rule 6's longitude, wider than the canonical `-180..180`: a map's
+ * coordinates are written in the frame of the battle it serves (ADR-0001 as
+ * amended, schema.md 3.2), so Midway's atoll is `182.63` and not `-177.37`.
+ *
+ * Wider than the bound the battle file is getting, too, and deliberately: a
+ * position there is read against its own extent's centre longitude (schema.md
+ * 2.10 rule 2, landing with #166). This validator sees a file and never a
+ * pairing, so it cannot narrow the same way — and it need not, because a
+ * mis-spelled map coordinate is clipped and costs a piece of the picture,
+ * where a mis-spelled position lies about where a force was.
+ */
+const MAP_LON_BOUNDS: NumberBounds = { min: -180, max: 360 };
 
 const AREA_GEOMETRIES = ["Polygon", "MultiPolygon"] as const;
 const LINE_GEOMETRIES = ["LineString", "MultiLineString"] as const;
@@ -46,6 +62,7 @@ const KIND_GEOMETRIES: Record<MapKind, readonly GeometryType[]> = {
   contour: LINE_GEOMETRIES,
   place: POINT_GEOMETRIES,
   work: POINT_GEOMETRIES,
+  rampart: LINE_GEOMETRIES,
 };
 
 /** Rule 5: how each property beyond `kind` is read, one entry per property name any kind carries. */
@@ -64,7 +81,7 @@ const PROPERTY_READERS = {
 
 type PropertyName = keyof typeof PROPERTY_READERS;
 
-/** Rules 5 and 7: what each kind carries beyond `kind`. Natural features carry nothing; a contour its level; named things a name. */
+/** Rules 5 and 7: what each kind carries beyond `kind`. Natural features and a rampart carry nothing; a contour its level; named things a name. */
 const KIND_PROPERTIES: Record<MapKind, readonly PropertyName[]> = {
   land: [],
   river: [],
@@ -72,6 +89,7 @@ const KIND_PROPERTIES: Record<MapKind, readonly PropertyName[]> = {
   contour: ["elevation"],
   place: ["name"],
   work: ["name"],
+  rampart: [],
 };
 
 const KINDS = Object.keys(KIND_GEOMETRIES) as MapKind[];
@@ -177,7 +195,7 @@ function readLonLat(value: unknown, path: string, errors: Errors): LonLat | unde
     errors.add(path, "expected a [lon, lat] pair with exactly two elements");
     return undefined;
   }
-  const lon = readNumber(value[0], appendPointer(path, 0), LON_BOUNDS, errors);
+  const lon = readNumber(value[0], appendPointer(path, 0), MAP_LON_BOUNDS, errors);
   const lat = readNumber(value[1], appendPointer(path, 1), LAT_BOUNDS, errors);
   if (lon === undefined || lat === undefined) return undefined;
   return [lon, lat];
