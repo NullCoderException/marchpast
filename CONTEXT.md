@@ -55,7 +55,7 @@ What the renderer draws around the picture without any battle authoring it and t
 _Avoid_: Chrome, overlay, HUD, widgets, controls
 
 **Legend**:
-The furniture box that keys the picture: each side's colour and name, the four state glyphs, the line styles for a track and the two kinds of move, and, when the battle has more than one arm, the sign for each. Always shown.
+The furniture box that keys the picture: each side's colour and name, the four state glyphs, the line styles for a track and the two kinds of move, and, when the roster at the level shown has more than one arm, the sign for each. Always shown.
 _Avoid_: Key, guide, symbols
 
 ### Weather
@@ -97,7 +97,7 @@ A body of force the battle follows as one marker on the map, such as a fleet col
 _Avoid_: Marker, force, group, side, formation
 
 **Parent**:
-The unit a smaller unit belongs to, named once per battle as part of the smaller unit's identity: a squadron's column, a legion's wing. The parent and its children are all units in their own right, each authored in every phase; nothing about a parent is worked out from its children. A parent's children share its side.
+The unit a smaller unit belongs to, named once per battle as part of the smaller unit's identity: a squadron's column, a legion's wing, a strike's force. The parent and its children are all units in their own right, each authored in every phase it exists in; nothing about a parent is worked out from its children, and a child may be absent while its parent stays, as a strike is from its force. A parent's children share its side.
 _Avoid_: Group, container, formation, superunit, root
 
 **Level**:
@@ -177,7 +177,7 @@ _Avoid_: Commentary, alternates, uncertainty, confidence
 ### Player
 
 **View**:
-A named whole visual treatment of the picture and the player's surface that the viewer picks: the chart plate (the default), the night plate, or atlas. Every view keeps the anatomy and owns everything about how the picture is drawn — its paper and inks, its type, how the ground is drawn, how each piece of furniture is drawn, and how a unit and its engaged mark are drawn. Remembered from one visit to the next, never authored in a battle file. **The viewer is the only thing that picks one**: no battle suggests a view, the clock derives none, and no operating-system preference chooses one. So the night plate is not the Nile's, whatever the Nile is called: it is the light a viewer reads in, and it stays on a daylight battle because it was picked, not because the picture asked for it.
+A named whole visual treatment of the picture and the player's surface that the viewer picks: the chart plate (the default), the night plate, atlas, or the staff map. Every view keeps the anatomy and owns everything about how the picture is drawn — its paper and inks, its type, how the ground is drawn, how each piece of furniture is drawn, and how a unit and its engaged mark are drawn. Remembered from one visit to the next, never authored in a battle file. **The viewer is the only thing that picks one**: no battle suggests a view, the clock derives none, and no operating-system preference chooses one. So the night plate is not the Nile's, whatever the Nile is called: it is the light a viewer reads in, and it stays on a daylight battle because it was picked, not because the picture asked for it.
 _Avoid_: Theme, skin, style, mode, layer, variant
 
 **Anatomy**:
@@ -185,7 +185,7 @@ What every view keeps: which facts the picture shows, where each one sits, and w
 _Avoid_: Layout, chrome, template, skeleton, base theme, invariants
 
 **Aesthetic**:
-The idiom a view is drawn in. The chart plate, the night plate and atlas share the engraved one; a view may also be drawn in an idiom of its own. Not something the viewer picks and not something the app counts: two views in one aesthetic simply resemble each other, and the view chooser offers views, never aesthetics.
+The idiom a view is drawn in. The chart plate, the night plate and atlas share the engraved one; the staff map is drawn in a second, a printed operations sheet's; a view may be drawn in an idiom of its own. Not something the viewer picks and not something the app counts: two views in one aesthetic simply resemble each other, and the view chooser offers views, never aesthetics.
 _Avoid_: Theme, style, look, family, skin, design language
 
 **View chooser**:
@@ -201,7 +201,7 @@ How a view draws one unit: the chart plate's ship-ticks, atlas's block. Drawn in
 _Avoid_: Icon, symbol, marker, sprite, token
 
 **Sign**:
-The shape by which a view tells one arm from another inside a glyph: the chart plate's chevron tick for a ship, its rank bar for foot and barred rank bar for horse, atlas's diagonal across a cavalry block. Every view has a sign for every arm.
+The shape by which a view tells one arm from another inside a glyph: the chart plate's chevron tick for a ship, its rank bar for foot, its barred rank bar for horse and its aeroplane in plan for aircraft, atlas's diagonal across a cavalry block, the staff map's stroked arrowhead for aircraft. Every view has a sign for every arm, and a view may draw an arm its own way: what every view shares is the distinction, never the drawing.
 _Avoid_: Mark (the state's), icon, symbol, tick (except for the ship sign), badge
 
 **Surface**:
@@ -225,8 +225,12 @@ The on-demand view that shows the current phase's notes and references, then the
 _Avoid_: Sidebar, drawer, info box, credits screen
 
 **Unit card**:
-The unit's label unfolded: a panel the renderer draws beside a unit's glyph, in the label's own place, giving its full name and commander, its arm, formation, state and strength, and its parent or children. Shown while the pointer rests on the unit and held open by a click or tap, one at a time, and never pauses playback. Viewer-opened, never authored in a battle file.
+The unit's label unfolded: a panel the renderer draws beside a unit's glyph, in the label's own place, giving its full name and commander, its arm, formation, state and strength, and its parent or children. Shown while the pointer rests on the unit or while its entry in the muster has focus, held open by a click, a tap or Enter, one at a time, and never pauses playback. Viewer-opened, never authored in a battle file.
 _Avoid_: Tooltip, popup, popover, info box, unit panel
+
+**Muster**:
+The units the plate is drawing at the current level and in the current phase, as a list a keyboard or screen reader can walk: one tab stop after the canvas, the arrows moving through it, focus opening a unit's card. Against the roster, which is every unit the battle file authors, the muster is what is drawn now.
+_Avoid_: Unit list, roll, roster (the authored one), index
 
 ### Site
 

@@ -1,5 +1,7 @@
 # State, strength and moves carry Cannae unchanged, with `broken` widened and a returning detachment costing nothing
 
+*Amended 2026-09-07: "Copenhagen's truce and the anchored lines are still open" was closed by [ADR-0019](0019-anchoring-and-the-truce-are-caption-matter-and-heading-is-the-fighting-front.md) — both are caption matter and heading is the fighting front. The rejected option of following a wing off the extent so it blinks back stays rejected on [ADR-0024](0024-aircraft-are-an-arm-and-a-unit-may-be-absent-from-a-phase.md)'s own terms: absence means a unit does not exist on the plate, never that it is off the extent, and a unit never reappears. Everything else here stands.*
+
 *Amended 2026-09-06: `docs/schema.md` is now the v2 spec, written at the handoff (#53).*
 
 ADR-0003 fixed a four-value **state** enum and an optional **strength** fraction; ADR-0004 fixed two **move** kinds and made a unit's own motion the renderer's **track**, with no schema field; ADR-0016 gave land units their signs and let a track run behind a unit that keeps its heading. Cannae is the first land battle authored against all three ([#41](https://github.com/NullCoderException/marchpast/issues/41)), and it is the hardest case v0.2 has: legions that fight on in fragments until they are killed where they stand, a cavalry wing that rides off the field in pursuit and comes back, a wing that flees with almost all its men alive, an army whose losses no source counts as they mount, and a ride round the enemy's rear that ends facing the way it came.

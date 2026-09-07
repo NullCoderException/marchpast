@@ -1,5 +1,7 @@
 # Moves are authored arrows for what positions cannot show, never a unit's own motion
 
+*Amended 2026-09-07: "off-map arrivals stay deferred with unit appearance" is closed the narrow way by [ADR-0024](0024-aircraft-are-an-arm-and-a-unit-may-be-absent-from-a-phase.md): a unit may be absent from a phase, but absence never means off the extent, so a move still has no free-floating tail and a head beyond the extent is still clipped. How each kind is drawn is now a view's `moves` hand (#139, ADR-0021 as amended), with no field in data. Everything else here stands.*
+
 The concept sketch gave each phase both `units[].position` and `moves[]` arrows, which invites the two to disagree. Since phases are snapshots the player tweens (ADR-0002), a unit's own motion between phases is already fully determined by its positions, so a move arrow for it would be redundant data. We chose to keep **move** only for authored arrows that positions cannot express: what part of a unit did that the unit's position does not follow, and what a unit was ordered to do whether or not it happened. Anything drawn about a unit's own motion (the **track**) is renderer styling with no schema field.
 
 ## Considered options

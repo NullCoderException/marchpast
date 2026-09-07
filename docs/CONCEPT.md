@@ -1,6 +1,6 @@
 # Marchpast
 
-*Concept document — started September 2026 for v0.1, roadmap and decisions log kept current through v0.2. Living doc; expand freely.*
+*Concept document — started September 2026 for v0.1, roadmap and decisions log kept current through v0.3. Living doc; expand freely.*
 
 ## One-liner
 
@@ -90,17 +90,21 @@ Explicitly out of scope this weekend: per-ship detail, terrain, the extraction p
 
 - **v0.1** — Trafalgar plays. Schema v1. *Done 2026-09-06; hosted on GitHub Pages.*
 - **v0.2** — Three more battles on the hosted site, one of them on land: Cannae forces schema v2 (arms, a third formation word, an authored hierarchy, rivers, shoals, works and contours in the map, a clock that crosses midnight); the Nile and Copenhagen are the naval reuse tests; the renderer becomes a set of viewer-picked views (chart plate, night plate, atlas); the site gets a library as its front door and a picker; Trafalgar is re-authored at squadron level. *Spec: [`docs/schema.md`](schema.md) and ADR-0011 to ADR-0019; build issues under the v0.2 milestone.*
-- **v0.3** — Extraction pipeline prototype.
-- **v0.4** — Real basemap option; ship or unit level below squadrons where it earns its keep; library thumbnails.
-- **Someday** — 3D experiment in Godot, if the 2D version proves the data is the valuable part.
+- **v0.3** — Three more battles across two millennia on a branded site whose views reach the player surface. Alesia (52 BC) brings a siege, a quiet day and the rampart as a map feature; the Little Bighorn (1876) brings conjecture, answered as notes matter; Midway (1942) brings aircraft as an arm, a unit absent from a phase and an extent across the 180th meridian. The product is renamed Marchpast and gets a mark, an icon set, a manifest and its own domain; the library gains a chronology rail and build-rendered stills; every battle gets a page and a social card of its own; a view is five hands over a fixed anatomy, drives the player's surface and is remembered; the Staff map is the first view outside the engraved system. *Spec: [`docs/schema.md`](schema.md) and ADR-0020 to ADR-0030; build issues under the v0.3 milestone, handed off 2026-09-07.*
+- **v0.4** — Extraction pipeline prototype, with the Cannae extraction test from Polybius as its first trial.
+- **v0.5** — Real basemap option; ship or unit level below squadrons where it earns its keep.
+- **Someday** — 3D experiment in Godot, if the 2D version proves the data is the valuable part; a store app, once there is a brand and seven battles to package; a parchment or medieval view, when someone can name the battle it serves.
 
 ## Open questions
 
-The v0.1 questions are all answered: real lat/lon from day one (ADR-0001), a linear tween between snapshots (ADR-0002), authored state and strength rather than a simulation (ADR-0003), one caption per phase with the argument in `notes` (ADR-0006). The name is settled the other way: the product was renamed from Sandtable to Marchpast on 2026-09-07 (ADR-0020). What remains open is what the next map charts:
+The v0.1 questions are all answered: real lat/lon from day one (ADR-0001), a linear tween between snapshots (ADR-0002), authored state and strength rather than a simulation (ADR-0003), one caption per phase with the argument in `notes` (ADR-0006). The name is settled the other way: the product was renamed from Sandtable to Marchpast on 2026-09-07 (ADR-0020). The v0.2 questions closed on the v0.3 map: thumbnails are stills the build renders from the phase a battle marks (ADR-0025), and the Little Bighorn and Midway are v0.3 battles with the schema changes they forced (ADR-0024, ADR-0027). What remains open is what the next map charts:
 
-- An extraction test on Cannae from Polybius, before or alongside the pipeline effort (v0.3).
-- Library thumbnails: a still per battle rendered by the build from a chosen phase in a decided view.
-- Little Bighorn and any WWII battle: the arms and elevation are designed with them in mind; each is its own effort.
+- The extraction pipeline, with the Cannae test from Polybius as its first trial (v0.4).
+- A store app: a native wrapper, store accounts, pricing and offline, once v0.3 has shipped a brand and seven battles to package.
+- A parchment or medieval view, or any fifth view: the seam is cut (ADR-0021) and a view waits for the battle it serves.
+- Grouping the library, when it passes twelve battles or a grouping would hold three entries that chronology does not already make contiguous (ADR-0022).
+- Labels beside the three choosers, if a control's width can be found for them (#137).
+- A forced-colours repair, only if the real Windows High Contrast check (#181) finds the opt-out does not hold (ADR-0030).
 
 ## Decisions log
 
@@ -124,6 +128,15 @@ The v0.1 questions are all answered: real lat/lon from day one (ADR-0001), a lin
 | 2026-09-06 | Labels place by a sticky search with a five-step collapse and an authored `short_label`; the unit card is the label unfolded; the view and level choosers are `<select>`s that never remember | Measured over whole playbacks: the only algorithm with no overlap to sixteen units; neither derived short name survives Cannae |
 | 2026-09-07 | The product is renamed from Sandtable to Marchpast (ADR-0020) | The name research found a live USPTO application for SANDTABLE in classes 9 and 42 for software that simulates forces over terrain, a registered SIMTABLE beside it, the npm name taken and every useful domain held; a brand ticket was about to draw a logo and a task ticket about to buy a domain, so this was the cheapest hour the rename would ever cost |
 | 2026-09-07 | Hosting stays GitHub Pages, now behind the custom domain `marchpast.com` (`.app` and `.org` held alongside and redirected); the Pages base becomes a bare `/` (ADR-0020) | A brand needs its own address and an unregistered name can go any day; the domain in front of Pages is also what makes the repository rename free, and it deletes the base-path literal rather than rewriting it twice |
+| 2026-09-07 | The anatomy is fixed and a view owns how it is drawn: a view is a palette, pens and five hands, and there may be any number of aesthetics (ADR-0021, #139) | The staff map broke ADR-0014's closed list in four places at once; a rule can be applied by the session that meets the next case, a list only amended by another one |
+| 2026-09-07 | The library is a chronology with a rail, not a grouping (ADR-0022) | The sort already makes every cluster worth having; the 1,849 years between Alesia and the Nile need writing, not drawing |
+| 2026-09-07 | The view reaches the player surface and is remembered; the surface derives its tokens from the palette, the choosers stay native, the strip carries `← All battles` (ADR-0023, ADR-0030) | A view already supplies every value the strip needs; hand-copied colours in three files were the only reason it did not follow, and a shared link made a way back necessary |
+| 2026-09-07 | `aircraft` is an arm and a unit may be absent from a phase (ADR-0024) | Midway is about aeroplanes, and under the old rule a carrier whose strike was airborne dropped off the plate |
+| 2026-09-07 | The library shows a build-rendered still of the phase a battle marks; a battle is a page at `/<name>/` with its own social card (ADR-0025, ADR-0028) | Every battle opens pre-contact, so the picture is authored; a static host cannot vary a card from a query string, so the card is downstream of the URL |
+| 2026-09-07 | A rampart is the seventh map feature, and Alesia needs nothing else (ADR-0026) | Thirty-seven kilometres of ditch and rampart are the subject of the battle and `work` is a point; everything else on the research's list closed with a caption or a rule |
+| 2026-09-07 | Conjecture is notes matter, `notes` is required and a battle authors one reading (ADR-0027) | The evidence is compound and a field is atomic; a flag would price a glyph and a legend row for a reason rather than a picture |
+| 2026-09-07 | The site reads no operating-system preference and the surface declines forced colours (ADR-0029) | All motion is requested, a view cannot be derived from two values, and the one query that breaks a page is the one that gets a rule |
+| 2026-09-07 | The brand is A · The Review; the Staff map is the fourth view; the aircraft sign is an aeroplane in plan; the unit card is reached through a muster (#135, #139, #140, #130; no ADR) | Drawn and chosen on canvases, or decided against the code as it stands; none changes a rule |
 
 ## Known risks
 

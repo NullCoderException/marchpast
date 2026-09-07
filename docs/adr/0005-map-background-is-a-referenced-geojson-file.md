@@ -1,5 +1,7 @@
 # The map background is a separate GeoJSON file the battle file points at
 
+*Amended 2026-09-07 by [ADR-0026](0026-a-rampart-is-the-seventh-map-feature-and-alesia-needs-nothing-else.md): the map file gained a seventh kind, `rampart`, a built line drawn with its ditch and the teeth on the side it faces; and "ground is sea" held for the first inland battle, whose map opens with one covering `land` polygon that overhangs the extent rather than reviving the withdrawn `ground` field (#132). Everything else here stands.*
+
 *Amended 2026-09-06 by ADR-0012: the map file gained `river`, `shoal`, `work` and `contour` kinds (no `road`); "layers are a v0.2 question" was answered in the negative, one map file being one moment; and the deferred `ground` field was withdrawn, not merely unexercised. The strict validator, the two foreign members and "ground is sea" stand.*
 
 Everything drawn behind the units must come from data, because the renderer knows nothing about any specific battle. We considered a bounding box alone (parchment, no geography), vector features inline in the battle file, an SVG path, a positioned raster of a public-domain chart, and vector features in a separate file. We chose a separate **map** file in plain GeoJSON, referenced from the battle file by name and optional: the map's points are real lat/lon, so the renderer projects the coastline through the same function it uses for unit positions and the two cannot drift apart, while the battle file stays a short, human-and-model-authored document with no geometry to preserve.
