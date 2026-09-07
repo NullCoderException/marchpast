@@ -5,9 +5,13 @@
  * around the block.
  *
  * One block for every arm, with the arm's sign inside it: crossed diagonals
- * for foot, a single diagonal for horse, nothing for a ship (ADR-0015). A
- * `mass` is the two-rank footprint, a block half the length of a line and
- * twice its thickness (ADR-0016).
+ * for foot, a single diagonal for horse, nothing for a ship, and an aeroplane
+ * in plan for air (ADR-0015, #140). Every one of them is **stroked**, and that
+ * is a rule rather than a taste: `paintSign` draws the sign twice under a clip
+ * and sets only `strokeStyle`, so a sign that filled would come out in
+ * whatever the last fill colour happened to be. A `mass` is the two-rank
+ * footprint, a block half the length of a line and twice its thickness
+ * (ADR-0016).
  *
  * The second claim the seam makes (ADR-0014): a view that draws a unit in a
  * wholly different way replaces this one pass and nothing else. Drawn at the
@@ -44,6 +48,15 @@ const SIGN_WIDTH = 1.2;
  * 45-degree cross and slash the atlases use, whatever shape the block is.
  */
 const SIGN_ASPECT = 1.4;
+/**
+ * The aeroplane in plan (#140), as fractions of that field: the wing set
+ * forward of the middle, the tailplane short and aft. The plate draws the same
+ * shape in a footprint too small to hold the tailplane, which is why these are
+ * near its numbers rather than the same ones.
+ */
+const WING_Y = -0.2;
+const TAILPLANE_Y = 0.72;
+const TAILPLANE_SPAN = 0.45;
 
 /**
  * Atlas's sign for every arm (ADR-0015): the convention of nineteenth-century
@@ -63,13 +76,29 @@ const signs: Record<Arm, Sign> = {
     diagonal(ctx, half, 1);
   },
   /**
-   * Stopgap: the ship's own plain block, so Atlas compiles with the arm in the
-   * allowlist. It is the wrong sign — a viewer cannot tell an aeroplane from a
-   * ship. Written as a delegation, as the plate's is, so the two stopgaps read
-   * alike and go together.
+   * Air as the aeroplane in plan the plate draws (#140). Atlas has the room
+   * the plate has not: `signField` is near square, so the tailplane the
+   * plate's pen cannot afford survives here, and the family reads X foot,
+   * / horse, aeroplane air across the three views with nothing to learn on a
+   * switch — which is ADR-0015's own argument for the cross and the slash.
+   *
+   * The field follows the block's long axis, as it does for the cross and the
+   * slash, so the aeroplane is broad-winged in a line and long-bodied in a
+   * column. Its fuselage lies up the heading whichever it is, which is the
+   * part that carries meaning; the proportions stretch, as every sign in this
+   * table already stretches with the block it is drawn in.
    */
-  // TODO #171: draw the aircraft sign, here and in `ticks.ts`.
-  aircraft: (ctx, half, scale) => signs.ship(ctx, half, scale),
+  aircraft: (ctx, half) => {
+    const { x, y } = signField(half);
+    ctx.beginPath();
+    ctx.moveTo(0, -y);
+    ctx.lineTo(0, y);
+    ctx.moveTo(-x, WING_Y * y);
+    ctx.lineTo(x, WING_Y * y);
+    ctx.moveTo(-x * TAILPLANE_SPAN, TAILPLANE_Y * y);
+    ctx.lineTo(x * TAILPLANE_SPAN, TAILPLANE_Y * y);
+    ctx.stroke();
+  },
 };
 
 /** One diagonal across the sign's field at the block's centre. `rise` picks which way it leans. */

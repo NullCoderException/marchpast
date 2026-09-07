@@ -5,9 +5,9 @@
  * the phase's wind.
  *
  * The sign is the arm's: a ship's chevron tick unchanged from v1, a solid rank
- * bar for foot, the same bar barred for horse (ADR-0015, ADR-0016). Where the
- * signs sit is `slots.ts`, which every view shares; this file is only
- * what they look like on paper.
+ * bar for foot, the same bar barred for horse, and an aeroplane in plan for air
+ * (ADR-0015, ADR-0016, #140). Where the signs sit is `slots.ts`, which every
+ * view shares; this file is only what they look like on paper.
  *
  * Used by both plate views: the Chart plate and the Night plate differ only in
  * their palettes, which is the seam's first claim (ADR-0014). Everything here
@@ -50,6 +50,16 @@ const CHORD_MIN_SCALE = 0.9;
  */
 const SIGN_HALF_WIDTH = 2.6;
 const SIGN_HALF_HEIGHT = 3.25;
+
+/**
+ * The aeroplane in plan (#140), as fractions of the sign's own footprint: the
+ * wing set forward of the middle, the tailplane short, aft, and drawn at this
+ * much of the pen it was handed.
+ */
+const WING_Y = -0.18;
+const TAILPLANE_Y = 0.72;
+const TAILPLANE_SPAN = 0.46;
+const TAILPLANE_PEN = 0.8;
 
 /** The rank bar's weight: solid, because hollow already means destroyed (ADR-0016). */
 const RANK_BAR_THICKNESS = 2.6;
@@ -97,13 +107,35 @@ const signs: Record<Arm, Sign> = {
     ctx.stroke();
   },
   /**
-   * Stopgap: the ship's own chevron, so a strike is drawn as something rather
-   * than as nothing while the arm is in the allowlist and its sign is not yet
-   * drawn. It is the wrong sign — a viewer cannot tell an aeroplane from a
-   * ship.
+   * Air as an aeroplane in plan: fuselage, wing, tailplane. At the plate's own
+   * pen the tailplane merges into the fuselage and what is drawn is a **cross**
+   * — which is the point rather than a loss, because a cross is in nothing
+   * else's vocabulary, holds in a rank at the signs' own pitch, and survives
+   * the legend's smaller sample. The sign is authored as the aeroplane and
+   * drawn as what the pen allows, which is the relationship a rank bar already
+   * has to five thousand men (#140, ADR-0016).
+   *
+   * Never a filled dart: at the legend's scale it closes up into the ship's
+   * chevron one row above it. Never a ring: it does not point.
    */
-  // TODO #171: draw the aircraft sign, here and in `block.ts`.
-  aircraft: (ctx, half, scale) => signs.ship(ctx, half, scale),
+  aircraft: (ctx, half) => {
+    ctx.beginPath();
+    ctx.moveTo(0, -half.y);
+    ctx.lineTo(0, half.y);
+    ctx.moveTo(-half.x, WING_Y * half.y);
+    ctx.lineTo(half.x, WING_Y * half.y);
+    ctx.stroke();
+    // The tailplane is the one stroke drawn finer than the pen it was handed,
+    // so that where there is room for both it reads as the smaller surface;
+    // the pen is read back rather than named, because the body pass owns it.
+    const pen = ctx.lineWidth;
+    ctx.lineWidth = pen * TAILPLANE_PEN;
+    ctx.beginPath();
+    ctx.moveTo(-half.x * TAILPLANE_SPAN, TAILPLANE_Y * half.y);
+    ctx.lineTo(half.x * TAILPLANE_SPAN, TAILPLANE_Y * half.y);
+    ctx.stroke();
+    ctx.lineWidth = pen;
+  },
 };
 
 export const ticks: Glyph = {

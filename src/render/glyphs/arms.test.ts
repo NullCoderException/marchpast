@@ -3,7 +3,8 @@
  * (ADR-0015): the one piece of the legend that is a decision rather than ink.
  */
 import { describe, expect, it } from "vitest";
-import type { Arm, Unit } from "../../schema/types.ts";
+import { drawnAtLevel } from "../../schema/hierarchy.ts";
+import type { Arm, Phase, Unit } from "../../schema/types.ts";
 import { legendArm, legendArms } from "./arms.ts";
 
 /** A roster of the given arms, which is all these two functions read. */
@@ -47,5 +48,28 @@ describe("legendArm", () => {
 
   it("answers the first arm the spec lists for an empty roster, which the validator never allows anyway", () => {
     expect(legendArm([])).toBe("infantry");
+  });
+});
+
+describe("the arm rows and the phase", () => {
+  /** A phase holding a snapshot for the named units and no others; `drawnAtLevel` reads nothing else off one. */
+  function phaseHolding(...ids: string[]): Phase {
+    return { units: ids.map((id) => ({ id })) } as unknown as Phase;
+  }
+
+  it("keys the aircraft row off the roster, so it does not blink out in a phase the strike is away", () => {
+    // ADR-0024: a unit may be absent from a phase, and at Midway 6 June is a
+    // day of ships alone. The legend is keyed on what the level can draw and
+    // not on what this phase does, so the arm the viewer learnt on 4 June is
+    // still explained on the 6th.
+    const units = roster("ship", "ship", "aircraft");
+    expect(drawnAtLevel(units, 0, phaseHolding("u0", "u1")).map((unit) => unit.arm)).toEqual(["ship", "ship"]);
+    expect(legendArms(units)).toEqual(["ship", "aircraft"]);
+  });
+
+  it("keys the row in a phase the strike is the only thing present, for the same reason", () => {
+    const units = roster("ship", "ship", "aircraft");
+    expect(drawnAtLevel(units, 0, phaseHolding("u2")).map((unit) => unit.arm)).toEqual(["aircraft"]);
+    expect(legendArms(units)).toEqual(["ship", "aircraft"]);
   });
 });
