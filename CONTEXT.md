@@ -177,7 +177,7 @@ _Avoid_: Commentary, alternates, uncertainty, confidence
 ### Player
 
 **View**:
-A named whole visual treatment of the picture and the player's surface that the viewer picks: the chart plate (the default), the night plate, or atlas. Every view keeps the anatomy and owns everything about how the picture is drawn — its paper and inks, its type, how the ground is drawn, how each piece of furniture is drawn, and how a unit and its engaged mark are drawn. Remembered from one visit to the next, never authored in a battle file.
+A named whole visual treatment of the picture and the player's surface that the viewer picks: the chart plate (the default), the night plate, or atlas. Every view keeps the anatomy and owns everything about how the picture is drawn — its paper and inks, its type, how the ground is drawn, how each piece of furniture is drawn, and how a unit and its engaged mark are drawn. Remembered from one visit to the next, never authored in a battle file. **The viewer is the only thing that picks one**: no battle suggests a view, the clock derives none, and no operating-system preference chooses one. So the night plate is not the Nile's, whatever the Nile is called: it is the light a viewer reads in, and it stays on a daylight battle because it was picked, not because the picture asked for it.
 _Avoid_: Theme, skin, style, mode, layer, variant
 
 **Anatomy**:
