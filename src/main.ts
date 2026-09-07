@@ -9,21 +9,22 @@
  *
  * `?fixture=<name>` plays a renderer fixture from `app/fixtures.ts` instead:
  * no fetch, no library and no Picker. It is a way to look at a slice before
- * its battle file exists, and nothing else uses it. `&map=<name>` draws a map
- * fixture from `app/mapFixtures.ts` under it, for the same reason; without it
- * a fixture plays over bare parchment.
+ * its battle file exists, and nothing else uses it; both registers are empty
+ * just now, so the route answers with the notice below. `&map=<name>` draws a
+ * map fixture from `app/mapFixtures.ts` under it, for the same reason; without
+ * it a fixture plays over bare parchment.
  *
  * The layout is the plate above and the controls beneath, set in `index.html`;
  * this file only fills the two slots, and takes them both down again when the
  * page is the library, which has no plate to draw and nothing to control.
  */
 import { battleNameFrom, battleQuery } from "./app/battleName.ts";
-import { fixtureNameFrom, FIXTURES } from "./app/fixtures.ts";
+import { fixtureNameFrom, FIXTURES, fixturesThereAre } from "./app/fixtures.ts";
 import { createLibraryLink, createLibraryPage } from "./app/libraryPage.ts";
 import { formatLoadErrors, type LoadError } from "./app/load.ts";
 import { loadBattle, type LoadResult } from "./app/loadBattle.ts";
 import { loadLibrary, type LibraryResult } from "./app/loadLibrary.ts";
-import { mapFixtureNameFrom, MAP_FIXTURES } from "./app/mapFixtures.ts";
+import { mapFixtureNameFrom, MAP_FIXTURES, mapFixturesThereAre } from "./app/mapFixtures.ts";
 import { showNotice } from "./app/notice.ts";
 import { loadPlateFont } from "./fonts/plate.ts";
 import { createPlayer } from "./player/index.ts";
@@ -119,17 +120,14 @@ function playFixture(page: Page, name: string, mapName: string | undefined): voi
   const battle = FIXTURES[name];
   if (battle === undefined) {
     console.error(`Sandtable has no fixture "${name}"`);
-    showNotice(page.canvas, { heading: `No fixture “${name}”`, lines: [`The fixtures there are: ${Object.keys(FIXTURES).join(", ")}.`] });
+    showNotice(page.canvas, { heading: `No fixture “${name}”`, lines: [fixturesThereAre()] });
     page.controlsRoot.append(createLibraryLink());
     return;
   }
   const map = mapName === undefined ? undefined : MAP_FIXTURES[mapName];
   if (mapName !== undefined && map === undefined) {
     console.error(`Sandtable has no map fixture "${mapName}"`);
-    showNotice(page.canvas, {
-      heading: `No map fixture “${mapName}”`,
-      lines: [`The map fixtures there are: ${Object.keys(MAP_FIXTURES).join(", ")}.`],
-    });
+    showNotice(page.canvas, { heading: `No map fixture “${mapName}”`, lines: [mapFixturesThereAre()] });
     page.controlsRoot.append(createLibraryLink());
     return;
   }
