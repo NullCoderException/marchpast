@@ -503,6 +503,18 @@ describe("the unit card in the label pass", () => {
     expect(label.name).toBe("Van");
   });
 
+  it("walks the label in off the ring when the card it takes over from had ridden out", () => {
+    // The card's displacement is the card's: a label that inherited it would
+    // sit out there for good, since staying is free every frame and recovery
+    // only ever gives back a step (#115). The angle it rode out on survives.
+    const units = [unit({ id: "a" })];
+    const fresh = place(units);
+    const closed = place(units, { memory: new Map([["a", { angle: toRadians(90), extra: 104, step: CARD_STEP, clean: 5 }]]) });
+    expect(closed.memory.get("a")?.extra).toBe(0);
+    expect(closed.memory.get("a")?.angle).toBe(toRadians(90));
+    expect(byId(closed.placed, "a").box).toEqual(byId(fresh.placed, "a").box);
+  });
+
   it("draws over the least-bad slot rather than the first one when nothing is free", () => {
     // A plate barely bigger than the card leaves no slot inside it at all.
     const tight = { x: 0, y: 0, width: 260, height: 200 };
