@@ -143,38 +143,59 @@ describe("mapPoints", () => {
 });
 
 /**
- * The seventh kind reached the format on #167 ahead of its ink, and neither
- * this pass nor the placer knows what one looks like until #170 and #175. A
- * map carrying ramparts has to load and play all the same, with the lines
- * simply not there — so what is tested is that they change nothing: no name
- * reaches the placer, and the pass lays down exactly the marks it would if the
- * features were not in the file at all.
+ * The seventh kind reached the format on #167 ahead of its ink and gained it on
+ * #170: a rampart is drawn **among the ground**, after the relief treatment and
+ * the water and before the named things, in the idiom its view carries
+ * (ADR-0026, schema.md 4). Which side its teeth fall on is arithmetic and is
+ * tested where the arithmetic is, in `views/engraved/rampart.test.ts`; what is
+ * tested here is that it reaches the plate at all, in every view, in the pass
+ * the order puts it in, and that it still carries no name.
  */
-describe("a rampart, read but not drawn yet", () => {
+describe("a rampart among the ground", () => {
   const WITHOUT: MapFile = {
     ...FIXTURE,
     features: FIXTURE.features.filter(({ properties }) => properties.kind !== "rampart"),
   };
 
-  /** Every mark the ground laid, in order, drawing `map` on the Nile's plate. */
-  const marks = (map: MapFile): string[] => {
+  /** Every mark the ground pass laid, in order, drawing `map` on the Nile's plate in one view. */
+  const ground = (map: MapFile, view: (typeof VIEWS)[number]): string[] => {
     const calls: string[] = [];
     const ctx = fakeContext(calls);
-    const plate = { ...shippedPlate("nile.json", VIEWS[0]!), ctx, map };
-    paintGround(ctx, plate, { width: 1120, plateHeight: 640 });
-    drawNamedThings(plate, []);
+    paintGround(ctx, { ...shippedPlate("nile.json", view), ctx, map }, { width: 1120, plateHeight: 640 });
     return calls;
   };
 
+  /** And every mark the named things laid after it, which a nameless line must leave alone. */
+  const named = (map: MapFile): string[] => {
+    const calls: string[] = [];
+    const ctx = fakeContext(calls);
+    drawNamedThings({ ...shippedPlate("nile.json", VIEWS[0]!), ctx, map }, []);
+    return calls;
+  };
+
+  /** What the two ramparts alone added to one view's ground: the line, and a tooth every spacing along it. */
+  const added = (view: (typeof VIEWS)[number]): number => ground(FIXTURE, view).length - ground(WITHOUT, view).length;
+
   it("is nameless, so it reaches no label", () => {
-    const named = mapPoints({ ...shippedPlate("nile.json", VIEWS[0]!), map: FIXTURE });
-    expect(named.map(({ text }) => text)).toEqual(["Aboukir Island", "ISLAND BATTERY"]);
+    const points = mapPoints({ ...shippedPlate("nile.json", VIEWS[0]!), map: FIXTURE });
+    expect(points.map(({ text }) => text)).toEqual(["Aboukir Island", "ISLAND BATTERY"]);
   });
 
-  it("leaves the plate exactly as it stands without it", () => {
-    // The guard first: two empty logs would satisfy the comparison and say nothing.
-    expect(marks(WITHOUT).length).toBeGreaterThan(0);
-    expect(marks(FIXTURE)).toEqual(marks(WITHOUT));
+  it("puts its line and its ditch on the ground in every view, none of which may leave it off", () => {
+    // The guard first: two equal logs would satisfy the comparison and say nothing.
+    expect(ground(WITHOUT, VIEWS[0]!).length).toBeGreaterThan(0);
+    for (const view of VIEWS) expect([view.id, added(view) > 0]).toEqual([view.id, true]);
+  });
+
+  it("draws it among the ground and not with the named things, which it leaves exactly as they stand", () => {
+    expect(named(WITHOUT).length).toBeGreaterThan(0);
+    expect(named(FIXTURE)).toEqual(named(WITHOUT));
+  });
+
+  it("cuts the two engraved views alike and Atlas's teeth further apart, which is the idiom and not the palette", () => {
+    const [plate, night, atlas] = VIEWS;
+    expect(added(night!)).toBe(added(plate!));
+    expect(added(atlas!)).toBeLessThan(added(plate!));
   });
 });
 

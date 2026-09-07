@@ -3,13 +3,14 @@
  * a set of pens and the five hands ADR-0021 and #139 settled.
  *
  * All three are the **engraved** aesthetic, so all three name hands out of
- * `views/engraved/`. That sharing is by value and never by inheritance: the
- * night plate names the plate's glyph, type, furniture and moves and supplies
- * its own ground — the plate's relief treatment, under its own palette — and
- * Atlas names the plate's type, furniture and moves, supplies its own block
- * glyph, and supplies its own ground with the tint bands in it. #170 takes the
- * night plate's ground to illuminated contours and Atlas's to a hypsometric
- * ramp, and neither costs anything outside this file and one hand (#138).
+ * `views/engraved/`. That sharing is by value and never by inheritance: each
+ * names the plate's glyph or its own, the plate's type, furniture and moves,
+ * and an engraved ground built round **its own relief treatment** — the plate's
+ * contours weighted by level, the night plate's lit from the north-west,
+ * Atlas's hypsometric ramp. #138 found that no treatment survives the move
+ * from one view to the next, so the ground is three hands round one frame, and
+ * neither of the two new ones costs anything outside this file and its own
+ * module.
  *
  * Adding a fourth view is a value here plus one folder per new aesthetic.
  */
@@ -17,8 +18,11 @@ import { block } from "./glyphs/block.ts";
 import { ticks } from "./glyphs/ticks.ts";
 import type { Pens, View } from "./view.ts";
 import { engravedFurniture } from "./views/engraved/furniture.ts";
-import { engravedGround, tintedContours, weightedContours } from "./views/engraved/ground.ts";
+import { engravedGround, weightedContours } from "./views/engraved/ground.ts";
+import { ATLAS_RAMP, hypsometricRamp } from "./views/engraved/groundAtlas.ts";
+import { illuminatedContours } from "./views/engraved/groundNight.ts";
 import { engravedMoves } from "./views/engraved/moves.ts";
+import { ATLAS_RAMPART, ENGRAVED_RAMPART } from "./views/engraved/rampart.ts";
 import { engravedType } from "./views/engraved/type.ts";
 
 /** The plate's pens: fine dotted track, dashed intent, solid detachment (ADR-0009, #58). */
@@ -47,13 +51,13 @@ export const CHART_PLATE: View = {
     panel: "rgba(239,227,198,0.92)",
     coast: "#2b2418",
     stipple: "rgba(120,90,40,0.06)",
-    relief: { contour: 0.32, index: 0.62, numeral: 0.75, band: undefined },
+    relief: { contour: 0.32, index: 0.62, numeral: 0.75, ramp: undefined },
     sides: ["#8f2f24", "#24406b", "#3e5a2a", "#6b4a1e", "#5a3a6b", "#2f5f5a"],
   },
   pens: PLATE_PENS,
   glyph: ticks,
   type: engravedType,
-  ground: engravedGround(weightedContours),
+  ground: engravedGround(weightedContours, ENGRAVED_RAMPART),
   furniture: engravedFurniture,
   moves: engravedMoves,
 };
@@ -70,15 +74,16 @@ export const NIGHT_PLATE: View = {
     panel: "rgba(27,36,48,0.92)",
     coast: "#a9b6c6",
     stipple: "rgba(239,227,198,0.05)",
-    relief: { contour: 0.22, index: 0.5, numeral: 0.65, band: undefined },
+    relief: { contour: 0.22, index: 0.5, numeral: 0.65, ramp: undefined },
     sides: ["#e2685a", "#86a9e8", "#8fc08a", "#d3a765", "#b892d8", "#79c4bd"],
   },
   pens: PLATE_PENS,
   glyph: ticks,
   type: engravedType,
-  // Its own ground, drawing the plate's treatment under its own palette, until
-  // #170 lights the contours from the north-west (#138).
-  ground: engravedGround(weightedContours),
+  // Its own ground: the same rings lit from one light low in the north-west,
+  // so the hill is modelled by the lines and nothing is washed over the paper
+  // (#138). It keeps the plate's engraved rampart, as a siege plan cuts one.
+  ground: engravedGround(illuminatedContours, ENGRAVED_RAMPART),
   furniture: engravedFurniture,
   moves: engravedMoves,
 };
@@ -90,13 +95,17 @@ export const ATLAS: View = {
   palette: {
     ...CHART_PLATE.palette,
     stipple: undefined,
-    // The one view that lays height as tone: a wash is quiet under blocks, and darkens the ground the side inks sit on anywhere else (#62).
-    relief: { contour: 0.22, index: 0.45, numeral: 0.65, band: 0.075 },
+    // The one view that lays height as tone, and since #138 as a hue rather
+    // than a density: five colours off `#e6d9b4 → #c0a066`, under index
+    // contours faint enough to stay quiet beneath the blocks. Atlas lays no
+    // fine weight at all over its ramp, so `contour` goes unread here; it is
+    // still answered for, because a view answers for every value there is.
+    relief: { contour: 0.22, index: 0.32, numeral: 0.65, ramp: ATLAS_RAMP },
   },
   pens: ATLAS_PENS,
   glyph: block,
   type: engravedType,
-  ground: engravedGround(tintedContours),
+  ground: engravedGround(hypsometricRamp, ATLAS_RAMPART),
   furniture: engravedFurniture,
   moves: engravedMoves,
 };

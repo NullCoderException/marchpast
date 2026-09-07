@@ -93,20 +93,30 @@ export interface Palette {
 }
 
 /**
- * The alphas relief is inked at, all of them the palette's own ink (#62). The
- * two contour weights are fixed across the engraved views and only these
- * alphas move, which is why they sit on the palette: it keeps the plate, the
- * night plate and Atlas on one relief hand with no pass testing a view id.
+ * How heavily a view inks the contour weights, plus the one relief material
+ * that is not an alpha at all.
+ *
+ * These sat on the palette because one relief hand served three views and only
+ * the alphas moved between them (#62). The three treatments diverged on #138
+ * and each has its own hand now, so the weights are a hand's business —
+ * the plate's two are `ground.ts`'s, the night plate scales them by the light,
+ * Atlas thins its index line and lays no fine one — and what is left here is
+ * what it always was: how hard each view lays the ink.
  */
 export interface ReliefInks {
   /** Every contour, at the fine weight. */
   contour: number;
   /** Every fifth level, at the heavy weight. */
   index: number;
-  /** The numeral an index contour is labelled with, on its paper knock-out. */
+  /** The numeral an index contour is labelled with, on the knock-out of the ground it stands on. */
   numeral: number;
-  /** Ink per tint band under the contours; `undefined` lays no bands, which is every view but Atlas. */
-  band: number | undefined;
+  /**
+   * The colours the tint bands are laid in, one per threshold in
+   * `TINT_BAND_LEVELS` and in that order; `undefined` lays no bands, which is
+   * every view but Atlas. A ramp rather than an alpha, so the high ground is a
+   * hue and not a density and every side ink reads over every band (#138).
+   */
+  ramp: readonly string[] | undefined;
 }
 
 /** Arrow head shapes: `open` is two pen strokes, `filled` a solid barb. */
@@ -295,9 +305,9 @@ export interface Naming extends Setting {
 /**
  * How a view draws the ground: everything in map space, through the
  * projection, under the units. The shared half keeps the order — the sea,
- * the land, the relief treatment, the water, and the named things last — and
- * the clipping to the extent; every mark inside that order is the view's
- * (ADR-0021, #138).
+ * the land, the relief treatment, the water, the ramparts, and the named
+ * things last — and the clipping to the extent; every mark inside that order
+ * is the view's (ADR-0021, #138, #170).
  *
  * A staff map's kilometre graticule is ground too (#138), and it gets no slot
  * here: it runs over the whole of a ground its own hand draws, so that hand
@@ -313,6 +323,15 @@ export interface Ground {
   relief(request: GroundRequest): void;
   /** The water on the land: the shoals and the rivers. */
   water(request: GroundRequest): void;
+  /**
+   * The built lines on the ground: every rampart, with its ditch and the teeth
+   * on the side it faces (ADR-0026). Its own step rather than a corner of
+   * `water` because the shared half owns the order and schema.md section 4
+   * puts a rampart among the ground — after the treatment and the water,
+   * before the named things — and because the three idioms #138 drew are three
+   * drawings and not one under different values.
+   */
+  rampart(request: GroundRequest): void;
   /** The mark a named point stands on, drawn at the origin: a place's dot, a work's plan sign. */
   mark(ctx: CanvasRenderingContext2D, kind: MapLabelKind, palette: Palette): void;
   /** How this view sets a named point's name. The placer measures with it and the pass draws with it, so the two cannot disagree. */
