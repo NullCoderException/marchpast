@@ -1,5 +1,7 @@
 # Narrative is one authored caption per phase, with sources in a battle-level table
 
+*Amended 2026-09-07: [ADR-0027](0027-conjecture-is-notes-matter-and-a-battle-authors-one-reading.md) makes `notes` **required** on every phase, so the "optional" in the clause below no longer holds; everything else here stands. It also settles for a position what this ADR settled for a time: the battle authors one reading, names the one it declined in `notes`, and no field marks a position or a state as conjectural (#133).*
+
 Trafalgar's sources disagree by an hour on when *Victory* cut the line and by three ships on the number of prizes, and the concept doc asked whether the player should carry per-source alternate captions. We chose one author-selected **caption** per phase, an optional per-phase **notes** string for the author's reasoning about disputed readings, and **references** into a battle-level **sources** table. Per-source alternates would have turned the player into a source-comparison tool and multiplied what an extraction pipeline must produce; a caption alone left the "why this reading" with no home.
 
 ## Considered options
