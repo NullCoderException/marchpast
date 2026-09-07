@@ -8,8 +8,14 @@
  * know, and calls the view's glyph — which is the whole of what changes
  * between the plate's ticks and Atlas's blocks.
  *
+ * Laid out first, drawn second. `layoutUnits` says where every glyph will land
+ * and what the placer will be told about it; `drawUnits` inks that. The two
+ * are separate because the whole plate is laid out before anything is drawn:
+ * the map's names clear the units' labels and the units' labels clear the
+ * map's names, and the map is drawn first (#107).
+ *
  * It does **not** draw the labels. Placing them needs the furniture's boxes as
- * well as the glyphs', so the pass runs last, unclipped, over what this one
+ * well as the glyphs', so that pass runs last, unclipped, over what this one
  * reports: every drawn unit as the placer sees it — where its glyph landed,
  * how far it reaches, and the words its roster entry offers (#39).
  *
@@ -20,7 +26,7 @@ import type { Arm } from "../schema/types.ts";
 import type { Picture, UnitPicture } from "../timeline/picture.ts";
 import type { LabelUnit } from "./labels/index.ts";
 import type { Plate } from "./plate.ts";
-import { drawArrow, hashString } from "./primitives.ts";
+import { drawArrow, hashString, type Point } from "./primitives.ts";
 import { toRadians } from "./projection.ts";
 import { GLYPH_PX } from "./style.ts";
 import type { GlyphRequest } from "./view.ts";
@@ -28,10 +34,25 @@ import type { GlyphRequest } from "./view.ts";
 /** Below this many pixels a track is a dot under the glyph, not an arrow. */
 const MIN_ARROW_PX = 6;
 
-/** Draws the units this level puts on the plate and reports them for the label pass. */
-export function drawUnits(plate: Plate): LabelUnit[] {
-  const { ctx, battle, picture, unitsDrawn, projection, view } = plate;
-  const { palette, pens } = view;
+/**
+ * One unit ready to be inked: where it landed, what it asks the view's glyph
+ * for, and the label it offers the placer. Laid out before anything is drawn,
+ * because the map's names have to clear the units' labels and the map is drawn
+ * first (#107).
+ */
+export interface LaidOutUnit {
+  unit: UnitPicture;
+  at: Point;
+  /** Radians, as the canvas is rotated by. */
+  heading: number;
+  request: GlyphRequest;
+  label: LabelUnit;
+}
+
+/** Works out where every unit this level draws will land, and what the label pass will be told about it. */
+export function layoutUnits(plate: Plate): LaidOutUnit[] {
+  const { battle, picture, unitsDrawn, projection, view } = plate;
+  const { palette } = view;
   // The whole roster, never the level's slice of it: a unit's label — and the
   // numeral that will key it in the legend (#39) — is its whole-roster entry
   // at every level (schema.md 2.11).
@@ -53,31 +74,10 @@ export function drawUnits(plate: Plate): LabelUnit[] {
     return arm;
   };
 
-  // Tracks and moves. A track runs wherever the tween takes it: heading is the
-  // front, so a unit retiring in good order draws its track back through its
-  // own rear (ADR-0016). Nothing here assumes it runs ahead.
-  for (const unit of unitsDrawn) {
-    const here = projection.project(unit.position.lat, unit.position.lon);
-    if (unit.track !== undefined) {
-      const ahead = projection.project(unit.track.to.lat, unit.track.to.lon);
-      if (Math.hypot(ahead.x - here.x, ahead.y - here.y) >= MIN_ARROW_PX) drawArrow(ctx, here, ahead, pens.track, palette.ink);
-    }
-    for (const move of unit.moves) {
-      const to = projection.project(move.to.lat, move.to.lon);
-      if (move.kind === "intent") drawArrow(ctx, here, to, pens.intent, palette.ink);
-      else drawArrow(ctx, here, to, pens.detachment, colourOf(unit));
-    }
-  }
-
-  // Glyphs, in two passes: every unit's mark, then every unit's body. One
-  // unit's smoke must never cover the next unit's ships, and at 13:30 off
-  // Trafalgar three units overlap (ADR-0014).
   const windFrom = blowingWind(picture);
-  const glyphs = unitsDrawn.map((unit) => ({
-    unit,
-    at: projection.project(unit.position.lat, unit.position.lon),
-    heading: toRadians(unit.heading),
-    request: {
+  return unitsDrawn.map((unit) => {
+    const at = projection.project(unit.position.lat, unit.position.lon);
+    const request: GlyphRequest = {
       length: GLYPH_PX,
       formation: unit.formation,
       arm: armOf(unit),
@@ -88,23 +88,10 @@ export function drawUnits(plate: Plate): LabelUnit[] {
       scale: 1,
       windTo: windFrom === undefined ? undefined : windToRelative(unit.heading, windFrom),
       palette,
-    } satisfies GlyphRequest,
-  }));
+    };
 
-  for (const half of ["mark", "body"] as const) {
-    if (view.glyph[half] === undefined) continue;
-    for (const { at, heading, request } of glyphs) {
-      ctx.save();
-      ctx.translate(at.x, at.y);
-      ctx.rotate(heading);
-      view.glyph[half]?.(ctx, request);
-      ctx.restore();
-    }
-  }
-
-  // What the label pass needs and only this pass knows: where each glyph
-  // landed, how far it reaches across its axis, and the roster entry behind it.
-  return glyphs.map(({ unit, at, request }) => {
+    // What the label pass needs and only this pass knows: where each glyph
+    // landed, how far it reaches across its axis, and the roster entry behind it.
     const entry = roster.get(unit.id);
     const label: LabelUnit = {
       id: unit.id,
@@ -122,8 +109,43 @@ export function drawUnits(plate: Plate): LabelUnit[] {
     };
     if (entry?.unit.short_label !== undefined) label.shortLabel = entry.unit.short_label;
     if (request.windTo !== undefined) label.windTo = request.windTo;
-    return label;
+    return { unit, at, heading: toRadians(unit.heading), request, label };
   });
+}
+
+/** Draws what `layoutUnits` worked out, in the order the plate reads: every arrow, then every glyph. */
+export function drawUnits(plate: Plate, laid: readonly LaidOutUnit[]): void {
+  const { ctx, projection, view } = plate;
+  const { palette, pens } = view;
+
+  // Tracks and moves. A track runs wherever the tween takes it: heading is the
+  // front, so a unit retiring in good order draws its track back through its
+  // own rear (ADR-0016). Nothing here assumes it runs ahead.
+  for (const { unit, at: here, request } of laid) {
+    if (unit.track !== undefined) {
+      const ahead = projection.project(unit.track.to.lat, unit.track.to.lon);
+      if (Math.hypot(ahead.x - here.x, ahead.y - here.y) >= MIN_ARROW_PX) drawArrow(ctx, here, ahead, pens.track, palette.ink);
+    }
+    for (const move of unit.moves) {
+      const to = projection.project(move.to.lat, move.to.lon);
+      if (move.kind === "intent") drawArrow(ctx, here, to, pens.intent, palette.ink);
+      else drawArrow(ctx, here, to, pens.detachment, request.colour);
+    }
+  }
+
+  // Glyphs, in two passes: every unit's mark, then every unit's body. One
+  // unit's smoke must never cover the next unit's ships, and at 13:30 off
+  // Trafalgar three units overlap (ADR-0014).
+  for (const half of ["mark", "body"] as const) {
+    if (view.glyph[half] === undefined) continue;
+    for (const { at, heading, request } of laid) {
+      ctx.save();
+      ctx.translate(at.x, at.y);
+      ctx.rotate(heading);
+      view.glyph[half]?.(ctx, request);
+      ctx.restore();
+    }
+  }
 }
 
 /** The bearing the phase's wind blows from, or `undefined` when there is no wind to speak of (ADR-0008). */

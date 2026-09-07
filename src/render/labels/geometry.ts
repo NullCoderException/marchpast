@@ -203,6 +203,16 @@ export function overlaps(a: Rect, b: Rect): boolean {
   return overlapArea(a, b) > 0;
 }
 
+/**
+ * Whether two boxes share a pixel, with no slack at all. What a map label is
+ * judged by against a mark: a name stands off its own point by a gap narrower
+ * than the pad, so padding there would refuse the slot every map label has
+ * always taken (#107).
+ */
+export function touches(a: Rect, b: Rect): boolean {
+  return a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+}
+
 /** The square pixels two boxes share, pad included: nothing if they are clear of each other. */
 export function overlapArea(a: Rect, b: Rect): number {
   const x = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x) + BOX_PAD * 2;

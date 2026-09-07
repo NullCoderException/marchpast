@@ -17,8 +17,16 @@
  * banks with the sea's material between them; a work as a bastioned-square
  * plan sign with its name in small capitals; a place, unchanged from v1, as a
  * dot with its name in italic.
+ *
+ * The marks are this pass's own; **where the names go is not**. `mapPoints`
+ * measures every named point in its own face and `labels/map.ts` finds each a
+ * slot, because a name has to clear the furniture and the other names, which
+ * this pass cannot see from inside the clip (#107). The names are still drawn
+ * here, before the units, so a glyph covers a name and never the other way
+ * about.
  */
 import type { LonLat, MapFile, MapFeature } from "../schema/types.ts";
+import type { MapLabel, MapLabelKind, MapPoint } from "./labels/index.ts";
 import type { Projection } from "./projection.ts";
 import type { Plate } from "./plate.ts";
 import { seeded } from "./primitives.ts";
@@ -76,7 +84,12 @@ const WORK_LABEL_GAP = 11;
 const WORK_LABEL_SIZE = 11;
 const WORK_LABEL_TRACKING = "0.5px";
 
-export function drawMap(plate: Plate): void {
+/**
+ * The map, and the names the placer found room for. Every named point's dot or
+ * sign is drawn whatever the placer said: a name it had to drop leaves the
+ * thing on the plate and only the word off it (#107).
+ */
+export function drawMap(plate: Plate, labels: readonly MapLabel[]): void {
   const { map } = plate;
   if (map === undefined) return;
 
@@ -85,8 +98,9 @@ export function drawMap(plate: Plate): void {
   drawShoals(plate, map);
   drawRelief(plate, map);
   drawRivers(plate, map, land);
-  drawPlaces(plate, map);
-  drawWorks(plate, map);
+  drawPlaceDots(plate, map);
+  drawWorkSigns(plate, map);
+  drawMapLabels(plate, labels);
 }
 
 /** Land polygons in the view's land tone, with a fine coastline shaded inward. */
@@ -306,54 +320,109 @@ function drawRivers(plate: Plate, map: MapFile, land: LonLat[][]): void {
   ctx.restore();
 }
 
-/** A place: a small mark with the name in the plate face. Unchanged from v1. */
-function drawPlaces({ ctx, projection, view: { palette } }: Plate, map: MapFile): void {
+/** A place's own: the small dot, unchanged from v1. Its name is the placer's business. */
+function drawPlaceDots({ ctx, projection, view: { palette } }: Plate, map: MapFile): void {
   const places = namedPoints(map, "place");
   if (places.length === 0) return;
 
   ctx.save();
   ctx.fillStyle = palette.ink;
-  ctx.font = font(PLACE_LABEL_SIZE, true);
-  ctx.textBaseline = "middle";
-  ctx.textAlign = "left";
-  for (const { name, lon, lat } of places) {
+  for (const { lon, lat } of places) {
     const { x, y } = projection.project(lat, lon);
     ctx.beginPath();
     ctx.arc(x, y, PLACE_DOT_RADIUS, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillText(name, x + PLACE_LABEL_GAP, y);
   }
   ctx.restore();
 }
 
 /**
- * A work: the bastioned-square plan sign, and its name beside it upright in
- * tracked capitals. One sign for a fort, a battery and a camp alike — what
- * they differ in is the name, which is authoring, not schema (ADR-0012).
+ * A work's own: the bastioned-square plan sign. One sign for a fort, a
+ * battery and a camp alike — what they differ in is the name, which is
+ * authoring, not schema (ADR-0012).
  */
-function drawWorks(plate: Plate, map: MapFile): void {
+function drawWorkSigns(plate: Plate, map: MapFile): void {
   const { ctx, projection } = plate;
   const { palette } = plate.view;
-  const works = namedPoints(map, "work");
-  if (works.length === 0) return;
+  for (const { lon, lat } of namedPoints(map, "work")) {
+    const { x, y } = projection.project(lat, lon);
+    drawWorkSign(ctx, x, y, palette);
+  }
+}
+
+/**
+ * The names, each where the placer put it: a place's in italic, a work's
+ * upright in tracked capitals, both in ink and both on the middle they hang
+ * from (#62). The face is set per label rather than per pass because the two
+ * kinds are interleaved in the map file's own order.
+ */
+function drawMapLabels({ ctx, view: { palette } }: Plate, labels: readonly MapLabel[]): void {
+  if (labels.length === 0) return;
 
   ctx.save();
   ctx.fillStyle = palette.ink;
-  ctx.font = font(WORK_LABEL_SIZE);
   ctx.textBaseline = "middle";
-  ctx.textAlign = "left";
-  ctx.letterSpacing = WORK_LABEL_TRACKING;
-  for (const { name, lon, lat } of works) {
-    const { x, y } = projection.project(lat, lon);
-    drawWorkSign(ctx, x, y, palette);
-    ctx.fillStyle = palette.ink;
-    ctx.fillText(name.toUpperCase(), x + WORK_LABEL_GAP, y);
+  for (const { point, at, align } of labels) {
+    setLabelFace(ctx, point.kind);
+    ctx.textAlign = align;
+    ctx.fillText(point.text, at.x, at.y);
   }
   // Tracking is part of the drawing state, so `restore` puts it back; it is
   // cleared here as well because a browser that has not implemented it would
   // otherwise leave every later label tracked.
   ctx.letterSpacing = "0px";
   ctx.restore();
+}
+
+/** The face a kind's name is set in. The one place that says it, so measuring and drawing cannot disagree. */
+function setLabelFace(ctx: CanvasRenderingContext2D, kind: MapLabelKind): void {
+  if (kind === "place") {
+    ctx.font = font(PLACE_LABEL_SIZE, true);
+    ctx.letterSpacing = "0px";
+    return;
+  }
+  ctx.font = font(WORK_LABEL_SIZE);
+  ctx.letterSpacing = WORK_LABEL_TRACKING;
+}
+
+/**
+ * Every named point the map carries, measured in its own face and projected
+ * onto the plate: what `placeMapLabels` needs and only this pass knows (#107).
+ * In the map file's own order across both kinds, which is the order the placer
+ * treats as priority.
+ *
+ * A label's box is its measured width by its point size, centred on the middle
+ * the name is drawn on. The size is a shade taller than the ink — a 15 px face
+ * does not reach 15 px from cap to descender — which is the way to be wrong
+ * here: two names that only just clear each other are still two names.
+ */
+export function mapPoints({ ctx, map, projection }: Plate): MapPoint[] {
+  if (map === undefined) return [];
+
+  const points: MapPoint[] = [];
+  ctx.save();
+  for (const { geometry, properties } of map.features) {
+    if (geometry.type !== "Point") continue;
+    if (properties.kind !== "place" && properties.kind !== "work") continue;
+    const { kind } = properties;
+    const [lon, lat] = geometry.coordinates;
+    const at = projection.project(lat, lon);
+    const text = kind === "place" ? properties.name : properties.name.toUpperCase();
+    setLabelFace(ctx, kind);
+    const half = kind === "place" ? PLACE_DOT_RADIUS : WORK_BASTION_OUTER;
+    points.push({
+      kind,
+      text,
+      at,
+      footprint: { x: at.x - half, y: at.y - half, width: half * 2, height: half * 2 },
+      width: ctx.measureText(text).width,
+      height: kind === "place" ? PLACE_LABEL_SIZE : WORK_LABEL_SIZE,
+      gap: kind === "place" ? PLACE_LABEL_GAP : WORK_LABEL_GAP,
+    });
+  }
+  ctx.letterSpacing = "0px";
+  ctx.restore();
+  return points;
 }
 
 /** The sign itself: a square with a bastion at each corner, filled paper and outlined in ink, so it reads over relief. */
