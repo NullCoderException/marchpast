@@ -6,7 +6,10 @@
  */
 export const PLATE_FONT_FAMILY = "IM Fell English";
 
+/** The face and what a browser falls back to, as a CSS `font-family` list: what the surface sets the strip in (ADR-0023). */
+export const PLATE_FONT_STACK = `"${PLATE_FONT_FAMILY}", Georgia, serif`;
+
 /** A CSS font shorthand in the plate face, e.g. `plateFont(24)`. */
 export function plateFont(sizePx: number): string {
-  return `${sizePx}px "${PLATE_FONT_FAMILY}", Georgia, serif`;
+  return `${sizePx}px ${PLATE_FONT_STACK}`;
 }

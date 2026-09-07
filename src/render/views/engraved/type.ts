@@ -1,13 +1,16 @@
 /**
  * The engraved views' type: IM Fell English, the ramp the three engraved views
- * share, the **slope** as the device that tells a name from a fact, and the
- * label's leader — a hairline to a dot on the glyph's centre (#58).
+ * share, the **slope** as the device that tells a name from a fact, the
+ * label's leader — a hairline to a dot on the glyph's centre (#58) — and the
+ * chooser's caret, a two-stroke chevron (ADR-0030).
  *
  * ADR-0021 fixes the eight roles and their rank and leaves the face, the sizes
- * and the device to the view. The rank holds on a desktop; a phone thins the
- * band and the furniture (`layout.ts`, #86) and leaves the glyph and its label
- * at their plate constants (ADR-0016), so the label's two lines end up larger
- * than the caption's — which is the collapse working, not the ramp breaking.
+ * and the device to the view; #139 widened the hand to the marks that set a
+ * name against a thing, which is what the leader and the caret both are. The
+ * rank holds on a desktop; a phone thins the band and the furniture
+ * (`layout.ts`, #86) and leaves the glyph and its label at their plate
+ * constants (ADR-0016), so the label's two lines end up larger than the
+ * caption's — which is the collapse working, not the ramp breaking.
  *
  * "No bold" is a rule of *this* aesthetic and not an invariant (ADR-0021), and
  * it is why the ramp below moves in size and slope alone.
@@ -43,6 +46,13 @@ const RAMP: Readonly<Record<TypeRole, { desktop: number; phone: number; italic: 
 const LEADER_WIDTH = 0.8;
 const LEADER_DOT = 0.8;
 
+/**
+ * The caret: two strokes meeting at a point, round-capped, in a box the width
+ * `player.css` reserves beside a chooser's value. Drawn rather than typed, so
+ * it is the plate's own chevron at every zoom and in every browser.
+ */
+const CARET = { width: 9, height: 6, weight: 1.1 } as const;
+
 /** Nothing in the engraved system is tracked but a work's name, which its ground hand sets itself. */
 const NO_TRACKING = "0px";
 
@@ -77,4 +87,19 @@ export const engravedType: Type = {
     ctx.fill();
     ctx.restore();
   },
+
+  /** A two-stroke chevron, the same open hand the plate's arrow heads are drawn with (ADR-0030). */
+  caret(ink: string): string {
+    const { width, height, weight } = CARET;
+    return dataUri(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">` +
+        `<path d="M0.6 0.6 L4.5 5 L8.4 0.6" fill="none" stroke="${ink}" stroke-width="${weight}" stroke-linecap="round"/>` +
+        `</svg>`,
+    );
+  },
 };
+
+/** An SVG as a URI a stylesheet can name. Encoded whole: a palette's ink carries a `#`, which unescaped ends the URI at the fragment. */
+function dataUri(svg: string): string {
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}

@@ -2,9 +2,11 @@
  * The Library in the plate's spirit: parchment, ink, the bundled face and the
  * plate's type ramp, set as a page rather than drawn on a canvas.
  *
- * As in player.css, the values are the Chart plate's (CHART_PLATE in
- * src/render/views.ts), copied rather than published: the view stops at the
- * canvas edge (ADR-0014, #47), and the Library has no view at all.
+ * These are the only colour values left in the app's CSS, and they are the
+ * Library's own rather than a copy: since ADR-0023 the player's surface is
+ * derived from whichever view is picked, and the Library has one look, the
+ * brand's, following neither a view nor the operating system (ADR-0029). It
+ * declares them over the root's, which a battle visit leaves set.
  */
 
 /*
@@ -18,8 +20,13 @@
   overflow: auto;
 }
 
-.st-library,
-.st-library-back {
+/*
+ * The Library's own tones, declared on the page itself rather than on the
+ * list: the root carries whatever view a battle visit last left there, and the
+ * list is narrower than the window, so its margins would otherwise be that
+ * view's letterbox through index.html's `--st-edge`.
+ */
+.st-library-page {
   --st-ink: #2b2418;
   --st-parchment: #efe3c6;
   --st-rule: rgba(43, 36, 24, 0.55);
@@ -151,18 +158,6 @@
 }
 
 .st-library a {
-  color: inherit;
-}
-
-/* The way back from a battle that would not load: the only thing in the
-   controls strip when there is no player to control. */
-.st-library-back {
-  display: inline-block;
-  padding: 10px 24px;
-  border-top: 1px solid var(--st-rule);
-  width: 100%;
-  box-sizing: border-box;
-  font-size: 15px;
   color: inherit;
 }
 

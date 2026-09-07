@@ -18,15 +18,16 @@
  * with one entry. The staff map adds the second (#139), and the build-time
  * still renderer registers the same list with a Node canvas (#126).
  */
-import { PLATE_FONT_FAMILY } from "./plate.ts";
+import { PLATE_FONT_FAMILY, PLATE_FONT_STACK } from "./plate.ts";
 import plateFontUrl from "./IMFellEnglish-Regular.woff2";
 
 /** How a view names its face: `Type.face` carries one of these. */
 export type FaceId = "plate";
 
-/** One bundled face: the family a font shorthand names, and the file it is loaded from. */
+/** One bundled face: the family a font shorthand names, the CSS list a stylesheet sets, and the file it is loaded from. */
 export interface Face {
   family: string;
+  stack: string;
   url: string;
 }
 
@@ -37,8 +38,18 @@ export interface Face {
  * added for a view cannot be forgotten by the build (#126, ADR-0025).
  */
 export const FACES: Readonly<Record<FaceId, Face>> = {
-  plate: { family: PLATE_FONT_FAMILY, url: plateFontUrl },
+  plate: { family: PLATE_FONT_FAMILY, stack: PLATE_FONT_STACK, url: plateFontUrl },
 };
+
+/**
+ * The CSS `font-family` list a face is set in, fallbacks and all. The canvas
+ * waits for the real face rather than drawing in a fallback (ADR-0009), but
+ * the surface is DOM: the strip has to say what it falls back to while the
+ * face is in flight, so this is the one place a stack is published (ADR-0023).
+ */
+export function fontStack(id: FaceId): string {
+  return FACES[id].stack;
+}
 
 /** Every face there is, so the prefetch needs no list of its own. */
 export const FACE_IDS = Object.keys(FACES) as readonly FaceId[];

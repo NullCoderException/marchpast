@@ -1,28 +1,43 @@
 /*
- * The controls in the plate's spirit: parchment, ink and the bundled face, one
- * quiet strip beneath the picture. Nothing here competes with the plate, so
- * there are no fills brighter than the paper and no colour but the ink.
+ * The controls in the picture's spirit: one quiet strip beneath the plate, in
+ * the paper, the ink and the face of whichever view the plate is drawn in.
+ * Nothing here competes with the picture, so there are no fills brighter than
+ * the paper and no colour but the ink.
  *
- * The view stops at the canvas edge (ADR-0014, #47): whichever view the
- * chooser is on, the strip stays in the Chart plate's language, so these
- * values are copied from CHART_PLATE in src/render/views.ts rather than
- * published from it. The face is loaded by src/fonts/plate.ts, which the app
- * awaits before the first frame.
+ * The view crosses the canvas edge (ADR-0023, superseding ADR-0014's clause):
+ * every token below is written on the document root by src/player/surface.ts,
+ * derived from the view's own palette and type, once when the player opens and
+ * once per switch. So this file has the rules and none of the values — a
+ * colour literal here would be the hand copy the derivation exists to end.
+ * The one thing it does not read is `palette.land`, which is a picture value
+ * (ADR-0030).
  *
- * The load notice takes the same three tokens, because it stands where the
- * plate would be and is the surface rather than the picture (#130, ADR-0023).
+ * The load notice takes the same tokens, because it stands where the plate
+ * would be and is the surface rather than the picture (#130, ADR-0023).
  */
 
 .st-controls,
 .st-details,
 .st-notice {
-  --st-ink: #2b2418;
-  --st-parchment: #efe3c6;
-  --st-rule: rgba(43, 36, 24, 0.55);
-  --st-sunk: #e3d3ac;
-  font-family: "IM Fell English", Georgia, serif;
+  font-family: var(--st-face);
   color: var(--st-ink);
-  background: var(--st-parchment);
+  background-color: var(--st-ground);
+}
+
+/*
+ * Windows High Contrast repaints CSS colour and cannot reach a <canvas>, so
+ * without this the strip flips to the system palette while the plate above it
+ * keeps the view's parchment — and a key row, which is a canvas sample beside
+ * a word, splits down the middle (ADR-0029). #181 records what real High
+ * Contrast makes of it; emulation was not enough.
+ *
+ * The notice is not in this list. It stands *instead of* the canvas rather
+ * than beside it (#130), so there is no split to prevent, and DOM text
+ * repainted in the viewer's own system colours is the feature working.
+ */
+.st-controls,
+.st-details {
+  forced-color-adjust: none;
 }
 
 .st-controls {
@@ -43,18 +58,37 @@
 .st-controls select {
   font: inherit;
   color: inherit;
-  background: var(--st-parchment);
+  /* The colour alone, never the shorthand: the shorthand would take the
+     chooser's caret off again on every hover. */
+  background-color: var(--st-ground);
   border: 1px solid var(--st-rule);
   border-radius: 2px;
   padding: 4px 10px;
   cursor: pointer;
 }
 
-.st-controls button:hover,
-.st-controls select:hover {
-  background: var(--st-sunk);
+/*
+ * The three choosers keep the operating system's popup — and with it the
+ * phone's wheel picker, the arrow keys, the screen-reader semantics and what
+ * `color-scheme` does for a dark view — and give up only the one glyph the
+ * aesthetic could not reach: the caret is the view's own type hand, drawn in
+ * its ink (ADR-0030).
+ */
+.st-controls select {
+  appearance: none;
+  padding-right: 28px;
+  background-image: var(--st-caret);
+  background-repeat: no-repeat;
+  background-position: right 9px center;
 }
 
+.st-controls button:hover,
+.st-controls select:hover {
+  background-color: var(--st-sunk);
+}
+
+/* `appearance: none` drops the native focus ring on some platforms, so this
+   rule is load-bearing for the choosers rather than a supplement (ADR-0030). */
 .st-controls button:focus-visible,
 .st-controls select:focus-visible,
 .st-bar:focus-visible {
@@ -62,12 +96,32 @@
   outline-offset: 2px;
 }
 
+/*
+ * The way back to the library, at the strip's head and on the error path,
+ * where it is the whole strip. This is the rule library.css used to carry, not
+ * a second one: it came off the library's declaration so that it inherits the
+ * strip's tokens rather than restating the plate's (ADR-0023), and it is set
+ * as the reference drawing sets it — no underline, a hairline in the strip's
+ * own rule beneath — rather than as a full-width bar, because it now heads a
+ * flex row instead of standing alone under a notice. It picks up the strip's
+ * 16px in place of the bar's 15px for the same reason.
+ *
+ * The drawing is prototypes/player-surface/lib.mjs on prototype/player-surface,
+ * `back === "link"`; nothing about it is decided here.
+ */
+.st-library-back {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--st-rule);
+  padding-bottom: 1px;
+}
+
 .st-play {
   min-width: 5.5em;
 }
 
 .st-details-toggle.st-on {
-  background: var(--st-sunk);
+  background-color: var(--st-sunk);
 }
 
 /* The scrubber: one flexed segment per phase, ticks at the phase instants. */
@@ -126,7 +180,7 @@
   margin: -6px 0 0 -6px;
   border: 1px solid var(--st-ink);
   border-radius: 50%;
-  background: var(--st-parchment);
+  background: var(--st-ground);
   pointer-events: none;
 }
 
@@ -273,7 +327,7 @@
 .st-sources th,
 .st-sources td {
   padding: 3px 12px 3px 0;
-  border-bottom: 1px solid rgba(43, 36, 24, 0.2);
+  border-bottom: 1px solid color-mix(in srgb, var(--st-ink) 20%, transparent);
   vertical-align: top;
 }
 
@@ -381,7 +435,7 @@
 
   .st-sources tr {
     padding: 8px 0;
-    border-bottom: 1px solid rgba(43, 36, 24, 0.2);
+    border-bottom: 1px solid color-mix(in srgb, var(--st-ink) 20%, transparent);
   }
 
   .st-sources td {
