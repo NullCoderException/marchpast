@@ -21,7 +21,7 @@ import type { Palette, Pens } from "../../view.ts";
  * engraved plate stacks ink, which is the whole difference between a printed
  * sheet's ground and an engraving's.
  */
-export const STAFF_RAMP: readonly string[] = ["#d3cbab", "#cbc199", "#c1b587", "#b5a771", "#a6975e"];
+const STAFF_RAMP: readonly string[] = ["#d3cbab", "#cbc199", "#c1b587", "#b5a771", "#a6975e"];
 
 /** The contours' own ink: burnt sienna, not the sheet's slate (#138). */
 export const STAFF_CONTOUR = "#8d6b43";
@@ -52,10 +52,11 @@ export const STAFF_PALETTE: Palette = {
 /**
  * The pens the staff map's `moves` hand draws with. Two of the four values a
  * `Pen` carries reach it — the **width**, which is the outline weight of the
- * tapered polygon, and the **head size**, which is the head's own half-width —
- * and the **dash never does**: a taper is a filled polygon, and a dash along a
- * shaft whose width varies is not a thing an operations sheet draws (#139).
- * `pens` is unchanged as a value type; this view simply reads less of it.
+ * tapered polygon, and the **head size**, which is the head's own half-width
+ * for a taper and its length for the track's open head — and the **dash never
+ * does**: a taper is a filled polygon, and a dash along a shaft whose width
+ * varies is not a thing an operations sheet draws (#139). `pens` is unchanged
+ * as a value type; this view simply reads less of it.
  */
 export const STAFF_PENS: Pens = {
   track: { width: 1.2, dash: [], head: "open", headSize: 8 },

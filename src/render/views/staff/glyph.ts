@@ -1,6 +1,6 @@
 /**
  * The staff map's glyph: **the frame is the frontage** (#139). A unit's whole
- * 72-pixel footprint is the symbol — a box tinted by the fraction still
+ * 72-pixel footprint is the glyph — a box tinted by the fraction still
  * fighting, with the arm's sign set in the middle and the leading edge drawn
  * heavy — where the engraved plate ranks eight ink signs inside the same
  * length and Atlas fills one solid block (ADR-0016, ADR-0021).
@@ -46,7 +46,7 @@ const CONTACT_RISE = 0.8;
 /** However short the front, a serration is never fewer teeth than this — two would read as a chevron. */
 const MIN_TEETH = 3;
 
-/** The strike that cancels a destroyed symbol: the sheet crosses a unit out rather than hollowing it. */
+/** The strike that cancels a destroyed unit: the sheet crosses one out rather than hollowing it. */
 const STRIKE_WIDTH = 1.6;
 
 /** The arm sign's weight inside the frame, and how much of the box it is drawn in. */
@@ -152,15 +152,16 @@ function body(ctx: CanvasRenderingContext2D, request: GlyphRequest): void {
   const broken = state === "broken";
 
   ctx.save();
-  // Square corners, as a printed symbol has: said here rather than left to the
-  // context, because the ground pass's own `lineJoin` has leaked this far
-  // before (`block.ts`, #168).
+  // Square corners, as a printed form rules them: said here rather than left
+  // to the context, because the ground pass's own `lineJoin` has leaked this
+  // far before (`block.ts`, #168).
   ctx.lineJoin = "miter";
   ctx.lineCap = "butt";
   ctx.strokeStyle = colour;
 
   // The tint, filled from the front: along the heading for a column and a
-  // mass, which empty from the rear, and across it for a line.
+  // mass, which empty from the rear, and from the left flank for a line, whose
+  // frontage is what it loses. Atlas's block fills the same way (`block.ts`).
   if (!dead && strength > 0) {
     ctx.save();
     ctx.globalAlpha = broken ? BROKEN_TINT_ALPHA : TINT_ALPHA;

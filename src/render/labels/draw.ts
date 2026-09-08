@@ -18,6 +18,7 @@
  * It runs after every glyph's body and after the furniture, because a label
  * may sit over the plate's paper but never under another unit's ships.
  */
+import { clearRun, runWidth, setRun } from "../run.ts";
 import { CARD_PAD } from "./card.ts";
 import { DETAIL_DROP, DETAIL_SIZE, NAME_RISE, NAME_SIZE } from "./content.ts";
 import type { Measure } from "./content.ts";
@@ -31,22 +32,7 @@ import type { Type, View } from "../view.ts";
  * tracked capitals cannot measure it uncapitalised (ADR-0021, #139).
  */
 export function canvasMeasure(ctx: CanvasRenderingContext2D, type: Type): Measure {
-  return (text, size, voice) => {
-    const run = type.run(size, voice);
-    ctx.font = run.font;
-    ctx.letterSpacing = run.tracking;
-    const width = ctx.measureText(run.spell(text)).width;
-    ctx.letterSpacing = "0px";
-    return width;
-  };
-}
-
-/** Sets one run of type on the context and answers the words as this view spells them. */
-function setRun(ctx: CanvasRenderingContext2D, type: Type, sizePx: number, voice: "name" | "fact", words: string): string {
-  const run = type.run(sizePx, voice);
-  ctx.font = run.font;
-  ctx.letterSpacing = run.tracking;
-  return run.spell(words);
+  return (text, size, voice) => runWidth(ctx, text, type.run(size, voice));
 }
 
 export function drawLabels(ctx: CanvasRenderingContext2D, placed: readonly Placed[], view: View): void {
@@ -64,11 +50,12 @@ export function drawLabels(ctx: CanvasRenderingContext2D, placed: readonly Place
     if (label.card !== undefined) continue;
     ctx.textAlign = label.align;
     ctx.fillStyle = label.unit.colour;
-    ctx.fillText(setRun(ctx, type, NAME_SIZE, "name", label.name), label.at.x, label.at.y - NAME_RISE);
+    ctx.fillText(setRun(ctx, type.run(NAME_SIZE, "name"), label.name), label.at.x, label.at.y - NAME_RISE);
     if (label.detail === undefined) continue;
     ctx.fillStyle = palette.ink;
-    ctx.fillText(setRun(ctx, type, DETAIL_SIZE, "fact", label.detail), label.at.x, label.at.y + DETAIL_DROP);
+    ctx.fillText(setRun(ctx, type.run(DETAIL_SIZE, "fact"), label.detail), label.at.x, label.at.y + DETAIL_DROP);
   }
+  clearRun(ctx);
 
   for (const label of placed) {
     if (label.card !== undefined) drawCard(ctx, label, view);
@@ -87,6 +74,8 @@ function drawCard(ctx: CanvasRenderingContext2D, label: Placed, { palette, type 
   const { box, card } = label;
   if (card === undefined) return;
 
+  // The panel is laid at full strength whatever the last run was set at.
+  clearRun(ctx);
   ctx.fillStyle = palette.panel;
   ctx.fillRect(box.x, box.y, box.width, box.height);
   ctx.strokeStyle = palette.ink;
@@ -95,9 +84,9 @@ function drawCard(ctx: CanvasRenderingContext2D, label: Placed, { palette, type 
 
   ctx.textAlign = "left";
   for (const line of card.lines) {
-    const words = setRun(ctx, type, line.size, line.voice, line.text);
+    const words = setRun(ctx, type.run(line.size, line.voice), line.text);
     ctx.fillStyle = line.side ? label.unit.colour : palette.ink;
     ctx.fillText(words, box.x + CARD_PAD, box.y + line.y);
   }
-  ctx.letterSpacing = "0px";
+  clearRun(ctx);
 }

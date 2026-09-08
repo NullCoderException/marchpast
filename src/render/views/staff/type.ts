@@ -18,8 +18,9 @@
  * constants (`labels/content.ts`), and they carry it through `run`, which
  * answers a whole `Setting` rather than a face for exactly this reason: a name
  * reaches the plate at 600 in tracked capitals in the side ink, over a fact at
- * 400 as it is written. The ramp's own `unitName` and `stateWord` **sizes** are
- * the canvas's, and are what the conformance test ranks.
+ * 400 as it is written and laid at .85 of the plate's ink. The ramp's own
+ * `unitName` and `stateWord` **sizes** are the canvas's, and are what the
+ * conformance test ranks.
  */
 import { staffFont } from "../../../fonts/staff.ts";
 import type { LayoutMode } from "../../layout.ts";
@@ -28,14 +29,18 @@ import type { LeaderRequest, Setting, Type, TypeRole, Voice } from "../../view.t
 /** The weight a name is set at, and the weight a fact is. */
 const NAME_WEIGHT = 600;
 const FACT_WEIGHT = 400;
+/** How hard a fact is laid against the name over it: .85 of the plate's ink (#139). */
+const FACT_ALPHA = 0.85;
 
-/** How one role is set: the size in each mode, the weight, the tracking, and whether the words are capitalised. */
+/** How one role is set: the size in each mode, the weight, the tracking, whether the words are capitalised, and how hard it is laid. */
 interface Row {
   desktop: number;
   phone: number;
   weight: number;
   tracking: number;
   caps: boolean;
+  /** `undefined` is full strength. A sheet quiets what is beside the point, and never by shrinking it further. */
+  alpha?: number;
 }
 
 /**
@@ -49,7 +54,7 @@ const RAMP: Readonly<Record<TypeRole, Row>> = {
   title: { desktop: 19, phone: 12, weight: 600, tracking: 1.5, caps: true },
   caption: { desktop: 15, phone: 13, weight: 400, tracking: 0, caps: false },
   unitName: { desktop: 12.5, phone: 12.5, weight: NAME_WEIGHT, tracking: 0.9, caps: true },
-  stateWord: { desktop: 12, phone: 12, weight: FACT_WEIGHT, tracking: 0, caps: false },
+  stateWord: { desktop: 12, phone: 12, weight: FACT_WEIGHT, tracking: 0, caps: false, alpha: FACT_ALPHA },
   legendLine: { desktop: 11.5, phone: 10, weight: 400, tracking: 0.7, caps: true },
   scaleCaption: { desktop: 11, phone: 10, weight: 500, tracking: 0.8, caps: true },
   credit: { desktop: 10, phone: 10, weight: 400, tracking: 0.7, caps: true },
@@ -64,8 +69,13 @@ const LEADER_TICK_WIDTH = 1.5;
 /** The caret's box, which is the width `player.css` reserves beside a chooser's value (ADR-0030). */
 const CARET = { width: 9, height: 6 } as const;
 
-const asWritten = (words: string): string => words;
-const asCaps = (words: string): string => words.toUpperCase();
+/**
+ * The two spellings this view sets anything in. Exported because the ground
+ * hand names a place and a work with them too: the device is the view's, and
+ * one answer for both is what keeps them the same device (#139).
+ */
+export const asWritten = (words: string): string => words;
+export const asCaps = (words: string): string => words.toUpperCase();
 
 /** The staff face at a size in one of the two weights. Exported: the ground and the furniture set runs this ramp does not name. */
 export function font(sizePx: number, weight: number = FACT_WEIGHT): string {
@@ -76,9 +86,9 @@ export const staffType: Type = {
   face: "staff",
 
   role(role: TypeRole, mode: LayoutMode): Setting {
-    const { desktop, phone, weight, tracking, caps } = RAMP[role];
+    const { desktop, phone, weight, tracking, caps, alpha } = RAMP[role];
     const size = mode === "phone" ? phone : desktop;
-    return { font: font(size, weight), size, tracking: `${tracking}px`, spell: caps ? asCaps : asWritten };
+    return { font: font(size, weight), size, tracking: `${tracking}px`, spell: caps ? asCaps : asWritten, alpha };
   },
 
   /**
@@ -87,12 +97,13 @@ export const staffType: Type = {
    * the fact at 400 as it is written.
    */
   run(sizePx: number, voice: Voice): Setting {
-    const name = voice === "name";
+    const row = voice === "name" ? RAMP.unitName : RAMP.stateWord;
     return {
-      font: font(sizePx, name ? NAME_WEIGHT : FACT_WEIGHT),
+      font: font(sizePx, row.weight),
       size: sizePx,
-      tracking: name ? `${RAMP.unitName.tracking}px` : `${RAMP.stateWord.tracking}px`,
-      spell: name ? asCaps : asWritten,
+      tracking: `${row.tracking}px`,
+      spell: row.caps ? asCaps : asWritten,
+      alpha: row.alpha,
     };
   },
 

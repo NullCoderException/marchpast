@@ -6,8 +6,9 @@
  * the shaft — narrow at the tail, wider at the shoulder, opening into the head
  * — and that is a filled polygon, which no `Pen` value produces at any
  * weights. `pens` stays what a hand draws *with*; this is the hand, and what it
- * reads off the pen is the outline's weight and the head's half-width. The
- * dash it ignores: there is no dashing a polygon whose width varies.
+ * reads off the pen is the outline's weight and the head's size — the two
+ * values it shares with every other view's arrows. The dash it ignores: there
+ * is no dashing a polygon whose width varies.
  *
  * The three styles stay tellable apart as the anatomy requires, and each in its
  * own way rather than by three weights of one line: the **track** is a fine
@@ -21,7 +22,7 @@
  * 0.5, 1)` and the head is capped at 45% of the run.
  */
 import type { Point } from "../../primitives.ts";
-import type { MoveLine, MoveStyle, Moves } from "../../view.ts";
+import type { MoveLine, MoveStyle, Moves, Pen } from "../../view.ts";
 
 /** The run at which an arrow is drawn at its full size, and the floor it never shrinks below. */
 const FULL_RUN = 150;
@@ -29,20 +30,28 @@ const MIN_SCALE = 0.5;
 /** However short the run, the head never takes more than this much of it. */
 const MAX_HEAD_SHARE = 0.45;
 
-/** The four dimensions of one tapered arrow, at full size: half-widths at the tail, the shoulder and the head, and the head's length. */
+/**
+ * A tapered arrow's shaft at full size: the half-widths at the tail and the
+ * shoulder, and how far back from the point the head begins. The head's own
+ * half-width is not here — it is the **pen's** `headSize`, which is the one
+ * value of a `Pen` this hand shares with every other view's arrows, and
+ * keeping it in two places is how the two would come to disagree.
+ */
 export interface Taper {
   tail: number;
   shoulder: number;
-  head: number;
   headLength: number;
 }
 
 /** The intent's arrow: hollow, so what is inside it is the ground and not the side. */
-const INTENT: Taper = { tail: 3, shoulder: 9, head: 17, headLength: 26 };
+const INTENT: Taper = { tail: 3, shoulder: 9, headLength: 26 };
 /** The detachment's: a shade broader everywhere, and filled solid in the unit's ink. */
-const DETACHMENT: Taper = { tail: 4, shoulder: 11, head: 20, headLength: 30 };
+const DETACHMENT: Taper = { tail: 4, shoulder: 11, headLength: 30 };
 
-/** The track: the pip it leaves from, the ticks along its run, and the open head it ends in. */
+/** How wide the track's open head opens, as a share of the length the pen gives it. */
+const TRACK_HEAD_SPREAD = 0.5625;
+
+/** The track: the pip it leaves from, and the ticks along its run. */
 const PIP_RADIUS = 2.6;
 /** Where the line starts, clear of the pip. */
 const PIP_CLEARANCE = 4;
@@ -51,7 +60,6 @@ const TICK_HALF = 3.5;
 const TICK_WIDTH = 1.1;
 /** How far short of the head the last tick falls, so the two never touch. */
 const TICK_TAIL_OFF = 8;
-const TRACK_HEAD = { back: 8, half: 4.5 };
 
 /**
  * The seven points of a tapered arrow from `from` to `to`, in order round the
@@ -62,7 +70,7 @@ const TRACK_HEAD = { back: 8, half: 4.5 };
  * A run of no length answers no polygon at all: two coincident points name no
  * direction, and an arrow drawn on one would be a spike of arbitrary bearing.
  */
-export function taperPolygon(from: Point, to: Point, taper: Taper): Point[] {
+export function taperPolygon(from: Point, to: Point, taper: Taper, headHalf: number): Point[] {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
   const run = Math.hypot(dx, dy);
@@ -71,7 +79,7 @@ export function taperPolygon(from: Point, to: Point, taper: Taper): Point[] {
   const scale = Math.max(MIN_SCALE, Math.min(1, run / FULL_RUN));
   const tail = taper.tail * scale;
   const shoulder = taper.shoulder * scale;
-  const head = taper.head * scale;
+  const head = headHalf * scale;
   const headLength = Math.min(taper.headLength * scale, run * MAX_HEAD_SHARE);
 
   const ux = dx / run;
@@ -89,8 +97,8 @@ export function taperPolygon(from: Point, to: Point, taper: Taper): Point[] {
 }
 
 /** One tapered arrow, filled and outlined. The fill is what tells the intent from the detachment. */
-function drawTaper(ctx: CanvasRenderingContext2D, from: Point, to: Point, taper: Taper, fill: string, stroke: string, width: number): void {
-  const points = taperPolygon(from, to, taper);
+function drawTaper(ctx: CanvasRenderingContext2D, from: Point, to: Point, taper: Taper, pen: Pen, fill: string, stroke: string): void {
+  const points = taperPolygon(from, to, taper, pen.headSize);
   const first = points[0];
   if (first === undefined) return;
 
@@ -102,7 +110,7 @@ function drawTaper(ctx: CanvasRenderingContext2D, from: Point, to: Point, taper:
   ctx.closePath();
   ctx.fillStyle = fill;
   ctx.fill();
-  ctx.lineWidth = width;
+  ctx.lineWidth = pen.width;
   ctx.strokeStyle = stroke;
   ctx.stroke();
   ctx.restore();
@@ -146,22 +154,25 @@ const track: MoveLine = (ctx, from, to, { pen, colour }) => {
 
   ctx.lineWidth = pen.width;
   ctx.lineCap = "round";
+  // The head's own length is the pen's, as it is for the two tapers.
+  const back = pen.headSize;
+  const half = pen.headSize * TRACK_HEAD_SPREAD;
   ctx.beginPath();
-  ctx.moveTo(to.x - ux * TRACK_HEAD.back - nx * TRACK_HEAD.half, to.y - uy * TRACK_HEAD.back - ny * TRACK_HEAD.half);
+  ctx.moveTo(to.x - ux * back - nx * half, to.y - uy * back - ny * half);
   ctx.lineTo(to.x, to.y);
-  ctx.lineTo(to.x - ux * TRACK_HEAD.back + nx * TRACK_HEAD.half, to.y - uy * TRACK_HEAD.back + ny * TRACK_HEAD.half);
+  ctx.lineTo(to.x - ux * back + nx * half, to.y - uy * back + ny * half);
   ctx.stroke();
   ctx.restore();
 };
 
 /** The intent: the broad arrow hollow, its fill the sheet's own paper, so the ground does not read through it. */
 const intent: MoveLine = (ctx, from, to, { pen, colour, palette }) => {
-  drawTaper(ctx, from, to, INTENT, palette.paper, colour, pen.width);
+  drawTaper(ctx, from, to, INTENT, pen, palette.paper, colour);
 };
 
 /** The detachment: the same arrow solid, in the unit's own side ink. */
 const detachment: MoveLine = (ctx, from, to, { pen, colour }) => {
-  drawTaper(ctx, from, to, DETACHMENT, colour, colour, pen.width);
+  drawTaper(ctx, from, to, DETACHMENT, pen, colour, colour);
 };
 
 export const staffMoves: Moves = { track, intent, detachment } satisfies Readonly<Record<MoveStyle, MoveLine>>;

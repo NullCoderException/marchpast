@@ -97,6 +97,9 @@ describe("the views there are", () => {
         expect(run.font).toContain("14px");
         expect(run.tracking).toMatch(/px$/);
         expect(run.spell("Weather column")).toBeTruthy();
+        // How hard a run is laid is part of the ramp, and the label pass reads
+        // it: a view that quiets a fact says so here and nowhere else (#175).
+        expect(run.alpha === undefined || (run.alpha > 0 && run.alpha <= 1)).toBe(true);
       }
       // The two voices are told apart by *something* — a slope, a weight, a
       // case or a tracking — or a fact reads as a name.

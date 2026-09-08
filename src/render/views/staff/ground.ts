@@ -50,7 +50,7 @@ import { bandIndexAt, indexLevels, tintBandLevels } from "../../relief.ts";
 import type { Ground, GroundRequest, Naming, Palette } from "../../view.ts";
 import { graticule } from "./graticule.ts";
 import { STAFF_CONTOUR, STAFF_GRID, STAFF_SHALLOW } from "./palette.ts";
-import { font } from "./type.ts";
+import { asCaps, asWritten, font } from "./type.ts";
 
 /** The shore: one fine line, and no inward shading — a printed sheet rules its coast rather than engraving it. */
 const COAST_WIDTH = 1;
@@ -271,7 +271,7 @@ function naming(kind: MapLabelKind): Naming {
       font: font(PLACE_LABEL_SIZE),
       size: PLACE_LABEL_SIZE,
       tracking: "0px",
-      spell: (name) => name,
+      spell: asWritten,
       gap: PLACE_LABEL_GAP,
       half: PLACE_DOT_RADIUS,
     };
@@ -280,7 +280,7 @@ function naming(kind: MapLabelKind): Naming {
     font: font(WORK_LABEL_SIZE, WORK_LABEL_WEIGHT),
     size: WORK_LABEL_SIZE,
     tracking: WORK_LABEL_TRACKING,
-    spell: (name) => name.toUpperCase(),
+    spell: asCaps,
     gap: WORK_LABEL_GAP,
     half: WORK_PENNANT_SPAN,
   };
@@ -387,7 +387,7 @@ function drawInlineNumerals(request: GroundRequest, lines: Map<number, LonLat[][
 }
 
 /** The angle a figure lies at to run along a line, turned into the upright half turn so it is never upside down. */
-export function alongLine(before: Point, after: Point): number {
+function alongLine(before: Point, after: Point): number {
   const angle = Math.atan2(after.y - before.y, after.x - before.x);
   if (angle > Math.PI / 2) return angle - Math.PI;
   if (angle < -Math.PI / 2) return angle + Math.PI;

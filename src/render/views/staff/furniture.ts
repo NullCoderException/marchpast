@@ -9,11 +9,16 @@
  * `layout.ts`'s (#86). What is here is ink and nothing else.
  *
  * **Every corner of this view stands on paper.** The shared half lays a piece
- * its panel wherever the ground runs under that corner, and the staff map's
- * ground answers that it always does — the graticule runs over the whole
- * extent at every scale (`ground.ts`, #62, #175). So no piece here lays paper
- * of its own, and the key, standing on the scale bar's corner panel, rules
- * itself rather than filling a second one.
+ * its panel wherever the ground runs under that corner, and this view's ground
+ * answers that it always does — the graticule runs over the whole extent at
+ * every scale (`ground.ts`, #62, #175). So no piece here lays paper of its
+ * own: the desktop key stands on the scale bar's corner panel and only rules
+ * itself, and the phone's strip answers with its own rectangle for the shared
+ * half to fill.
+ *
+ * Every run of type goes through `run.ts`, because this view tracks and
+ * capitalises: a panel measured to `ctx.font` alone is cut short of the words
+ * it is meant to carry (#175).
  */
 import type { Wind, WindForce } from "../../../schema/types.ts";
 import { legendArm, legendArms } from "../../glyphs/arms.ts";
@@ -34,6 +39,7 @@ import type { Plate } from "../../plate.ts";
 import type { Rect } from "../../projection.ts";
 import { toRadians } from "../../projection.ts";
 import { contourInterval } from "../../relief.ts";
+import { clearRun, runWidth, setRun } from "../../run.ts";
 import { METRES_PER_UNIT, scaleBarLength, UNIT_LABEL } from "../../scaleBar.ts";
 import { compassPoint } from "../../text.ts";
 import type {
@@ -70,12 +76,19 @@ const CREDIT_WEIGHT = 400;
 /* --------------------------------------------------------------- compass */
 
 /**
- * The rose's corner: where its panel starts, how deep it stands, and the least
+ * A compass corner: where its panel starts, how deep it stands, and the least
  * width it ever takes. The inset is the corner panels' own, because a
  * graticule numeral rides in that same margin and a panel edge inside it would
  * cut one in half rather than cover it (`ground.ts`).
  */
-const COMPASS_PANEL = { inset: CORNER_PANEL_INSET, height: 112, minWidth: 176 };
+interface CompassBox {
+  inset: number;
+  top: number;
+  height: number;
+  minWidth: number;
+}
+
+const COMPASS_PANEL: CompassBox = { inset: CORNER_PANEL_INSET, top: CORNER_PANEL_INSET, height: 112, minWidth: 176 };
 /** The needle, the barb and the wind's words, in the frame's own coordinates. */
 const NEEDLE_AT = { x: 52, y: 58 };
 const BARB_AT = { x: 120, y: 54 };
@@ -120,7 +133,7 @@ export function barbFor(force: WindForce): Barb {
 const BARB = { ring: 3, shaft: 30, width: 1.5, span: 11, rise: 5, pitch: 6, halfSpan: 5.5, halfRise: 2.5 };
 
 /** The phone's compass: the same needle at a smaller scale, with the wind as a sentence beside it. */
-const PHONE_COMPASS_PANEL = { inset: 8, top: 4, height: 40, minWidth: 40 };
+const PHONE_COMPASS_PANEL: CompassBox = { inset: CORNER_PANEL_INSET, top: 4, height: 40, minWidth: 40 };
 const PHONE_NEEDLE_AT = { x: 22, y: 26 };
 const PHONE_NEEDLE_SCALE = 0.45;
 const PHONE_WIND_TEXT_X = 38;
@@ -216,25 +229,6 @@ function drawPanel(ctx: CanvasRenderingContext2D, box: Rect, palette: Palette): 
   ctx.restore();
 }
 
-/* ----------------------------------------------------------------- runs */
-
-/** How wide a run of type stands in this view's face, tracking and all, without disturbing what the caller had set. */
-function runWidth(ctx: CanvasRenderingContext2D, text: string, setting: Setting): number {
-  ctx.save();
-  ctx.font = setting.font;
-  ctx.letterSpacing = setting.tracking;
-  const { width } = ctx.measureText(text);
-  ctx.restore();
-  ctx.letterSpacing = "0px";
-  return width;
-}
-
-/** Sets one run of type on the context: the face and the tracking together, so the two can never disagree. */
-function setRun(ctx: CanvasRenderingContext2D, setting: Setting): void {
-  ctx.font = setting.font;
-  ctx.letterSpacing = setting.tracking;
-}
-
 /* --------------------------------------------------------------- compass */
 
 /** The wind as this view writes it, in capitals, or `undefined` when the battle does not track wind. */
@@ -278,7 +272,7 @@ function drawNeedle(ctx: CanvasRenderingContext2D, ink: string, scale: number, l
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText("N", 0, NEEDLE.letter);
-  ctx.letterSpacing = "0px";
+  clearRun(ctx);
   ctx.restore();
 }
 
@@ -288,7 +282,7 @@ function drawNeedle(ctx: CanvasRenderingContext2D, ink: string, scale: number, l
  * points along the direction the wind blows **from** and carries no head; the
  * feathers sit at its outer end. Calm is the bare ring.
  */
-export function drawWindBarb(ctx: CanvasRenderingContext2D, ink: string, force: WindForce, fromDegrees: number | undefined): void {
+function drawWindBarb(ctx: CanvasRenderingContext2D, ink: string, force: WindForce, fromDegrees: number | undefined): void {
   ctx.save();
   ctx.strokeStyle = ink;
   ctx.fillStyle = ink;
@@ -340,13 +334,17 @@ export function drawWindBarb(ctx: CanvasRenderingContext2D, ink: string, force: 
   ctx.restore();
 }
 
-function compassPanel({ plate, frame }: FurniturePlace): Rect {
+/**
+ * Paper behind the needle and whatever stands beside it, in either corner: wide
+ * enough for the wind's words, and never narrower than the box the needle and
+ * the barb need, so a calm plate's panel is the same shape as a windy one's.
+ */
+function compassPanel({ plate, frame }: FurniturePlace, box: CompassBox, textX: number, setting: Setting): Rect {
   const text = windText(plate.picture.wind);
-  const x = frame.x + COMPASS_PANEL.inset;
-  const setting = plate.view.type.role("legendLine", "desktop");
-  const wordsRight = text === undefined ? 0 : frame.x + WIND_TEXT_AT.x + runWidth(plate.ctx, text, setting) + PANEL_PAD;
-  const right = Math.max(x + COMPASS_PANEL.minWidth, wordsRight);
-  return { x, y: frame.y + COMPASS_PANEL.inset, width: right - x, height: COMPASS_PANEL.height };
+  const x = frame.x + box.inset;
+  const wordsRight = text === undefined ? 0 : frame.x + textX + runWidth(plate.ctx, text, setting) + PANEL_PAD;
+  const right = Math.max(x + box.minWidth, wordsRight);
+  return { x, y: frame.y + box.top, width: right - x, height: box.height };
 }
 
 function drawCompass(place: FurniturePlace): void {
@@ -375,17 +373,8 @@ function drawCompass(place: FurniturePlace): void {
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
   ctx.fillText(text, frame.x + WIND_TEXT_AT.x, frame.y + WIND_TEXT_AT.y);
-  ctx.letterSpacing = "0px";
+  clearRun(ctx);
   ctx.restore();
-}
-
-function phoneCompassPanel({ plate, frame }: FurniturePlace): Rect {
-  const text = windText(plate.picture.wind);
-  const x = frame.x + PHONE_COMPASS_PANEL.inset;
-  const setting = plate.view.type.role("credit", "phone");
-  const wordsRight = text === undefined ? 0 : frame.x + PHONE_WIND_TEXT_X + runWidth(plate.ctx, text, setting) + PANEL_PAD;
-  const right = Math.max(x + PHONE_COMPASS_PANEL.minWidth, wordsRight);
-  return { x, y: frame.y + PHONE_COMPASS_PANEL.top, width: right - x, height: PHONE_COMPASS_PANEL.height };
 }
 
 /** The phone's compass: the same needle at a smaller scale, with the wind as a sentence rather than a barb (#86). */
@@ -407,12 +396,22 @@ function drawPhoneCompass(place: FurniturePlace): void {
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillText(text, frame.x + PHONE_WIND_TEXT_X, frame.y + PHONE_NEEDLE_AT.y);
-  ctx.letterSpacing = "0px";
+  clearRun(ctx);
   ctx.restore();
 }
 
-const ROSE: Piece = { panel: compassPanel, draw: drawCompass };
-const NEEDLE_PIECE: Piece = { panel: phoneCompassPanel, draw: drawPhoneCompass };
+/** What the desktop's compass and the phone's each measure their paper from. */
+const roseSetting = (place: FurniturePlace): Setting => place.plate.view.type.role("legendLine", "desktop");
+const needleSetting = (place: FurniturePlace): Setting => place.plate.view.type.role("credit", "phone");
+
+const ROSE: Piece = {
+  panel: (place) => compassPanel(place, COMPASS_PANEL, WIND_TEXT_AT.x, roseSetting(place)),
+  draw: drawCompass,
+};
+const NEEDLE_PIECE: Piece = {
+  panel: (place) => compassPanel(place, PHONE_COMPASS_PANEL, PHONE_WIND_TEXT_X, needleSetting(place)),
+  draw: drawPhoneCompass,
+};
 const compassFor = (place: FurniturePlace): Piece => (furnitureFor(place.plate.mode).compass === "rose" ? ROSE : NEEDLE_PIECE);
 
 /* ---------------------------------------------------------------- legend */
@@ -476,7 +475,6 @@ function drawLegend(place: FurniturePlace, legend: LegendPlace): HitRegion[] {
   ctx.save();
   // The corner's paper is the scale bar's, laid once for both (#62); the key
   // adds its own rule and a heavy head over it.
-  if (!legend.onPanel) drawPanel(ctx, box, palette);
   ctx.strokeStyle = palette.ink;
   ctx.lineWidth = LEGEND_RULE;
   ctx.strokeRect(box.x + LEGEND_RULE / 2, box.y + LEGEND_RULE / 2, box.width - LEGEND_RULE, box.height - LEGEND_RULE);
@@ -520,7 +518,7 @@ function drawLegend(place: FurniturePlace, legend: LegendPlace): HitRegion[] {
     rows.push({ id: row.id, box: { x: box.x, y: rowY - KEY_ROW_HEIGHT / 2, width: box.width, height: KEY_ROW_HEIGHT }, hover: false });
     rowY += KEY_ROW_HEIGHT;
   }
-  ctx.letterSpacing = "0px";
+  clearRun(ctx);
   ctx.restore();
   return rows;
 }
@@ -550,8 +548,7 @@ function stripRect({ plate, frame }: FurniturePlace, key: readonly NumeralRow[])
  * (#86), with the numeral rows stacked above it — a numeral on the plate is
  * unreadable without the name it stands for, so those stay on the picture.
  */
-function drawSideStrip(place: FurniturePlace, legend: LegendPlace): HitRegion[] {
-  const { key } = legend;
+function drawSideStrip(place: FurniturePlace, { key }: LegendPlace): HitRegion[] {
   const { plate } = place;
   const { ctx, colours, view } = plate;
   const { palette } = view;
@@ -559,7 +556,8 @@ function drawSideStrip(place: FurniturePlace, legend: LegendPlace): HitRegion[] 
   const setting = view.type.role("legendLine", "phone");
 
   ctx.save();
-  if (!legend.onPanel) drawPanel(ctx, panel, palette);
+  // The strip's own paper is laid by the shared half, off the rectangle
+  // `SIDE_STRIP` answers with; what is added here is its rule.
   ctx.strokeStyle = palette.ink;
   ctx.lineWidth = LEGEND_RULE;
   ctx.strokeRect(panel.x + LEGEND_RULE / 2, panel.y + LEGEND_RULE / 2, panel.width - LEGEND_RULE, panel.height - LEGEND_RULE);
@@ -591,12 +589,12 @@ function drawSideStrip(place: FurniturePlace, legend: LegendPlace): HitRegion[] 
     ctx.fillText(setting.spell(keyRowLabel(row)), x + STRIP_SAMPLE + STRIP_SAMPLE_GAP, centreY);
     x += stripSideWidth(plate, keyRowLabel(row), setting) + STRIP_SIDE_GAP;
   }
-  ctx.letterSpacing = "0px";
+  clearRun(ctx);
   ctx.restore();
   return rows;
 }
 
-/** Both forms of the key lay their own paper, so neither answers the shared half with a panel of its own to fill. */
+/** A desktop's key stands on the scale bar's corner panel and answers with none of its own; a phone's strip is a panel in its own right. */
 const FULL_LEGEND: LegendHand = { panel: () => undefined, draw: drawLegend };
 const SIDE_STRIP: LegendHand = { panel: (place, legend) => stripRect(place, legend.key), draw: drawSideStrip };
 const keyFor = (place: FurniturePlace): LegendHand => (furnitureFor(place.plate.mode).legend === "full" ? FULL_LEGEND : SIDE_STRIP);
@@ -642,7 +640,7 @@ export const staffFurniture: Furniture = {
       const setting = view.type.role("title", mode);
       setRun(ctx, setting);
       ctx.fillText(setting.spell(battle.title), titleRight(frame), titleTop(frame));
-      ctx.letterSpacing = "0px";
+      clearRun(ctx);
       ctx.restore();
     },
   },
@@ -734,7 +732,7 @@ export const staffFurniture: Furniture = {
       }
       ctx.textAlign = "left";
       ctx.fillText(caption, x + bar.pixels + BAR_UNIT_GAP, y - BAR_BLOCK_HEIGHT / 2);
-      ctx.letterSpacing = "0px";
+      clearRun(ctx);
       ctx.restore();
     },
   },
@@ -766,7 +764,7 @@ export const staffFurniture: Furniture = {
       ctx.textBaseline = "bottom";
       setRun(ctx, run.setting);
       ctx.fillText(run.text, creditRight(place.frame), creditBaseline(place.frame));
-      ctx.letterSpacing = "0px";
+      clearRun(ctx);
       ctx.restore();
     },
   },
