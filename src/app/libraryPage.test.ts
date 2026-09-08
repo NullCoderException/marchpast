@@ -185,7 +185,13 @@ describe("the interval between two battles", () => {
     expect(intervalBetween(on(1798, 12, 20), on(1799, 1, 5))).toBe("less than a month later");
   });
 
-  it("writes the word later on every one of them, which is what makes it a chronology", () => {
+  it("drops the word later for two battles fought on one day, which are not later than one another", () => {
+    // `compareBattles` orders these by name, so the rail has a run to write
+    // between two entries that nothing separates in time.
+    expect(intervalBetween(on(1798, 8, 1), on(1798, 8, 1))).toBe("the same day");
+  });
+
+  it("writes the word later wherever one battle is later, which is what makes it a chronology", () => {
     const runs = [
       intervalBetween(V03.cannae, V03.alesia),
       intervalBetween(on(1801, 4, 2), on(1801, 11, 30)),
@@ -193,6 +199,8 @@ describe("the interval between two battles", () => {
       intervalBetween(on(1798, 12, 20), on(1799, 1, 5)),
     ];
     for (const run of runs) expect(run).toContain("later");
+    // The one exception, and the reason it is one: nothing is later.
+    expect(intervalBetween(on(1798, 8, 1), on(1798, 8, 1))).not.toContain("later");
   });
 });
 

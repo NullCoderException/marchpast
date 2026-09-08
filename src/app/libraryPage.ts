@@ -125,13 +125,16 @@ function counted(count: number, unit: string): string {
  * *within* a battle may be had this way (ADR-0013, amended by ADR-0022).
  *
  * Under a year it falls back to whole months, and two battles inside one
- * calendar year read *later the same year*. Two battles either side of a new
- * year and under a month apart are none of those three, so they say what is
- * true and count nothing.
+ * calendar year read *later the same year*. Two cases the ADR did not write
+ * fall through all three and are answered here rather than left to say
+ * something false: two battles on **one day**, which `compareBattles` already
+ * anticipates and orders by name, are not later than one another at all, and
+ * two either side of a new year and under a month apart count nothing.
  */
 export function intervalBetween(before: SortDate, after: SortDate): string {
   const years = elapsedYears(before, after);
   if (years >= 1) return `${counted(years, "year")} later`;
+  if (before.year === after.year && before.month === after.month && before.day === after.day) return "the same day";
   if (before.year === after.year) return "later the same year";
   const months = elapsedMonths(before, after);
   if (months < 1) return "less than a month later";
@@ -220,10 +223,13 @@ function cardFor(battle: LibraryEntry): HTMLSpanElement {
   // date, sides and summary, and a picture of ground the summary describes in
   // words adds noise to that name rather than meaning.
   const still = element("img", "st-library-still");
-  still.src = stillUrl(battle.name);
   still.alt = "";
-  // Set as an attribute rather than through `loading`, which not every DOM reflects.
+  // Set as an attribute rather than through `loading`, which not every DOM
+  // reflects, and set **before** `src`: eagerness is read when the image data
+  // is updated, so an element that is given its source first is the shape
+  // browsers warn about, and seven eager stills is the whole page at once.
   still.setAttribute("loading", "lazy");
+  still.src = stillUrl(battle.name);
 
   const text = element("span", "st-library-text");
   text.append(
