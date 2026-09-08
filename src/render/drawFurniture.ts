@@ -90,8 +90,9 @@ function furniturePlace(plate: Plate): FurniturePlace {
 
 /** What the key is drawn against: the scale bar it shares a corner with, and the numerals this frame implies. */
 function legendPlace(place: FurniturePlace, key: readonly NumeralRow[]): LegendPlace {
-  const bar = place.plate.view.furniture.scaleBar.layout(place);
-  return { key, bar, onPanel: place.plate.contourLevels.length > 0 };
+  const { view, contourLevels } = place.plate;
+  const bar = view.furniture.scaleBar.layout(place);
+  return { key, bar, onPanel: view.ground.underFurniture(contourLevels) };
 }
 
 /**

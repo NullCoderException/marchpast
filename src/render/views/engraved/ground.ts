@@ -31,13 +31,22 @@
  * a slot, because a name has to clear the furniture and the other names, which
  * nothing inside the clip can see (#107).
  */
-import type { LonLat, MapFile, MapFeature } from "../../../schema/types.ts";
+import type { LonLat, MapFile } from "../../../schema/types.ts";
+import { atAlpha } from "../../ink.ts";
 import type { MapLabelKind } from "../../labels/index.ts";
-import { type Point, seeded } from "../../primitives.ts";
+import {
+  areaRings,
+  byWeight,
+  contourLinesOf,
+  landRings,
+  lineStrings,
+  tracePolygons,
+  tracePolyline,
+} from "../../mapGeometry.ts";
+import { seeded } from "../../primitives.ts";
 import type { Projection } from "../../projection.ts";
 import { indexLevels } from "../../relief.ts";
 import type { Ground, GroundRequest, Naming, Palette } from "../../view.ts";
-import { atAlpha } from "./ink.ts";
 import { drawRamparts, type RampartPen } from "./rampart.ts";
 import { font } from "./type.ts";
 
@@ -138,19 +147,24 @@ export function engravedGround(relief: ReliefHand, rampart: RampartPen): Ground 
     relief,
     water,
     rampart: (request) => drawRamparts(request, rampart),
+    // Contours are the only thing an engraved ground puts under a corner, so a
+    // plate without them leaves bare paper there and needs none laid (#62).
+    underFurniture: (contourLevels) => contourLevels.length > 0,
     mark,
     naming,
   };
 }
 
 /**
- * The sea: the view's paper inside the extent, with a faint fixed mottle on it
- * where the palette carries a stipple. Seeded, so it never shimmers from one
- * render to the next, and blank paper in Atlas, which carries none (#138).
+ * The sea: the view's water inside the extent — which for all three engraved
+ * views is their own paper, an engraved chart's sea being the paper it is
+ * printed on — with a faint fixed mottle on it where the palette carries a
+ * stipple. Seeded, so it never shimmers from one render to the next, and blank
+ * paper in Atlas, which carries none (#138).
  */
 function sea({ ctx, projection, palette }: GroundRequest): void {
   const { x, y, width, height } = projection.extentRect;
-  ctx.fillStyle = palette.paper;
+  ctx.fillStyle = palette.water;
   ctx.fillRect(x, y, width, height);
   if (palette.stipple === undefined) return;
 
@@ -228,26 +242,6 @@ function naming(kind: MapLabelKind): Naming {
     gap: WORK_LABEL_GAP,
     half: WORK_BASTION_OUTER,
   };
-}
-
-/** The map's contour polylines gathered by level, or nothing when the map carries no relief. */
-export function contourLinesOf({ map, contourLevels }: GroundRequest): Map<number, LonLat[][]> | undefined {
-  if (map === undefined || contourLevels.length === 0) return undefined;
-  return contourLines(map);
-}
-
-/**
- * The contours split by the weight they are drawn at: the levels indexed every
- * fifth, and all the rest. Nothing here is derived from the ground but the
- * lines themselves — the map file carries no slope and no raster, and by
- * ADR-0012 it never will (#138).
- */
-export function byWeight(lines: Map<number, LonLat[][]>, contourLevels: readonly number[]): { fine: LonLat[][]; index: LonLat[][] } {
-  const heavy = new Set(indexLevels(contourLevels));
-  const fine: LonLat[][] = [];
-  const index: LonLat[][] = [];
-  for (const [level, polylines] of lines) (heavy.has(level) ? index : fine).push(...polylines);
-  return { fine, index };
 }
 
 /** One set of contour polylines at a weight, in the palette's own ink at one of its own alphas. */
@@ -450,74 +444,4 @@ function drawWorkSign(ctx: CanvasRenderingContext2D, palette: Palette): void {
     ctx.stroke();
   }
   ctx.restore();
-}
-
-/** Every ring of every land feature, outer and holes alike; even-odd filling sorts them out. */
-function landRings(map: MapFile): LonLat[][] {
-  const rings: LonLat[][] = [];
-  for (const feature of map.features) {
-    // A shoal is a polygon too, so the kind is what selects; checking the geometry is what narrows the type.
-    if (feature.properties.kind !== "land") continue;
-    rings.push(...areaRings(feature));
-  }
-  return rings;
-}
-
-/** Every ring of one area feature, whether it is a polygon or a multipolygon. */
-function areaRings(feature: MapFeature): LonLat[][] {
-  const { geometry } = feature;
-  if (geometry.type === "Polygon") return geometry.coordinates;
-  if (geometry.type === "MultiPolygon") return geometry.coordinates.flat();
-  return [];
-}
-
-/** Every polyline of one line feature, whether it is a linestring or a multilinestring. */
-function lineStrings(feature: MapFeature): LonLat[][] {
-  const { geometry } = feature;
-  if (geometry.type === "LineString") return [geometry.coordinates];
-  if (geometry.type === "MultiLineString") return geometry.coordinates;
-  return [];
-}
-
-/** The map's contour polylines, gathered by level, ascending. */
-function contourLines(map: MapFile): Map<number, LonLat[][]> {
-  const byLevel = new Map<number, LonLat[][]>();
-  for (const feature of map.features) {
-    if (feature.properties.kind !== "contour") continue;
-    const level = feature.properties.elevation;
-    const lines = byLevel.get(level) ?? [];
-    lines.push(...lineStrings(feature));
-    byLevel.set(level, lines);
-  }
-  return new Map([...byLevel].sort(([a], [b]) => a - b));
-}
-
-/** A ring: a polyline that comes back to where it started, so filling it encloses ground. */
-export function isClosed(line: readonly LonLat[]): boolean {
-  const first = line[0];
-  const last = line[line.length - 1];
-  if (first === undefined || last === undefined || line.length < 4) return false;
-  return first[0] === last[0] && first[1] === last[1];
-}
-
-export function tracePolygons(ctx: CanvasRenderingContext2D, projection: Projection, rings: readonly LonLat[][]): void {
-  ctx.beginPath();
-  for (const ring of rings) {
-    tracePolyline(ctx, projection, ring);
-    ctx.closePath();
-  }
-}
-
-/** One polyline's points on the canvas. Projected once by a hand that walks the same line twice, as the lit contours and the ramparts both do. */
-export function projectLine(projection: Projection, line: readonly LonLat[]): Point[] {
-  return line.map(([lon, lat]) => projection.project(lat, lon));
-}
-
-/** Adds one polyline to the path already open; the caller begins and strokes it. */
-function tracePolyline(ctx: CanvasRenderingContext2D, projection: Projection, line: readonly LonLat[]): void {
-  line.forEach(([lon, lat], i) => {
-    const { x, y } = projection.project(lat, lon);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
 }

@@ -14,21 +14,31 @@
  *     the idle prefetch that is always already true; if it somehow is not, the
  *     failure is late instead of wrong.
  *
- * Today every view is engraved and there is one face, so this is the mechanism
- * with one entry. The staff map adds the second (#139), and the build-time
- * still renderer registers the same list with a Node canvas (#126).
+ * The three engraved views share the plate's face and the staff map adds the
+ * second (#139, #175), and the build-time still renderer registers the same
+ * list with a Node canvas (#126).
  */
 import { PLATE_FONT_FAMILY, PLATE_FONT_STACK } from "./plate.ts";
+import { STAFF_FONT_FAMILY, STAFF_FONT_STACK, STAFF_FONT_WEIGHTS } from "./staff.ts";
 import plateFontUrl from "./IMFellEnglish-Regular.woff2";
+import staffFontUrl from "./Archivo-SemiCondensed.woff2";
 
 /** How a view names its face: `Type.face` carries one of these. */
-export type FaceId = "plate";
+export type FaceId = "plate" | "staff";
 
 /** One bundled face: the family a font shorthand names, the CSS list a stylesheet sets, and the file it is loaded from. */
 export interface Face {
   family: string;
   stack: string;
   url: string;
+  /**
+   * The weights the file carries, as a `FontFace` descriptor spells them, for
+   * a variable face; `undefined` for a face that is one weight. A `FontFace`
+   * built without it is a 400 face whatever its axes say, and a browser asked
+   * for 600 synthesises a bold rather than instancing the axis — which is the
+   * difference between the staff map's ramp and a fake one (#175).
+   */
+  weight?: string;
 }
 
 /**
@@ -39,6 +49,7 @@ export interface Face {
  */
 export const FACES: Readonly<Record<FaceId, Face>> = {
   plate: { family: PLATE_FONT_FAMILY, stack: PLATE_FONT_STACK, url: plateFontUrl },
+  staff: { family: STAFF_FONT_FAMILY, stack: STAFF_FONT_STACK, url: staffFontUrl, weight: STAFF_FONT_WEIGHTS },
 };
 
 /**
@@ -63,9 +74,9 @@ const held = new Set<FaceId>();
 export function loadFace(id: FaceId): Promise<void> {
   const started = asked.get(id);
   if (started !== undefined) return started;
-  const { family, url } = FACES[id];
+  const { family, url, weight } = FACES[id];
   const loading = (async () => {
-    const face = new FontFace(family, `url(${url}) format("woff2")`);
+    const face = new FontFace(family, `url(${url}) format("woff2")`, weight === undefined ? {} : { weight });
     await face.load();
     document.fonts.add(face);
     held.add(id);

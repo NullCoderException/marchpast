@@ -1,9 +1,10 @@
 /**
- * The views there are: the three v0.2 views decided in #58, each one a palette,
- * a set of pens and the five hands ADR-0021 and #139 settled.
+ * The views there are: the three v0.2 views decided in #58 and the staff map
+ * #139 drew, each one a palette, a set of pens and the five hands ADR-0021
+ * settled.
  *
- * All three are the **engraved** aesthetic, so all three name hands out of
- * `views/engraved/`. That sharing is by value and never by inheritance: each
+ * The first three are the **engraved** aesthetic, so all three name hands out
+ * of `views/engraved/`. That sharing is by value and never by inheritance: each
  * names the plate's glyph or its own, the plate's type, furniture and moves,
  * and an engraved ground built round **its own relief treatment** — the plate's
  * contours weighted by level, the night plate's lit from the north-west,
@@ -12,7 +13,11 @@
  * neither of the two new ones costs anything outside this file and its own
  * module.
  *
- * Adding a fourth view is a value here plus one folder per new aesthetic.
+ * The **staff map** is the second aesthetic, and it is what the seam was cut
+ * for: a printed twentieth-century operations sheet on the unchanged anatomy.
+ * It shares nothing below this file — its own face, its own five hands, its own
+ * folder — and adding it cost a value here, an id, and `views/staff/`
+ * (ADR-0021, #175).
  */
 import { block } from "./glyphs/block.ts";
 import { ticks } from "./glyphs/ticks.ts";
@@ -24,6 +29,12 @@ import { illuminatedContours } from "./views/engraved/groundNight.ts";
 import { engravedMoves } from "./views/engraved/moves.ts";
 import { ATLAS_RAMPART, ENGRAVED_RAMPART } from "./views/engraved/rampart.ts";
 import { engravedType } from "./views/engraved/type.ts";
+import { staffFurniture } from "./views/staff/furniture.ts";
+import { frame } from "./views/staff/glyph.ts";
+import { staffGround } from "./views/staff/ground.ts";
+import { staffMoves } from "./views/staff/moves.ts";
+import { STAFF_PALETTE, STAFF_PENS } from "./views/staff/palette.ts";
+import { staffType } from "./views/staff/type.ts";
 
 /** The plate's pens: fine dotted track, dashed intent, solid detachment (ADR-0009, #58). */
 const PLATE_PENS: Pens = {
@@ -46,6 +57,9 @@ export const CHART_PLATE: View = {
   palette: {
     ink: "#2b2418",
     paper: "#efe3c6",
+    // An engraved chart's sea is the paper it is printed on, so the two are one
+    // value here; the staff map is the first view they part company in (#175).
+    water: "#efe3c6",
     land: "#e3d3ac",
     letterbox: "#d9c8a2",
     panel: "rgba(239,227,198,0.92)",
@@ -69,6 +83,7 @@ export const NIGHT_PLATE: View = {
   palette: {
     ink: "#efe3c6",
     paper: "#1b2430",
+    water: "#1b2430",
     land: "#2a3340",
     letterbox: "#111820",
     panel: "rgba(27,36,48,0.92)",
@@ -110,8 +125,27 @@ export const ATLAS: View = {
   moves: engravedMoves,
 };
 
+/**
+ * The fourth view and the second aesthetic: a printed operations sheet, in
+ * Archivo at wdth 75, with the frame-to-frontage glyph, the `ops` ground and
+ * its kilometre graticule, the block scale bar and the tapered arrows (#139).
+ * Every hand is its own, which is what ADR-0021 predicted a second aesthetic
+ * would cost and the whole of what it did cost.
+ */
+export const STAFF_MAP: View = {
+  id: "staff",
+  name: "Staff map",
+  palette: STAFF_PALETTE,
+  pens: STAFF_PENS,
+  glyph: frame,
+  type: staffType,
+  ground: staffGround,
+  furniture: staffFurniture,
+  moves: staffMoves,
+};
+
 /** Every view, in the order the View chooser offers them. The first is the default. */
-export const VIEWS: readonly View[] = [CHART_PLATE, NIGHT_PLATE, ATLAS];
+export const VIEWS: readonly View[] = [CHART_PLATE, NIGHT_PLATE, ATLAS, STAFF_MAP];
 
 /** What a visit opens on, and what the notice is painted in before there is any player state (#47). */
 export const DEFAULT_VIEW: View = CHART_PLATE;

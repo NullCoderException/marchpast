@@ -24,12 +24,29 @@ import type { Measure } from "./content.ts";
 import type { Placed } from "./place.ts";
 import type { Type, View } from "../view.ts";
 
-/** Measures with the view's own face, for the placer, which never touches a canvas itself. */
+/**
+ * Measures with the view's own run of type, for the placer, which never
+ * touches a canvas itself. The words are spelled the way the view will draw
+ * them and tracked the way it will track them, so a view that sets a name in
+ * tracked capitals cannot measure it uncapitalised (ADR-0021, #139).
+ */
 export function canvasMeasure(ctx: CanvasRenderingContext2D, type: Type): Measure {
   return (text, size, voice) => {
-    ctx.font = type.font(size, voice);
-    return ctx.measureText(text).width;
+    const run = type.run(size, voice);
+    ctx.font = run.font;
+    ctx.letterSpacing = run.tracking;
+    const width = ctx.measureText(run.spell(text)).width;
+    ctx.letterSpacing = "0px";
+    return width;
   };
+}
+
+/** Sets one run of type on the context and answers the words as this view spells them. */
+function setRun(ctx: CanvasRenderingContext2D, type: Type, sizePx: number, voice: "name" | "fact", words: string): string {
+  const run = type.run(sizePx, voice);
+  ctx.font = run.font;
+  ctx.letterSpacing = run.tracking;
+  return run.spell(words);
 }
 
 export function drawLabels(ctx: CanvasRenderingContext2D, placed: readonly Placed[], view: View): void {
@@ -46,13 +63,11 @@ export function drawLabels(ctx: CanvasRenderingContext2D, placed: readonly Place
   for (const label of placed) {
     if (label.card !== undefined) continue;
     ctx.textAlign = label.align;
-    ctx.font = type.font(NAME_SIZE, "name");
     ctx.fillStyle = label.unit.colour;
-    ctx.fillText(label.name, label.at.x, label.at.y - NAME_RISE);
+    ctx.fillText(setRun(ctx, type, NAME_SIZE, "name", label.name), label.at.x, label.at.y - NAME_RISE);
     if (label.detail === undefined) continue;
-    ctx.font = type.font(DETAIL_SIZE, "fact");
     ctx.fillStyle = palette.ink;
-    ctx.fillText(label.detail, label.at.x, label.at.y + DETAIL_DROP);
+    ctx.fillText(setRun(ctx, type, DETAIL_SIZE, "fact", label.detail), label.at.x, label.at.y + DETAIL_DROP);
   }
 
   for (const label of placed) {
@@ -80,8 +95,9 @@ function drawCard(ctx: CanvasRenderingContext2D, label: Placed, { palette, type 
 
   ctx.textAlign = "left";
   for (const line of card.lines) {
-    ctx.font = type.font(line.size, line.voice);
+    const words = setRun(ctx, type, line.size, line.voice, line.text);
     ctx.fillStyle = line.side ? label.unit.colour : palette.ink;
-    ctx.fillText(line.text, box.x + CARD_PAD, box.y + line.y);
+    ctx.fillText(words, box.x + CARD_PAD, box.y + line.y);
   }
+  ctx.letterSpacing = "0px";
 }

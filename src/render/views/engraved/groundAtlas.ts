@@ -24,7 +24,8 @@
 import type { LonLat } from "../../../schema/types.ts";
 import { bandIndexAt, tintBandLevels } from "../../relief.ts";
 import type { GroundRequest, Palette } from "../../view.ts";
-import { byWeight, contourLinesOf, drawContourNumerals, isClosed, type ReliefHand, strokeContours, tracePolygons } from "./ground.ts";
+import { byWeight, contourLinesOf, isClosed, tracePolygons } from "../../mapGeometry.ts";
+import { drawContourNumerals, type ReliefHand, strokeContours } from "./ground.ts";
 
 /**
  * The ramp Atlas carries, `#e6d9b4 → #c0a066`: one colour per threshold in
