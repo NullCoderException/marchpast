@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- The middle dot #135 set a page's own name on; the em dash is the library title's, where it carries the tagline. -->
+    <title>No such battle · Marchpast</title>
+    <meta name="theme-color" content="#efe3c6" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!--
+      The first page the site has that is not the app (ADR-0028): GitHub Pages
+      serves it for any path the build did not emit, which since #176 means any
+      name the site does not hold. It carries **no bundle** — there is nothing
+      here to play, and a page that booted the app would only load the library
+      a second time — so it is a whole document, and the brand's materials are
+      written out rather than imported.
+
+      Three things are copies, and `vite/public.test.ts` holds each of them to
+      its original by reading that original: the ink and the parchment are
+      `src/app/library.css`'s `--st-ink` and `--st-parchment`, the type stack
+      is that file's too, and the mark is `markSvg(40)` from `src/app/mark.ts`,
+      character for character.
+
+      The face is the one thing this page cannot have. `IM Fell English` is
+      loaded by the app as a `FontFace` from a hashed bundle asset, so a
+      document with no bundle has no URL to ask for it and falls to the same
+      Georgia every other rule here names second. That is the fallback the
+      whole site already declares in the DOM; ADR-0009's absolute is about the
+      plate, which this page does not draw.
+    -->
+    <style>
+      html {
+        background: #efe3c6;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 20px;
+        padding: 48px 24px;
+        color: #2b2418;
+        font-family: "IM Fell English", Georgia, serif;
+        font-size: 17px;
+        line-height: 1.5;
+      }
+      .st-404 {
+        width: 100%;
+        max-width: 46rem;
+        margin: 0 auto;
+      }
+      /* The masthead's lockup: the mark's baseline on the wordmark's, the two feet aligned (library.css). */
+      .st-404-lockup {
+        display: flex;
+        align-items: flex-end;
+        gap: 14px;
+        color: inherit;
+        text-decoration: none;
+      }
+      .st-404-mark {
+        line-height: 0;
+        margin-bottom: -3px;
+      }
+      .st-404-mark svg {
+        display: block;
+      }
+      .st-404-name {
+        font-size: 30px;
+        line-height: 1;
+      }
+      .st-404-head {
+        margin: 24px 0 0;
+        padding-bottom: 16px;
+        border-bottom: 3px double rgba(43, 36, 24, 0.55);
+        font-size: 30px;
+        font-weight: normal;
+        line-height: 1.2;
+      }
+      .st-404-said {
+        margin: 16px 0 0;
+      }
+      .st-404 a {
+        color: inherit;
+      }
+      @media (max-width: 520px) {
+        .st-404-head {
+          font-size: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="st-404">
+      <a class="st-404-lockup" href="/">
+        <span class="st-404-mark" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><line x1="5" y1="50" x2="59" y2="50" stroke-width="1.6"/><line x1="11" y1="28" x2="11" y2="50" stroke-width="3.6"/><line x1="19.5" y1="28" x2="19.5" y2="50" stroke-width="3.6"/><line x1="28" y1="28" x2="28" y2="50" stroke-width="3.6"/><line x1="52" y1="28" x2="52" y2="50" stroke-width="3.6"/><line x1="37.5" y1="5" x2="37.5" y2="58" stroke-width="1.6"/><line x1="42.5" y1="5" x2="42.5" y2="58" stroke-width="1.6"/></svg></span>
+        <span class="st-404-name">Marchpast</span>
+      </a>
+      <h1 class="st-404-head">No such battle</h1>
+      <p class="st-404-said">This address names a battle the site does not hold. <a href="/">All battles →</a></p>
+    </main>
+  </body>
+</html>

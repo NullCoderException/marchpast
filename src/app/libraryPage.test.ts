@@ -17,7 +17,7 @@ import type { Library } from "../data/library.ts";
 import { stillUrl } from "../data/paths.ts";
 import { DEFAULT_VIEW } from "../render/views.ts";
 import type { SortDate } from "../schema/types.ts";
-import { battleQuery } from "./battleName.ts";
+import { battlePath } from "./battleName.ts";
 import { createLibraryPage, IDEA, intervalBetween, libraryOrder, mastheadHtml, STORY } from "./libraryPage.ts";
 
 /** A library entry with only the fields the page reads; `sides` is one side unless a test wants more. */
@@ -245,7 +245,7 @@ describe("the list the page draws", () => {
     const links = entries.map((item) => item.querySelectorAll("a"));
     expect(links.every((found) => found.length === 1)).toBe(true);
     expect(entries.map((item) => item.querySelector("a")?.getAttribute("href"))).toEqual(
-      ["cannae", "alesia", "nile", "copenhagen", "trafalgar", "little-bighorn", "midway"].map(battleQuery),
+      ["cannae", "alesia", "nile", "copenhagen", "trafalgar", "little-bighorn", "midway"].map(battlePath),
     );
   });
 });

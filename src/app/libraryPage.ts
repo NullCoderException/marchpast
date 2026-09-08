@@ -1,8 +1,8 @@
 /**
  * The library page: the site's front door (ADR-0011). The bare URL lists every
  * battle oldest first — its still, title, date, sides and summary — each entry
- * linking to `?battle=<name>`, beneath the masthead and above a credit line
- * naming the repository and the data licence.
+ * linking to `/<name>/`, beneath the masthead and above a credit line naming
+ * the repository and the data licence.
  *
  * It is a chronology rather than a grouping (ADR-0022): the entries hang off a
  * rail down a gutter to their left, a node marking each battle, and the run
@@ -31,7 +31,7 @@ import { stillUrl } from "../data/paths.ts";
 import { element } from "../player/dom.ts";
 import { DEFAULT_VIEW } from "../render/views.ts";
 import type { SortDate } from "../schema/types.ts";
-import { battleQuery } from "./battleName.ts";
+import { battlePath } from "./battleName.ts";
 import { markSvg } from "./mark.ts";
 import "./library.css";
 
@@ -203,7 +203,7 @@ function entryFor(battle: LibraryEntry, previous: LibraryEntry | undefined): HTM
 /** The card: the rail's line and node, the still, and the words. */
 function linkFor(battle: LibraryEntry): HTMLAnchorElement {
   const link = element("a", "st-library-link");
-  link.href = battleQuery(battle.name);
+  link.href = battlePath(battle.name);
   link.append(railPart("st-library-rail"), railPart("st-library-node"), cardFor(battle));
   return link;
 }

@@ -14,6 +14,7 @@ import os from "node:os";
 import path from "node:path";
 import { build } from "vite";
 import { afterAll, describe, expect, it } from "vitest";
+import { markSvg } from "../src/app/mark.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const PUBLIC = path.join(ROOT, "public");
@@ -40,6 +41,23 @@ const manifest = JSON.parse(fs.readFileSync(path.join(PUBLIC, "site.webmanifest"
 
 /** The head, as the crawlers read it. */
 const INDEX = fs.readFileSync(path.join(ROOT, "index.html"), "utf-8");
+
+/** What a static host answers with for a name the site does not hold (ADR-0028). */
+const NOT_FOUND = fs.readFileSync(path.join(PUBLIC, "404.html"), "utf-8");
+
+/**
+ * The Library's stylesheet, which the 404 page copies its materials from. A
+ * document with no bundle cannot import it, so the copy is held to this
+ * original by reading the original rather than by repeating its values here.
+ */
+const LIBRARY_CSS = fs.readFileSync(path.join(ROOT, "src", "app", "library.css"), "utf-8");
+
+/** The value `library.css` declares for one of its custom properties. */
+function libraryToken(name: string): string {
+  const declared = new RegExp(`--${name}:\\s*([^;]+);`).exec(LIBRARY_CSS)?.[1];
+  if (declared === undefined) throw new Error(`library.css no longer declares --${name}`);
+  return declared.trim();
+}
 
 /** A PNG's real pixel box, straight out of its header. */
 function pngSize(file: string): string {
@@ -114,6 +132,37 @@ describe("the social card", () => {
   it("is the image index.html hands the crawlers, at an absolute URL", () => {
     // A crawler resolves og:image against nothing: a relative path unfurls as no image at all.
     expect(INDEX).toContain('<meta property="og:image" content="https://marchpast.com/social-card.png" />');
+  });
+});
+
+describe("the 404 page", () => {
+  it("says what happened and offers the one way on", () => {
+    expect(NOT_FOUND).toContain('<h1 class="st-404-head">No such battle</h1>');
+    expect(NOT_FOUND).toMatch(/<a[^>]*href="\/"/);
+  });
+
+  it("names itself on the middle dot a page's own title takes (#135)", () => {
+    expect(NOT_FOUND).toContain("<title>No such battle · Marchpast</title>");
+  });
+
+  it("carries no bundle: it is a document, not the app", () => {
+    expect(NOT_FOUND).not.toContain("<script");
+  });
+
+  it("draws the mark character for character, since a plain document cannot import it", () => {
+    // `markSvg` is the drawing (src/app/mark.ts); this copy is the only one on
+    // the site that no module can build, so it is held to the original here.
+    expect(NOT_FOUND).toContain(markSvg(40));
+  });
+
+  it("is on the Library's own parchment, ink and type stack, and never a view's", () => {
+    // Read out of library.css, so editing the Library's tones turns this red
+    // rather than leaving the two pages quietly different (ADR-0029).
+    expect(NOT_FOUND).toContain(libraryToken("st-parchment"));
+    expect(NOT_FOUND).toContain(libraryToken("st-ink"));
+    const stack = /font-family:\s*([^;]+);/.exec(LIBRARY_CSS)?.[1]?.trim() ?? "";
+    expect(stack).not.toBe("");
+    expect(NOT_FOUND).toContain(stack);
   });
 });
 

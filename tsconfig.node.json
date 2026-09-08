@@ -21,6 +21,9 @@
     "vite.config.ts",
     "vite",
     "src/schema",
+    // The mark's drawing: `vite/public.test.ts` holds `public/404.html`'s copy
+    // of it to this original, and the module is bare strings with no imports.
+    "src/app/mark.ts",
     "src/data/library.ts",
     "src/render/layout.ts",
     "src/render/text.ts",

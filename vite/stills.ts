@@ -39,6 +39,7 @@ import { errorLine, type ValidationError } from "../src/schema/validation.ts";
 import { clockIntervals } from "../src/timeline/intervals.ts";
 import type { Picture } from "../src/timeline/picture.ts";
 import { pictureAt } from "../src/timeline/pictureAt.ts";
+import type { LibraryEntry } from "../src/data/library.ts";
 import { readLibrary } from "./library.ts";
 
 /** Where the battle files and their maps live inside the data directory. */
@@ -353,6 +354,30 @@ export function readBattle(dataDir: string, name: string): StillSource | undefin
   return { battle, map: map.map };
 }
 
+/** One battle the library lists: what the front door knows of it, and the files it is drawn from. */
+export interface LibraryBattle extends StillSource {
+  /** The library's own entry, `entry.name` being the bare file name. */
+  entry: LibraryEntry;
+}
+
+/**
+ * Every battle the library lists, each with its file and its map: the walk the
+ * build's two emitters share — the pictures here, the page per battle in
+ * `pages.ts` (#176).
+ *
+ * The library is the list, so what the build writes is exactly what the front
+ * door links to and a stray output is obvious. A battle the library lists and
+ * the disk does not hold **fails the build**: the library was read off that
+ * same disk a moment ago, so it can only mean the two disagree.
+ */
+export function libraryBattles(dataDir: string): LibraryBattle[] {
+  return readLibrary(dataDir).map((entry) => {
+    const source = readBattle(dataDir, entry.name);
+    if (source === undefined) throw new Error(`Marchpast: the library lists ${entry.name}, which has no battle file.`);
+    return { entry, ...source };
+  });
+}
+
 /** A request for a picture: which battle, and which of the two sizes. */
 export interface StillRequest {
   /** The battle's bare name, as `data/battles/<name>.json` spells it. */
@@ -448,13 +473,9 @@ export function stills(): Plugin {
       const loader = await createStillLoader(root);
       try {
         const modules = await loadStillModules((id) => loader.ssrLoadModule(id), root);
-        // The library is the list, so `dist/data/stills/` holds exactly the
-        // pictures the front door shows and a stray file is obvious.
-        for (const { name } of readLibrary(dataDir)) {
-          const source = readBattle(dataDir, name);
-          if (source === undefined) throw new Error(`Marchpast: the library lists ${name}, which has no battle file.`);
-          writePicture(path.join(outDir, "data", STILLS_DIR, `${name}.png`), battleStill(modules, source.battle, source.map, THUMBNAIL));
-          writePicture(path.join(outDir, "data", CARDS_DIR, `${name}.png`), battleStill(modules, source.battle, source.map, CARD));
+        for (const { entry, battle, map } of libraryBattles(dataDir)) {
+          writePicture(path.join(outDir, "data", STILLS_DIR, `${entry.name}.png`), battleStill(modules, battle, map, THUMBNAIL));
+          writePicture(path.join(outDir, "data", CARDS_DIR, `${entry.name}.png`), battleStill(modules, battle, map, CARD));
         }
       } finally {
         await loader.close();
