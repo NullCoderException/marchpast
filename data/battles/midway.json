@@ -1,0 +1,4353 @@
+{
+  "schema_version": 2,
+  "title": "The Battle of Midway",
+  "summary": "Four Japanese carriers steam in against an atoll whose garrison is awake and whose fleet is waiting north-east of it; in six minutes on the morning of 4 June three of them are burning, the fourth cripples Yorktown before she is caught herself, and a battle fought across the 180th meridian is decided by the aircraft the two sides put in the air.",
+  "dates": [
+    "4 June 1942",
+    "5 June 1942",
+    "6 June 1942",
+    "7 June 1942"
+  ],
+  "sort_date": {
+    "year": 1942,
+    "month": 6,
+    "day": 4
+  },
+  "extent": {
+    "north": 33.6,
+    "south": 27.4,
+    "east": 187.25,
+    "west": 173
+  },
+  "scale_unit": "nmi",
+  "map": "midway",
+  "end": "05:30",
+  "end_day": 3,
+  "license": "CC-BY-4.0",
+  "attribution": "Marchpast contributors, CC BY 4.0. Positions and captions authored from the public-domain United States Navy documents listed in the file.",
+  "sources": {
+    "cincpac": {
+      "label": "CINCPAC's report",
+      "work": "Commander-in-Chief, U.S. Pacific Fleet (Nimitz) to Commander-in-Chief, U.S. Fleet, \"Battle of Midway\", Cincpac File A16, Serial 01849, 28 June 1942",
+      "url": "https://www.ibiblio.org/hyperwar/USN/rep/Midway/Midway-CinCPac.html",
+      "license": "public-domain",
+      "license_note": "The official report of a US naval officer, a work of the United States Government under 17 U.S.C. 105. The copy read is the HyperWar transcription (ibiblio.org); the archival copy is at the Naval History and Heritage Command. Numbered paragraphs are the locators, and the transcription carries the original's misprints."
+    },
+    "combat-narrative": {
+      "label": "The 1943 combat narrative",
+      "work": "Office of Naval Intelligence, Combat Narratives: The Battle of Midway, June 3-6, 1942, Publications Branch, ONI, 13 March 1943",
+      "url": "https://www.ibiblio.org/hyperwar/USN/USN-CN-Midway/index.html",
+      "license": "public-domain",
+      "license_note": "A United States Government work under 17 U.S.C. 105. The copy read is the HyperWar transcription (ibiblio.org); the archival copy is at the Naval History and Heritage Command. Chapter numbers are the locators."
+    },
+    "nagumo": {
+      "label": "The Nagumo report",
+      "work": "\"The Japanese Story of the Battle of Midway (A Translation)\", CinC First Air Fleet Detailed Battle Report No. 6, translated by Fred Woodrough Jr., Office of Naval Communications, ONI Review vol. 2 no. 5, May 1947 (OPNAV P32-1002)",
+      "url": "https://www.ibiblio.org/hyperwar/Japan/IJN/rep/Midway/Nagumo/",
+      "license": "public-domain",
+      "license_note": "The 1947 translation is a United States Navy work under 17 U.S.C. 105; the 1942 Japanese original is a captured Imperial Japanese Navy report. The copy read is the HyperWar transcription (ibiblio.org); the archival copy is at the Naval History and Heritage Command. Original page numbers are the locators. Every time in this source is Tokyo time, plus 9."
+    },
+    "enterprise-report": {
+      "label": "Enterprise's action report",
+      "work": "Commanding Officer USS Enterprise (Murray) to CINCPAC, \"Battle of Midway Island, June 4-6, 1942 -- Report of\", CV6/A16-3/(60-Br), Serial 0133, 8 June 1942",
+      "url": "https://www.ibiblio.org/hyperwar/USN/ships/logs/CV/cv6-Midway.html",
+      "license": "public-domain",
+      "license_note": "A United States Government work under 17 U.S.C. 105. The copy read is the HyperWar transcription (ibiblio.org); the archival copy is at the Naval History and Heritage Command. Logged times are the locators, and every one of them is Zone plus 10."
+    },
+    "hornet-report": {
+      "label": "Hornet's action report",
+      "work": "Commanding Officer USS Hornet (Mitscher) to CINCPAC, \"Report of Action -- 4-6 June 1942\", Serial 0018, 13 June 1942",
+      "url": "https://www.ibiblio.org/hyperwar/USN/ships/logs/CV/cv8-Midway.html",
+      "license": "public-domain",
+      "license_note": "A United States Government work under 17 U.S.C. 105. The copy read is the HyperWar transcription (ibiblio.org); the archival copy is at the Naval History and Heritage Command. Every time in it is Zone plus 10, which paragraph 5 states."
+    },
+    "yorktown-report": {
+      "label": "Yorktown's action report",
+      "work": "Commanding Officer USS Yorktown (Buckmaster) to CINCPAC, report of the action of 4 June 1942 and of the loss of the ship, 18 June 1942",
+      "url": "https://www.ibiblio.org/hyperwar/USN/ships/logs/CV/cv5-Midway.html",
+      "license": "public-domain",
+      "license_note": "A United States Government work under 17 U.S.C. 105. The copy read is the HyperWar transcription (ibiblio.org); the archival copy is at the Naval History and Heritage Command. The report is cited by its logged times, which are Zone plus 10: it never says so, but its 0701 for a sinking CINCPAC puts at 0501 proves it."
+    },
+    "tf16-report": {
+      "label": "Task Force 16's report",
+      "work": "Commander Task Force Sixteen (Spruance) to CINCPAC, report of the action of 4-6 June 1942, Serial 0144, 16 June 1942",
+      "url": "https://www.history.navy.mil/research/archives/digital-exhibits-highlights/action-reports/wwii-battle-of-midway/tf-16-action-report.html",
+      "license": "public-domain",
+      "license_note": "A United States Government work under 17 U.S.C. 105, read from the Naval History and Heritage Command's transcription. Paragraph 3 states the clock."
+    },
+    "ussbs-amagai": {
+      "label": "Amagai's interrogation",
+      "work": "United States Strategic Bombing Survey, Interrogations of Japanese Officials, Nav No. 1 (USSBS No. 6), Captain Amagai Takahisa, air officer of Kaga, Tokyo, 6 October 1945",
+      "url": "https://www.ibiblio.org/hyperwar/AAF/USSBS/IJO/IJO-1.html",
+      "license": "public-domain",
+      "license_note": "A United States Government work under 17 U.S.C. 105. The copy read is the HyperWar transcription (ibiblio.org); the archival copy is at the Naval History and Heritage Command. The transcription prints the name as AMAGI. A recollection three years after the battle, not a contemporary record."
+    },
+    "ussbs-kawaguchi": {
+      "label": "Kawaguchi's interrogation",
+      "work": "United States Strategic Bombing Survey, Interrogations of Japanese Officials, Nav No. 2 (USSBS No. 11), Captain Kawaguchi Susumu, air officer of Hiryu, Tokyo, 10 October 1945",
+      "url": "https://www.ibiblio.org/hyperwar/AAF/USSBS/IJO/IJO-2.html",
+      "license": "public-domain",
+      "license_note": "A United States Government work under 17 U.S.C. 105. The copy read is the HyperWar transcription (ibiblio.org); the archival copy is at the Naval History and Heritage Command."
+    },
+    "ussbs-aoki": {
+      "label": "Aoki's interrogation",
+      "work": "United States Strategic Bombing Survey, Interrogations of Japanese Officials, Nav No. 4 (USSBS No. 23), Captain Aoki Taijiro, commanding officer of Akagi, Tokyo, 9 October 1945",
+      "url": "https://www.ibiblio.org/hyperwar/AAF/USSBS/IJO/IJO-4.html",
+      "license": "public-domain",
+      "license_note": "A United States Government work under 17 U.S.C. 105. The copy read is the HyperWar transcription (ibiblio.org); the archival copy is at the Naval History and Heritage Command. The interrogation carries no date of its own beyond the day it names."
+    },
+    "ussbs-watanabe": {
+      "label": "Watanabe's interrogation",
+      "work": "United States Strategic Bombing Survey, Interrogations of Japanese Officials, Nav No. 13 (USSBS No. 96), Captain Watanabe Yasuji, of Yamamoto's staff, Tokyo, 15 October 1945",
+      "url": "https://www.ibiblio.org/hyperwar/AAF/USSBS/IJO/IJO-13.html",
+      "license": "public-domain",
+      "license_note": "A United States Government work under 17 U.S.C. 105. The copy read is the HyperWar transcription (ibiblio.org); the archival copy is at the Naval History and Heritage Command. The only first-hand account here of the Main Body and of the cruisers' collision."
+    },
+    "ussbs-ohara": {
+      "label": "Ohara's interrogation",
+      "work": "United States Strategic Bombing Survey, Interrogations of Japanese Officials, Nav No. 39 (USSBS No. 165), Capt. Ohara H., executive officer of Soryu",
+      "url": "https://www.ibiblio.org/hyperwar/AAF/USSBS/IJO/IJO-39.html",
+      "license": "public-domain",
+      "license_note": "A United States Government work under 17 U.S.C. 105. The copy read is the HyperWar transcription (ibiblio.org); the archival copy is at the Naval History and Heritage Command. The transcription carries neither a place nor a date for this one."
+    }
+  },
+  "levels": [
+    "Forces",
+    "Ships and strikes"
+  ],
+  "units": [
+    {
+      "id": "mobile-force",
+      "side": "Japanese",
+      "label": "First Mobile Force",
+      "short_label": "Mobile Force",
+      "commander": "Nagumo",
+      "arm": "ship"
+    },
+    {
+      "id": "akagi",
+      "side": "Japanese",
+      "label": "Akagi",
+      "short_label": "Akagi",
+      "commander": "Aoki",
+      "arm": "ship",
+      "parent": "mobile-force"
+    },
+    {
+      "id": "kaga",
+      "side": "Japanese",
+      "label": "Kaga",
+      "short_label": "Kaga",
+      "commander": "Okada",
+      "arm": "ship",
+      "parent": "mobile-force"
+    },
+    {
+      "id": "soryu",
+      "side": "Japanese",
+      "label": "Soryu",
+      "short_label": "Soryu",
+      "commander": "Yanagimoto",
+      "arm": "ship",
+      "parent": "mobile-force"
+    },
+    {
+      "id": "hiryu",
+      "side": "Japanese",
+      "label": "Hiryu",
+      "short_label": "Hiryu",
+      "commander": "Yamaguchi",
+      "arm": "ship",
+      "parent": "mobile-force"
+    },
+    {
+      "id": "midway-strike",
+      "side": "Japanese",
+      "label": "The strike on Midway",
+      "short_label": "Tomonaga",
+      "commander": "Tomonaga",
+      "arm": "aircraft",
+      "parent": "mobile-force"
+    },
+    {
+      "id": "hiryu-bombers",
+      "side": "Japanese",
+      "label": "Hiryu's dive bombers",
+      "short_label": "Kobayashi",
+      "commander": "Kobayashi",
+      "arm": "aircraft",
+      "parent": "mobile-force"
+    },
+    {
+      "id": "hiryu-torpedo",
+      "side": "Japanese",
+      "label": "Hiryu's torpedo planes",
+      "short_label": "Torpedo planes",
+      "commander": "Tomonaga",
+      "arm": "aircraft",
+      "parent": "mobile-force"
+    },
+    {
+      "id": "crudiv-7",
+      "side": "Japanese",
+      "label": "Cruiser Division 7",
+      "short_label": "CruDiv 7",
+      "arm": "ship"
+    },
+    {
+      "id": "tf16",
+      "side": "American",
+      "label": "Task Force 16",
+      "short_label": "TF 16",
+      "commander": "Spruance",
+      "arm": "ship"
+    },
+    {
+      "id": "enterprise",
+      "side": "American",
+      "label": "Enterprise",
+      "short_label": "Enterprise",
+      "commander": "Murray",
+      "arm": "ship",
+      "parent": "tf16"
+    },
+    {
+      "id": "hornet",
+      "side": "American",
+      "label": "Hornet",
+      "short_label": "Hornet",
+      "commander": "Mitscher",
+      "arm": "ship",
+      "parent": "tf16"
+    },
+    {
+      "id": "vt-8",
+      "side": "American",
+      "label": "Torpedo Eight",
+      "short_label": "VT-8",
+      "commander": "Waldron",
+      "arm": "aircraft",
+      "parent": "tf16"
+    },
+    {
+      "id": "enterprise-strike",
+      "side": "American",
+      "label": "Enterprise's attack group",
+      "short_label": "Enterprise group",
+      "commander": "McClusky",
+      "arm": "aircraft",
+      "parent": "tf16"
+    },
+    {
+      "id": "hiryu-hunters",
+      "side": "American",
+      "label": "The afternoon strike on Hiryu",
+      "short_label": "Hiryu strike",
+      "arm": "aircraft",
+      "parent": "tf16"
+    },
+    {
+      "id": "enterprise-6-june",
+      "side": "American",
+      "label": "Enterprise's strike on the cruisers",
+      "short_label": "Cruiser strike",
+      "arm": "aircraft",
+      "parent": "tf16"
+    },
+    {
+      "id": "tf17",
+      "side": "American",
+      "label": "Task Force 17",
+      "short_label": "TF 17",
+      "commander": "Fletcher",
+      "arm": "ship"
+    },
+    {
+      "id": "yorktown",
+      "side": "American",
+      "label": "Yorktown",
+      "short_label": "Yorktown",
+      "commander": "Buckmaster",
+      "arm": "ship",
+      "parent": "tf17"
+    },
+    {
+      "id": "yorktown-strike",
+      "side": "American",
+      "label": "Yorktown's attack group",
+      "short_label": "Yorktown group",
+      "commander": "Leslie",
+      "arm": "aircraft",
+      "parent": "tf17"
+    },
+    {
+      "id": "midway",
+      "side": "American",
+      "label": "Midway",
+      "short_label": "Midway",
+      "commander": "Simard",
+      "arm": "aircraft"
+    },
+    {
+      "id": "midway-air",
+      "side": "American",
+      "label": "Midway's air group",
+      "short_label": "MAG-22",
+      "commander": "Kimes",
+      "arm": "aircraft",
+      "parent": "midway"
+    },
+    {
+      "id": "midway-torpedo",
+      "side": "American",
+      "label": "The torpedo flight from Midway",
+      "short_label": "Torpedo flight",
+      "arm": "aircraft",
+      "parent": "midway"
+    },
+    {
+      "id": "vmsb-241",
+      "side": "American",
+      "label": "Marine Scout Bombing 241",
+      "short_label": "VMSB-241",
+      "commander": "Henderson",
+      "arm": "aircraft",
+      "parent": "midway"
+    },
+    {
+      "id": "b-17s",
+      "side": "American",
+      "label": "The B-17s",
+      "short_label": "B-17s",
+      "commander": "Sweeney",
+      "arm": "aircraft",
+      "parent": "midway"
+    },
+    {
+      "id": "b-17s-evening",
+      "side": "American",
+      "label": "The B-17s at dusk",
+      "short_label": "B-17s (dusk)",
+      "commander": "Sweeney",
+      "arm": "aircraft",
+      "parent": "midway"
+    }
+  ],
+  "phases": [
+    {
+      "id": "dawn-launch",
+      "label": "Nagumo launches a hundred and eight aircraft against Midway",
+      "t": "04:30",
+      "playback_rate": 900,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "Two hundred and fifteen miles north-west of Midway, within a few miles of the 180th meridian, Nagumo turns his four carriers into the wind and sends a hundred and eight aircraft against the atoll under Tomonaga of the Hiryu. Two hundred miles to the east Spruance's two carriers and Fletcher's one are at the rendezvous the code-breakers bought them, unsighted and unsuspected. On Midway every serviceable aeroplane is warming up.",
+      "notes": "Clock: every time in this file is Midway local, Zone plus 12, the convention of CINCPAC's report and of the 1943 combat narrative. Two other clocks run through the sources and both are converted on the way in: the task-force and carrier action reports keep Zone plus 10, two hours ahead of Midway, and the Nagumo report keeps Tokyo time, plus 9, twenty-one hours ahead, so its 0130 on the 5th is 04:30 on 4 June here. That breaks the rule that a time is copied verbatim from the source that gives it, knowingly and in one direction only: the source's own reading stays in the reference beside it, and every phase says which of the three clocks its instant came off.\n\nTime: converted. The Nagumo report has the strike take off at 0130 Tokyo, which is 04:30. CINCPAC has Midway's own patrol planes away before dawn and the narrative has them off at 0415.\n\nPositions: the launch point is given as a latitude and longitude by no source and is derived twice over. From the patrol plane's 05:52 fix — bearing 320, distance 180 miles from Midway, course 135, speed 25 — the force was at 30.5 N 179.6 W then, and eighty-two minutes earlier, on the course the Nagumo report prescribes for the three and a half hours after the launch, about 30.9 N on the meridian. Back-plotted the other way from CruDiv 8's 09:30 position, bearing 137 and 96 miles from the take-off point, and from the 10:22 fix Enterprise logged, it comes to 30.9 N 180.2 W. The file authors 30.9 N, 180.0. Every longitude here is written in the frame the extent fixes, so 179.6 W is 180.4 and Midway is 182.63. The four carriers are set two miles apart about the force's own point, which is the square formation Kaga's air officer described and not a fix. TF 16 and TF 17 are at the 04:30 rendezvous Enterprise's report names, TF 17 ten miles north-east of TF 16 as its own report has it. CruDiv 7 is about four hundred miles west of Midway; no source tracks it through 4 June, and its run east is authored from where it was at dawn to where Tambor found it in the night.\n\nStrikes: the Midway strike is drawn aboard — at the force's own position, in file on the force's own heading — which is this file's picture of a strike that has not left yet or has come home, and it tweens out toward the atoll over the next two phases. Midway's own flights are not on the plate until the next phase, when the reports have them airborne.",
+      "references": [
+        {
+          "source": "nagumo",
+          "locator": "p. 7, the take-off of the Midway attack unit",
+          "quote": "under command of flight officer of the Hiryu, Lieut. Tomonaga, Organization #5 composed of 36 ship-based fighters, 36 ship-based bombers, and 36 ship-based torpedo planes, took off to attack Midway",
+          "note": "The report's own reading is 0130 on the 5th, Tokyo time, which is 04:30 on 4 June on this file's clock."
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 13, Mobile Force Signal Order 100, the course after the launch",
+          "quote": "For three hours and 30 minutes following the first wave's take-off, the fleet will proceed on course 135 degrees, speed, 24 knots"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 17, the striking force unsighted on 3 June",
+          "quote": "The Japanese Main Striking Force assumed to have 4 carriers was not sighted on the third"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 13, the report's clock",
+          "quote": "All times in this rept are Zone plus 12",
+          "note": "The statement this file's clock is taken from."
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 30.9,
+            "lon": 180
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 30.935,
+            "lon": 179.96
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "kaga",
+          "position": {
+            "lat": 30.865,
+            "lon": 179.96
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "soryu",
+          "position": {
+            "lat": 30.935,
+            "lon": 180.04
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 30.865,
+            "lon": 180.04
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "midway-strike",
+          "position": {
+            "lat": 30.9,
+            "lon": 180
+          },
+          "heading": 135,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.2,
+            "lon": 175.1
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 31.55,
+            "lon": 183.55
+          },
+          "heading": 210,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 31.58,
+            "lon": 183.52
+          },
+          "heading": 210,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 31.52,
+            "lon": 183.58
+          },
+          "heading": 210,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 31.67,
+            "lon": 183.69
+          },
+          "heading": 210,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 31.67,
+            "lon": 183.69
+          },
+          "heading": 210,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "intact"
+        }
+      ]
+    },
+    {
+      "id": "carriers-sighted",
+      "label": "A patrol plane reports two carriers, bearing 320, a hundred and eighty miles",
+      "t": "05:52",
+      "playback_rate": 600,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "A Catalina out of Midway reports many aircraft coming in; seven minutes later another finds two carriers and a screen a hundred and eighty miles out on the same bearing, closing at twenty-five knots. Spruance turns toward the contact at twenty-four knots and Fletcher tells him to attack the carriers when they are definitely located. At Midway the alarm goes and everything that can leave the ground leaves it.",
+      "notes": "Time: verbatim, Zone plus 12. CINCPAC gives the first contact at 0545 and the carrier contact seven minutes later, so the file takes 05:52. Enterprise logged the intercepts at 0734, 0753 and 0803 Zone plus 10, which are 05:34, 05:53 and 06:03 here, and its own report is the source for Fletcher's order.\n\nPositions: the Mobile Force is put exactly where the patrol plane placed it, bearing 320 and 180 miles from Midway on course 135 at twenty-five knots, which is 30.5 N 179.6 W and 180.4 in this file's frame. TF 16 has turned to 239 but has barely moved; no source fixes it between the rendezvous and the launch, so it is carried forward at fifteen knots and its 07:00 position, which is fixed, is what the interval runs to.\n\nStrikes: Midway's three flights come onto the plate here, drawn on the atoll in file, because the reports have every serviceable aeroplane airborne before six o'clock and the atoll is where they left from. Each is one unit for one sortie: the torpedo flight of six Navy TBFs and four Army B-26s, Henderson's twenty-seven Marine dive bombers, and the sixteen B-17s. The twenty-seven Marine fighters are not a strike — their interception is the air group's own state and strength from the next phase — and the search planes, the patrol planes and the combat air patrols are caption matter throughout.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "para. 18, the two contacts",
+          "quote": "At 0545 the most important contact of the battle was made"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 19, Midway's aircraft airborne",
+          "quote": "All serviceable planes at Midway were in the air before 0600"
+        },
+        {
+          "source": "tf16-report",
+          "locator": "para. 4(a), the first contact and the turn toward it",
+          "quote": "We received our first contact report at 0740. Task Force SEVENTEEN was about 10 miles to the N.E. of us with search in the air. Task Force SIXTEEN headed toward the contact at 24 knots.",
+          "note": "0740 Zone plus 10 is 05:40 here, and this is the source for TF 17 being ten miles north-east of TF 16 through the morning."
+        },
+        {
+          "source": "enterprise-report",
+          "locator": "0807, Fletcher's order to Spruance",
+          "quote": "proceed southwesterly and attack enemy carriers when definitely located",
+          "note": "Logged at 0807 Zone plus 10, which is 06:07 here."
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 13, the flying boat sighted and the fighters scrambled",
+          "quote": "Sight one enemy flying boat in position bearing 166 degrees, distance, 40 kilometers"
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 30.5,
+            "lon": 180.4
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 30.535,
+            "lon": 180.36
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "kaga",
+          "position": {
+            "lat": 30.465,
+            "lon": 180.36
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "soryu",
+          "position": {
+            "lat": 30.535,
+            "lon": 180.44
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 30.465,
+            "lon": 180.44
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "midway-strike",
+          "position": {
+            "lat": 29.07,
+            "lon": 181.79
+          },
+          "heading": 140,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.2,
+            "lon": 175.35
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 31.53,
+            "lon": 183.5
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 31.56,
+            "lon": 183.47
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 31.5,
+            "lon": 183.53
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 31.65,
+            "lon": 183.64
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 31.65,
+            "lon": 183.64
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "midway-torpedo",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "vmsb-241",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "b-17s",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "column",
+          "state": "intact"
+        }
+      ]
+    },
+    {
+      "id": "midway-bombed",
+      "label": "The Marine fighters intercept and the first bomb falls",
+      "t": "06:30",
+      "playback_rate": 300,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "Thirty miles out, fourteen of Midway's twenty-seven fighters meet a hundred aircraft and are cut to pieces; fifteen of them do not come back. The first bomb falls on the atoll at half past six and the bombing and strafing go on for a quarter of an hour, wrecking the power plant on Eastern Island and leaving the runways deliberately whole for the landing that is meant to follow.",
+      "notes": "Time: verbatim, Zone plus 12. The narrative has the first bomb at 0630 and CINCPAC at about 0633; the file takes 06:30. The Japanese account of the same minutes, converted, runs a quarter of an hour later — bombs on the installations between about 0345 and 0410 Tokyo, which is 06:45 to 07:10 — and that gap holds all morning wherever both sides timed one event. Where an American witness has a reading the file takes it; where only the Japanese side saw the thing happen, as with the launches and the sinkings, it takes the converted Tokyo reading.\n\nPositions: the Mobile Force is on its prescribed 135 at twenty-four knots between the 05:52 fix and the 07:55 one, and this position is interpolated between them. The strike is drawn over the atoll, a few miles north-west of it so that the two signs read apart; nothing places it more precisely than over Midway.\n\nStrikes: Midway's air group takes the interception as its own — state engaged, strength 0.44, the twelve fighters of twenty-seven that were neither lost nor badly shot up — and the atoll itself carries a coarser 0.75, an authored aggregate over the whole air group as the losses of the morning come in. Neither is a casualty count.",
+      "references": [
+        {
+          "source": "combat-narrative",
+          "locator": "ch. 5, the first bomb on Midway",
+          "quote": "The first bomb fell on Midway at 0630"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 20, the bombing and the damage",
+          "quote": "The first bomb hit Midway at about 0633 from horizontal bombers"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 20, what was hit and what was spared",
+          "quote": "Considerable damage was done to nearly all structures above ground"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 19, the fighters' losses",
+          "quote": "Of the 27 fighters available, 15 were lost and 7 severely damaged"
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 7, the attack on the installations",
+          "quote": "bombs were dropped on military installations on Midway between about 0345 and 0410",
+          "note": "Tokyo time: 06:45 to 07:10 here, a quarter of an hour later than the American readings of the same attack."
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 30.3,
+            "lon": 180.7
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 30.335,
+            "lon": 180.66
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "kaga",
+          "position": {
+            "lat": 30.265,
+            "lon": 180.66
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "soryu",
+          "position": {
+            "lat": 30.335,
+            "lon": 180.74
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 30.265,
+            "lon": 180.74
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "midway-strike",
+          "position": {
+            "lat": 28.28,
+            "lon": 182.5
+          },
+          "heading": 140,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.2,
+            "lon": 175.47
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 31.52,
+            "lon": 183.45
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 31.55,
+            "lon": 183.42
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 31.49,
+            "lon": 183.48
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 31.64,
+            "lon": 183.59
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 31.64,
+            "lon": 183.59
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.75
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        },
+        {
+          "id": "midway-torpedo",
+          "position": {
+            "lat": 29.05,
+            "lon": 181.86
+          },
+          "heading": 321,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "vmsb-241",
+          "position": {
+            "lat": 28.95,
+            "lon": 182
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "b-17s",
+          "position": {
+            "lat": 29,
+            "lon": 182.05
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "intact"
+        }
+      ]
+    },
+    {
+      "id": "tf16-launches",
+      "label": "Enterprise and Hornet launch; Tone's plane sights ten ships",
+      "t": "07:00",
+      "playback_rate": 300,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "TF 16 turns south into a light wind and takes an hour to put its groups in the air; Torpedo Eight goes off low and alone. Ten minutes later Midway's torpedo aircraft find the carriers and are shot to pieces without a hit. Nagumo, told a second attack is needed, orders the reserve rearmed with land bombs; at half past seven a float plane from Tone reports ten ships to the north-east, and does not say what they are.",
+      "notes": "Time: verbatim, Zone plus 12. CINCPAC has launching commence at about 0700; Hornet logged 0900 and Enterprise 0906, both Zone plus 10, which are 07:00 and 07:06 here. The Japanese readings for the same window are converted: Tomonaga's call for a second attack at 0415 Tokyo is 07:15, and Tone's number four plane reported at 0428 Tokyo, which is 07:28.\n\nPositions: TF 16 is fixed here, and it is the fix the whole American morning hangs on — the carriers were reported about 155 miles distant on bearing 239 from the task force, which puts TF 16 at 31.5 N 176.6 W, written 183.4 in this frame. It is drawn heading 180 because both its own report and Hornet's have it turning south into the wind to launch. The Mobile Force is interpolated on its prescribed course. Tone's plane put the Americans forty miles too far north, an error in the report that is not corrected here because the file draws where the ships were, not where they were reported.\n\nStrikes: Torpedo Eight and Enterprise's group are drawn aboard, in file on their carriers' heading and overprinting them, and tween outward from here. Hornet's dive bombers and fighters are not a unit: they found nothing, turned south, and are authored as an intent arrow from Hornet and from TF 16 to the estimated position of the enemy, 155 miles on 239. Midway's torpedo flight is at the target, engaged, at strength 0.3 — three of ten came back — and this is its last phase; the survivors landed inside the interval that follows, and the flight is struck off rather than drawn home, because 07:55 is the most crowded phase of the battle and this is where the trimming is done.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "para. 27, the launch",
+          "quote": "At about 0700 launching commenced"
+        },
+        {
+          "source": "hornet-report",
+          "locator": "para. 5, the launch and the clock",
+          "quote": "At 090 (all times given hereafter are zone plus 10) commenced launching",
+          "note": "The report's statement of its own clock; 0900 Zone plus 10 is 07:00 here. The transcription's 090 is the original's."
+        },
+        {
+          "source": "tf16-report",
+          "locator": "para. 3, the report's clock",
+          "quote": "All times given are zone plus ten, which is two hours ahead of Midway time, zone plus twelve.",
+          "note": "The clearest statement in any of these documents of the two-hour offset this file converts across."
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 7, Tomonaga's signal",
+          "quote": "There is a necessity for carrying out a second attack",
+          "note": "Radioed at 0415 Tokyo, which is 07:15 here."
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 21, the Army torpedo attack",
+          "quote": "The B-26's found their targets, 2 CV, about 0710 and made a most gallant attack"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 21, the first Army torpedo attack of the war",
+          "quote": "our Army's first attack with torpedo planes"
+        },
+        {
+          "source": "ussbs-kawaguchi",
+          "locator": "Nav No. 2, the torpedo attack on the carriers",
+          "quote": "About an hour after sunrise, we were attacked by torpedo bombers"
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 30.2,
+            "lon": 180.8
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 30.235,
+            "lon": 180.76
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "kaga",
+          "position": {
+            "lat": 30.165,
+            "lon": 180.76
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "soryu",
+          "position": {
+            "lat": 30.235,
+            "lon": 180.84
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 30.165,
+            "lon": 180.84
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "midway-strike",
+          "position": {
+            "lat": 29.1,
+            "lon": 181.85
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.94
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.2,
+            "lon": 175.56
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 31.5,
+            "lon": 183.4
+          },
+          "heading": 180,
+          "formation": "mass",
+          "state": "intact",
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 30.17,
+                "lon": 180.8
+              }
+            }
+          ]
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 31.53,
+            "lon": 183.37
+          },
+          "heading": 180,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 31.47,
+            "lon": 183.43
+          },
+          "heading": 180,
+          "formation": "mass",
+          "state": "intact",
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 30.17,
+                "lon": 180.8
+              }
+            }
+          ]
+        },
+        {
+          "id": "vt-8",
+          "position": {
+            "lat": 31.47,
+            "lon": 183.43
+          },
+          "heading": 180,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise-strike",
+          "position": {
+            "lat": 31.53,
+            "lon": 183.37
+          },
+          "heading": 180,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 31.6,
+            "lon": 183.55
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 31.6,
+            "lon": 183.55
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.65
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        },
+        {
+          "id": "midway-torpedo",
+          "position": {
+            "lat": 30.15,
+            "lon": 180.85
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.3
+        },
+        {
+          "id": "vmsb-241",
+          "position": {
+            "lat": 29.45,
+            "lon": 181.65
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "b-17s",
+          "position": {
+            "lat": 29.5,
+            "lon": 181.7
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "intact"
+        }
+      ]
+    },
+    {
+      "id": "midways-strikes",
+      "label": "Midway's bombers attack; Yorktown launches",
+      "t": "07:55",
+      "playback_rate": 400,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "Sixteen Marine dive bombers under Henderson glide-bomb a carrier and eight are shot down; the B-17s bomb from twenty thousand feet and the Vindicators go for a battleship, and none of them hit anything. At twenty past eight Tone's plane adds that the enemy is accompanied by what appears to be a carrier. Fletcher, his scouts back, launches Yorktown's group.",
+      "notes": "Time: verbatim, Zone plus 12. CINCPAC has Henderson's attack at 0755, the B-17s attacking from 0814, the Vindicators at about 0820 and Yorktown launching from 0830; the narrative has 0838 and Yorktown's own report has 1030 to 1050 Zone plus 10, which is 08:30 to 08:50. Tone's second report is 0520 Tokyo, which is 08:20.\n\nPositions: the Mobile Force is drawn under attack and turning, on the courses the Nagumo report logs through the morning — 115 degrees at 0628 Tokyo, 300 at 0638 — and about 30.0 N 179.0 W, interpolated between the fixes on either side of it. The two Midway flights are put at the target rather than at their own separate attack points; the plate cannot hold nineteen minutes apart at this scale, and the notes carry what the picture cannot.\n\nStrikes: fifteen units are drawn at the finer level here and at 09:00, the most the battle ever puts on the plate at once and one under the ceiling. Yorktown's group is aboard, in file on TF 17's heading, and launches inside the interval that follows. The B-17s are marked engaged at 07:55 although they bombed at 0814: the phase's picture holds until the next one, and the alternative is a phase for every bomb.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "para. 23, Henderson's attack",
+          "quote": "At 0755 a group of 16 Marine dive bombers, under Major L. R. Henderson, USMC made a gallant glide bombing attack on one of the carriers"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 25, the B-17s",
+          "quote": "at 0814 began attacking from 20,000 feet"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 34, Yorktown launches",
+          "quote": "At 0830 Yorktown commenced launching"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 26, what Midway's strikes had and had not done",
+          "quote": "The Midway Forces had struck with full strength, but the Japanese were not as yet checked"
+        },
+        {
+          "source": "ussbs-amagai",
+          "locator": "Nav No. 1, the order of the morning's attacks as Kaga's air officer remembered them",
+          "quote": "I think first high horizontal bombers, no hits."
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 30,
+            "lon": 181
+          },
+          "heading": 115,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 30.035,
+            "lon": 180.96
+          },
+          "heading": 115,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "kaga",
+          "position": {
+            "lat": 29.965,
+            "lon": 180.96
+          },
+          "heading": 115,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "soryu",
+          "position": {
+            "lat": 30.035,
+            "lon": 181.04
+          },
+          "heading": 115,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 29.965,
+            "lon": 181.04
+          },
+          "heading": 115,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "midway-strike",
+          "position": {
+            "lat": 29.55,
+            "lon": 181.45
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.94
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.2,
+            "lon": 175.73
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 31.3,
+            "lon": 183.36
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 31.33,
+            "lon": 183.33
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 31.27,
+            "lon": 183.39
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "vt-8",
+          "position": {
+            "lat": 31.25,
+            "lon": 182.95
+          },
+          "heading": 239,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise-strike",
+          "position": {
+            "lat": 31.25,
+            "lon": 182.85
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 31.45,
+            "lon": 183.5
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 31.45,
+            "lon": 183.5
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "yorktown-strike",
+          "position": {
+            "lat": 31.45,
+            "lon": 183.5
+          },
+          "heading": 239,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.55
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        },
+        {
+          "id": "vmsb-241",
+          "position": {
+            "lat": 29.9,
+            "lon": 181.08
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "b-17s",
+          "position": {
+            "lat": 29.95,
+            "lon": 181.2
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged"
+        }
+      ]
+    },
+    {
+      "id": "nagumo-recovers",
+      "label": "The Midway strike lands; Nagumo turns north-east to fight",
+      "t": "09:00",
+      "playback_rate": 300,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "Nagumo takes Tomonaga's aircraft aboard, decides to recover before he strikes, and turns north-east to destroy the American force in a daylight engagement. It is the decision the whole battle turns on, and it is made in the report's own words. Away to the east three American groups are in the air on three different courses: Hornet's turns south and finds nothing at all.",
+      "notes": "Time: converted. The Nagumo report has the strike back aboard by about 0600 Tokyo, which is 09:00, and the blinker ordering course 70 timed 0630 Tokyo, which is 09:30. CINCPAC, from the other side, has the striking force turning away sometime after 0830 Zone plus 12, which is why the American groups did not find it where they expected.\n\nPositions: 29.8 N 178.9 W, derived from the report's own statement that at 0630 Tokyo the force was bearing 137 and 96 miles from the take-off point on a northerly course at twenty-four knots. TF 16 and TF 17 are interpolated between the launch fix and the 10:22 one.\n\nStrikes: the Midway strike is recovered — back at the force's position, in file on its heading — and this is its last phase. Henderson's dive bombers and the B-17s are recovered at the atoll for the same reason: both attacked between 07:55 and 08:20 about a hundred and forty miles out, and at cruising speed both were over Midway by nine. The dive bombers come home broken at half strength; the B-17s come home whole, having hit nothing all battle. Hornet's group carries a detachment arrow toward Midway, where thirteen of its dive bombers landed after its fighters ran out of fuel and went into the sea.",
+      "references": [
+        {
+          "source": "nagumo",
+          "locator": "p. 7, the strike recovered",
+          "quote": "returned to their carriers by about 0600",
+          "note": "Tokyo time: 09:00 here."
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 7, the decision to recover before striking",
+          "quote": "It was therefore decided that we would await the return of the Midway attack unit and then carry out a grand scale air attack."
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 18, the blinker from the force commander",
+          "quote": "Plan to destroy the enemy in a daylight engagement",
+          "note": "Timed 0630 Tokyo, which is 09:30 here."
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 29, the turn away and its consequence",
+          "quote": "Sometime after 0830, when the last attack that morning by Midway planes was completed, the Japanese striking force commenced retirement to the north or northwest."
+        },
+        {
+          "source": "combat-narrative",
+          "locator": "ch. 7, McClusky's decision",
+          "quote": "But their group commander, Lt. Comdr. Clarence W. McClusky, Jr.,"
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 29.8,
+            "lon": 181.1
+          },
+          "heading": 70,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 29.835,
+            "lon": 181.06
+          },
+          "heading": 70,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "kaga",
+          "position": {
+            "lat": 29.765,
+            "lon": 181.06
+          },
+          "heading": 70,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "soryu",
+          "position": {
+            "lat": 29.835,
+            "lon": 181.14
+          },
+          "heading": 70,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 29.765,
+            "lon": 181.14
+          },
+          "heading": 70,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "midway-strike",
+          "position": {
+            "lat": 29.8,
+            "lon": 181.1
+          },
+          "heading": 70,
+          "formation": "column",
+          "state": "engaged",
+          "strength": 0.94
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.2,
+            "lon": 175.93
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 31.1,
+            "lon": 183.28
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 31.13,
+            "lon": 183.25
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 31.07,
+            "lon": 183.31
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact",
+          "moves": [
+            {
+              "kind": "detachment",
+              "to": {
+                "lat": 28.21,
+                "lon": 182.63
+              }
+            }
+          ]
+        },
+        {
+          "id": "vt-8",
+          "position": {
+            "lat": 30.26,
+            "lon": 181.49
+          },
+          "heading": 239,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise-strike",
+          "position": {
+            "lat": 30.8,
+            "lon": 182.1
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 31.3,
+            "lon": 183.42
+          },
+          "heading": 180,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 31.3,
+            "lon": 183.42
+          },
+          "heading": 180,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "yorktown-strike",
+          "position": {
+            "lat": 31.2,
+            "lon": 183.3
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        },
+        {
+          "id": "vmsb-241",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "column",
+          "state": "broken",
+          "strength": 0.5
+        },
+        {
+          "id": "b-17s",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "column",
+          "state": "engaged"
+        }
+      ]
+    },
+    {
+      "id": "torpedo-squadrons",
+      "label": "The torpedo squadrons attack unsupported",
+      "t": "09:20",
+      "playback_rate": 300,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "Waldron finds the enemy and takes Torpedo Eight straight in without fighters, without dive bombers and without hope. Fifteen aircraft attack; not one comes back. Enterprise's and Yorktown's torpedo squadrons follow over the next hour and are cut up in their turn, and the Japanese fighters are pulled down to the water where the dive bombers are about to come from.",
+      "notes": "Time: verbatim, Zone plus 12. CINCPAC puts Waldron's attack at about 0920 and Akagi's log, converted, sights fourteen torpedo planes at 0640 Tokyo, which is 09:40. That twenty-minute spread is the largest disagreement of the day: the American reading is an estimate made by men who watched from a distance, the Japanese one a ship's log. The file takes 09:20 and lets the phase's own interval carry the difference.\n\nPositions: the force is evasive here, on the 300 Akagi turned to when the torpedo planes were sighted bearing 118. The narrative has the ships on 270 at the moment of contact, turning to 000 and then to 180 as the aircraft came in, which is the same ship in the same quarter of an hour; nothing in the file tries to draw all three.\n\nStrikes: Torpedo Eight is drawn destroyed at strength 0 at 09:20, twenty minutes before the last of it went down, and this is its last phase. That is the file's reading of a squadron that ceased to exist inside one phase interval; its one survivor, who watched the rest of the battle from the water, is caption matter. Enterprise's and Yorktown's groups are still on their way in.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "para. 31, Waldron's attack",
+          "quote": "the Hornet's torpedo squadron led by Lt. Comdr. J. C. Waldron had found the enemy and without hesitation at about 0920 conducted a most gallant and heroic attack entirely unsupported"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 32, the squadron's end",
+          "quote": "Not a plane survived this magnificent devotion to purpose"
+        },
+        {
+          "source": "combat-narrative",
+          "locator": "ch. 7, Torpedo Eight",
+          "quote": "Of the 15 planes, not one returned"
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 8, Akagi's turn away from the torpedo planes",
+          "quote": "At 0706, enemy torpedo planes were sighted bearing 118 degrees. To minimize the target area, the Akagi turned to course 300 degrees and stayed on this course",
+          "note": "Tokyo time: 10:06 here, the second wave of torpedo attacks rather than Waldron's."
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 33, what the torpedo squadrons bought",
+          "quote": "The results was that the VT squadrons were a sacrifice that enabled the dive bombers to make their attack almost unopposed, with disastrous results for the enemy."
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 30,
+            "lon": 181.1
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 30.035,
+            "lon": 181.06
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "kaga",
+          "position": {
+            "lat": 29.965,
+            "lon": 181.06
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "soryu",
+          "position": {
+            "lat": 30.035,
+            "lon": 181.14
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 29.965,
+            "lon": 181.14
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.2,
+            "lon": 175.99
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 31.05,
+            "lon": 183.25
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 31.08,
+            "lon": 183.22
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 31.02,
+            "lon": 183.28
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "vt-8",
+          "position": {
+            "lat": 29.97,
+            "lon": 181.18
+          },
+          "heading": 320,
+          "formation": "column",
+          "state": "destroyed",
+          "strength": 0
+        },
+        {
+          "id": "enterprise-strike",
+          "position": {
+            "lat": 30.6,
+            "lon": 181.8
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 31.25,
+            "lon": 183.38
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 31.25,
+            "lon": 183.38
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "yorktown-strike",
+          "position": {
+            "lat": 31.05,
+            "lon": 183
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        }
+      ]
+    },
+    {
+      "id": "three-carriers-hit",
+      "label": "Kaga, Akagi and Soryu are bombed within six minutes",
+      "t": "10:22",
+      "playback_rate": 240,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "The dive bombers arrive unopposed out of the cloud, Enterprise's on Kaga and Akagi, Yorktown's on Soryu. Kaga is hit at twenty-two minutes past ten, Akagi at twenty-six, Soryu between twenty-five and twenty-eight, and all three burn from end to end with their own aircraft and ordnance alight on deck. Only Hiryu, drawing off to the north, is untouched.",
+      "notes": "Time: converted, and the one instant in the battle all three clocks agree on. CINCPAC has the attack between 1020 and 1025 Zone plus 12; Enterprise logged 1222 Zone plus 10, which is 10:22; the Nagumo report has Kaga hit at 0722, Akagi at 0726 and Soryu at 0725, 0726 and 0728 Tokyo, which are 10:22, 10:26 and 10:25 to 10:28. The file takes 10:22, the Japanese reading of the first hit, which falls inside CINCPAC's own bracket.\n\nPositions: 30 degrees 05 minutes north, 178 degrees 50 minutes west, the fix Enterprise logged with the attack, written 30.083 and 181.167 in this frame. It is the best-attested position in the battle and the three carriers are set about it in the box they were steaming in. Nagumo shifted his flag to the cruiser Nagara at 0830 Tokyo, which is 11:30, so the force's own marker is still on the carriers here and on the Nagara group from the next phase.\n\nStrikes: this is the phase the library's still and the battle page's card are drawn from. Six minutes decided the Pacific war, and it is the only picture in the file in which three of the four Japanese carriers change state at once. Nautilus's torpedo, which the 1943 sources credit with finishing Soryu and which Kaga's own air officer says struck his ship and failed to explode, is caption matter: the file does not decide which carrier the submarine hit.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "para. 36, the dive bombing",
+          "quote": "The dive bombing attacks by both Enterprise and Yorktown squadrons began at about the same time, between 1020 and 1025"
+        },
+        {
+          "source": "enterprise-report",
+          "locator": "1222, the attack and the position of the enemy force",
+          "quote": "Position of enemy force, Lat. 30",
+          "note": "Logged 1222 Zone plus 10, which is 10:22 here; the fix reads 30 degrees 05 minutes north, 178 degrees 50 minutes west."
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 9, Kaga hit",
+          "quote": "These efforts were successful against the first, second, and third bombs, but #4 hit starboard, aft, while #7 was a direct hit in the vicinity of the forward elevator",
+          "note": "Tokyo time 0722, which is 10:22 here."
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 7, the three carriers left burning",
+          "quote": "About 30 carrier-based bombers then attacked us resulting in fires aboard the Akagi, Kaga, and Soryu, forcing them to fall behind and leaving only the Hiryu untouched"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 35, Kaga and Akagi burning",
+          "quote": "Both Kaga and Akagi, between which he lay, were hit repeatedly, the planes on deck that they sought to launch being ignited until the two ships burned fiercely from stem to stern"
+        },
+        {
+          "source": "combat-narrative",
+          "locator": "ch. 7, the fourth carrier",
+          "quote": "The fourth carrier, the Hiryu had withdrawn to the north undamaged"
+        },
+        {
+          "source": "ussbs-amagai",
+          "locator": "Nav No. 1, the submarine torpedo that did not explode",
+          "quote": "while swimming in water several hours after attack saw a torpedo apparently fired from submarine strike side of ship at angle and bounce off. Didn't explode",
+          "note": "Kaga's air officer, against CINCPAC's account of Nautilus hitting Soryu. The file leaves the question open."
+        }
+      ],
+      "still": true,
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 30.083,
+            "lon": 181.167
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.25
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 30.115,
+            "lon": 181.13
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.3
+        },
+        {
+          "id": "kaga",
+          "position": {
+            "lat": 30.05,
+            "lon": 181.13
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.2
+        },
+        {
+          "id": "soryu",
+          "position": {
+            "lat": 30.115,
+            "lon": 181.21
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.2
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 30.15,
+            "lon": 181.22
+          },
+          "heading": 350,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.2,
+            "lon": 176.18
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 30.88,
+            "lon": 183.2
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 30.91,
+            "lon": 183.17
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 30.85,
+            "lon": 183.23
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise-strike",
+          "position": {
+            "lat": 30.18,
+            "lon": 181.08
+          },
+          "heading": 135,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 31.05,
+            "lon": 183.28
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 31.05,
+            "lon": 183.28
+          },
+          "heading": 239,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "yorktown-strike",
+          "position": {
+            "lat": 30.2,
+            "lon": 181.3
+          },
+          "heading": 220,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.66
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        }
+      ]
+    },
+    {
+      "id": "hiryu-strikes-back",
+      "label": "Hiryu launches; Nagumo shifts his flag to the Nagara",
+      "t": "10:58",
+      "playback_rate": 400,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "Within half an hour of losing three carriers Yamaguchi sends Hiryu's dive bombers after the one American carrier Tone's plane had found. Nagumo, burnt out of Akagi, takes his flag to the cruiser Nagara and forms the survivors up to look for a surface action. TF 16 and TF 17 are turning east into the wind to take their own aircraft back aboard.",
+      "notes": "Time: converted. The Nagumo report has Hiryu's attack unit of six fighters and eighteen bombers airborne at 0758 Tokyo, which is 10:58, and Nagumo aboard the Nagara at 0830 Tokyo, which is 11:30. Enterprise began landing at 1255 Zone plus 10, which is 10:55.\n\nPositions: the Nagara group is authored north-east of the 10:22 fix on the course the report logs — 60 degrees at 0900 Tokyo, then 0 degrees, then twenty-four knots — and the three burning carriers are left where they fell behind, drifting toward the sinking positions the report gives for each of them. Those four drifts are interpolations between two attested points, the 10:22 fix and each ship's own grave; nothing in between is sourced.\n\nStrikes: Kobayashi's bombers launch from Hiryu, drawn aboard her and in file on her heading. Enterprise's and Yorktown's groups are recovered here, aboard and overprinting their ships, and both runs end: Enterprise's at half strength after losing ten of fourteen torpedo aircraft and eighteen of thirty-three dive bombers, Yorktown's at two thirds after losing ten of twelve torpedo aircraft with its dive bombers whole. Where Yorktown's aircraft actually came down — many of them on Enterprise — is caption matter.",
+      "references": [
+        {
+          "source": "nagumo",
+          "locator": "p. 8, Hiryu's counter-strike",
+          "quote": "Hiryu's attack unit (6 fighters and 18 bombers) took off and carried out the attack",
+          "note": "Timed 0758 Tokyo, which is 10:58 here."
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 8, the decision to strike the carrier Tone's plane had found",
+          "quote": "After our ships had been damaged, the commander of CarDiv 2 decided to carry out the attack against the enemy carrier sighted by Tone's float recco plane"
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 10, the order to assemble for a surface action",
+          "quote": "We are now going to attack. Assemble.",
+          "note": "Issued 0853 Tokyo, which is 11:53 here."
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 40, Yorktown's afternoon search",
+          "quote": "at 1150 Yorktown launched scouts to search sector 280-030 to 200 miles"
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 30.2,
+            "lon": 181.2
+          },
+          "heading": 60,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.25
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 30.13,
+            "lon": 181.14
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.3
+        },
+        {
+          "id": "kaga",
+          "position": {
+            "lat": 30.1,
+            "lon": 181.05
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.2
+        },
+        {
+          "id": "soryu",
+          "position": {
+            "lat": 30.2,
+            "lon": 181.24
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.2
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 30.3,
+            "lon": 181.2
+          },
+          "heading": 100,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "hiryu-bombers",
+          "position": {
+            "lat": 30.3,
+            "lon": 181.2
+          },
+          "heading": 100,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.2,
+            "lon": 176.29
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 30.8,
+            "lon": 183.24
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 30.83,
+            "lon": 183.21
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 30.77,
+            "lon": 183.27
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise-strike",
+          "position": {
+            "lat": 30.83,
+            "lon": 183.21
+          },
+          "heading": 90,
+          "formation": "column",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 30.98,
+            "lon": 183.24
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 30.98,
+            "lon": 183.24
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "yorktown-strike",
+          "position": {
+            "lat": 30.98,
+            "lon": 183.24
+          },
+          "heading": 90,
+          "formation": "column",
+          "state": "engaged",
+          "strength": 0.66
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        }
+      ]
+    },
+    {
+      "id": "yorktown-bombed",
+      "label": "Three bombs stop Yorktown",
+      "t": "12:14",
+      "playback_rate": 400,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "Yorktown's radar picks up Kobayashi's bombers thirty-two miles out and her fighters shoot down most of them, but seven get through. Three bombs hit; one goes down the uptakes and at fourteen minutes past twelve the ship stops dead in the water with her boilers out. The Japanese, seeing one carrier stopped and burning, report an Enterprise-class carrier possibly sunk.",
+      "notes": "Time: verbatim, Zone plus 12. CINCPAC has the radar contact at 1152, the fighters engaging, and the uptake hit stopping the ship at 1214; the narrative has the attack at 1208 and Yorktown's own report logs the bomb at about 1420 Zone plus 10, which is 12:20.\n\nPositions: Yorktown's position through the afternoon is the weakest fix in the file. CINCPAC prints 33 degrees 51 minutes north for 1402, which cannot be right for a ship that sank three days later at 30 degrees 36 minutes after a two-knot tow eastward and is a misprint. Chikuma's float plane put her listing and stopped at 30-15 N 176-50 W at 1413 Tokyo, which is 17:13. The file authors 30.75 N and 183.12 in this frame, which puts her the fourteen or fifteen miles north-west of TF 16 that Hornet described as almost hull down on the horizon, and lets the whole of the tow and the drift run east to the grave CINCPAC gives.\n\nStrikes: Kobayashi's bombers are engaged over Yorktown at strength 0.3; seven of twenty-four came back. Damage does not reduce strength, so Yorktown herself is engaged at strength 1 here and stays there while she is stopped, burning and then under way again at nineteen knots: the fraction is what is still fighting as part of the unit, and a hurt ship that is still a ship is not a fraction of one.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "para. 41, the uptake hit",
+          "quote": "At 1214 a hit in the uptake forced the Yorktown to stop"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 41, the third bomb",
+          "quote": "the third was cut into fragments by automatic gun fire, but the bomb tumbling down exploded on the flight deck aft of the island and wiped out two 1.1 mount crews"
+        },
+        {
+          "source": "yorktown-report",
+          "locator": "the engineering log, the bomb in the uptakes",
+          "quote": "Bomb exploded just above third deck level in the uptakes leading from the forward group of firerooms",
+          "note": "Logged at about 1420 Zone plus 10, which is 12:20 here."
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 7, what the Japanese believed they had done",
+          "quote": "Direct hits by 5 #25 ordinary and 1 land bombs were scored on an Enterprise class carrier, inflicting serious damage to her (possibly sinking her)"
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 30.45,
+            "lon": 181.1
+          },
+          "heading": 20,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.25
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 30.2,
+            "lon": 181.18
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.3
+        },
+        {
+          "id": "kaga",
+          "position": {
+            "lat": 30.18,
+            "lon": 180.95
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.2
+        },
+        {
+          "id": "soryu",
+          "position": {
+            "lat": 30.35,
+            "lon": 181.28
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.2
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 30.6,
+            "lon": 181.12
+          },
+          "heading": 20,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "hiryu-bombers",
+          "position": {
+            "lat": 30.85,
+            "lon": 183
+          },
+          "heading": 130,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.3
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.2,
+            "lon": 176.52
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 30.7,
+            "lon": 183.4
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 30.73,
+            "lon": 183.37
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 30.67,
+            "lon": 183.43
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 30.75,
+            "lon": 183.12
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 30.75,
+            "lon": 183.12
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        }
+      ]
+    },
+    {
+      "id": "hiryu-torpedo-strike",
+      "label": "Hiryu's torpedo planes go out; Yorktown gets under way; Adams finds Hiryu",
+      "t": "13:31",
+      "playback_rate": 400,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "Yorktown's fires are out, her uptake patched, and she works back up to nineteen knots with the men going about the flight deck refuelling fighters. Hiryu, down to a handful of serviceable aircraft, sends Tomonaga off again with torpedoes. At half past two one of Yorktown's own scouts finds Hiryu, and for the first time an American knows exactly where the last Japanese carrier is.",
+      "notes": "Time: authored, and the only instant in the file no public-domain source gives. Neither the Nagumo report's narrative nor any American document times the second Hiryu launch; CarDiv 2's blinker, received 0840 Tokyo, which is 11:40, says only that another nine attack planes and three fighters would take off in about an hour. The file authors 13:31, the reading the modern accounts settled on, and takes the fact without quoting the histories that established it, all of which are in copyright. CINCPAC's 1430 for Adams's contact and Yorktown's return to nineteen knots are verbatim, Zone plus 12.\n\nPositions: Hiryu is put at 30.92 N and 180.93, an hour's steaming south of the fix CINCPAC gives for 1430 — 31 degrees 15 minutes north, 179 degrees 05 minutes west, course north, speed 20. The Nagumo report has the same force on course 285 at 1130 Tokyo, which is 14:30, and the two cannot both be true of the same ship at the same minute; the file takes the American fix, because it is a position and the other is an intention. Yorktown is under way on 090, her course when she worked up again.\n\nStrikes: Kobayashi's survivors land back aboard Hiryu and Tomonaga's torpedo aircraft leave her in the same phase, both drawn aboard her and in file on her heading, so that two strike signs overprint the one carrier. That is the picture: one carrier, one deck, two strikes crossing on it.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "para. 42, Yorktown under way again",
+          "quote": "At 1402 with all fires extinguished and temporary repairs to the uptake completed, Yorktown was able to go ahead"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 45, Adams's contact with Hiryu",
+          "quote": "one of the Yorktown's scouts contacted the Hiryu"
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 21, CarDiv 2's blinker on the second launch",
+          "quote": "Plan to have an additional 9 ship-based attack planes and 3 fighters take off in one hour",
+          "note": "Received 0840 Tokyo, which is 11:40 here. It is the nearest any public-domain source comes to timing the launch this phase is named for."
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 8, what the second scouting report told the Japanese",
+          "quote": "it was not known until the return of this plane that, in addition to the aforementioned, there was a task force which had as its nucleus a carrier of the Enterprise class and another of the Hornet class"
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 30.85,
+            "lon": 181.05
+          },
+          "heading": 350,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.25
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 30.28,
+            "lon": 181.22
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.3
+        },
+        {
+          "id": "kaga",
+          "position": {
+            "lat": 30.24,
+            "lon": 180.87
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.2
+        },
+        {
+          "id": "soryu",
+          "position": {
+            "lat": 30.47,
+            "lon": 181.31
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.2
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 30.92,
+            "lon": 180.93
+          },
+          "heading": 10,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "hiryu-bombers",
+          "position": {
+            "lat": 30.92,
+            "lon": 180.93
+          },
+          "heading": 10,
+          "formation": "column",
+          "state": "broken",
+          "strength": 0.3
+        },
+        {
+          "id": "hiryu-torpedo",
+          "position": {
+            "lat": 30.92,
+            "lon": 180.93
+          },
+          "heading": 10,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.2,
+            "lon": 176.76
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 30.7,
+            "lon": 183.5
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 30.73,
+            "lon": 183.47
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 30.67,
+            "lon": 183.53
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 30.72,
+            "lon": 183.14
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 30.72,
+            "lon": 183.14
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        }
+      ]
+    },
+    {
+      "id": "yorktown-torpedoed",
+      "label": "Two torpedoes; Yorktown is abandoned; TF 16 launches again",
+      "t": "14:45",
+      "playback_rate": 600,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "Tomonaga's aircraft come in through a wall of fire and two torpedoes hit Yorktown amidships thirty seconds apart. She takes a twenty-six degree list, loses all power, and ten minutes later the order is given to abandon her. Spruance, with Adams's report in his hand, turns TF 16 into the wind and sends forty dive bombers after the last carrier.",
+      "notes": "Time: verbatim, Zone plus 12. CINCPAC has the two torpedoes at 1445 and the narrative has the same, thirty seconds apart, with the order to abandon at 1455; Yorktown's own log has the hit at about 1620 Zone plus 10, which is 14:20. The file takes 14:45, two first-hand accounts against one. Enterprise began launching at 1730 and Hornet at 1803 Zone plus 10, which are 15:30 and 16:03, both inside this phase's interval.\n\nPositions: Yorktown is held where she was stopped, drifting slowly; her cruisers and four of her destroyers went to TF 16 after she was abandoned and are drawn as a detachment arrow from TF 17 toward it. The Mobile Force is turning west, on the report's own account of a force that meant to fight a night action.\n\nStrikes: Tomonaga's torpedo aircraft are engaged over Yorktown at strength 0.31 — five of sixteen came home, against CINCPAC's belief that all of them were shot down — and are broken rather than destroyed for that reason. The afternoon strike on Hiryu appears here aboard Enterprise, in file on TF 16's heading, an hour before it actually launched: it is the last phase before the attack, and a strike needs a picture at both ends of an interval to be drawn across it at all.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "para. 43, the two torpedoes",
+          "quote": "The last two, released at about 800 yards, at 1445 hit Yorktown amidships on the port side"
+        },
+        {
+          "source": "combat-narrative",
+          "locator": "ch. 8, the order to abandon ship",
+          "quote": "at 1455 orders were given to abandon ship"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 44, the list and the fear of another hit",
+          "quote": "It seemed that the Yorktown might capsize, and that she certainly would should she be hit again"
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 10, the turn west for a night action",
+          "quote": "We, therefore, turned about and proceeded westward, with the expectation of destroying the enemy in a night encounter."
+        },
+        {
+          "source": "hornet-report",
+          "locator": "para. 10, the second attack group",
+          "quote": "At 1803 commenced launching the second attack group, consisting of 16 VSBs",
+          "note": "1803 Zone plus 10 is 16:03 here."
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 31.1,
+            "lon": 180.95
+          },
+          "heading": 285,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.25
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 30.34,
+            "lon": 181.26
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.3
+        },
+        {
+          "id": "kaga",
+          "position": {
+            "lat": 30.28,
+            "lon": 180.82
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.2
+        },
+        {
+          "id": "soryu",
+          "position": {
+            "lat": 30.55,
+            "lon": 181.33
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.2
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 31.3,
+            "lon": 180.9
+          },
+          "heading": 10,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "hiryu-torpedo",
+          "position": {
+            "lat": 30.78,
+            "lon": 183.02
+          },
+          "heading": 120,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.31
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.2,
+            "lon": 176.98
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 30.62,
+            "lon": 183.62
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 30.65,
+            "lon": 183.59
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 30.59,
+            "lon": 183.65
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "hiryu-hunters",
+          "position": {
+            "lat": 30.65,
+            "lon": 183.59
+          },
+          "heading": 90,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 30.7,
+            "lon": 183.16
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken",
+          "moves": [
+            {
+              "kind": "detachment",
+              "to": {
+                "lat": 30.62,
+                "lon": 183.62
+              }
+            }
+          ]
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 30.7,
+            "lon": 183.16
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        }
+      ]
+    },
+    {
+      "id": "hiryu-hit",
+      "label": "Four bombs on Hiryu; the B-17s miss at dusk",
+      "t": "17:05",
+      "playback_rate": 600,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "Forty dive bombers, twenty-four of them Enterprise's with fourteen of Yorktown's among them, dive on the Japanese formation at five past five. Hiryu is hit as an experimental bomber is about to leave her deck and burns like the other three. Twelve B-17s bomb the same ships between ten past six and half past and hit nothing, and with that the day's flying ends and the mastery of the air is settled.",
+      "notes": "Time: verbatim, Zone plus 12. CINCPAC has the attack beginning at 1705 for half an hour and the narrative's timeline agrees, though its text says 1650; Enterprise logged 1905 Zone plus 10, which is 17:05, and the Nagumo report has 1403 Tokyo, which is 17:03. Every clock in the battle agrees here to within two minutes.\n\nPositions: Enterprise logged the attack at 31 degrees 40 minutes north, 179 degrees 10 minutes west, and Hiryu is drawn there, written 31.667 and 180.833. TF 16 is at 30.5 N 176.2 W, which is where Chikuma's float plane reported two carriers on course 270 at twelve knots an hour later, worked back at that speed. The three earlier wrecks go on drifting toward their graves.\n\nStrikes: the strike on Hiryu is at the target at strength 0.93, three aircraft lost. Tomonaga's torpedo survivors are drawn aboard Hiryu as she burns, and that is their last phase: what was left of them went with the ship. Midway's B-17s are back on the plate as a second unit, because a second sortie is a second unit and their opening strength is their own, not a fraction of the morning's.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "para. 45, the attack on Hiryu",
+          "quote": "beginning at 1705 for half an hour dived on the Japanese formation"
+        },
+        {
+          "source": "enterprise-report",
+          "locator": "1905, the attack and its position",
+          "quote": "Left 1 CV and 1 BB severely damaged and mass of flames",
+          "note": "Logged 1905 Zone plus 10, which is 17:05 here, at 31 degrees 40 minutes north, 179 degrees 10 minutes west."
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 8, Hiryu set on fire",
+          "quote": "the Hiryu was subjected to dive bombing attacks from 13 enemy ship-based bombers. The Hiryu, also, broke out in flames",
+          "note": "Timed 1403 Tokyo, which is 17:03 here."
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 46, the last attack of the day",
+          "quote": "Between 1810 and 1830 twelve (12) B-17's in several flights struck the last blow of 4 June"
+        },
+        {
+          "source": "ussbs-kawaguchi",
+          "locator": "Nav No. 2, the hits on Hiryu",
+          "quote": "The Hiryu was hit six times during the fourth attack by dive bombers",
+          "note": "Hiryu's own air officer. CINCPAC says many times, the narrative six, the modern accounts four; the file keeps the number out of the caption."
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 31.6,
+            "lon": 180.82
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.1
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 30.42,
+            "lon": 181.3
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.3
+        },
+        {
+          "id": "kaga",
+          "position": {
+            "lat": 30.32,
+            "lon": 180.76
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.2
+        },
+        {
+          "id": "soryu",
+          "position": {
+            "lat": 30.64,
+            "lon": 181.35
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.2
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 31.667,
+            "lon": 180.833
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.2
+        },
+        {
+          "id": "hiryu-torpedo",
+          "position": {
+            "lat": 31.667,
+            "lon": 180.833
+          },
+          "heading": 300,
+          "formation": "column",
+          "state": "broken",
+          "strength": 0.31
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.2,
+            "lon": 177.6
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 30.5,
+            "lon": 183.8
+          },
+          "heading": 270,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 30.53,
+            "lon": 183.77
+          },
+          "heading": 270,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 30.47,
+            "lon": 183.83
+          },
+          "heading": 270,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "hiryu-hunters",
+          "position": {
+            "lat": 31.75,
+            "lon": 180.95
+          },
+          "heading": 200,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.93
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 30.68,
+            "lon": 183.16
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 30.68,
+            "lon": 183.16
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        },
+        {
+          "id": "b-17s-evening",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "column",
+          "state": "intact"
+        }
+      ]
+    },
+    {
+      "id": "evening-sinkings",
+      "label": "Soryu and Kaga go down; Yamamoto orders a night pursuit",
+      "t": "19:13",
+      "playback_rate": 2400,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "Soryu sinks at thirteen minutes past seven and Kaga twelve minutes later, both after fires reached their tanks. Yamamoto, believing the American carriers destroyed and retiring east, orders the fleet to overtake them and take Midway anyway; Nagumo signals back that the enemy still has four carriers and that his own are all out of action, and retires north-west at eighteen knots.",
+      "notes": "Time: converted. The Nagumo report has Soryu sink at 1613 and Kaga at 1625 Tokyo, which are 19:13 and 19:25. The phase is set on Soryu's minute and Kaga is drawn destroyed at it, twelve minutes early, because the two losses are one event on this clock and a phase apiece would be a phase for a quarter of an hour. Yamamoto's pursuit order was received at 1615 Tokyo, which is 19:15, and Nagumo's reply went at 1950, which is 22:50.\n\nPositions: both sinking positions are the report's own and are the best-attested points in the file — Kaga at 30-20.3 N 179-17.2 W and Soryu at 30-42.5 N 178-37.5 W, written 180.713 and 181.375 here. Twenty-four miles separate the two graves and forty separate Kaga's from Soryu's, which is what a day of drifting apart looks like. Kaga and Soryu leave the plate after this phase: a ship that has sunk is gone, and the file does not draw a wreck as a unit.\n\nStrikes: the afternoon strike is drawn coming home in the dark rather than aboard, which is where it was at 19:13; it landed at 2120 Zone plus 10, which is 21:20, inside the interval that follows, and is struck off at the next phase. Midway's dusk B-17s are on their way back too.",
+      "references": [
+        {
+          "source": "nagumo",
+          "locator": "p. 10, Soryu's end",
+          "quote": "there was a great underwater explosion at 1620",
+          "note": "Tokyo time: the ship sank at 1613, which is 19:13 here, and the explosion at 19:20. Her position is given as 30-42.5N, 178-37.5W."
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 9, Kaga's end and her position",
+          "quote": "The fire on board spread to both the forward and aft fuel tanks by 1625, causing two great explosions and the ship's sinking. Position of Kaga's sinking: 30-20.3N, 179-17.2W.",
+          "note": "1625 Tokyo is 19:25 here."
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 10, Soryu's captain",
+          "quote": "Flames surrounded him but he refused to give up his post. He was shouting \"Banzai\" over and over again when heroic death overtook him."
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 48, TF 16 through the night",
+          "quote": "After attacking the Hiryu, Task Force 16 stood to the eastward and back to the westward during the night"
+        },
+        {
+          "source": "ussbs-ohara",
+          "locator": "Nav No. 39, the summary of Soryu's loss",
+          "quote": "While trying to escape at reduced speed later in the day, it was sunk by torpedoes from a submarine.",
+          "note": "Soryu's executive officer credits a submarine with finishing his ship, where Kaga's air officer puts the torpedo alongside Kaga. The file draws neither: Nautilus is caption matter."
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 31.7,
+            "lon": 180.6
+          },
+          "heading": 315,
+          "formation": "column",
+          "state": "broken",
+          "strength": 0.1
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 30.47,
+            "lon": 181.32
+          },
+          "heading": 315,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.3
+        },
+        {
+          "id": "kaga",
+          "position": {
+            "lat": 30.338,
+            "lon": 180.713
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "destroyed",
+          "strength": 0
+        },
+        {
+          "id": "soryu",
+          "position": {
+            "lat": 30.708,
+            "lon": 181.375
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "destroyed",
+          "strength": 0
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 31.55,
+            "lon": 180.72
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.1
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.2,
+            "lon": 178.3
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "intact"
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 30.45,
+            "lon": 183.95
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 30.48,
+            "lon": 183.92
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 30.42,
+            "lon": 183.98
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "hiryu-hunters",
+          "position": {
+            "lat": 31,
+            "lon": 182.5
+          },
+          "heading": 100,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.93
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 30.67,
+            "lon": 183.17
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 30.67,
+            "lon": 183.17
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        },
+        {
+          "id": "b-17s-evening",
+          "position": {
+            "lat": 29.3,
+            "lon": 181.9
+          },
+          "heading": 140,
+          "formation": "mass",
+          "state": "engaged"
+        }
+      ]
+    },
+    {
+      "id": "occupation-cancelled",
+      "label": "The occupation is cancelled; Mogami and Mikuma collide",
+      "day": 1,
+      "t": "02:55",
+      "playback_rate": 1800,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "Yamamoto gives up: the occupation of Midway is cancelled and the fleet is to assemble and refuel to the west. Cruiser Division 7, still running east to bombard the atoll, is turned about, and in the dark Mogami runs into Mikuma and stoves in her own bow. Tambor, off Midway, reports many ships ninety miles to the west, and Spruance turns north of the atoll at twenty-five knots in case it is a landing after all.",
+      "notes": "Time: converted. The Nagumo report logs the cancelling order at 2355 Tokyo, which is 02:55, and Nagumo had already turned about at 2212 Tokyo, which is 01:12. Watanabe remembered the order going out at ten o'clock at night, three years later; the file takes the logged time.\n\nPositions: CruDiv 7 is put ninety miles west of Midway, which is where Tambor's night report placed the ships it found — 28.2 N and 180.9 in this frame. No source times the collision itself, so it is carried in the caption and in the division's state rather than in a phase of its own. The division's run east through 4 June is authored between this fix and its position at dawn on the 4th; nothing else fixes it.\n\nStrikes: nothing is in the air on either side. The two Japanese forces that never came within the extent — Yamamoto's Main Body and Kondo's Occupation Force — are off the roster entirely rather than drawn off the plate, and the submarines of both sides are caption matter throughout. From here the Mobile Force's own marker is a group of cruisers and destroyers escorting two burning carriers, and its strength of 0.1 says so.",
+      "references": [
+        {
+          "source": "nagumo",
+          "locator": "p. 38, Combined Fleet Despatch Operation Order 161",
+          "quote": "Occupation of AF (Midway) is cancelled",
+          "note": "Received 2355 Tokyo, which is 02:55 here."
+        },
+        {
+          "source": "ussbs-watanabe",
+          "locator": "Nav No. 13, the collision",
+          "quote": "During the night, the MOGAMI and MIKUMA collided"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 48, Tambor's report and Spruance's answer",
+          "quote": "The first information on the 5th was Tambor's report of many ships 90 miles west of Midway. This looked like a landing attempt, so Task Force 16 changed course to a point north of Midway and increased speed to 25 knots."
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 31.8,
+            "lon": 180.2
+          },
+          "heading": 300,
+          "formation": "column",
+          "state": "broken",
+          "strength": 0.1
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 30.5,
+            "lon": 181.333
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.3
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 31.48,
+            "lon": 180.65
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.1
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.2,
+            "lon": 180.9
+          },
+          "heading": 270,
+          "formation": "column",
+          "state": "engaged",
+          "strength": 0.75
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 30.5,
+            "lon": 184.5
+          },
+          "heading": 270,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 30.53,
+            "lon": 184.47
+          },
+          "heading": 270,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 30.47,
+            "lon": 184.53
+          },
+          "heading": 270,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 30.65,
+            "lon": 183.2
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 30.65,
+            "lon": 183.2
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        }
+      ]
+    },
+    {
+      "id": "akagi-and-hiryu-scuttled",
+      "label": "Akagi and Hiryu are scuttled; Midway's bombers find the cruisers",
+      "day": 1,
+      "t": "05:00",
+      "playback_rate": 2400,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "Yamamoto orders the two burning carriers disposed of. Akagi is torpedoed by her own destroyers at five o'clock and Hiryu ten minutes later, Yamaguchi and her captain waving their caps from her deck as the crew goes over the side. At Midway the Marine bombers take off again after the crippled cruisers and dive on them at eight minutes past eight; eight B-17s follow half an hour later and, like every B-17 in this battle, hit nothing.",
+      "notes": "Time: converted. The Nagumo report has the disposal order at 0150 and Akagi scuttled at 0200 on the 6th Tokyo, which is 05:00 on 5 June here, and Hiryu at 0210, which is 05:10. Every Japanese date in that report runs a day ahead of this file's. CINCPAC's times for the Marine attack, 0808, and for the B-17s, about 0830, are Zone plus 12 and verbatim.\n\nPositions: both scuttling positions are the report's own — Akagi at 30-30 N 178-40 W and Hiryu at 31-27.5 N 179-23.5 W, written 181.333 and 180.608 — and both ships leave the plate after this phase. CruDiv 7 is where the narrative put two Mogami-type cruisers at six o'clock, bearing 272 and 115 miles from Midway, worked back an hour at the eight knots the two positions imply; the file's 28.24 N, 180.61 is that interpolation and not a fix.\n\nStrikes: the second Marine sortie and the second B-17 sortie of the 5th are carried in the caption rather than as units. Each of them launched, attacked and landed inside this phase's ten-hour interval, and a strike with no phase between its launch and its recovery cannot be drawn flying: it would sit on the atoll at both ends and never move. Where the phase list can hold a flight it holds one; where it cannot, the sortie is caption matter and says so here.",
+      "references": [
+        {
+          "source": "nagumo",
+          "locator": "p. 9, Akagi scuttled",
+          "quote": "In accordance with this order, the ship was scuttled at 0200, in position 30-30N, 178-40W.",
+          "note": "0200 on the 6th Tokyo is 05:00 on 5 June here."
+        },
+        {
+          "source": "nagumo",
+          "locator": "pp. 9-10, Hiryu scuttled",
+          "quote": "At 0210 the Hiryu was scuttled by torpedo (1) from the Makigumo. Position of Hiryu's scuttling: 31-27.5N, 179-23.5W.",
+          "note": "0210 on the 6th Tokyo is 05:10 on 5 June here."
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 9, the two officers who stayed aboard Hiryu",
+          "quote": "After completion of the transfer operations, the Division Commander and Captain remained aboard ship. They waved their caps to their men and with complete composure joined their fate with that of their ship."
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 50, the Marine attack on the cruisers",
+          "quote": "Dives began at 0808"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 51, the B-17s",
+          "quote": "Eight B-17's attacked both the damaged CA's about 0830 with 4 to 8-500 pound bombs per plane, altitude 19,000 -- 20,000 feet"
+        },
+        {
+          "source": "ussbs-aoki",
+          "locator": "Nav No. 4, the summary of Akagi's loss",
+          "quote": "On the morning of the 5th a Japanese DD torpedoed and sank the Akagi.",
+          "note": "Akagi's own captain, on the morning the Nagumo report timestamps at 0200 Tokyo on the 6th."
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 32,
+            "lon": 179.9
+          },
+          "heading": 300,
+          "formation": "column",
+          "state": "broken",
+          "strength": 0.05
+        },
+        {
+          "id": "akagi",
+          "position": {
+            "lat": 30.5,
+            "lon": 181.333
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "destroyed",
+          "strength": 0
+        },
+        {
+          "id": "hiryu",
+          "position": {
+            "lat": 31.4583,
+            "lon": 180.6083
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "destroyed",
+          "strength": 0
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 28.24,
+            "lon": 180.61
+          },
+          "heading": 268,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.75
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 30.3,
+            "lon": 184.4
+          },
+          "heading": 230,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 30.33,
+            "lon": 184.37
+          },
+          "heading": 230,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 30.27,
+            "lon": 184.43
+          },
+          "heading": 230,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 30.64,
+            "lon": 183.21
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 30.64,
+            "lon": 183.21
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        }
+      ]
+    },
+    {
+      "id": "pursuit-northwest",
+      "label": "TF 16 searches north-west and finds one destroyer",
+      "day": 1,
+      "t": "15:00",
+      "playback_rate": 3600,
+      "wind": {
+        "from": 135,
+        "force": "light"
+      },
+      "caption": "Spruance sends fifty-eight dive bombers two hundred and fifty miles north-west after a burning carrier that is no longer there, and they find only Tanikaze, who dodges everything they drop and shoots down one of them. The aircraft come back after dark and most of the pilots land on a carrier by night for the first time. Vireo has Yorktown under tow at two knots, heading east.",
+      "notes": "Time: verbatim, Zone plus 12. CINCPAC has the striking group away at 1500 to 1530; Enterprise logged 1700, the attack on the light cruiser at 2030 and the recovery at 2203, all Zone plus 10, which are 15:00, 18:30 and 20:03 here.\n\nPositions: TF 16 is at 30.1 N 175.7 W, written 184.3, which is where the target position and distance Enterprise gave its pilots put it — an objective at 32 N 179-32 W estimated two hundred and thirty miles off. The narrative's account of the same day, which has the force turning to 300 at eleven and crossing the 180th meridian shortly after sunset, cannot be reconciled with that distance, and the file follows the ship's own estimate. Nothing else fixes TF 16 on 5 June; the net effect of a night spent steaming east and a day spent searching west is that it ends near where it began, which is what the reports describe. The Mobile Force has joined the Main Body at 33 N 176-55 E and is drawn there; from the next phase it is west of the extent, refuelling toward 33 N 170 E, and the renderer clips it.\n\nStrikes: the pursuit is drawn as an intent arrow from TF 16 to the point where Enterprise's aircraft found Tanikaze, and not as a unit, for the reason the last phase gives: it launched, attacked and recovered inside one interval, and there is no second phase for it to be drawn to.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "para. 48, the search to the north-west",
+          "quote": "At 1500-1530 a striking group of planes from each carrier set off in a 250 mile search to the northwest, unsuccessfully; the only quarry found were 2 DD (possibly only 1) which were bombed but not hit"
+        },
+        {
+          "source": "enterprise-report",
+          "locator": "2030, the attack that found the wrong ship",
+          "quote": "Objective not found. Attacked 1 CL position Lat. 33",
+          "note": "Logged 2030 Zone plus 10, which is 18:30 here; the position reads 33 degrees north, 177 degrees east."
+        },
+        {
+          "source": "combat-narrative",
+          "locator": "ch. 11, the night recovery",
+          "quote": "For most of the pilots this was the first landing on a carrier by night"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 62, Vireo takes Yorktown in tow",
+          "quote": "Vireo joined about noon 5 June and at 1436 began towing at about 2 knots on course 090"
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 33,
+            "lon": 176.9
+          },
+          "heading": 290,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.05
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 27.95,
+            "lon": 177.8
+          },
+          "heading": 268,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.75
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 30.1,
+            "lon": 184.3
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "engaged",
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 33,
+                "lon": 177
+              }
+            }
+          ]
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 30.13,
+            "lon": 184.27
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 30.07,
+            "lon": 184.33
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 30.63,
+            "lon": 183.28
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 30.63,
+            "lon": 183.28
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        }
+      ]
+    },
+    {
+      "id": "cruisers-caught",
+      "label": "The search finds Mogami and Mikuma; Hornet attacks",
+      "day": 2,
+      "t": "06:45",
+      "playback_rate": 1800,
+      "wind": {
+        "from": 225,
+        "force": "moderate"
+      },
+      "caption": "Eighteen scouts go out at ten past five into the western half of the compass and two of them find ships. The second contact, four hundred and thirty-five miles west of Midway, is the two damaged cruisers with their destroyers, making ten knots for home. Hornet's group is off at four minutes to eight and attacks between half past nine and ten. Off to the east Hammann is lashed alongside Yorktown and the salvage party has her list coming down.",
+      "notes": "Time: verbatim, Zone plus 12. CINCPAC has the search launched at 0510 and the second contact at 0645; Hornet logged the launch at 0957 and the attack at 1150 Zone plus 10, which are 07:57 and 09:50 here, both inside this phase's interval.\n\nPositions: Cruiser Division 7 is put where Enterprise's scout 8-B-2 logged it, 29 degrees 33 minutes north, 174 degrees 50 minutes east, on course 270 — the narrative prints the same contact ten minutes of longitude further west, and the file takes the ship's own log. TF 16 is at 30.3 N 177.4 E, worked back from Hornet's own bearing and distance to the target, 142 miles on 235. Yorktown is under tow, a hundred miles of ocean and one day of two-knot towing from the grave CINCPAC gives her.\n\nStrikes: Enterprise's strike on the cruisers is aboard here, in file on TF 16's heading, and is the only one of the three attacks made this day that the phase list can draw flying. Hornet's two are intent arrows from her toward the cruisers, for the same reason as the 5 June pursuit.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "para. 55, the morning search",
+          "quote": "At 0510, 6 June, 18 VSB were launched for a 200 miles search in the western semicircle"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 55, the second contact",
+          "quote": "The second at 0645, bearing about 280°, distance 435 miles from Midway, through variously identified, appears to have been the Mikuma and Mogami with 3 or 4 DD on course west, speed 10",
+          "note": "The transcription's \"through\" is the original's misprint for \"though\"."
+        },
+        {
+          "source": "hornet-report",
+          "locator": "para. 14, the first attack of 6 June",
+          "quote": "At 0957, commenced launching air group of 26 VSB and 8 VF",
+          "note": "0957 Zone plus 10 is 07:57 here."
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 63, the salvage party",
+          "quote": "At 0220 on 6 June Hammann, Balch and Benham joined under commanding officer Yorktown"
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 33.05,
+            "lon": 172.4
+          },
+          "heading": 290,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.05
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 29.55,
+            "lon": 174.83
+          },
+          "heading": 270,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.75
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 30.3,
+            "lon": 177.4
+          },
+          "heading": 280,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 30.33,
+            "lon": 177.37
+          },
+          "heading": 280,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 30.27,
+            "lon": 177.43
+          },
+          "heading": 280,
+          "formation": "mass",
+          "state": "engaged",
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 29.55,
+                "lon": 174.83
+              }
+            }
+          ]
+        },
+        {
+          "id": "enterprise-6-june",
+          "position": {
+            "lat": 30.33,
+            "lon": 177.37
+          },
+          "heading": 280,
+          "formation": "column",
+          "state": "intact"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 30.62,
+            "lon": 183.38
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 30.62,
+            "lon": 183.38
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        }
+      ]
+    },
+    {
+      "id": "mikuma-sinks",
+      "label": "Mikuma is bombed to pieces; Mogami gets away",
+      "day": 2,
+      "t": "11:50",
+      "playback_rate": 900,
+      "wind": {
+        "from": 225,
+        "force": "moderate"
+      },
+      "caption": "Enterprise's group attacks at ten to twelve and leaves both cruisers burning; about one o'clock a bomb amidships sets off Mikuma's torpedoes and she goes down. Hornet's second group finishes the day against the escort at a quarter to three. Mogami, gutted forward and smoking heavily, keeps going west with two destroyers, and both CINCPAC and Yamamoto's staff believe her sunk.",
+      "notes": "Time: converted. Enterprise logged the attack at 1350 Zone plus 10, which is 11:50, and the file takes it; CINCPAC has the first bombers on the cruisers at about 1140 Zone plus 12 and the last of them finishing Mikuma about 1300. Hornet's last attack was at 1645 Zone plus 10, which is 14:45; the narrative prints 1445 in its timeline and the unconverted 1645 in its text, and 14:45 is right.\n\nPositions: Cruiser Division 7 is carried west from the morning contact at the ten knots CINCPAC gives it. Mikuma's own grave is in no public-domain source, which is why the division is one unit here and not two: it is drawn broken at half strength, one cruiser of two gone, rather than as a Mogami and a Mikuma whose parting no document in this file can place. TF 16 is worked back from Hornet's bearings to the target.\n\nStrikes: Enterprise's group attacks at this phase's own instant and is recovered at the next, which is the one complete out-and-back flight the file draws on 6 June.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "para. 57, the end of Mikuma",
+          "quote": "From the stories of survivors of Mikuma it appears that the first planes at 1140 hit and disabled the Mikuma and the last ones about 1300 finished her off when a bomb amidships detonated her torpedoes"
+        },
+        {
+          "source": "enterprise-report",
+          "locator": "1350, the attack on the cruisers",
+          "quote": "Commenced attack, dive bombing and VF strafing. VT did not attack.",
+          "note": "Logged 1350 Zone plus 10, which is 11:50 here."
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 57, what the group reported and what happened",
+          "quote": "The Enterprise Group reported 1 CA as \"dead in the water burning furiously with heavy explosions\" shattered and abandoned"
+        },
+        {
+          "source": "ussbs-watanabe",
+          "locator": "Nav No. 13, the Japanese count of ships lost",
+          "quote": "Five ships sunk: AKAGI, KAGA, SORYU, HIRYU, MIKUMA",
+          "note": "CINCPAC believed both cruisers sunk; Mogami reached harbour. The division is drawn broken, not destroyed."
+        },
+        {
+          "source": "hornet-report",
+          "locator": "para. 17, the retirement",
+          "quote": "Retirement was commenced on a northeasterly course"
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 33.1,
+            "lon": 170.6
+          },
+          "heading": 290,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.05
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 29.55,
+            "lon": 173.86
+          },
+          "heading": 270,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.5
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 30,
+            "lon": 176.5
+          },
+          "heading": 250,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 30.03,
+            "lon": 176.47
+          },
+          "heading": 250,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 29.97,
+            "lon": 176.53
+          },
+          "heading": 250,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "enterprise-6-june",
+          "position": {
+            "lat": 29.65,
+            "lon": 173.95
+          },
+          "heading": 200,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.98
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 30.61,
+            "lon": 183.42
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 30.61,
+            "lon": 183.42
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        }
+      ]
+    },
+    {
+      "id": "yorktown-torpedoed-again",
+      "label": "A submarine hits Yorktown twice and sinks Hammann",
+      "day": 2,
+      "t": "13:36",
+      "playback_rate": 3600,
+      "wind": {
+        "from": 225,
+        "force": "moderate"
+      },
+      "caption": "With the list down five degrees and the salvage going well, torpedo wakes are seen coming through the screen. Two hit Yorktown and two hit Hammann alongside her; the destroyer breaks in half and goes down in three minutes, her depth charges killing men in the water. Yorktown stays afloat, and her destroyers hunt the submarine for the next day and a half.",
+      "notes": "Time: verbatim, Zone plus 12. CINCPAC has the wakes at 1335, the hits at 1336 and Hammann gone at 1339; Yorktown's own log has a salvo of four torpedoes at about 1536 Zone plus 10, which is 13:36.\n\nPositions: Yorktown is drawn at the position CINCPAC gives for her sinking, 30-36 N 176-34 W, written 183.433, because she was hit here and went down here a day and a half later without being moved again. Her own report and the narrative both print a longitude of 167 degrees for the same place, twenty times too far east and a plain transposition; CINCPAC's is the reading the file follows. TF 16 is retiring north-east on fuel.\n\nStrikes: nothing is in the air. TF 17's strength falls to 0.75 here with Hammann gone, and Yorktown stays broken at strength 1: she is abandoned, not fighting in fragments, and what remains of her is a whole ship.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "para. 63, the submarine attack",
+          "quote": "At 1336 Yorktown received 2 hits, and Hammann 2 hits, one under her bridge and the second just abaft the mainmast"
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 63, the loss of Hammann",
+          "quote": "Hammann sank at 1339 with many heavy explosions, probably depth charges or warheads, which killed a number of personnel in the water"
+        },
+        {
+          "source": "yorktown-report",
+          "locator": "the account of the submarine attack",
+          "quote": "Approximately a minute after Hammann's stern sank, a terrific explosion occurred, apparently from her depth charges"
+        },
+        {
+          "source": "nagumo",
+          "locator": "p. 11, the Japanese account of Yorktown's end",
+          "quote": "was definitely sunk by subsequent submarine action"
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 33.1,
+            "lon": 170.1
+          },
+          "heading": 290,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.05
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 29.55,
+            "lon": 173.55
+          },
+          "heading": 270,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.5
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 29.9,
+            "lon": 176.2
+          },
+          "heading": 250,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 29.93,
+            "lon": 176.17
+          },
+          "heading": 250,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 29.87,
+            "lon": 176.23
+          },
+          "heading": 250,
+          "formation": "mass",
+          "state": "engaged",
+          "moves": [
+            {
+              "kind": "intent",
+              "to": {
+                "lat": 29.55,
+                "lon": 173.55
+              }
+            }
+          ]
+        },
+        {
+          "id": "enterprise-6-june",
+          "position": {
+            "lat": 29.93,
+            "lon": 176.17
+          },
+          "heading": 250,
+          "formation": "column",
+          "state": "engaged",
+          "strength": 0.98
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 30.6,
+            "lon": 183.433
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.75
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 30.6,
+            "lon": 183.433
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken"
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        }
+      ]
+    },
+    {
+      "id": "yorktown-sinks",
+      "label": "Yorktown capsizes and sinks",
+      "day": 3,
+      "t": "05:01",
+      "playback_rate": 900,
+      "wind": {
+        "from": 225,
+        "force": "moderate"
+      },
+      "caption": "Through the night the list increases; at one minute past five on the morning of the seventh Yorktown turns over on her port side and goes down in three thousand fathoms with her battle flags flying, and the destroyers around her half-mast their colours. TF 16 is far to the north-east and out of fuel for pursuit, and what is left of the Mobile Force is eight hundred miles west and going home.",
+      "notes": "Time: verbatim, Zone plus 12. CINCPAC has her sink at 0501 on 7 June; her own report has 0701 Zone plus 10, which is the same minute and the proof that the report keeps Hawaii time throughout.\n\nPositions: 30-36 N 176-34 W, CINCPAC's, written 183.433 in this file's frame — the position that shows what the frame is for. The Mobile Force and Cruiser Division 7 are both west of the extent by now, on their way to the refuelling rendezvous at 33 N 170 E and to harbour, and the renderer clips them: absence in this file means a unit did not exist on the plate, never that it had gone off the edge of it, so both are still authored and still carried.\n\nStrikes: nothing is in the air, and nothing has been since the afternoon of the 6th. The Japanese refuelling, Mogami's passage home and the return of both fleets are caption matter; the file ends half an hour after Yorktown, with the last picture holding.",
+      "references": [
+        {
+          "source": "cincpac",
+          "locator": "para. 65, the loss of Yorktown",
+          "quote": "After slowly capsizing to port, at 0501, 7 June, in about 30-36 N, 176-34 W, Yorktown sank"
+        },
+        {
+          "source": "yorktown-report",
+          "locator": "the last entry, the ship turning over",
+          "quote": "at 0701, Yorktown turned over on her port side and sank in about 3000 fathoms of water with all battle flags flying",
+          "note": "0701 Zone plus 10 is 05:01 here. The position this entry gives, longitude 167 degrees, is a misprint the narrative repeats."
+        },
+        {
+          "source": "cincpac",
+          "locator": "para. 45, what the day of the fourth had settled",
+          "quote": "With the destruction of the Hiryu our forces had won mastery of the air"
+        }
+      ],
+      "units": [
+        {
+          "id": "mobile-force",
+          "position": {
+            "lat": 33.4,
+            "lon": 166
+          },
+          "heading": 300,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.05
+        },
+        {
+          "id": "crudiv-7",
+          "position": {
+            "lat": 29.9,
+            "lon": 170.4
+          },
+          "heading": 270,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.5
+        },
+        {
+          "id": "tf16",
+          "position": {
+            "lat": 32.6,
+            "lon": 179.3
+          },
+          "heading": 45,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "enterprise",
+          "position": {
+            "lat": 32.63,
+            "lon": 179.27
+          },
+          "heading": 45,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "hornet",
+          "position": {
+            "lat": 32.57,
+            "lon": 179.33
+          },
+          "heading": 45,
+          "formation": "mass",
+          "state": "engaged"
+        },
+        {
+          "id": "tf17",
+          "position": {
+            "lat": 30.6,
+            "lon": 183.433
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "broken",
+          "strength": 0.5
+        },
+        {
+          "id": "yorktown",
+          "position": {
+            "lat": 30.6,
+            "lon": 183.433
+          },
+          "heading": 90,
+          "formation": "mass",
+          "state": "destroyed",
+          "strength": 0
+        },
+        {
+          "id": "midway",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.5
+        },
+        {
+          "id": "midway-air",
+          "position": {
+            "lat": 28.21,
+            "lon": 182.63
+          },
+          "heading": 320,
+          "formation": "mass",
+          "state": "engaged",
+          "strength": 0.44
+        }
+      ]
+    }
+  ]
+}
