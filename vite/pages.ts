@@ -29,8 +29,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Plugin } from "vite";
 import { battleSegment, type LibraryEntry } from "../src/data/library.ts";
-import { readLibrary } from "./library.ts";
-import { CARD, cardAlt, readBattle } from "./stills.ts";
+import { CARD, cardAlt, libraryBattles } from "./stills.ts";
 
 /**
  * The site's one canonical origin, hardcoded (ADR-0028). A local build emits
@@ -77,18 +76,20 @@ export function escapeHtml(text: string): string {
 /**
  * One battle's head, as the lines that replace the marked block.
  *
- * The `<title>` carries the site's name after the battle's, matching what
- * `main.ts` sets at runtime, so the tab does not change its mind when the
- * bundle arrives. `og:title` carries the battle's name **bare**: every preview
- * client prints `og:site_name` or the domain on its own line, and the suffix
- * would set the name twice inside a box three lines tall (ADR-0028).
+ * The `<title>` carries the site's name after the battle's, on the middle dot
+ * #135 settled — the library's em dash carries a tagline that a battle page
+ * does not need — and `main.ts` sets the same string at runtime, so the tab
+ * does not change its mind when the bundle arrives. `og:title` carries the
+ * battle's name **bare**: every preview client prints `og:site_name` or the
+ * domain on its own line, and the suffix would set the name twice inside a box
+ * three lines tall (ADR-0028).
  */
 export function battleHead(entry: LibraryEntry, alt: string): string {
   const title = escapeHtml(entry.title);
   const summary = escapeHtml(entry.summary);
   const url = battleUrl(entry.name);
   return [
-    `<title>${title} — ${SITE_NAME}</title>`,
+    `<title>${title} · ${SITE_NAME}</title>`,
     `<meta name="description" content="${summary}" />`,
     `<meta property="og:type" content="website" />`,
     `<meta property="og:site_name" content="${SITE_NAME}" />`,
@@ -130,18 +131,16 @@ export interface BattlePage {
  * A page for every battle in the library, built over the transformed
  * `index.html`.
  *
- * The library is the list, exactly as it is for the stills, so the pages the
- * build writes are exactly the battles the front door links to. The battle
- * file is read again here for the card's alt, which is written from the whole
- * battle rather than from its library entry; a battle the library lists and
- * the disk does not hold **fails the build**, as it does in `stills.ts`.
+ * It walks `libraryBattles`, the same list the pictures are drawn from, so the
+ * pages and the cards cannot come out as different sets. The whole battle
+ * rather than its library entry, because the card's alt is written from the
+ * still phase's clock and label and the entry carries neither.
  */
 export function battlePages(dataDir: string, indexHtml: string): BattlePage[] {
-  return readLibrary(dataDir).map((entry) => {
-    const source = readBattle(dataDir, entry.name);
-    if (source === undefined) throw new Error(`Marchpast: the library lists ${entry.name}, which has no battle file.`);
-    return { file: battlePageFile(entry.name), html: pageHtml(indexHtml, battleHead(entry, cardAlt(source.battle))) };
-  });
+  return libraryBattles(dataDir).map(({ entry, battle }) => ({
+    file: battlePageFile(entry.name),
+    html: pageHtml(indexHtml, battleHead(entry, cardAlt(battle))),
+  }));
 }
 
 /**
@@ -175,7 +174,14 @@ export function pages(): Plugin {
     // `closeBundle` rather than `writeBundle`, for the reason `stills.ts` gives:
     // the pages land after everything else has written whatever it writes.
     closeBundle() {
-      if (indexHtml === undefined || !fs.existsSync(dataDir)) return;
+      if (!fs.existsSync(dataDir)) return;
+      // A build that never handed this plugin its document would otherwise go
+      // green with no battle pages in it at all, which is the one failure here
+      // that looks exactly like success. `pageHtml` is loud about a missing
+      // marker; this is loud about never reaching it.
+      if (indexHtml === undefined) {
+        throw new Error("Marchpast: the build emitted no index.html for the battle pages to be copies of.");
+      }
       for (const page of battlePages(dataDir, indexHtml)) {
         const file = path.join(outDir, page.file);
         fs.mkdirSync(path.dirname(file), { recursive: true });

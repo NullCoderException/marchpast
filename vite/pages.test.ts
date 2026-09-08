@@ -61,7 +61,7 @@ describe("a battle's head", () => {
     const entry = { name: "trafalgar", title: battle.title, date: "21 October 1805", sort_date: battle.sort_date, summary: battle.summary, sides: [] };
     const head = battleHead(entry, "a picture of it");
 
-    expect(head).toContain("<title>The Battle of trafalgar — Marchpast</title>");
+    expect(head).toContain("<title>The Battle of trafalgar · Marchpast</title>");
     expect(head).toContain(`<meta name="description" content="${battle.summary}" />`);
     expect(head).toContain('<meta property="og:type" content="website" />');
     expect(head).toContain('<meta property="og:site_name" content="Marchpast" />');
@@ -81,7 +81,7 @@ describe("a battle's head", () => {
     expect(escapeHtml('Villeneuve & "the line" <br>')).toBe("Villeneuve &amp; &quot;the line&quot; &lt;br&gt;");
     const entry = { name: "x", title: 'A "battle"', date: "", sort_date: { year: 1, month: 1, day: 1 }, summary: "Ships & men", sides: [] };
     const head = battleHead(entry, "");
-    expect(head).toContain("<title>A &quot;battle&quot; — Marchpast</title>");
+    expect(head).toContain("<title>A &quot;battle&quot; · Marchpast</title>");
     expect(head).toContain('<meta property="og:description" content="Ships &amp; men" />');
   });
 
@@ -118,7 +118,7 @@ describe("the pages the build writes", () => {
     const built = battlePages(dataDir, fakeIndex("<title>Marchpast</title>"));
 
     expect(built.map((page) => page.file)).toEqual(["cannae/index.html", "trafalgar/index.html"]);
-    expect(built[1]?.html).toContain("<title>The Battle of trafalgar — Marchpast</title>");
+    expect(built[1]?.html).toContain("<title>The Battle of trafalgar · Marchpast</title>");
     expect(built[0]?.html).toContain('<link rel="canonical" href="https://marchpast.com/cannae/" />');
   });
 
@@ -167,5 +167,15 @@ describe("the library's own head", () => {
 
   it("unfurls as the site and never as a battle: its card is the brand's own", () => {
     expect(INDEX).not.toContain("/data/cards/");
+  });
+
+  it("spells every absolute URL at the one canonical origin the build emits", () => {
+    // Three literals in the document against one constant in the build: the
+    // drift `vite/public.test.ts` already pins for the description (#136).
+    const absolute = [...INDEX.matchAll(/(?:content|href)="(https:\/\/[^"]*)"/g)].map((match) => match[1] ?? "");
+    expect(absolute.length).toBeGreaterThan(0);
+    for (const url of absolute) expect(url.startsWith(`${CANONICAL_ORIGIN}/`), url).toBe(true);
+    expect(INDEX).toContain(`<link rel="canonical" href="${CANONICAL_ORIGIN}/" />`);
+    expect(INDEX).toContain(`<meta property="og:url" content="${CANONICAL_ORIGIN}/" />`);
   });
 });

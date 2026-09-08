@@ -25,16 +25,22 @@ export function battleNameFrom(search: string): string | null {
  * The battle named by a path such as `/cannae/`, or `null` when the path names
  * none — the site's root, or anything that is not one bare segment under it.
  *
- * A segment ending in `.html` names a **document the host served by its own
- * file name** (`/index.html`, `/404.html`) and never a battle, so those keep
- * showing the page they are. Rule 19 keeps the rest of the site's own paths
- * out of the battle namespace (`src/schema/reservedNames.ts`).
+ * A battle page **is** `<name>/index.html` on the disk, so a URL that names
+ * that document outright reads as the battle whose head it carries — anything
+ * else would boot the Library under Cannae's title. Every other segment ending
+ * in `.html` names a document the host served by its own file name
+ * (`/404.html`) and never a battle, so those keep showing the page they are.
+ * Rule 19 keeps the rest of the site's own paths out of the battle namespace
+ * (`src/schema/reservedNames.ts`).
  */
 export function battleNameFromPath(pathname: string): string | null {
   const base = import.meta.env.BASE_URL;
   if (!pathname.startsWith(base)) return null;
 
-  const segment = pathname.slice(base.length).replace(/\/+$/, "");
+  const segment = pathname
+    .slice(base.length)
+    .replace(/(^|\/)index\.html$/, "$1")
+    .replace(/\/+$/, "");
   if (segment === "" || segment.includes("/") || segment.endsWith(".html")) return null;
 
   let name: string;
@@ -49,9 +55,17 @@ export function battleNameFromPath(pathname: string): string | null {
 /**
  * Where a battle is played: a page of its own at `/<name>/`, so following it
  * is a fresh visit and no player state survives it. The Library's entries link
- * to it and the Picker navigates to it; the build writes the document it names
- * off the same `battleSegment` (ADR-0028). It hangs off the app's base URL
+ * to it and the Picker navigates to it. It hangs off the app's base URL
  * exactly as `libraryHref` does, which on this domain is a bare `/`.
+ *
+ * **Narrower than ADR-0028 wrote it.** That ADR has this function as "the one
+ * place the shape lives: the library's links, the Picker and the build all
+ * call it". The build cannot: `import.meta.env` exists only inside the bundle,
+ * and `vite/pages.ts` runs in Node. So the *shape* moved one module down, to
+ * `battleSegment` in `src/data/library.ts`, which the app and the build both
+ * already hold, and this function is what the app calls it through. The
+ * decision is unchanged — one spelling of `/<name>/`, and no second — and the
+ * divergence is recorded on #176.
  */
 export function battlePath(name: string): string {
   return `${import.meta.env.BASE_URL}${battleSegment(name)}`;
@@ -69,4 +83,35 @@ export function battleQuery(name: string): string {
 /** Where the Library is: the app's own page with no battle named. */
 export function libraryHref(): string {
   return import.meta.env.BASE_URL;
+}
+
+/** What one URL asks for: the battle it names, and the URL it ought to have been. */
+export interface Route {
+  /** The battle to play, or `null` for the Library. */
+  name: string | null;
+  /**
+   * Where the URL should be put with `replaceState`, or `null` when the URL
+   * that arrived is already the one the site emits. Never a navigation: the
+   * document the browser holds is the one this path names.
+   */
+  rewriteTo: string | null;
+}
+
+/**
+ * The route one visit is on: the path first, the legacy `?battle=` second
+ * (ADR-0028).
+ *
+ * A visit that arrived by the query is answered with the path to put itself
+ * on, so the old shape stops propagating rather than merely being tolerated —
+ * the address bar, a copied link and the back button all end up carrying what
+ * the site emits. Pure, so the precedence and the rewrite are testable without
+ * a `window`; `main.ts` is what actually calls `replaceState`.
+ */
+export function readRoute(pathname: string, search: string): Route {
+  const onThePath = battleNameFromPath(pathname);
+  if (onThePath !== null) return { name: onThePath, rewriteTo: null };
+
+  const onTheQuery = battleNameFrom(search);
+  if (onTheQuery === null) return { name: null, rewriteTo: null };
+  return { name: onTheQuery, rewriteTo: battlePath(onTheQuery) };
 }

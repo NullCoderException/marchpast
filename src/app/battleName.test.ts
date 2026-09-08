@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { battleNameFrom, battleNameFromPath, battlePath, battleQuery, libraryHref } from "./battleName.ts";
+import { battleNameFrom, battleNameFromPath, battlePath, battleQuery, libraryHref, readRoute } from "./battleName.ts";
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -44,6 +44,12 @@ describe("the battle named by the path", () => {
     expect(battleNameFromPath("/404.html")).toBeNull();
   });
 
+  it("is the battle when the URL names that battle's own document outright", () => {
+    // `/cannae/index.html` is the file the build writes for `/cannae/`, and it
+    // carries Cannae's head: booting the Library under it would be a lie.
+    expect(battleNameFromPath("/cannae/index.html")).toBe("cannae");
+  });
+
   it("is nothing for anything deeper than one segment", () => {
     expect(battleNameFromPath("/data/battles/cannae.json")).toBeNull();
     expect(battleNameFromPath("/cannae/again/")).toBeNull();
@@ -86,6 +92,26 @@ describe("where a battle was played before ADR-0028", () => {
   it("escapes a name that needs it, so the legacy link survives the round trip", () => {
     expect(battleNameFrom(battleQuery("the nile"))).toBe("the nile");
     expect(battleQuery("a&b")).toBe("?battle=a%26b");
+  });
+});
+
+describe("the route one visit is on", () => {
+  it("is the Library when the URL names no battle, and rewrites nothing", () => {
+    expect(readRoute("/", "")).toEqual({ name: null, rewriteTo: null });
+    expect(readRoute("/", "?view=night")).toEqual({ name: null, rewriteTo: null });
+  });
+
+  it("is the path's battle, left where it is", () => {
+    expect(readRoute("/cannae/", "")).toEqual({ name: "cannae", rewriteTo: null });
+  });
+
+  it("takes the path over the query, and leaves the URL alone when it does", () => {
+    expect(readRoute("/cannae/", "?battle=trafalgar")).toEqual({ name: "cannae", rewriteTo: null });
+  });
+
+  it("reads the legacy query, and answers with the path it should be put on", () => {
+    expect(readRoute("/", "?battle=trafalgar")).toEqual({ name: "trafalgar", rewriteTo: "/trafalgar/" });
+    expect(readRoute("/", "?battle=the%20nile")).toEqual({ name: "the nile", rewriteTo: "/the%20nile/" });
   });
 });
 

@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>No such battle — Marchpast</title>
-    <meta name="robots" content="noindex" />
+    <!-- The middle dot #135 set a page's own name on; the em dash is the library title's, where it carries the tagline. -->
+    <title>No such battle · Marchpast</title>
     <meta name="theme-color" content="#efe3c6" />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -19,10 +19,11 @@
       a second time — so it is a whole document, and the brand's materials are
       written out rather than imported.
 
-      Three things are copies, and each has a test holding it to its original:
-      the tones and the type stack are `src/app/library.css`'s, and the mark is
-      `markSvg(40)` from `src/app/mark.ts`, character for character
-      (`vite/public.test.ts`).
+      Three things are copies, and `vite/public.test.ts` holds each of them to
+      its original by reading that original: the ink and the parchment are
+      `src/app/library.css`'s `--st-ink` and `--st-parchment`, the type stack
+      is that file's too, and the mark is `markSvg(40)` from `src/app/mark.ts`,
+      character for character.
 
       The face is the one thing this page cannot have. `IM Fell English` is
       loaded by the app as a `FontFace` from a hashed bundle asset, so a

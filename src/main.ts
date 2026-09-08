@@ -27,7 +27,7 @@
  * takes the landmark down whole when the page is the library, which has no
  * plate to draw and nothing to control.
  */
-import { battleNameFrom, battleNameFromPath, battlePath } from "./app/battleName.ts";
+import { battlePath, readRoute } from "./app/battleName.ts";
 import { fixtureNameFrom, FIXTURES, fixturesThereAre } from "./app/fixtures.ts";
 import { createLibraryPage } from "./app/libraryPage.ts";
 import { formatLoadErrors, type LoadError } from "./app/load.ts";
@@ -67,7 +67,11 @@ async function start(): Promise<void> {
     return;
   }
 
-  const name = battleOnTheUrl();
+  const { name, rewriteTo } = readRoute(window.location.pathname, window.location.search);
+  // The legacy query form, put on the path in place: no navigation, because
+  // the document the browser already holds is the one that path names.
+  if (rewriteTo !== null) window.history.replaceState(null, "", rewriteTo);
+
   // Both pages want the library: it is the front door's list, and it fills the
   // player's Picker. Every fetch is started before the face is awaited.
   const library = loadLibrary();
@@ -81,22 +85,6 @@ async function start(): Promise<void> {
   const battle = loadBattle(name);
   await loadOpeningFace();
   await playBattle(page, name, battle, library);
-}
-
-/**
- * The battle this visit is for: the path first, the legacy query second
- * (ADR-0028). A visit that arrived by the query is put on the path with
- * `replaceState`, so the address bar, a copied link and the back button all
- * carry the shape the site emits — and nothing is navigated to, because the
- * document the browser already has is the one the path names.
- */
-function battleOnTheUrl(): string | null {
-  const onThePath = battleNameFromPath(window.location.pathname);
-  if (onThePath !== null) return onThePath;
-
-  const onTheQuery = battleNameFrom(window.location.search);
-  if (onTheQuery !== null) window.history.replaceState(null, "", battlePath(onTheQuery));
-  return onTheQuery;
 }
 
 /** The front door: every battle, oldest first, as a page rather than a plate. */
@@ -184,9 +172,14 @@ function playFixture(page: Page, name: string, mapName: string | undefined): voi
  * What the page is now called, in both places a battle's title belongs: the
  * document title, and the page's own heading, which is read but never seen
  * (#130). The heading is the only `h1` on the player route.
+ *
+ * The separator is the middle dot #135 settled — the em dash is the library
+ * title's, where it carries the tagline a battle page does not need — and the
+ * build sets the same string into the page's own `<title>` (`vite/pages.ts`),
+ * so the tab does not change its mind when the bundle arrives.
  */
 function nameThePage(page: Page, title: string): void {
-  document.title = `${title} — Marchpast`;
+  document.title = `${title} · Marchpast`;
   page.heading.textContent = title;
 }
 
