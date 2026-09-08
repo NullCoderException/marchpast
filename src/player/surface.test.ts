@@ -16,7 +16,7 @@
  * is because 1.05 fails it and 1.14 passes (ADR-0030).
  */
 import { describe, expect, it } from "vitest";
-import { CHART_PLATE, NIGHT_PLATE, VIEWS } from "../render/views.ts";
+import { ATLAS, CHART_PLATE, NIGHT_PLATE, STAFF_MAP, VIEWS } from "../render/views.ts";
 import { contrastRatio, luminance, over, ruleAlpha, surfaceOf } from "./surface.ts";
 
 /** What text has to clear, against anything it is set on. */
@@ -69,13 +69,14 @@ describe("what the surface takes from a view, and what it leaves", () => {
   });
 
   it("holds the three engraved rules at the 0.55 floor, which already clears 3:1", () => {
-    for (const view of VIEWS) expect(ruleAlpha(view.palette.ink, view.palette.paper)).toBe(0.55);
+    for (const view of [CHART_PLATE, NIGHT_PLATE, ATLAS]) expect(ruleAlpha(view.palette.ink, view.palette.paper)).toBe(0.55);
   });
 
   it("raises the rule's alpha by hundredths for a palette the floor does not carry", () => {
     // The staff map's, from #139: a flat 0.55 measures 2.91 and 0.57 measures 3.07 (ADR-0030).
-    expect(ruleAlpha("#2f3134", "#ded7c2")).toBe(0.57);
-    expect(contrastRatio(over("#2f3134", "#ded7c2", 0.55), "#ded7c2")).toBeLessThan(RULE);
+    const { ink, paper } = STAFF_MAP.palette;
+    expect(ruleAlpha(ink, paper)).toBe(0.57);
+    expect(contrastRatio(over(ink, paper, 0.55), paper)).toBeLessThan(RULE);
   });
 
   it("sets `color-scheme` from the paper's own luminance, never from the operating system (ADR-0029)", () => {

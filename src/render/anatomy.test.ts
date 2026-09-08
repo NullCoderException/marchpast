@@ -22,8 +22,8 @@
 import { describe, expect, it } from "vitest";
 import type { Battle, MapFile, Unit, UnitState } from "../schema/types.ts";
 import type { Picture, UnitPicture } from "../timeline/picture.ts";
-import { GLYPH_PX, leeDrift, MOVE_STYLES, sideColours, TYPE_ROLES } from "./anatomy.ts";
-import { layoutUnits } from "./drawUnits.ts";
+import { GLYPH_PX, leeDrift, MOVE_STYLES, sideColours, STATES, TYPE_ROLES } from "./anatomy.ts";
+import { drawUnits, layoutUnits } from "./drawUnits.ts";
 import { drawKeyRowSample } from "./key.ts";
 import { glyphBox, isForward, overlaps } from "./labels/geometry.ts";
 import { type LabelUnit, type Measure, NO_LABEL_MEMORY, placeLabels } from "./labels/index.ts";
@@ -287,6 +287,33 @@ describe.each(named)("%s keeps the anatomy", (_name, view) => {
     drawKeyRowSample(ctx, spied, { kind: "side", side: "British", colour: "#900" }, at);
     drawKeyRowSample(ctx, spied, { kind: "line", line: "intent" }, at);
     expect(drawn).toEqual(["glyph", "intent"]);
+  });
+
+  it("lays every engaged mark down before any body, or lays none and clears nothing", () => {
+    // The units pass runs `mark` for every unit and then `body` for every unit,
+    // because one unit's smoke must never cover the next unit's ships. A view
+    // whose engaged mark is drawn inside the glyph's own footprint has no mark
+    // half at all: its first loop runs empty, and it clears no ground for one
+    // (ADR-0021, #139).
+    const drawn: string[] = [];
+    const spied: View = {
+      ...view,
+      glyph: {
+        ...view.glyph,
+        mark: view.glyph.mark === undefined ? undefined : () => drawn.push("mark"),
+        body: () => drawn.push("body"),
+      },
+    };
+    const plate = plateFor(spied);
+    drawUnits(plate, layoutUnits(plate));
+    expect(drawn.filter((half) => half === "body")).toHaveLength(plate.unitsDrawn.length);
+
+    if (view.glyph.mark !== undefined) {
+      expect(drawn.lastIndexOf("mark")).toBeLessThan(drawn.indexOf("body"));
+      return;
+    }
+    expect(drawn).not.toContain("mark");
+    for (const state of STATES) expect(view.glyph.markReach(1, state)).toBe(0);
   });
 
   it("carries all three motion styles, tellable apart by a pen or by a hand", () => {

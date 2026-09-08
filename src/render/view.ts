@@ -41,7 +41,7 @@ import type { Projection, Rect } from "./projection.ts";
 import type { ScaleBarLength } from "./scaleBar.ts";
 
 /** The view's key: what player state holds and the View chooser sets. */
-export type ViewId = "plate" | "night" | "atlas";
+export type ViewId = "plate" | "night" | "atlas" | "staff";
 
 /** The unit whose card is open, and whether a click pinned it there or the pointer is merely resting on it (#60). */
 export interface CardTarget {
@@ -75,8 +75,16 @@ export interface Viewer {
 /** The materials a view is drawn in. */
 export interface Palette {
   ink: string;
-  /** The sea, the caption band, and the canvas ground. */
+  /** The caption band, the panels, and the paper a numeral or a river is knocked out of. */
   paper: string;
+  /**
+   * The sea inside the extent. The engraved views set it to their own paper,
+   * because an engraved chart's sea *is* the paper it is printed on; the staff
+   * map is the first view whose sea is a body of water with a colour of its
+   * own, which is why this is a value rather than a hand's reading of `paper`
+   * (#138, #175).
+   */
+  water: string;
   land: string;
   /** Outside the extent, so the plate's edge reads. */
   letterbox: string;
@@ -237,7 +245,12 @@ export type TypeRole = "clock" | "title" | "caption" | "unitName" | "stateWord" 
  */
 export type Voice = "name" | "fact";
 
-/** One run of type as a view sets it: what goes on the context, and how the words are spelled. */
+/**
+ * One run of type as a view sets it: what goes on the context, and how the
+ * words are spelled. `run.ts` sets and measures one, and every pass that uses
+ * a `Setting` goes through that pair, so a hand cannot measure what it will
+ * not draw (#175).
+ */
 export interface Setting {
   /** For `ctx.font`. */
   font: string;
@@ -247,6 +260,14 @@ export interface Setting {
   tracking: string;
   /** The words as this view spells them: the plate leaves them alone, a staff map capitalises a name. */
   spell(words: string): string;
+  /**
+   * How hard the run is laid, for `ctx.globalAlpha`; `undefined` is full
+   * strength, which is every engraved run. It is here rather than left to the
+   * pass because it is part of a view's ramp and not of the colour the anatomy
+   * gives a run: the staff map sets a fact at .85 of its ink under a name at
+   * full, which is the same distinction its case and its weight carry (#139).
+   */
+  alpha?: number;
 }
 
 /** What a leader is drawn between: the label that was placed, and the glyph it belongs to. */
@@ -272,11 +293,22 @@ export interface Type {
   /** How this view sets one of the eight fixed roles, at a layout mode. */
   role(role: TypeRole, mode: LayoutMode): Setting;
   /**
-   * The face at any size in one of the two voices: every run the picture sets
-   * that is not one of the eight roles — a band's date line, a place's name,
-   * a contour's numeral, a card's lines.
+   * A whole run of type at any size in one of the two voices: the label's two
+   * lines and the card's, which are the runs the picture sets that are not one
+   * of the eight roles.
+   *
+   * A `Setting` and not a face, because the **device** is the view's and only
+   * some of it is a font string: the engraved views slope a name, and the
+   * staff map sets one in tracked capitals, which is a `spell` and a
+   * `letterSpacing` (ADR-0021, #139). The label pass measures and draws through
+   * this one answer, so a view whose name is capitalised cannot measure it
+   * uncapitalised.
+   *
+   * The **size** is the anatomy's, not this ramp's: the label's box constants
+   * are shared by every view (`labels/content.ts`, ADR-0016), and a view sets
+   * its type to fill them.
    */
-  font(sizePx: number, voice: Voice): string;
+  run(sizePx: number, voice: Voice): Setting;
   /** The line from a placed label to its glyph: the plate's hairline and dot, the staff map's elbow and tick. */
   leader(ctx: CanvasRenderingContext2D, request: LeaderRequest): void;
   /**
@@ -343,6 +375,16 @@ export interface Ground {
    * drawings and not one under different values.
    */
   rampart(request: GroundRequest): void;
+  /**
+   * Whether this ground runs under the furniture's corners, so the shared half
+   * lays a piece its paper before anything is drawn there (#62).
+   *
+   * It was read off the plate's contours, which was the same question while
+   * every ground was contours and bare paper. The staff map's **graticule** runs
+   * over the whole extent at every scale, contours or none, so the proxy stopped
+   * being the question and the ground answers it itself (ADR-0021, #175).
+   */
+  underFurniture(contourLevels: readonly number[]): boolean;
   /** The mark a named point stands on, drawn at the origin: a place's dot, a work's plan sign. */
   mark(ctx: CanvasRenderingContext2D, kind: MapLabelKind, palette: Palette): void;
   /** How this view sets a named point's name. The placer measures with it and the pass draws with it, so the two cannot disagree. */

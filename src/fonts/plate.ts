@@ -1,8 +1,8 @@
 /**
  * The plate typeface: IM Fell English (Igino Marini, SIL Open Font License 1.1,
- * see OFL.txt beside the font). Bundled so the app works offline. Which faces
+ * see OFL-IMFellEnglish.txt beside the font). Bundled so the app works offline. Which faces
  * are fetched and when is `faces.ts`, which loads this one for every engraved
- * view (ADR-0021).
+ * view; the staff map sets its own (`staff.ts`, ADR-0021).
  */
 export const PLATE_FONT_FAMILY = "IM Fell English";
 

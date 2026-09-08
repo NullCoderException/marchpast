@@ -68,8 +68,9 @@ export const engravedType: Type = {
     return { font: font(size, italic), size, tracking: NO_TRACKING, spell: asWritten };
   },
 
-  font(sizePx: number, voice: Voice): string {
-    return font(sizePx, voice === "name");
+  /** The label's two lines and the card's: the size the anatomy fixes, sloped for a name and upright for a fact. */
+  run(sizePx: number, voice: Voice): Setting {
+    return { font: font(sizePx, voice === "name"), size: sizePx, tracking: NO_TRACKING, spell: asWritten };
   },
 
   /** A hairline from the label's near edge to the glyph's centre, ending on a dot there (#58). */

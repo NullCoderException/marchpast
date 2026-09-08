@@ -1,6 +1,7 @@
 /**
- * The one fact about a rampart that is arithmetic rather than ink: **which
- * side the teeth fall on**. ADR-0026 fixed it as the right of the direction
+ * The one fact about a rampart that is arithmetic rather than ink, and so the
+ * one part of `mapGeometry.ts` a test can hold: **which side the teeth fall
+ * on**. ADR-0026 fixed it as the right of the direction
  * the line is drawn in, because Alesia's lines are not closed rings and there
  * is no inside to derive it from — the author draws a rampart keeping the side
  * it faces on their right, and nothing in the format checks them (schema.md
@@ -12,8 +13,8 @@
  * the works faced.
  */
 import { describe, expect, it } from "vitest";
-import type { Point } from "../../primitives.ts";
-import { rampartTeeth } from "./rampart.ts";
+import { rampartTeeth } from "./mapGeometry.ts";
+import type { Point } from "./primitives.ts";
 
 /** A unit square in canvas coordinates (y down), given clockwise on the screen. */
 const CLOCKWISE: Point[] = [

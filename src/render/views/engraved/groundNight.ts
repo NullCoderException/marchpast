@@ -35,8 +35,9 @@ import type { LonLat } from "../../../schema/types.ts";
 import type { Point } from "../../primitives.ts";
 import { indexLevels, uphillOf, uphillToward } from "../../relief.ts";
 import type { GroundRequest, Palette } from "../../view.ts";
-import { CONTOUR_WIDTH, contourLinesOf, drawContourNumerals, INDEX_CONTOUR_WIDTH, isClosed, projectLine, type ReliefHand } from "./ground.ts";
-import { atAlpha } from "./ink.ts";
+import { contourLinesOf, isClosed, projectLine } from "../../mapGeometry.ts";
+import { CONTOUR_WIDTH, drawContourNumerals, INDEX_CONTOUR_WIDTH, type ReliefHand } from "./ground.ts";
+import { atAlpha } from "../../ink.ts";
 
 /** Where the light stands, in degrees true: low in the north-west, as Tanaka sets it. */
 const LIGHT_AZIMUTH = 315;
