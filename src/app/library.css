@@ -6,7 +6,12 @@
  * Library's own rather than a copy: since ADR-0023 the player's surface is
  * derived from whichever view is picked, and the Library has one look, the
  * brand's, following neither a view nor the operating system (ADR-0029). It
- * declares them over the root's, which a battle visit leaves set.
+ * declares them over the root's, which a battle visit leaves set. The one
+ * exception is a side's ink, which is set on the element by `libraryPage.ts`
+ * out of the view the still beside it is drawn in.
+ *
+ * Every number in the rail, the card and the two widths is the drawing's
+ * (#151, the `prototype/library-rail` canvas), ported rather than re-derived.
  */
 
 /*
@@ -31,20 +36,28 @@
   --st-parchment: #efe3c6;
   --st-rule: rgba(43, 36, 24, 0.55);
   --st-sunk: #e3d3ac;
+  --st-hair: rgba(43, 36, 24, 0.2);
+  --st-rail: rgba(43, 36, 24, 0.3);
+  --st-quiet: rgba(43, 36, 24, 0.72);
   font-family: "IM Fell English", Georgia, serif;
   color: var(--st-ink);
   background: var(--st-parchment);
 }
 
+/*
+ * 52rem, up from the 46rem that held text alone: 24 padding, a 48 gutter for
+ * the rail, a 288 still, a 24 gap and 424 of text — 58 characters of summary,
+ * inside the measure it already had.
+ */
 .st-library {
   box-sizing: border-box;
   width: 100%;
-  max-width: 46rem;
+  max-width: 52rem;
   margin: 0 auto;
   padding: 56px 24px 40px;
 }
 
-/* The plate's rule, in the one place the page needs a horizon. */
+/* The plate's rule, in the one place the page needs a horizon — and what the rail hangs from. */
 .st-library-head {
   padding-bottom: 16px;
   border-bottom: 3px double var(--st-rule);
@@ -102,12 +115,34 @@
   list-style: none;
 }
 
-.st-library-entry + .st-library-entry {
-  border-top: 1px solid rgba(43, 36, 24, 0.2);
+/*
+ * The gutter the rail runs down. There is no hairline between entries any
+ * more: it ran the full measure, so it would cross the rail, and with an
+ * interval line and a still edge already separating two entries a third
+ * separator is one too many. The hover ground still gives a card its extent.
+ */
+.st-library-entry {
+  padding-left: 48px;
+}
+
+/*
+ * The run between two battles: 13px italic one step quieter than the date,
+ * because it is a fact about the shelf rather than about a battle. The
+ * negative left margin puts it back on the rail at x 22 of the gutter, and the
+ * rail is broken for it — a break of one height whatever the number says,
+ * which is the whole of what makes an ordinal rail honest.
+ */
+.st-library-interval {
+  margin: 18px 0 18px -26px;
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.2;
+  color: var(--st-quiet);
 }
 
 /* The whole entry is the target: the summary is part of what is being chosen. */
 .st-library-link {
+  position: relative;
   display: block;
   padding: 20px 12px;
   margin: 0 -12px;
@@ -124,9 +159,69 @@
   outline-offset: 2px;
 }
 
+/*
+ * One line, 1px, ink at 30%. Single, never doubled: the page has one doubled
+ * rule and it is the masthead's horizon, which this hangs from. `left` is the
+ * rail's x 22 measured from the card, which bleeds 12px back into the gutter.
+ */
+.st-library-rail {
+  position: absolute;
+  left: -14px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--st-rail);
+}
+
+/* The rail stops dead at the last node: the library is not claiming there is more below. */
+.st-library-entry:last-child .st-library-rail {
+  bottom: auto;
+  height: 20px;
+}
+
+/*
+ * A bar 13 × 3 in full ink across the rail: short and thick against thin and
+ * pale, the mark's own tick on the mark's own rule. It sits level with the top
+ * edge of the still, which is the one line in the same place at both widths.
+ */
+.st-library-node {
+  position: absolute;
+  left: -20px;
+  top: 18.5px;
+  width: 13px;
+  height: 3px;
+  background: var(--st-ink);
+}
+
+.st-library-card {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/*
+ * A fixed box at ADR-0025's size, so a still that fails to load leaves the
+ * list's rhythm intact. 288 × 182 is the plate box at 760, which is the last
+ * height at which every extent the library holds is still height-fitted.
+ */
+.st-library-still {
+  display: block;
+  flex: none;
+  width: 288px;
+  height: 182px;
+  object-fit: cover;
+}
+
+/* The words beside the still, held to the flex track rather than to their own longest line. */
+.st-library-text {
+  display: block;
+  min-width: 0;
+}
+
 .st-library-title {
   display: block;
   font-size: 22px;
+  line-height: 1.2;
 }
 
 /* A date is an aside, as it is on the plate. */
@@ -135,6 +230,17 @@
   margin-top: 2px;
   font-size: 13px;
   font-style: italic;
+}
+
+/* Who fought, in the inks the still beside it draws them in; the ink itself is set on the side. */
+.st-library-sides {
+  display: block;
+  margin-top: 3px;
+  font-size: 13px;
+}
+
+.st-library-sides-rule {
+  color: var(--st-hair);
 }
 
 .st-library-summary {
@@ -150,7 +256,9 @@
   font-style: italic;
 }
 
+/* The credit line, which the rail stops well above. */
 .st-library-credit {
+  margin-top: 34px;
   padding-top: 20px;
   border-top: 1px solid var(--st-rule);
   font-size: 11px;
@@ -162,8 +270,9 @@
 }
 
 /* A phone: PHONE_MAX_WIDTH from src/render/layout.ts, the same threshold
-   the plate collapses at, copied rather than published (#86). The list is
-   one column at every width, so only its margins give. */
+   the plate collapses at, copied rather than published (#86). The card goes to
+   one column and the rail survives, narrower; the intervals are content and
+   carry the chronology whatever the line does. */
 @media (max-width: 560px) {
   .st-library {
     padding: 32px 16px 28px;
@@ -191,5 +300,42 @@
   /* The story line keeps its head and loses its tail: one line at 390. */
   .st-library-story-more {
     display: none;
+  }
+
+  /* Gutter 26, rail at x 12, node 9 × 2.5 — the same arithmetic against the phone's own card padding. */
+  .st-library-entry {
+    padding-left: 26px;
+  }
+
+  .st-library-interval {
+    margin: 14px 0 14px -14px;
+    font-size: 12px;
+  }
+
+  .st-library-rail {
+    left: -6px;
+  }
+
+  .st-library-entry:last-child .st-library-rail {
+    height: 16px;
+  }
+
+  .st-library-node {
+    left: -10px;
+    top: 14.75px;
+    width: 9px;
+    height: 2.5px;
+  }
+
+  /* The still above the text, so the title stays the first thing read after it. */
+  .st-library-card {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .st-library-still {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 288 / 182;
   }
 }
