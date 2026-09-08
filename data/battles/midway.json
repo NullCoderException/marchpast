@@ -344,7 +344,7 @@
         "force": "light"
       },
       "caption": "Two hundred and fifteen miles north-west of Midway, within a few miles of the 180th meridian, Nagumo turns his four carriers into the wind and sends a hundred and eight aircraft against the atoll under Tomonaga of the Hiryu. Two hundred miles to the east Spruance's two carriers and Fletcher's one are at the rendezvous the code-breakers bought them, unsighted and unsuspected. On Midway every serviceable aeroplane is warming up.",
-      "notes": "Clock: every time in this file is Midway local, Zone plus 12, the convention of CINCPAC's report and of the 1943 combat narrative. Two other clocks run through the sources and both are converted on the way in: the task-force and carrier action reports keep Zone plus 10, two hours ahead of Midway, and the Nagumo report keeps Tokyo time, plus 9, twenty-one hours ahead, so its 0130 on the 5th is 04:30 on 4 June here. That breaks the rule that a time is copied verbatim from the source that gives it, knowingly and in one direction only: the source's own reading stays in the reference beside it, and every phase says which of the three clocks its instant came off.\n\nTime: converted. The Nagumo report has the strike take off at 0130 Tokyo, which is 04:30. CINCPAC has Midway's own patrol planes away before dawn and the narrative has them off at 0415.\n\nPositions: the launch point is given as a latitude and longitude by no source and is derived twice over. From the patrol plane's 05:52 fix — bearing 320, distance 180 miles from Midway, course 135, speed 25 — the force was at 30.5 N 179.6 W then, and eighty-two minutes earlier, on the course the Nagumo report prescribes for the three and a half hours after the launch, about 30.9 N on the meridian. Back-plotted the other way from CruDiv 8's 09:30 position, bearing 137 and 96 miles from the take-off point, and from the 10:22 fix Enterprise logged, it comes to 30.9 N 180.2 W. The file authors 30.9 N, 180.0. Every longitude here is written in the frame the extent fixes, so 179.6 W is 180.4 and Midway is 182.63. The four carriers are set two miles apart about the force's own point, which is the square formation Kaga's air officer described and not a fix. TF 16 and TF 17 are at the 04:30 rendezvous Enterprise's report names, TF 17 ten miles north-east of TF 16 as its own report has it. CruDiv 7 is about four hundred miles west of Midway; no source tracks it through 4 June, and its run east is authored from where it was at dawn to where Tambor found it in the night.\n\nStrikes: the Midway strike is drawn aboard — at the force's own position, in file on the force's own heading — which is this file's picture of a strike that has not left yet or has come home, and it tweens out toward the atoll over the next two phases. Midway's own flights are not on the plate until the next phase, when the reports have them airborne.",
+      "notes": "Clock: every time in this file is Midway local, Zone plus 12, the convention of CINCPAC's report and of the 1943 combat narrative. Two other clocks run through the sources and both are converted on the way in: the task-force and carrier action reports keep Zone plus 10, two hours ahead of Midway, and the Nagumo report keeps Tokyo time, plus 9, twenty-one hours ahead, so its 0130 on the 5th is 04:30 on 4 June here. That breaks the rule that a time is copied verbatim from the source that gives it, knowingly and in one direction only: the source's own reading stays in the reference beside it, and every phase says which of the three clocks its instant came off.\n\nTime: converted. The Nagumo report has the strike take off at 0130 Tokyo, which is 04:30. CINCPAC has Midway's own patrol planes away before dawn and the narrative has them off at 0415.\n\nPositions: the launch point is given as a latitude and longitude by no source and is derived twice over. From the patrol plane's 05:52 fix — bearing 320, distance 180 miles from Midway, course 135, speed 25 — the force was at 30.5 N 179.6 W then, and eighty-two minutes earlier, on the course the Nagumo report prescribes for the three and a half hours after the launch, about 30.9 N on the meridian. Back-plotted the other way from CruDiv 8's 09:30 position, bearing 137 and 96 miles from the take-off point, and from the 10:22 fix Enterprise logged, it comes to 30.9 N 180.2 W. The file authors 30.9 N, 180.0. Every longitude here is written in the frame the extent fixes, so 179.6 W is 180.4 and Midway is 182.63. The four carriers are set two miles apart about the force's own point, which is the square formation Kaga's air officer described and not a fix. TF 16 and TF 17 are at the 04:30 rendezvous Enterprise's report names, TF 17 ten miles north-east of TF 16 as its own report has it. CruDiv 7 is about four hundred miles west of Midway; no source tracks it through 4 June, and its run east is authored from where it was at dawn to where Tambor found it in the night.\n\nStrikes: the Midway strike is drawn aboard — at the force's own position, in file on the force's own heading — which is this file's picture of a strike that has not left yet or has come home, and it tweens out toward the atoll over the next two phases. A carrier force turns to launch and to recover and turns back again, so headings here swing through more than a quarter circle between phases oftener than in any other battle in the library, and the player tweens each of them the short way round: that is a course reversal the sources record, never an authoring slip, and the phase whose caption names the turn is the one that carries it. Midway's own flights are not on the plate until the next phase, when the reports have them airborne.",
       "references": [
         {
           "source": "nagumo",
@@ -735,7 +735,7 @@
         "force": "light"
       },
       "caption": "Thirty miles out, fourteen of Midway's twenty-seven fighters meet a hundred aircraft and are cut to pieces; fifteen of them do not come back. The first bomb falls on the atoll at half past six and the bombing and strafing go on for a quarter of an hour, wrecking the power plant on Eastern Island and leaving the runways deliberately whole for the landing that is meant to follow.",
-      "notes": "Time: verbatim, Zone plus 12. The narrative has the first bomb at 0630 and CINCPAC at about 0633; the file takes 06:30. The Japanese account of the same minutes, converted, runs a quarter of an hour later — bombs on the installations between about 0345 and 0410 Tokyo, which is 06:45 to 07:10 — and that gap holds all morning wherever both sides timed one event. Where an American witness has a reading the file takes it; where only the Japanese side saw the thing happen, as with the launches and the sinkings, it takes the converted Tokyo reading.\n\nPositions: the Mobile Force is on its prescribed 135 at twenty-four knots between the 05:52 fix and the 07:55 one, and this position is interpolated between them. The strike is drawn over the atoll, a few miles north-west of it so that the two signs read apart; nothing places it more precisely than over Midway.\n\nStrikes: Midway's air group takes the interception as its own — state engaged, strength 0.44, the twelve fighters of twenty-seven that were neither lost nor badly shot up — and the atoll itself carries a coarser 0.75, an authored aggregate over the whole air group as the losses of the morning come in. Neither is a casualty count.",
+      "notes": "Time: verbatim, Zone plus 12. The narrative has the first bomb at 0630 and CINCPAC at about 0633; the file takes 06:30. The Japanese account of the same minutes, converted, runs a quarter of an hour later — bombs on the installations between about 0345 and 0410 Tokyo, which is 06:45 to 07:10 — and that gap holds all morning wherever both sides timed one event. Where an American witness has a reading the file takes it; where only the Japanese side saw the thing happen, as with the launches and the sinkings, it takes the converted Tokyo reading.\n\nPositions: the Mobile Force is laid on one track between the two fixes that hold the morning — the patrol plane's at 05:52 and the one Enterprise logged with the dive-bombing at 10:22 — and every position between them is authored on it. The track is not the prescribed 135 at twenty-four knots, because the two fixes are only forty-seven miles apart across four and a half hours: the force steamed hard and made little ground, turning to fly off and take on aircraft and, from eight o'clock, to dodge. No leg between two phases asks it for more than twenty-four knots, which is the speed its own signal order set. The strike is drawn over the atoll, a few miles north-west of it so that the two signs read apart; nothing places it more precisely than over Midway.\n\nStrikes: Midway's air group takes the interception as its own — state engaged, strength 0.44, the twelve fighters of twenty-seven that were neither lost nor badly shot up — and the atoll itself carries a coarser 0.75, an authored aggregate over the whole air group as the losses of the morning come in. Neither is a casualty count.",
       "references": [
         {
           "source": "combat-narrative",
@@ -768,8 +768,8 @@
         {
           "id": "mobile-force",
           "position": {
-            "lat": 30.3,
-            "lon": 180.7
+            "lat": 30.4,
+            "lon": 180.52
           },
           "heading": 135,
           "formation": "mass",
@@ -778,8 +778,8 @@
         {
           "id": "akagi",
           "position": {
-            "lat": 30.335,
-            "lon": 180.66
+            "lat": 30.435,
+            "lon": 180.48
           },
           "heading": 135,
           "formation": "mass",
@@ -788,8 +788,8 @@
         {
           "id": "kaga",
           "position": {
-            "lat": 30.265,
-            "lon": 180.66
+            "lat": 30.365,
+            "lon": 180.48
           },
           "heading": 135,
           "formation": "mass",
@@ -798,8 +798,8 @@
         {
           "id": "soryu",
           "position": {
-            "lat": 30.335,
-            "lon": 180.74
+            "lat": 30.435,
+            "lon": 180.56
           },
           "heading": 135,
           "formation": "mass",
@@ -808,8 +808,8 @@
         {
           "id": "hiryu",
           "position": {
-            "lat": 30.265,
-            "lon": 180.74
+            "lat": 30.365,
+            "lon": 180.56
           },
           "heading": 135,
           "formation": "mass",
@@ -994,8 +994,8 @@
         {
           "id": "mobile-force",
           "position": {
-            "lat": 30.2,
-            "lon": 180.8
+            "lat": 30.32,
+            "lon": 180.64
           },
           "heading": 135,
           "formation": "mass",
@@ -1004,8 +1004,8 @@
         {
           "id": "akagi",
           "position": {
-            "lat": 30.235,
-            "lon": 180.76
+            "lat": 30.355,
+            "lon": 180.6
           },
           "heading": 135,
           "formation": "mass",
@@ -1014,8 +1014,8 @@
         {
           "id": "kaga",
           "position": {
-            "lat": 30.165,
-            "lon": 180.76
+            "lat": 30.285,
+            "lon": 180.6
           },
           "heading": 135,
           "formation": "mass",
@@ -1024,8 +1024,8 @@
         {
           "id": "soryu",
           "position": {
-            "lat": 30.235,
-            "lon": 180.84
+            "lat": 30.355,
+            "lon": 180.68
           },
           "heading": 135,
           "formation": "mass",
@@ -1034,8 +1034,8 @@
         {
           "id": "hiryu",
           "position": {
-            "lat": 30.165,
-            "lon": 180.84
+            "lat": 30.285,
+            "lon": 180.68
           },
           "heading": 135,
           "formation": "mass",
@@ -1175,8 +1175,8 @@
         {
           "id": "midway-torpedo",
           "position": {
-            "lat": 30.15,
-            "lon": 180.85
+            "lat": 30.27,
+            "lon": 180.7
           },
           "heading": 320,
           "formation": "mass",
@@ -1215,7 +1215,7 @@
         "force": "light"
       },
       "caption": "Sixteen Marine dive bombers under Henderson glide-bomb a carrier and eight are shot down; the B-17s bomb from twenty thousand feet and the Vindicators go for a battleship, and none of them hit anything. At twenty past eight Tone's plane adds that the enemy is accompanied by what appears to be a carrier. Fletcher, his scouts back, launches Yorktown's group.",
-      "notes": "Time: verbatim, Zone plus 12. CINCPAC has Henderson's attack at 0755, the B-17s attacking from 0814, the Vindicators at about 0820 and Yorktown launching from 0830; the narrative has 0838 and Yorktown's own report has 1030 to 1050 Zone plus 10, which is 08:30 to 08:50. Tone's second report is 0520 Tokyo, which is 08:20.\n\nPositions: the Mobile Force is drawn under attack and turning, on the courses the Nagumo report logs through the morning — 115 degrees at 0628 Tokyo, 300 at 0638 — and about 30.0 N 179.0 W, interpolated between the fixes on either side of it. The two Midway flights are put at the target rather than at their own separate attack points; the plate cannot hold nineteen minutes apart at this scale, and the notes carry what the picture cannot.\n\nStrikes: fifteen units are drawn at the finer level here and at 09:00, the most the battle ever puts on the plate at once and one under the ceiling. Yorktown's group is aboard, in file on TF 17's heading, and launches inside the interval that follows. The B-17s are marked engaged at 07:55 although they bombed at 0814: the phase's picture holds until the next one, and the alternative is a phase for every bomb.",
+      "notes": "Time: verbatim, Zone plus 12. CINCPAC has Henderson's attack at 0755, the B-17s attacking from 0814, the Vindicators at about 0820 and Yorktown launching from 0830; the narrative has 0838 and Yorktown's own report has 1030 to 1050 Zone plus 10, which is 08:30 to 08:50. Tone's second report is 0520 Tokyo, which is 08:20.\n\nPositions: the Mobile Force is still on the 135 its signal order set, thirteen miles along the track from the last phase; the turns the Nagumo report logs — 115 degrees at 0628 Tokyo and 300 at 0638, which are 09:28 and 09:38 here — belong to the torpedo attacks two phases on, not to this one. The two Midway flights are put at the target rather than at their own separate attack points; the plate cannot hold nineteen minutes apart at this scale, and the notes carry what the picture cannot.\n\nStrikes: fifteen units are drawn at the finer level here and at 09:00, the most the battle ever puts on the plate at once and one under the ceiling. Yorktown's group is aboard, in file on TF 17's heading, and launches inside the interval that follows. The B-17s are marked engaged at 07:55 although they bombed at 0814: the phase's picture holds until the next one, and the alternative is a phase for every bomb.",
       "references": [
         {
           "source": "cincpac",
@@ -1247,50 +1247,50 @@
         {
           "id": "mobile-force",
           "position": {
-            "lat": 30,
-            "lon": 181
+            "lat": 30.18,
+            "lon": 180.82
           },
-          "heading": 115,
+          "heading": 135,
           "formation": "mass",
           "state": "engaged"
         },
         {
           "id": "akagi",
           "position": {
-            "lat": 30.035,
-            "lon": 180.96
+            "lat": 30.215,
+            "lon": 180.78
           },
-          "heading": 115,
+          "heading": 135,
           "formation": "mass",
           "state": "intact"
         },
         {
           "id": "kaga",
           "position": {
-            "lat": 29.965,
-            "lon": 180.96
+            "lat": 30.145,
+            "lon": 180.78
           },
-          "heading": 115,
+          "heading": 135,
           "formation": "mass",
           "state": "intact"
         },
         {
           "id": "soryu",
           "position": {
-            "lat": 30.035,
-            "lon": 181.04
+            "lat": 30.215,
+            "lon": 180.86
           },
-          "heading": 115,
+          "heading": 135,
           "formation": "mass",
           "state": "intact"
         },
         {
           "id": "hiryu",
           "position": {
-            "lat": 29.965,
-            "lon": 181.04
+            "lat": 30.145,
+            "lon": 180.86
           },
-          "heading": 115,
+          "heading": 135,
           "formation": "mass",
           "state": "intact"
         },
@@ -1420,8 +1420,8 @@
         {
           "id": "vmsb-241",
           "position": {
-            "lat": 29.9,
-            "lon": 181.08
+            "lat": 30.12,
+            "lon": 180.88
           },
           "heading": 320,
           "formation": "mass",
@@ -1431,8 +1431,8 @@
         {
           "id": "b-17s",
           "position": {
-            "lat": 29.95,
-            "lon": 181.2
+            "lat": 30.24,
+            "lon": 180.72
           },
           "heading": 320,
           "formation": "mass",
@@ -1450,7 +1450,7 @@
         "force": "light"
       },
       "caption": "Nagumo takes Tomonaga's aircraft aboard, decides to recover before he strikes, and turns north-east to destroy the American force in a daylight engagement. It is the decision the whole battle turns on, and it is made in the report's own words. Away to the east three American groups are in the air on three different courses: Hornet's turns south and finds nothing at all.",
-      "notes": "Time: converted. The Nagumo report has the strike back aboard by about 0600 Tokyo, which is 09:00, and the blinker ordering course 70 timed 0630 Tokyo, which is 09:30. CINCPAC, from the other side, has the striking force turning away sometime after 0830 Zone plus 12, which is why the American groups did not find it where they expected.\n\nPositions: 29.8 N 178.9 W, derived from the report's own statement that at 0630 Tokyo the force was bearing 137 and 96 miles from the take-off point on a northerly course at twenty-four knots. TF 16 and TF 17 are interpolated between the launch fix and the 10:22 one.\n\nStrikes: the Midway strike is recovered — back at the force's position, in file on its heading — and this is its last phase. Henderson's dive bombers and the B-17s are recovered at the atoll for the same reason: both attacked between 07:55 and 08:20 about a hundred and forty miles out, and at cruising speed both were over Midway by nine. The dive bombers come home broken at half strength; the B-17s come home whole, having hit nothing all battle. Hornet's group carries a detachment arrow toward Midway, where thirteen of its dive bombers landed after its fighters ran out of fuel and went into the sea.",
+      "notes": "Time: converted. The Nagumo report has the strike back aboard by about 0600 Tokyo, which is 09:00, and the blinker ordering course 70 timed 0630 Tokyo, which is 09:30. CINCPAC, from the other side, has the striking force turning away sometime after 0830 Zone plus 12, which is why the American groups did not find it where they expected.\n\nPositions: 29.85 N and 181.1, half an hour short of the one point the report fixes for itself that morning — bearing 137 and 96 miles from the take-off point at 0630 Tokyo, which is 09:30 here, on a northerly course at twenty-four knots. The force is drawn heading 70 while the last hour's ground was made to the south-east, which is right: it had been steaming down-wind to take its aircraft aboard and turned north-east as the last of them landed. TF 16 and TF 17 are interpolated between the launch fix and the 10:22 one.\n\nStrikes: the Midway strike is recovered — back at the force's position, in file on its heading — and this is its last phase. Henderson's dive bombers and the B-17s are recovered at the atoll for the same reason: both attacked between 07:55 and 08:20 about a hundred and forty miles out, and at cruising speed both were over Midway by nine. The dive bombers come home broken at half strength; the B-17s come home whole, having hit nothing all battle. Both are drawn on the course they came home on rather than on the atoll's own: the aboard rule lays a strike in file along its carrier's heading because a carrier has one, and an island does not. Hornet's group carries a detachment arrow toward Midway, where thirteen of its dive bombers landed after its fighters ran out of fuel and went into the sea.",
       "references": [
         {
           "source": "nagumo",
@@ -1484,7 +1484,7 @@
         {
           "id": "mobile-force",
           "position": {
-            "lat": 29.8,
+            "lat": 29.85,
             "lon": 181.1
           },
           "heading": 70,
@@ -1494,7 +1494,7 @@
         {
           "id": "akagi",
           "position": {
-            "lat": 29.835,
+            "lat": 29.885,
             "lon": 181.06
           },
           "heading": 70,
@@ -1504,7 +1504,7 @@
         {
           "id": "kaga",
           "position": {
-            "lat": 29.765,
+            "lat": 29.815,
             "lon": 181.06
           },
           "heading": 70,
@@ -1514,7 +1514,7 @@
         {
           "id": "soryu",
           "position": {
-            "lat": 29.835,
+            "lat": 29.885,
             "lon": 181.14
           },
           "heading": 70,
@@ -1524,7 +1524,7 @@
         {
           "id": "hiryu",
           "position": {
-            "lat": 29.765,
+            "lat": 29.815,
             "lon": 181.14
           },
           "heading": 70,
@@ -1534,7 +1534,7 @@
         {
           "id": "midway-strike",
           "position": {
-            "lat": 29.8,
+            "lat": 29.85,
             "lon": 181.1
           },
           "heading": 70,
@@ -1669,7 +1669,7 @@
             "lat": 28.21,
             "lon": 182.63
           },
-          "heading": 320,
+          "heading": 140,
           "formation": "column",
           "state": "broken",
           "strength": 0.5
@@ -1680,7 +1680,7 @@
             "lat": 28.21,
             "lon": 182.63
           },
-          "heading": 320,
+          "heading": 140,
           "formation": "column",
           "state": "engaged"
         }
@@ -1696,7 +1696,7 @@
         "force": "light"
       },
       "caption": "Waldron finds the enemy and takes Torpedo Eight straight in without fighters, without dive bombers and without hope. Fifteen aircraft attack; not one comes back. Enterprise's and Yorktown's torpedo squadrons follow over the next hour and are cut up in their turn, and the Japanese fighters are pulled down to the water where the dive bombers are about to come from.",
-      "notes": "Time: verbatim, Zone plus 12. CINCPAC puts Waldron's attack at about 0920 and Akagi's log, converted, sights fourteen torpedo planes at 0640 Tokyo, which is 09:40. That twenty-minute spread is the largest disagreement of the day: the American reading is an estimate made by men who watched from a distance, the Japanese one a ship's log. The file takes 09:20 and lets the phase's own interval carry the difference.\n\nPositions: the force is evasive here, on the 300 Akagi turned to when the torpedo planes were sighted bearing 118. The narrative has the ships on 270 at the moment of contact, turning to 000 and then to 180 as the aircraft came in, which is the same ship in the same quarter of an hour; nothing in the file tries to draw all three.\n\nStrikes: Torpedo Eight is drawn destroyed at strength 0 at 09:20, twenty minutes before the last of it went down, and this is its last phase. That is the file's reading of a squadron that ceased to exist inside one phase interval; its one survivor, who watched the rest of the battle from the water, is caption matter. Enterprise's and Yorktown's groups are still on their way in.",
+      "notes": "Time: verbatim, Zone plus 12. CINCPAC puts Waldron's attack at about 0920 and Akagi's log, converted, sights fourteen torpedo planes at 0640 Tokyo, which is 09:40. That twenty-minute spread is the largest disagreement of the day: the American reading is an estimate made by men who watched from a distance, the Japanese one a ship's log. The file takes 09:20 and lets the phase's own interval carry the difference.\n\nPositions: the force is evasive here and has made two miles of ground in twenty minutes, on the 300 Akagi turned to when the torpedo planes were sighted bearing 118 — 0638 Tokyo, which is 09:38. Torpedo Eight is drawn where Akagi's log put the aircraft it saw, bearing 140 from the force and coming in on the reciprocal. The narrative has the ships on 270 at the moment of contact, turning to 000 and then to 180 as the aircraft came in, which is the same ship in the same quarter of an hour; nothing in the file tries to draw all three.\n\nStrikes: Torpedo Eight is drawn destroyed at strength 0 at 09:20, twenty minutes before the last of it went down, and this is its last phase. That is the file's reading of a squadron that ceased to exist inside one phase interval; its one survivor, who watched the rest of the battle from the water, is caption matter. Enterprise's and Yorktown's groups are still on their way in.",
       "references": [
         {
           "source": "cincpac",
@@ -1729,8 +1729,8 @@
         {
           "id": "mobile-force",
           "position": {
-            "lat": 30,
-            "lon": 181.1
+            "lat": 29.91,
+            "lon": 181.12
           },
           "heading": 300,
           "formation": "mass",
@@ -1739,8 +1739,8 @@
         {
           "id": "akagi",
           "position": {
-            "lat": 30.035,
-            "lon": 181.06
+            "lat": 29.945,
+            "lon": 181.08
           },
           "heading": 300,
           "formation": "mass",
@@ -1749,8 +1749,8 @@
         {
           "id": "kaga",
           "position": {
-            "lat": 29.965,
-            "lon": 181.06
+            "lat": 29.875,
+            "lon": 181.08
           },
           "heading": 300,
           "formation": "mass",
@@ -1759,8 +1759,8 @@
         {
           "id": "soryu",
           "position": {
-            "lat": 30.035,
-            "lon": 181.14
+            "lat": 29.945,
+            "lon": 181.16
           },
           "heading": 300,
           "formation": "mass",
@@ -1769,8 +1769,8 @@
         {
           "id": "hiryu",
           "position": {
-            "lat": 29.965,
-            "lon": 181.14
+            "lat": 29.875,
+            "lon": 181.16
           },
           "heading": 300,
           "formation": "mass",
@@ -1819,8 +1819,8 @@
         {
           "id": "vt-8",
           "position": {
-            "lat": 29.97,
-            "lon": 181.18
+            "lat": 29.86,
+            "lon": 181.19
           },
           "heading": 320,
           "formation": "column",
@@ -3119,7 +3119,7 @@
         "force": "light"
       },
       "caption": "Soryu sinks at thirteen minutes past seven and Kaga twelve minutes later, both after fires reached their tanks. Yamamoto, believing the American carriers destroyed and retiring east, orders the fleet to overtake them and take Midway anyway; Nagumo signals back that the enemy still has four carriers and that his own are all out of action, and retires north-west at eighteen knots.",
-      "notes": "Time: converted. The Nagumo report has Soryu sink at 1613 and Kaga at 1625 Tokyo, which are 19:13 and 19:25. The phase is set on Soryu's minute and Kaga is drawn destroyed at it, twelve minutes early, because the two losses are one event on this clock and a phase apiece would be a phase for a quarter of an hour. Yamamoto's pursuit order was received at 1615 Tokyo, which is 19:15, and Nagumo's reply went at 1950, which is 22:50.\n\nPositions: both sinking positions are the report's own and are the best-attested points in the file — Kaga at 30-20.3 N 179-17.2 W and Soryu at 30-42.5 N 178-37.5 W, written 180.713 and 181.375 here. Twenty-four miles separate the two graves and forty separate Kaga's from Soryu's, which is what a day of drifting apart looks like. Kaga and Soryu leave the plate after this phase: a ship that has sunk is gone, and the file does not draw a wreck as a unit.\n\nStrikes: the afternoon strike is drawn coming home in the dark rather than aboard, which is where it was at 19:13; it landed at 2120 Zone plus 10, which is 21:20, inside the interval that follows, and is struck off at the next phase. Midway's dusk B-17s are on their way back too.",
+      "notes": "Time: converted. The Nagumo report has Soryu sink at 1613 and Kaga at 1625 Tokyo, which are 19:13 and 19:25. The phase is set on Soryu's minute and Kaga is drawn destroyed at it, twelve minutes early, because the two losses are one event on this clock and a phase apiece would be a phase for a quarter of an hour. Yamamoto's pursuit order was received at 1615 Tokyo, which is 19:15, and Nagumo's reply went at 1950, which is 22:50.\n\nPositions: both sinking positions are the report's own and are the best-attested points in the file — Kaga at 30-20.3 N 179-17.2 W and Soryu at 30-42.5 N 178-37.5 W, written 180.713 and 181.375 here. Forty-one miles separate the two graves, which is what a day of burning and drifting apart looks like. Kaga and Soryu leave the plate after this phase: a ship that has sunk is gone, and the file does not draw a wreck as a unit.\n\nStrikes: the afternoon strike is drawn coming home in the dark rather than aboard, which is where it was at 19:13; it landed at 2120 Zone plus 10, which is 21:20, inside the interval that follows, and is struck off at the next phase. Midway's dusk B-17s are on their way back too.",
       "references": [
         {
           "source": "nagumo",
@@ -3637,7 +3637,7 @@
         "force": "light"
       },
       "caption": "Spruance sends fifty-eight dive bombers two hundred and fifty miles north-west after a burning carrier that is no longer there, and they find only Tanikaze, who dodges everything they drop and shoots down one of them. The aircraft come back after dark and most of the pilots land on a carrier by night for the first time. Vireo has Yorktown under tow at two knots, heading east.",
-      "notes": "Time: verbatim, Zone plus 12. CINCPAC has the striking group away at 1500 to 1530; Enterprise logged 1700, the attack on the light cruiser at 2030 and the recovery at 2203, all Zone plus 10, which are 15:00, 18:30 and 20:03 here.\n\nPositions: TF 16 is at 30.1 N 175.7 W, written 184.3, which is where the target position and distance Enterprise gave its pilots put it — an objective at 32 N 179-32 W estimated two hundred and thirty miles off. The narrative's account of the same day, which has the force turning to 300 at eleven and crossing the 180th meridian shortly after sunset, cannot be reconciled with that distance, and the file follows the ship's own estimate. Nothing else fixes TF 16 on 5 June; the net effect of a night spent steaming east and a day spent searching west is that it ends near where it began, which is what the reports describe. The Mobile Force has joined the Main Body at 33 N 176-55 E and is drawn there; from the next phase it is west of the extent, refuelling toward 33 N 170 E, and the renderer clips it.\n\nStrikes: the pursuit is drawn as an intent arrow from TF 16 to the point where Enterprise's aircraft found Tanikaze, and not as a unit, for the reason the last phase gives: it launched, attacked and recovered inside one interval, and there is no second phase for it to be drawn to.",
+      "notes": "Time: verbatim, Zone plus 12. CINCPAC has the striking group away at 1500 to 1530; Enterprise logged 1700, the attack on the light cruiser at 2030 and the recovery at 2203, all Zone plus 10, which are 15:00, 18:30 and 20:03 here.\n\nPositions: TF 16 is at 30.1 N 175.7 W, written 184.3, which is where the target position and distance Enterprise gave its pilots put it — an objective at 32 N 179-32 W estimated two hundred and thirty miles off. The narrative's account of the same day, which has the force turning to 300 at eleven and crossing the 180th meridian shortly after sunset, cannot be reconciled with that distance, and the file follows the ship's own estimate. Nothing else fixes TF 16 on 5 June; the net effect of a night spent steaming east and a day spent searching west is that it ends near where it began, which is what the reports describe. The Mobile Force has joined the Main Body at 33 N 176-55 E and is drawn there at the Forces level; from the next phase it is west of the extent, refuelling toward 33 N 170 E, and the renderer clips it. At Ships and strikes there is nothing of it left to draw from this phase on, its four carriers being on the bottom and its battleships, cruisers and destroyers never having been rostered apart from it. That is the fine level's answer and not a gap in it: from the morning of the fifth Japan has no carrier on the plate, which is the whole of what happened.\n\nStrikes: the pursuit is drawn as an intent arrow from TF 16 to the objective the pilots were given — 32 N, 179-32 W, which Enterprise's own log puts about two hundred and thirty miles off — and not as a unit, for the reason the last phase gives: it launched, attacked and recovered inside one interval, and there is no second phase for it to be drawn to. The arrow is the order, not the outcome: what the aircraft actually found, three hundred miles further on, was the destroyer Tanikaze.",
       "references": [
         {
           "source": "cincpac",
@@ -3697,8 +3697,8 @@
             {
               "kind": "intent",
               "to": {
-                "lat": 33,
-                "lon": 177
+                "lat": 32,
+                "lon": 180.467
               }
             }
           ]

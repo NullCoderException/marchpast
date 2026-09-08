@@ -190,6 +190,18 @@ function carrying(phaseId: string, strikeId: string): UnitSnapshot | undefined {
   );
 }
 
+/** Nautical miles between two positions, near enough at this latitude for a speed check. */
+function milesBetween(from: { lat: number; lon: number }, to: { lat: number; lon: number }): number {
+  const dLat = (to.lat - from.lat) * 60;
+  const dLon = (to.lon - from.lon) * 60 * Math.cos((((from.lat + to.lat) / 2) * Math.PI) / 180);
+  return Math.hypot(dLat, dLon);
+}
+
+/** Minutes from midnight of the battle's first day: what a leg's duration is measured in. */
+function instant(p: Phase): number {
+  return (p.day ?? 0) * 1440 + Number(p.t.slice(0, 2)) * 60 + Number(p.t.slice(3));
+}
+
 /** The map's features of one kind, narrowed to that kind's geometry and properties. */
 function featuresOfKind<K extends MapFeature["properties"]["kind"]>(
   kind: K,
@@ -396,6 +408,55 @@ describe("data/battles/midway.json", () => {
     expect(phase("mikuma-sinks").notes).toMatch(/Mikuma's own grave is in no public-domain source/);
   });
 
+  it("never asks a ship for more than the twenty-four knots the sources give her", () => {
+    const ships = new Set(battle.units.filter((u) => u.arm === "ship").map((u) => u.id));
+    for (const [index, p] of battle.phases.entries()) {
+      const before = battle.phases[index - 1];
+      if (before === undefined) continue;
+      const hours = (instant(p) - instant(before)) / 60;
+      for (const snap of p.units) {
+        if (!ships.has(snap.id)) continue;
+        const was = before.units.find((candidate) => candidate.id === snap.id);
+        if (was === undefined) continue;
+        const knots = milesBetween(was.position, snap.position) / hours;
+        expect(knots, `${snap.id} into ${p.id}`).toBeLessThanOrEqual(24);
+      }
+    }
+  });
+
+  it("keeps the pursuit's arrow the length the pilots were given, not the length they flew", () => {
+    const spruance = present("pursuit-northwest", "tf16");
+    const arrow = spruance.moves?.find((move) => move.kind === "intent");
+    expect(arrow).toBeDefined();
+    // Enterprise's log estimated the objective 230 miles off; what the aircraft actually found was 400 further on.
+    const miles = milesBetween(spruance.position, arrow!.to);
+    expect(miles).toBeGreaterThan(200);
+    expect(miles).toBeLessThan(260);
+    expect(phase("pursuit-northwest").notes).toMatch(/The arrow is the order, not the outcome/);
+  });
+
+  it("lets the Mobile Force go off the fine level once its four carriers are down, and says so", () => {
+    const gone = phaseIndex("pursuit-northwest");
+    for (const [index, p] of battle.phases.entries()) {
+      const drawn = drawnAtLevel(battle.units, 1, p).map((u) => u.id);
+      const japanese = drawn.filter((id) => ["akagi", "kaga", "soryu", "hiryu"].includes(id));
+      // `unitsAtLevel` never draws a parent that has children, so the four carriers are the force's whole
+      // representation at this level; after the scuttling there is nothing of it left to draw (ADR-0024).
+      expect(drawn, p.id).not.toContain("mobile-force");
+      expect(japanese.length > 0, p.id).toBe(index < gone);
+    }
+    expect(phase("pursuit-northwest").notes).toMatch(/At Ships and strikes there is nothing of it left to draw/);
+    // The three forces that must stay visible there do have a permanent childless child or ship apiece.
+    for (const [force, standIn] of [
+      ["tf16", "enterprise"],
+      ["tf17", "yorktown"],
+      ["midway", "midway-air"],
+    ]) {
+      expect(run(standIn!), standIn).toEqual(battle.phases.map((p) => p.id));
+      expect(unit(standIn!).parent, standIn).toBe(force);
+    }
+  });
+
   it("carries the wind on every phase: light from the south-east, then moderate from the south-west", () => {
     for (const p of battle.phases) {
       const expected = (p.day ?? 0) >= 2 ? { from: 225, force: "moderate" } : { from: 135, force: "light" };
@@ -425,6 +486,8 @@ describe("data/battles/midway.json", () => {
     expect(first).toMatch(/Zone plus 10/);
     expect(first).toMatch(/Tokyo time, plus 9/);
     expect(first).toMatch(/breaks the rule that a time is copied verbatim/);
+    // And keys the course reversals, which a carrier battle has more of than any other kind (schema.md 2.13).
+    expect(first).toMatch(/more than a quarter circle/);
     // And every phase whose instant is converted names the source reading it was converted from.
     for (const p of battle.phases.filter((candidate) => /Time: converted/.test(candidate.notes))) {
       expect(p.references.some((reference) => /Tokyo|Zone plus 10/.test(reference.note ?? "")), p.id).toBe(true);
