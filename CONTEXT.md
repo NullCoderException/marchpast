@@ -147,8 +147,8 @@ _Avoid_: Arrow, order, action, track
 ### Narrative
 
 **Caption**:
-The narration text a phase shows, one plain string chosen by the author, holding until the next phase begins.
-_Avoid_: Narration, subtitle, alternate, label
+The narration text a phase shows, one plain string chosen by the author, holding until the next phase begins. Addressed to a viewer who has never seen this repository.
+_Avoid_: Narration, subtitle, alternate, label, ADR and schema references
 
 **Summary**:
 One plain sentence a battle carries to describe itself where the whole battle is named but not played, such as the library.
@@ -171,8 +171,8 @@ A phase's pointer into one source: a locator precise enough to find the passage,
 _Avoid_: Citation, footnote, source ref
 
 **Notes**:
-The author's per-phase account of what the phase rests on: which reading of a disputed time or place was chosen and why, which reading was declined and who argues it, and where a position was read from when no witness gave it. Carried by every phase, surfaced on demand, never animated.
-_Avoid_: Commentary, alternates, uncertainty, confidence
+The author's per-phase account of what the phase rests on: which reading of a disputed time or place was chosen and why, which reading was declined and who argues it, and where a position was read from when no witness gave it. Carried by every phase, surfaced on demand, never animated. Addressed to a viewer who has never seen this repository, so a modelling choice is stated in plain terms rather than by citing the decision that settled it: a strength is the percentage the unit card shows, not the fraction the file stores.
+_Avoid_: Commentary, alternates, uncertainty, confidence, ADR and schema references, "the file", "authored", raw strength fractions
 
 ### Player
 
