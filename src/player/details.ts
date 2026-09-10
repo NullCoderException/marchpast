@@ -146,10 +146,24 @@ function sampleCanvas(view: View, row: KeyRow, place: Parameters<typeof drawKeyR
   return canvas;
 }
 
+/**
+ * The notes as the paragraphs they were written in. The longer ones run to
+ * several, separated by a blank line, and one text node would run them
+ * together into a wall the reader has to pick apart.
+ */
+export function notesParagraphs(notes: string): string[] {
+  return notes
+    .split(/\n\s*\n/)
+    .map((paragraph) => paragraph.trim())
+    .filter((paragraph) => paragraph !== "");
+}
+
 /** The current phase: its label, its notes, and its references. */
 function phaseChildren(battle: Battle, picture: Picture): Node[] {
   const children: Node[] = [element("h2", "st-details-heading", picture.label)];
-  children.push(element("p", "st-details-notes", picture.notes));
+  for (const paragraph of notesParagraphs(picture.notes)) {
+    children.push(element("p", "st-details-notes", paragraph));
+  }
 
   const list = element("ul", "st-references");
   for (const reference of picture.references) list.append(referenceItem(battle, reference));

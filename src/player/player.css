@@ -290,6 +290,10 @@
   margin: 0;
 }
 
+.st-details-notes + .st-details-notes {
+  margin-top: 8px;
+}
+
 .st-references {
   margin: 0;
   padding-left: 18px;

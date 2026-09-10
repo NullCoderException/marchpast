@@ -7,7 +7,7 @@
 import { describe, expect, it } from "vitest";
 import type { Battle, MapFile } from "../schema/types.ts";
 import { keyRowLabel } from "../render/key.ts";
-import { plateKey } from "./details.ts";
+import { notesParagraphs, plateKey } from "./details.ts";
 
 /** A roster of ships, or of the arms named: the arm rows are all the roster is read for. */
 function battleOf(...arms: ("ship" | "infantry" | "cavalry")[]): Battle {
@@ -56,5 +56,27 @@ describe("the plate's key in the Details panel", () => {
 
   it("still carries its rows when there is no credit to carry", () => {
     expect(words(battleOf("ship"), undefined).length).toBeGreaterThan(0);
+  });
+});
+
+describe("the phase notes in the Details panel", () => {
+  it("gives every paragraph its own element, so the long ones do not run together", () => {
+    expect(notesParagraphs("Time: verbatim.\n\nPositions: the fix.\n\nStrikes: aboard.")).toEqual([
+      "Time: verbatim.",
+      "Positions: the fix.",
+      "Strikes: aboard.",
+    ]);
+  });
+
+  it("leaves a one-paragraph note as one paragraph", () => {
+    expect(notesParagraphs("Positions: the fix.")).toEqual(["Positions: the fix."]);
+  });
+
+  it("drops the blank runs rather than drawing an empty paragraph", () => {
+    expect(notesParagraphs("One.\n\n\n   \n\nTwo.\n\n")).toEqual(["One.", "Two."]);
+  });
+
+  it("keeps a single newline inside a paragraph, which is not a break", () => {
+    expect(notesParagraphs("One.\nStill one.")).toEqual(["One.\nStill one."]);
   });
 });
