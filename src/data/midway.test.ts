@@ -477,7 +477,7 @@ describe("data/battles/midway.json", () => {
 
   it("says in every phase's notes which clock its instant came off, and how the positions were got", () => {
     for (const p of battle.phases) {
-      expect(p.notes, p.id).toMatch(/Time: (verbatim|converted|authored)/);
+      expect(p.notes, p.id).toMatch(/Time: (verbatim|converted|estimated)/);
       expect(p.notes, p.id).toMatch(/Positions:/);
     }
     // The three clocks are keyed once, in the first phase, with the conversion each needs.
